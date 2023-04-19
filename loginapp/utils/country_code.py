@@ -300,3 +300,13 @@ COUNTRY_CODES = [
         "country_short": "VNM"
     }
 ]
+
+country_codes = []
+for data in COUNTRY_CODES:
+    country_code = data['country_code']
+    country_short = data['country_short']
+    data = [
+        f"+{country_code}",
+        f"{country_short}(+{country_code})"
+    ]
+    country_codes.append(data)
