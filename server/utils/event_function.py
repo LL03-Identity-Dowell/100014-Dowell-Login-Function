@@ -1,4 +1,4 @@
-from loginapp.utils.dowellconnection import dowellconnection
+from server.utils.dowellconnection import dowellconnection
 import datetime
 import requests
 import json

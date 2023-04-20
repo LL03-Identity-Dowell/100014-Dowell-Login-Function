@@ -33,4 +33,13 @@ class GuestAccount(models.Model):
         return self.username
 
     class Meta:
-        db_table="GuestAccount"
+        db_table = "GuestAccount"
+
+class mobile_sms(models.Model):
+    username = models.CharField(max_length=20,default="user")
+    phone = models.CharField(max_length=15,unique=True)
+    sms = models.IntegerField(null=True)
+    expiry = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.username
