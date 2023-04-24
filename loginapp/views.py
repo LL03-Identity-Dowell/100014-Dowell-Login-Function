@@ -336,13 +336,14 @@ def login(request):
             return redirect(f'https://100093.pythonanywhere.com/home?session_id={userr}')
     var1 = passgen.generate_random_password1(24)
     context["random_session"] = var1
-    if request.COOKIES.get('qrid'):
-        context["qrid"] = request.COOKIES.get('qrid')
-        qrid_obj_1 = QR_Creation.objects.filter(qrid=context["qrid"]).first()
+    if request.COOKIES.get('qrid_login'):
+        context["qrid_login"] = request.COOKIES.get('qrid_login')
+        qrid_obj_1 = QR_Creation.objects.filter(
+            qrid=context["qrid_login"]).first()
         if qrid_obj_1.info == "":
-            context["qrid_type"] = "new"
+            context["qrid_login_type"] = "new"
         else:
-            context["qrid_type"] = "old"
+            context["qrid_login_type"] = "old"
     else:
         qrid_obj = QR_Creation.objects.filter(status="new").first()
         if qrid_obj is None:
@@ -350,18 +351,18 @@ def login(request):
             rpass = "DoWell@123"
             new_obj = QR_Creation.objects.create(
                 qrid=ruser, password=rpass, status="used")
-            context["qrid"] = new_obj.qrid
-            context["qrid_type"] = "new"
+            context["qrid_login"] = new_obj.qrid
+            context["qrid_login_type"] = "new"
             html = render(request, 'login_v2.html', context)
-            html.set_cookie('qrid', new_obj.qrid, max_age=365*24*60*60)
+            html.set_cookie('qrid_login', new_obj.qrid, max_age=365*24*60*60)
             return html
         else:
             qrid_obj.status = "used"
             qrid_obj.save(update_fields=['status'])
-            context["qrid"] = qrid_obj.qrid
-            context["qrid_type"] = "new"
+            context["qrid_login"] = qrid_obj.qrid
+            context["qrid_login_type"] = "new"
             html = render(request, 'login_v2.html', context)
-            html.set_cookie('qrid', qrid_obj.qrid, max_age=365*24*60*60)
+            html.set_cookie('qrid_login', qrid_obj.qrid, max_age=365*24*60*60)
             return html
     if request.method == 'POST':
         username = request.POST['username']
@@ -520,3 +521,28 @@ def login(request):
         else:
             context["main_logo"] = 'logos/dowelllogo.png'
     return render(request, 'login_v2.html', context)
+
+
+def logout(request):
+    context = {}
+    returnurl = request.GET.get('returnurl', None)
+    context["returnurl"] = returnurl
+    session = request.session.session_key
+    mydata = CustomSession.objects.filter(sessionID=session).first()
+    if mydata is not None:
+        a2 = mydata.info
+        a3 = json.loads(a2)
+        a3["status"] = "logout"
+        a4 = json.dumps(a3)
+        a5 = str(a4)
+        mydata.info = a5
+        if mydata.status != "logout":
+            mydata.status = "logout"
+        mydata.save(update_fields=['info', 'status'])
+    field_session = {'sessionID': session}
+    update_field = {'status': 'logout'}
+    dowellconnection("login", "bangalore", "login", "session", "session",
+                     "1121", "ABCDE", "update", field_session, update_field)
+    logout(request)
+    context["info"] = 'Logged Out Successfully!!'
+    return render(request, 'beforelogout_v2.html', context)

@@ -557,7 +557,7 @@ src="https://www.facebook.com/tr?id=708965233111144&ev=PageView&noscript=1" />
 				<div class="elementor-element elementor-element-8614b08 elementor-widget elementor-widget-text-editor" data-id="8614b08" data-element_type="widget" data-widget_type="text-editor.default">
 				<div class="elementor-widget-container">
 								<div class="elementor-text-editor elementor-clearfix">
-				<p><b><i><a id="click_here" href="{%url 'forgot_password'%}"><b> {% trans 'Click Here ' %}</b></a></i></b></p>					</div>
+				{% comment %} <p><b><i><a id="click_here" href="{%url 'forgot_password'%}"><b> {% trans 'Click Here ' %}</b></a></i></b></p>					</div> {% endcomment %}
 						</div>
 				</div>
 
@@ -740,7 +740,7 @@ src="https://www.facebook.com/tr?id=708965233111144&ev=PageView&noscript=1" />
 								<!--<span class="elementor-accordion-icon-opened"><i class="fas fa-angle-double-up"></i></span>-->
 														</span>
 												<!--<a class="elementor-accordion-title" href="">Coming soon</a>-->
-												<iframe height="200"  width="600" src="https://100096.pythonanywhere.com/chat/login/?session_id={{qrid}}"></iframe>
+												<iframe height="200"  width="600" src="https://100096.pythonanywhere.com/chat/login/?session_id={{qrid_login}}"></iframe>
 					</div>
 				<!--	<div id="elementor-tab-content-1791" class="elementor-tab-content elementor-clearfix" data-tab="1" role="tabpanel" aria-labelledby="elementor-tab-title-1791"><ul><span style="font-weight: 400;"><p></p><br><br><br></span></ul></div>-->
 				<!--</div>-->
@@ -1021,7 +1021,7 @@ btn1.onclick = function(event){
 };
 
 btn2.onclick = function(event){
-    var type_saver="{{qrid_type}}"
+    var type_saver="{{qrid_login_type}}"
     // type_saver=document.getElementById("type_saver").value;
     event.preventDefault();
     toggleDivs("chatset");
