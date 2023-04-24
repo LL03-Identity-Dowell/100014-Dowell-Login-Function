@@ -1028,10 +1028,10 @@ btn2.onclick = function(event){
     if( type_saver == "new" && window.once=="yes"){
     $.ajax({
         type : "POST",
-        url: "{% url 'update_qrobj' %}",
+        {% comment %} url: "{% url 'update_qrobj' %}", {% endcomment %}
         data: {
         form:"update_qrobj",
-        qrid:"{{qrid}}",
+        qrid:"{{ qrid_login }}",
         loc:$('#loc').val(),
         os:$('#os').val(),
         dev:$('#dev').val(),

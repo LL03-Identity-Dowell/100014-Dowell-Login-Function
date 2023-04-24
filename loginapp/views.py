@@ -10,7 +10,10 @@ from geopy.geocoders import Nominatim
 # django
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse, JsonResponse
+from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -47,6 +50,26 @@ def country_city_name(latitude, longitude):
     city = address.get('city', '')
     country = address.get('country', '')
     return (country, city)
+
+
+def legal_policy(request):
+    policyurl = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
+    if is_ajax(request=request):
+        if request.POST.get('form') == "policyform":
+            user = request.POST.get('user', "User")
+            obj_check = RandomSession.objects.filter(username=user).first()
+            if obj_check is not None:
+                response = {'error': 'Username Already taken..', 'msg': ''}
+                return JsonResponse(response)
+            obj = RandomSession.objects.create(
+                sessionID=user, status="Accepted", username=user)
+            policy = request.POST.get('policy', None)
+            time = datetime.datetime.now()
+            data = {"data": [{"event_id": "FB1010000000167475042357408025", "session_id": user, "i_agree": "true",
+                              "log_datetime": time, "i_agreed_datetime": time, "legal_policy_type": "app-privacy-policy"}], "isSuccess": "true"}
+            rep = requests.post(policyurl, data=data)
+            response = {'msg': f'Accepted'}
+            return JsonResponse(response)
 
 
 @method_decorator(xframe_options_exempt, name='dispatch')
@@ -147,9 +170,9 @@ def register(request):
                 response = {}
                 return JsonResponse(response)
             else:
-                insertdata = GuestAccount(
+                guest_account = GuestAccount(
                     username=user, email=email_ajax, otp=otp_user)
-                insertdata.save()
+                guest_account.save()
                 url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
                 payload = json.dumps({
                     "toEmail": email_ajax,
@@ -166,7 +189,7 @@ def register(request):
                 return Response(response, status=status.HTTP_200_OK)
 
     if request.method == 'POST':
-        valid = request.POST.get('otp_status', None)
+        otp_status = request.POST.get('otp_status', None)
         main_params = request.POST.get('mainparams', None)
         _type = request.POST.get('type', None)
         otp = request.POST.get('otp')
@@ -196,7 +219,9 @@ def register(request):
             context["error"] = "Passwords Not Matching.."
             return render(request, "register_v2.html", context)
 
-        if valid is not None:
+        print("OTP status:", otp_status)
+
+        if otp_status is not None:
             try:
                 account = Account.objects.filter(email=email)
 
@@ -211,12 +236,12 @@ def register(request):
             return render(request, "register_v2.html", context)
         if name is not None:
             if img:
-                new_user = Account.objects.create(email=email, username=user,
-                                                  password=make_password(password1), first_name=first, last_name=last, phonecode=phonecode, phone=phone, profile_image=img)
+                account = Account.objects.create(email=email, username=user,
+                                                 password=make_password(password1), first_name=first, last_name=last, phonecode=phonecode, phone=phone, profile_image=img)
             else:
-                new_user = Account.objects.create(email=email, username=user,
-                                                  password=make_password(password1), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
-            profile_image = new_user.profile_image
+                account = Account.objects.create(email=email, username=user,
+                                                 password=make_password(password1), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
+            profile_image = account.profile_image
 
             # Mongodb document structure
             json_data = open('static/clientadmin.json')
@@ -546,3 +571,111 @@ def logout(request):
     logout(request)
     context["info"] = 'Logged Out Successfully!!'
     return render(request, 'beforelogout_v2.html', context)
+
+
+@login_required
+def qr_creation(request):
+    if request.user.is_superuser:
+        if request.method == "POST":
+            number = request.POST["user_number"]
+            if int(number) > 0:
+                for a in range(int(number)):
+                    ruser = passgen.generate_random_password1(24)
+                    rpass = "DoWell@123"
+                    user = QR_Creation.objects.create(
+                        qrid=ruser, password=rpass, status="new")
+                return render(request, 'create_users_v2.html', {'msg': f'Successfully {number} users Created'})
+            else:
+                return render(request, 'create_users_v2.html', {'msg': 'Provide number greater than 0'})
+        return render(request, 'create_users_v2.html')
+    else:
+        return HttpResponse("You don not have access to this page")
+
+
+def update_qrobj(request):
+    if is_ajax(request=request):
+        loc = request.POST.get("loc")
+        device = request.POST.get("dev")
+        osver = request.POST.get("os")
+        brow = request.POST.get("brow")
+        ltime = request.POST.get("time")
+        ipuser = request.POST.get("ip")
+        mobconn = request.POST.get("conn")
+        qrid = request.POST.get("qrid")
+        qrobj = QR_Creation.objects.filter(qrid=qrid).first()
+        qrobj.info = "Data Updated.."
+        qrobj.save(update_fields=["info"])
+        field = {"qrid": qrid, "OS": osver, "Device": device, "Browser": brow,
+                 "Location": loc, "Time": str(ltime), "Connection": mobconn, "IP": ipuser}
+        dowellconnection("login", "bangalore", "login", "qrcodes",
+                         "qrcodes", "1178", "ABCDE", "insert", field, "nil")
+        response = {'msg': f'Updated {qrid}'}
+        return JsonResponse(response)
+    return HttpResponse("You don not have access to this page")
+
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def forgot_password(request):
+    context = {}
+    otp_password = generateOTP()
+    if is_ajax(request=request):
+        if request.POST.get('form') == "otp_form":
+            user = request.POST.get('user', "User")
+            email_ajax = request.POST.get('email', None)
+            time = datetime.datetime.now()
+            user_obj = Account.objects.filter(email=email_ajax, username=user)
+            if user_obj.exists():
+                try:
+                    emailexist = GuestAccount.objects.get(email=email_ajax)
+                except GuestAccount.DoesNotExist:
+                    emailexist = None
+                if emailexist is not None:
+                    GuestAccount.objects.filter(email=email_ajax).update(
+                        otp=otp_password, expiry=time, username=user)
+                    htmlgen = f'Dear {user}, <br> Please Enter below <strong>OTP</strong> to change password of dowell account <br><h2>Your OTP is <strong>{otp_password}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+                    send_mail('Your OTP for changing password of Dowell account', otp_password, settings.EMAIL_HOST_USER, [
+                              email_ajax], fail_silently=False, html_message=htmlgen)
+                    response = {'msg': ''}
+                    return JsonResponse(response)
+                else:
+                    guest_account = GuestAccount(
+                        username=user, email=email_ajax, otp=otp_password)
+                    guest_account.save()
+
+                    htmlgen = f'Dear {user}, <br> Please Enter below <strong>OTP</strong> to change password of dowell account <br><h2>Your OTP is <strong>{otp_password}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+                    send_mail('Your OTP for changing password of Dowell account', otp_password, settings.EMAIL_HOST_USER, [
+                              email_ajax], fail_silently=False, html_message=htmlgen)
+                    response = {'msg': ''}
+                    return JsonResponse(response)
+            else:
+                response = {'msg': 'Username, Email combination is incorrect!'}
+                return JsonResponse(response)
+        else:
+            username = request.POST['user']
+            email = request.POST['email']
+            password2 = request.POST['password2']
+            otp = request.POST['otp']
+            try:
+                valid = GuestAccount.objects.get(otp=otp, email=email)
+            except GuestAccount.DoesNotExist:
+                valid = None
+            if valid is not None:
+                aa = Account.objects.filter(
+                    email=email, username=username).first()
+                aa.set_password(password2)
+                aa.save()
+                field = {'Username': username, 'Email': email}
+                check = dowellconnection("login", "bangalore", "login", "registration",
+                                         "registration", "10004545", "ABCDE", "fetch", field, "nil")
+                check_res = json.loads(check)
+                if len(check_res["data"]) >= 1:
+                    update_field = {'Password': dowell_hash(password2)}
+                    dowellconnection("login", "bangalore", "login", "registration",
+                                     "registration", "10004545", "ABCDE", "update", field, update_field)
+                response = {'msg': ''}
+                return JsonResponse(response)
+            else:
+                response = {'msg': 'Wrong OTP'}
+                return JsonResponse(response)
+    return render(request, 'forgot_password_v2.html', context)
