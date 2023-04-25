@@ -9,7 +9,7 @@ def get_profile_image_path(self, filename):
 
 
 def get_default_profile_image():
-    return 'user.png'
+    return 'profile_images/user.png'
 
 
 class Account(AbstractUser):
@@ -21,9 +21,6 @@ class Account(AbstractUser):
     phonecode = models.CharField(max_length=20, null=True)
     phone = models.CharField(max_length=20, null=True)
     current_task = models.CharField(max_length=200, null=True)
-
-    def __str__(self):
-        return self.teamcode
 
 
 class GuestAccount(models.Model):

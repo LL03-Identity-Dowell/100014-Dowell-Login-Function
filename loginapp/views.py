@@ -244,7 +244,7 @@ def register(request):
             profile_image = account.profile_image
 
             # Mongodb document structure
-            json_data = open('static/clientadmin.json')
+            json_data = open('loginapp/static/clientadmin.json')
             data = json.load(json_data)
             json_data.close()
 
