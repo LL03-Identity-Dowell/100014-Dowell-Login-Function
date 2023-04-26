@@ -9,4 +9,5 @@ urlpatterns = [
     path('update_qrobj/', views.update_qrobj, name="update_qrobj"),
     path('qr_creation/', views.qr_creation, name="qr_creation"),
     path('forgot_password/', views.forgot_password, name="forgot_password"),
+    path('legalpolicy1/', views.LegalP, name="legal_policy1"),
 ]

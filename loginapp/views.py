@@ -12,7 +12,7 @@ from django.shortcuts import render, redirect
 from django.http.response import HttpResponse, JsonResponse
 from django.conf import settings
 from django.core.mail import send_mail
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.utils.decorators import method_decorator
@@ -51,6 +51,14 @@ def country_city_name(latitude, longitude):
     country = address.get('country', '')
     return (country, city)
 
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def LegalP(request):
+    s=request.GET.get('s')
+    print(s)
+    # print(f"legal func: {s}")
+    obj=RandomSession.objects.create(sessionID=s,status="Accepted",username="none")
+    return render(request,"policy.html")
 
 def legal_policy(request):
     policyurl = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
@@ -434,7 +442,7 @@ def login(request):
         user = authenticate(request, username=username, password=password)
         print(user)
         if user is not None:
-            form = login(request, user)
+            form = auth_login(request, user)
             context["username"] = username
             context["user"] = user
             if user.role == "Admin":
@@ -568,8 +576,9 @@ def logout(request):
     update_field = {'status': 'logout'}
     dowellconnection("login", "bangalore", "login", "session", "session",
                      "1121", "ABCDE", "update", field_session, update_field)
-    logout(request)
+    auth_logout(request)
     context["info"] = 'Logged Out Successfully!!'
+    print(context["info"])
     return render(request, 'beforelogout_v2.html', context)
 
 
