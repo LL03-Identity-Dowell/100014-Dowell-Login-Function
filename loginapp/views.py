@@ -361,6 +361,7 @@ def login(request):
     city = ""
     userr = request.session.session_key
     if userr:
+        return HttpResponse(f"Logged in successfully, SessionID is = {userr}")
         if orgs:
             return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={userr}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
         elif redirect_url:
@@ -534,11 +535,14 @@ def login(request):
                 sessionID=session, info=infoo, document="", status="login")
 
             if org1 != "None":
+                return HttpResponse(f"Logged in successfully, SessionID is = {session}, mainparams = {main_params}")
                 return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{main_params}')
 
             if url == "None":
+                return HttpResponse(f"Logged in successfully, SessionID is = {session}")
                 return redirect(f'https://100093.pythonanywhere.com/home?session_id={session}')
             else:
+                return HttpResponse(f"Logged in successfully, SessionID is = {session}, url = {url}")
                 return HttpResponse(f"<script>window.location.replace('{url}?session_id={session}');</script>")
                 return redirect(f'{url}?session_id={session}')
         else:
@@ -578,7 +582,6 @@ def logout(request):
                      "1121", "ABCDE", "update", field_session, update_field)
     auth_logout(request)
     context["info"] = 'Logged Out Successfully!!'
-    print(context["info"])
     return render(request, 'beforelogout_v2.html', context)
 
 

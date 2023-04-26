@@ -22,6 +22,8 @@ class Account(AbstractUser):
     phone = models.CharField(max_length=20, null=True)
     current_task = models.CharField(max_length=200, null=True)
 
+    def __str__(self):
+        return self.username
 
 class GuestAccount(models.Model):
     username = models.CharField(max_length=20, unique=True)
