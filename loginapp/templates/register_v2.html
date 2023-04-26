@@ -561,57 +561,7 @@ body{--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: 
 							<input type="checkbox" name="newsletter" value="Accepted"><br>
 						</div>
 						<script>
-						    $("#policy_status").change(function(e){
-						      if (document.getElementById("username").value!=""){
-                              if(this.checked) {
-
-
-                              e.preventDefault();
-                            $.ajax({
-                                type : "POST",
-                                url: "/legalpolicy",
-                                data: {
-                                form:"policyform",
-                                user:$('#username').val(),
-                                csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),
-                                // csrfmiddlewaretoken: '{{ csrf_token }}',
-
-                                dataType: "json",
-                                },
-                                success: function(data){
-                                if (data.msg!=""){
-                                    $('#policy_output').css("color", "green");
-                                    $('#policy_output').html("");
-                                    $('#policy_output').html(data.msg);
-                                }else{
-                                    $("#policy_status").prop("checked", false);
-                                    $('#policy_output').css("color", "red");
-                                    $('#policy_output').html("");
-                                    $('#policy_output').html(data.error);
-                                }
-
-                                },
-
-                                failure: function() {
-                                $("#policy_status").prop("checked", false);
-                                $('#policy_output').css("color", "red");
-                                $('#policy_output').html("");
-                                $('#policy_output').html(data.msg);
-                                }});
-
-                              }
-						      }else{
-						        $("#policy_status").prop("checked", false);
-                                $('#policy_output').css("color", "red");
-                                $('#policy_output').html("Provide username to accept policy");
-						      };
-
-                          });
-						    function view_policy(){
-                                uname=document.getElementById("username").value;
-                                document.getElementById("for_policy").src="https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/?redirect_url=https://100014.pythonanywhere.com/legalpolicy1?s="+uname+"&session_id="+uname;
-                                document.getElementById("for_policy").style.display="block";
-						    };
+             
 						</script>
 						    <iframe id="for_policy" style="display:none;border-radius:4px; padding:3px;border: #0A8303 solid; margin-top:10px;margin-bottom:20px;border-width: thin;" loading="lazy" src="https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/" allow="fullscreen" width="900" height="200"></iframe>
 			            </div><br>
