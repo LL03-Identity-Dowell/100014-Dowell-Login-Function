@@ -11,16 +11,14 @@ from geopy.geocoders import Nominatim
 from django.shortcuts import render, redirect
 from django.http.response import HttpResponse, JsonResponse
 from django.conf import settings
+from django.template import RequestContext, Template
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.clickjacking import (
-    xframe_options_exempt, xframe_options_deny, xframe_options_sameorigin,
-)
-
+from django.views.decorators.clickjacking import xframe_options_exempt
 # rest_framework
 from rest_framework import status
 from rest_framework.response import Response
@@ -52,8 +50,8 @@ def country_city_name(latitude, longitude):
     return (country, city)
 
 
-def legal_policy(request):
-    policyurl = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
+def register_legal_policy(request):
+    policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
     if is_ajax(request=request):
         if request.POST.get('form') == "policyform":
             user = request.POST.get('user', "User")
@@ -61,15 +59,35 @@ def legal_policy(request):
             if obj_check is not None:
                 response = {'error': 'Username Already taken..', 'msg': ''}
                 return JsonResponse(response)
-            obj = RandomSession.objects.create(
+            RandomSession.objects.create(
                 sessionID=user, status="Accepted", username=user)
-            policy = request.POST.get('policy', None)
+            request.POST.get('policy', None)
             time = datetime.datetime.now()
-            data = {"data": [{"event_id": "FB1010000000167475042357408025", "session_id": user, "i_agree": "true",
-                              "log_datetime": time, "i_agreed_datetime": time, "legal_policy_type": "app-privacy-policy"}], "isSuccess": "true"}
-            rep = requests.post(policyurl, data=data)
+            data = {
+                "data": [
+                    {
+                        "event_id": "FB1010000000167475042357408025",
+                        "session_id": user,
+                        "i_agree": "true",
+                        "log_datetime": time,
+                        "i_agreed_datetime": time,
+                        "legal_policy_type": "app-privacy-policy"
+                    }
+                ],
+                "isSuccess": "true"
+            }
+            requests.post(policy_url, data=data)
             response = {'msg': f'Accepted'}
-            return JsonResponse(response)
+            return Response(response, status=status.HTTP_200_OK)
+
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def login_legal_policy(request):
+    session_id = request.GET.get('s')
+    obj = RandomSession.objects.create(
+        sessionID=session_id, status="Accepted", username="none")
+    return render(request, "policy.html")
 
 
 @method_decorator(xframe_options_exempt, name='dispatch')
@@ -108,7 +126,7 @@ def register(request):
             sms = generateOTP()
             code = request.POST.get("phonecode")
             phone = request.POST.get("phone")
-            full_number = code+phone
+            full_number = code + phone
             time = datetime.datetime.utcnow()
             try:
                 phone_exists = mobile_sms.objects.get(phone=full_number)
@@ -218,8 +236,6 @@ def register(request):
         if password1 != password2:
             context["error"] = "Passwords Not Matching.."
             return render(request, "register_v2.html", context)
-
-        print("OTP status:", otp_status)
 
         if otp_status is not None:
             try:
@@ -679,3 +695,58 @@ def forgot_password(request):
                 response = {'msg': 'Wrong OTP'}
                 return JsonResponse(response)
     return render(request, 'forgot_password_v2.html', context)
+
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def forgot_username(request):
+    context = {}
+    otp_username = generateOTP()
+    if is_ajax(request=request):
+        if request.POST.get('form') == "otp_form":
+            user = "user"
+            email_ajax = request.POST.get('email', None)
+            time = datetime.datetime.now()
+            obj = models.GuestAccount.objects.filter(email=email_ajax)
+            if obj.exists():
+                obj.update(otp=otp_username, expiry=time)
+                htmlgen1 = f'Dear {user}, <br> Please Enter below <strong>OTP</strong> to recover username of dowell account <br><h2>Your OTP is <strong>{otp_username}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+                send_mail('Your OTP to recover username of Dowell account', otp_username, settings.EMAIL_HOST_USER, [
+                          email_ajax], fail_silently=False, html_message=htmlgen1)
+                response = {'msg': ''}
+                return JsonResponse(response)
+            else:
+                response = {'msg': 'Email not found!!'}
+                return JsonResponse(response)
+        else:
+            email = request.POST['email']
+            otp = request.POST['otp']
+            try:
+                valid = GuestAccount.objects.get(otp=otp, email=email)
+            except GuestAccount.DoesNotExist:
+                valid = None
+            if valid is not None:
+                field = {'Email': email}
+                check = dowellconnection("login", "bangalore", "login", "registration",
+                                         "registration", "10004545", "ABCDE", "fetch", field, "nil")
+                check_res = json.loads(check)
+                list_unames = []
+                if len(check_res["data"]) >= 1:
+                    for data in check_res["data"]:
+                        if data["Username"] not in list_unames:
+                            list_unames.append(data["Username"])
+                    context = RequestContext(
+                        request, {"email": email, "list_unames": list_unames})
+                    htmlgen2 = 'Dear user, <br> The list of username associated with your email: <strong>{{email}}</strong> as dowell account are as follows: <br><h3>{% for a in list_unames %}<ul><li>{{a}}</li></ul>{%endfor%}</h3><br>You can proceed to login now!'
+                    template = Template(htmlgen2)
+                    send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
+                              email], fail_silently=False, html_message=template.render(context))
+                    response = {'msg': ''}
+                    return JsonResponse(response)
+                else:
+                    response = {'msg': 'Email Not found..'}
+                    return JsonResponse(response)
+            else:
+                response = {'msg': 'Wrong OTP'}
+                return JsonResponse(response)
+    return render(request, 'forgot_username.html', context)
