@@ -126,10 +126,12 @@ def register(request):
                 valid = GuestAccount.objects.get(otp=otp, email=email)
             except GuestAccount.DoesNotExist:
                 valid = None
+
             if valid:
-                return JsonResponse({'verified': 'True'})
+                return Response({'verified': 'True'}, status=status.HTTP_200_OK)
             else:
-                return JsonResponse({'verified': 'False'})
+                return Response({'verified': 'False'}, status=status.HTTP_200_OK)
+
         elif request.POST.get('form') == 'mobileotp':
             sms = generateOTP()
             code = request.POST.get("phonecode")
@@ -719,7 +721,7 @@ def forgot_username(request):
             user = "user"
             email_ajax = request.POST.get('email', None)
             time = datetime.datetime.now()
-            obj = models.GuestAccount.objects.filter(email=email_ajax)
+            obj = GuestAccount.objects.filter(email=email_ajax)
             if obj.exists():
                 obj.update(otp=otp_username, expiry=time)
                 htmlgen1 = f'Dear {user}, <br> Please Enter below <strong>OTP</strong> to recover username of dowell account <br><h2>Your OTP is <strong>{otp_username}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
