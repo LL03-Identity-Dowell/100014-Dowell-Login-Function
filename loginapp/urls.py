@@ -15,5 +15,6 @@ urlpatterns = [
 
     path('forgot_username', views.forgot_username, name="forgot_username"),
     path('forgot_password/', views.forgot_password, name="forgot_password"),
-    path('legalpolicy1/', views.LegalP, name="legal_policy1"),
+
+    path('link_based/', views.linked_based, name="link_based"),
 ]

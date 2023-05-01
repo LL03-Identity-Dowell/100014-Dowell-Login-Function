@@ -32,6 +32,7 @@ from server.utils.dowell_func import generateOTP, dowellclock, get_next_pro_id
 from server.utils.dowell_hash import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import passgen
+from server.utils import qrcodegen
 from server.utils.country_code import country_codes
 
 
@@ -49,14 +50,45 @@ def country_city_name(latitude, longitude):
     country = address.get('country', '')
     return (country, city)
 
+
+def get_html_msg(username, otp):
+    return f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to change password of dowell account <br><h2>Your OTP is <strong>{otp}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+
+
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
-def LegalP(request):
-    s=request.GET.get('s')
-    print(s)
-    # print(f"legal func: {s}")
-    obj=RandomSession.objects.create(sessionID=s,status="Accepted",username="none")
-    return render(request,"policy.html")
+def linked_based(request):
+    url = request.GET.get("redirect_url", None)
+    murl = request.GET.get("mobileapp", None)
+    mobileurl = f'intent://{murl}/_n/mainfeed/#Intent;package={murl};scheme=https;end'
+    user = request.GET.get("user", None)
+    context = {}
+    if request.method == 'POST':
+        loc = request.POST["loc"]
+        device = request.POST["dev"]
+        osver = request.POST["os"]
+        brow = request.POST["brow"]
+        ltime = request.POST["time"]
+        ipuser = request.POST["ip"]
+        mobconn = request.POST["conn"]
+        if user is None:
+            user = passgen.generate_random_password1(8)
+        field = {"Username": user, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
+            ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
+        resp = dowellconnection("login", "bangalore", "login", "login",
+                                "login", "6752828281", "ABCDE", "insert", field, "nil")
+        respj = json.loads(resp)
+        qrcodegen.qrgen1(
+            user, respj["inserted_id"], f"media/userqrcodes/{respj['inserted_id']}.png")
+        if murl is not None:
+            # return HttpResponse("<script>function lav(){alert(%s) };lav();</script>" % (murl))
+            return HttpResponse(f'<script>url={mobileurl};window.location.replace(url);</script>')
+
+        if url is not None:
+            return redirect(f'{url}?qrid={respj["inserted_id"]}')
+        return HttpResponse("pl provide redirect url")
+    return render(request, "link_based.html", context)
+
 
 def register_legal_policy(request):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
@@ -93,7 +125,7 @@ def register_legal_policy(request):
 @csrf_exempt
 def login_legal_policy(request):
     session_id = request.GET.get('s')
-    obj = RandomSession.objects.create(
+    RandomSession.objects.create(
         sessionID=session_id, status="Accepted", username="none")
     return render(request, "policy.html")
 
@@ -651,31 +683,32 @@ def forgot_password(request):
     otp_password = generateOTP()
     if is_ajax(request=request):
         if request.POST.get('form') == "otp_form":
-            user = request.POST.get('user', "User")
+            username = request.POST.get('user', "User")
             email_ajax = request.POST.get('email', None)
             time = datetime.datetime.now()
-            user_obj = Account.objects.filter(email=email_ajax, username=user)
-            if user_obj.exists():
-                try:
-                    emailexist = GuestAccount.objects.get(email=email_ajax)
-                except GuestAccount.DoesNotExist:
-                    emailexist = None
-                if emailexist is not None:
+            user_qs = Account.objects.filter(
+                email=email_ajax, username=username)
+            email_qs = GuestAccount.objects.filter(email=email_ajax)
+            if user_qs.exists():
+                if email_qs.exists():
                     GuestAccount.objects.filter(email=email_ajax).update(
-                        otp=otp_password, expiry=time, username=user)
-                    htmlgen = f'Dear {user}, <br> Please Enter below <strong>OTP</strong> to change password of dowell account <br><h2>Your OTP is <strong>{otp_password}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+                        otp=otp_password, expiry=time, username=username)
+
+                    html_gen = get_html_msg(username, otp_password)
+
                     send_mail('Your OTP for changing password of Dowell account', otp_password, settings.EMAIL_HOST_USER, [
-                              email_ajax], fail_silently=False, html_message=htmlgen)
+                              email_ajax], fail_silently=False, html_message=html_gen)
                     response = {'msg': ''}
+
                     return JsonResponse(response)
                 else:
                     guest_account = GuestAccount(
-                        username=user, email=email_ajax, otp=otp_password)
+                        username=username, email=email_ajax, otp=otp_password)
                     guest_account.save()
 
-                    htmlgen = f'Dear {user}, <br> Please Enter below <strong>OTP</strong> to change password of dowell account <br><h2>Your OTP is <strong>{otp_password}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+                    html_gen = get_html_msg(username, otp_password)
                     send_mail('Your OTP for changing password of Dowell account', otp_password, settings.EMAIL_HOST_USER, [
-                              email_ajax], fail_silently=False, html_message=htmlgen)
+                              email_ajax], fail_silently=False, html_message=html_gen)
                     response = {'msg': ''}
                     return JsonResponse(response)
             else:
