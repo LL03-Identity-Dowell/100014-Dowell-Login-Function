@@ -3,8 +3,9 @@ from loginapp import views
 
 urlpatterns = [
     path('register/', views.register, name="register"),
-    path('login/', views.login, name="login"),
+    path('', views.login, name="login"),
     path('logout/', views.logout, name="logout"),
+    path('sign-out',views.before_logout,name="before_logout"),
     path('register/legalpolicy/', views.register_legal_policy,
          name="register_legal_policy"),
     path('login/legalpolicy/', views.login_legal_policy,
@@ -17,4 +18,5 @@ urlpatterns = [
     path('forgot_password/', views.forgot_password, name="forgot_password"),
 
     path('link_based/', views.linked_based, name="link_based"),
+    path('check_status/',views.check_status, name="check_status")
 ]

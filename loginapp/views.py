@@ -44,8 +44,8 @@ def country_city_name(latitude, longitude):
     geolocator = Nominatim(user_agent="geoapiExercises")
     Latitudes = latitude
     Longitudes = longitude
-    rloc = geolocator.reverse(Latitudes+","+Longitudes)
-    address = rloc.raw['address']
+    loc = geolocator.reverse(Latitudes+","+Longitudes)
+    address = loc.raw['address']
     city = address.get('city', '')
     country = address.get('country', '')
     return (country, city)
@@ -160,9 +160,9 @@ def register(request):
                 valid = None
 
             if valid:
-                return Response({'verified': 'True'}, status=status.HTTP_200_OK)
+                return JsonResponse({'verified': 'True'}, status=status.HTTP_200_OK)
             else:
-                return Response({'verified': 'False'}, status=status.HTTP_200_OK)
+                return JsonResponse({'verified': 'False'}, status=status.HTTP_200_OK)
 
         elif request.POST.get('form') == 'mobileotp':
             sms = generateOTP()
@@ -383,14 +383,6 @@ def register(request):
 @csrf_exempt
 def login(request):
     context = {}
-    orgs = None
-    type1 = None
-    email1 = None
-    name1 = None
-    u_code = None
-    spec = None
-    code = None
-    detail = None
     try:
         orgs = request.GET.get('org', None)
         type1 = request.GET.get('type', None)
@@ -409,17 +401,17 @@ def login(request):
     redirect_url = request.GET.get('redirect_url', None)
     country = ""
     city = ""
-    userr = request.session.session_key
-    if userr:
-        return HttpResponse(f"Logged in successfully, SessionID is = {userr}")
+    saved_browser_session = request.session.session_key
+    if saved_browser_session:
+        return HttpResponse(f"Logged in successfully, SessionID is = {saved_browser_session}")
         if orgs:
-            return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={userr}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
+            return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
         elif redirect_url:
-            return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={userr}');</script>")
+            return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={saved_browser_session}');</script>")
         else:
-            return redirect(f'https://100093.pythonanywhere.com/home?session_id={userr}')
-    var1 = passgen.generate_random_password1(24)
-    context["random_session"] = var1
+            return redirect(f'https://100093.pythonanywhere.com/home?session_id={saved_browser_session}')
+    random_text = passgen.generate_random_password1(24)
+    context["random_session"] = random_text
     if request.COOKIES.get('qrid_login'):
         context["qrid_login"] = request.COOKIES.get('qrid_login')
         qrid_obj_1 = QR_Creation.objects.filter(
@@ -458,16 +450,16 @@ def login(request):
         except:
             pass
         random_session = request.POST.get('random_session', None)
-        random_session_obj1 = RandomSession.objects.filter(
+        random_session_ByUname = RandomSession.objects.filter(
             username=username).first()
-        if random_session_obj1 is None:
-            random_session_obj = RandomSession.objects.filter(
+        if random_session_ByUname is None:
+            random_session_BySession = RandomSession.objects.filter(
                 sessionID=random_session).first()
-            if random_session_obj is None:
+            if random_session_BySession is None:
                 context["error"] = "Please accept the terms in policy page!"
                 return render(request, 'login_v2.html', context)
-            random_session_obj.username = username
-            random_session_obj.save(update_fields=['username'])
+            random_session_BySession.username = username
+            random_session_BySession.save(update_fields=['username'])
         main_params = request.POST.get('mainparams', None)
         org1 = request.POST.get('org', None)
         type1 = request.POST.get('type', None)
@@ -491,7 +483,6 @@ def login(request):
         mobconn = request.POST["conn"]
 
         user = authenticate(request, username=username, password=password)
-        print(user)
         if user is not None:
             form = auth_login(request, user)
             context["username"] = username
@@ -524,6 +515,11 @@ def login(request):
             phone = None
             User_type = None
             payment_status = None
+            newsletter=None
+            user_country=None
+            privacy_policy=None
+            other_policy=None
+            profile_image="https://100014.pythonanywhere.com/media/user.png"
             client_admin_id = ""
             field = {"Username": username}
             id = dowellconnection("login", "bangalore", "login", "registration",
@@ -541,10 +537,18 @@ def login(request):
                 email = response["data"]['Email']
                 phone = response["data"]['Phone']
                 try:
+                    if response["data"]['Profile_Image'] =="https://100014.pythonanywhere.com/media/":
+                        profile_image="https://100014.pythonanywhere.com/media/user.png"
+                    else:
+                        profile_image=response["data"]['Profile_Image']
                     User_type = response["data"]['User_type']
                     client_admin_id = response["data"]['client_admin_id']
-                    user_id = response["data"]['profile_id']
+                    user_id = response["data"]['_id']
                     payment_status = response["data"]['payment_status']
+                    newsletter=response["data"]['newsletter_subscription']
+                    user_country=response["data"]['user_country']
+                    privacy_policy=response["data"]['Policy_status']
+                    other_policy=response["data"]['safety_security_policy']
                     role_res = response["data"]['Role']
                     company = response["data"]['company_id']
                     member = response["data"]['Memberof']
@@ -564,8 +568,8 @@ def login(request):
                 dowell_time = ''
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
-            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member, 'status': 'login',
-                             'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'userdevice': device, 'userbrowser': brow, 'UserID': user_id, 'login_eventID': event_id, "redirect_url": redirect_url, "client_admin_id": client_admin_id, "payment_status": payment_status}
+            field_session={'sessionID':session,'role':role_res,'username':username,'Email':email,'profile_img':profile_image,'Phone':phone,"User_type":User_type,'language':language,'city':city,'country':country,'org':org,'company_id':company,'project':project,'subproject':subproject,'dept':dept,'Memberof':member,'status':'login','dowell_time':dowell_time,'timezone':zone,
+                           'regional_time':final_ltime,'server_time':serverclock,'userIP':ipuser,'userOS':osver,'userdevice':device,'userbrowser':brow,'UserID':user_id,'login_eventID':event_id,"redirect_url":redirect_url,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
 
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
@@ -576,17 +580,23 @@ def login(request):
             except:
                 pass
 
-            info = {"role": role_res, "username": username, "email": email, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone, "regional_time": final_ltime,
-                    "server_time": serverclock, "userIP": ipuser, "userOS": osver, "userDevice": device, "userBrowser": brow, "language": language, "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id, "payment_status": payment_status}
+            info={"role":role_res,"username":username,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,
+                  "userOS":osver,"userDevice":device,"userBrowser":brow,"language":language,"userID":user_id,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
 
             info1 = json.dumps(info)
             infoo = str(info1)
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
 
-            if org1 != "None":
-                return HttpResponse(f"Logged in successfully, SessionID is = {session}, mainparams = {main_params}")
-                return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{main_params}')
+            if "org" in main_params:
+                return HttpResponse(f"Logged in successfully, SessionID is = {session}")
+                if url=="https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" and "portfolio" in main_params and "product" in main_params:
+                    return redirect(f'https://100093.pythonanywhere.com/exportfolio?session_id={session}&{main_params}')
+                elif "linktype=common" in main_params:
+                    return redirect(f'https://100093.pythonanywhere.com/commoninvitelink?session_id={session}&{main_params}')
+                else:
+                    return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{main_params}')
+
 
             if url == "None":
                 return HttpResponse(f"Logged in successfully, SessionID is = {session}")
@@ -609,6 +619,11 @@ def login(request):
             context["main_logo"] = 'logos/dowelllogo.png'
     return render(request, 'login_v2.html', context)
 
+def before_logout(request):
+    context={}
+    returnurl=request.GET.get('returnurl',None)
+    context["returnurl"]=returnurl
+    return render(request, 'beforelogout_v2.html',context)
 
 def logout(request):
     context = {}
@@ -617,12 +632,12 @@ def logout(request):
     session = request.session.session_key
     mydata = CustomSession.objects.filter(sessionID=session).first()
     if mydata is not None:
-        a2 = mydata.info
-        a3 = json.loads(a2)
-        a3["status"] = "logout"
-        a4 = json.dumps(a3)
-        a5 = str(a4)
-        mydata.info = a5
+        info = mydata.info
+        loaded_info = json.loads(info)
+        loaded_info["status"] = "logout"
+        dumped_info = json.dumps(loaded_info)
+        string_info = str(dumped_info)
+        mydata.info = string_info
         if mydata.status != "logout":
             mydata.status = "logout"
         mydata.save(update_fields=['info', 'status'])
@@ -651,7 +666,7 @@ def qr_creation(request):
                 return render(request, 'create_users_v2.html', {'msg': 'Provide number greater than 0'})
         return render(request, 'create_users_v2.html')
     else:
-        return HttpResponse("You don not have access to this page")
+        return HttpResponse("You do not have access to this page")
 
 
 def update_qrobj(request):
@@ -673,7 +688,7 @@ def update_qrobj(request):
                          "qrcodes", "1178", "ABCDE", "insert", field, "nil")
         response = {'msg': f'Updated {qrid}'}
         return JsonResponse(response)
-    return HttpResponse("You don not have access to this page")
+    return HttpResponse("You do not have access to this page")
 
 
 @method_decorator(xframe_options_exempt, name='dispatch')
@@ -724,10 +739,10 @@ def forgot_password(request):
             except GuestAccount.DoesNotExist:
                 valid = None
             if valid is not None:
-                aa = Account.objects.filter(
+                obj = Account.objects.filter(
                     email=email, username=username).first()
-                aa.set_password(password2)
-                aa.save()
+                obj.set_password(password2)
+                obj.save()
                 field = {'Username': username, 'Email': email}
                 check = dowellconnection("login", "bangalore", "login", "registration",
                                          "registration", "10004545", "ABCDE", "fetch", field, "nil")
@@ -797,3 +812,13 @@ def forgot_username(request):
                 response = {'msg': 'Wrong OTP'}
                 return JsonResponse(response)
     return render(request, 'forgot_username.html', context)
+
+@method_decorator(xframe_options_exempt,name='dispatch')
+@csrf_exempt
+def check_status(request):
+    username=request.GET.get('username')
+    if username is not None:
+        obj=Account.objects.filter(username=username).first()
+        status=obj.current_task
+        return render(request,'check_status.html',{'status':status})
+    return render(request,'check_status.html')

@@ -74,13 +74,6 @@ def MobileLogin(request):
         response = json.loads(id)
         if response["data"] != None:
             form = login(request, user)
-            # try:
-            #     if request.session.session_key:
-            #         print("OK")
-            #         resp={'session_id':request.session.session_key}
-            #         return Response(resp)
-            # except:
-            #     pass
             request.session.save()
             session = request.session.session_key
             obj = CustomSession.objects.filter(sessionID=session)
@@ -93,14 +86,19 @@ def MobileLogin(request):
                 event_id = res['event_id']
             except:
                 event_id = None
+            profile_image="https://100014.pythonanywhere.com/media/user.png"
             first_name = response["data"]['Firstname']
             last_name = response["data"]['Lastname']
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
+                if response["data"]['Profile_Image'] =="https://100014.pythonanywhere.com/media/":
+                    profile_image="https://100014.pythonanywhere.com/media/user.png"
+                else:
+                    profile_image=response["data"]['Profile_Image']
                 User_type = response["data"]['User_type']
                 client_admin_id = response["data"]['client_admin_id']
-                user_id = response["data"]['profile_id']
+                user_id = response["data"]['_id']
                 role_res = response["data"]['Role']
                 company = response["data"]['company_id']
                 member = response["data"]['Memberof']
@@ -119,12 +117,12 @@ def MobileLogin(request):
                 dowell_time = ''
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
-            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
+            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email,"profile_img":profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
                              'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': user_id, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info = {"role": role_res, "username": username, "email": email, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
+            info = {"role": role_res, "username": username, "email": email,"profile_img":profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
                     "regional_time": final_ltime, "server_time": serverclock, "userIP": ipuser, "browser": browser, "userOS": osver, "userDevice": device, "userBrowser": "", "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id}
             info1 = json.dumps(info)
             infoo = str(info1)
@@ -164,51 +162,8 @@ def MobileLogout(request):
     logout(request)
     return Response({'msg': 'Logged out Successfully..'})
 
-
-class LoginView(APIView):
-    def post(self, request):
-        user1 = request.data['username']
-        username = ""
-        password = request.data['password']
-        field = {"Username": user1}
-        usr = dowellconnection("login", "bangalore", "login", "registration",
-                               "registration", "10004545", "ABCDE", "fetch", field, "nil")
-        r = json.loads(usr)
-        if len(r["data"]) < 1:
-            response = Response()
-            response.data = {'msg': "Username or password wrong"}
-            return response
-        for i in r["data"]:
-            username = i["Username"]
-            # i["id"] = i.pop("_id")
-            # usr_obj = namedtuple("Users", i.keys())(*i.values())
-        if user1 == username:
-            user = Account.objects.filter(username=user1).first()
-            if user is None:
-                raise AuthenticationFailed(
-                    "Username not Found or password not found")
-            if not user.check_password(password):
-                raise AuthenticationFailed("Incorrect password")
-            payload = {
-                'id': user.username,
-                'exp': datetime.datetime.utcnow()+datetime.timedelta(minutes=60),
-                'iat': datetime.datetime.utcnow()
-            }
-            token = jwt.encode(payload, 'dowell_secret',
-                               algorithm='HS256').decode('utf-8')
-            response = Response()
-            response.set_cookie(key="jwt", value=token)
-            response.data = {
-                'jwt': token
-            }
-            return response
-
-
 @api_view(['GET', 'POST'])
 def LinkBased(request):
-    # url=request.GET.get("url",None)
-    # user=request.GET.get("user",None)
-    # context={}
     if request.method == 'POST':
         user = request.data["Username"]
         loc = request.data["Location"]
@@ -230,62 +185,6 @@ def LinkBased(request):
         #     return redirect(f'{url}?qrid={respj["inserted_id"]}')
         # return HttpResponse("pl provide redirect url")
     return Response({"message": "its working"})
-
-
-@api_view(["POST"])
-def Registration(request):
-    user = request.data["Username"]
-    # return Response(user)
-    image = request.data["Profile_Image"]
-    password = request.data["Password"]
-    first = request.data["Firstname"]
-    last = request.data["Lastname"]
-    email = request.data["Email"]
-    role = "User"
-    ccode = request.data["Team_Code"]
-    phonecode = request.data["phonecode"]
-    phone = request.data["Phone"]
-
-    field_user = {'Username': user}
-    check_username = dowellconnection("login", "bangalore", "login", "registration",
-                                      "registration", "10004545", "ABCDE", "fetch", field_user, "nil")
-    check_response_username = json.loads(check_username)
-
-    if len(check_response_username['data']) > 0:
-        return Response({'message': "Username already taken"})
-
-    field1 = {}
-    id = dowellconnection("login", "bangalore", "login", "registration",
-                          "registration", "10004545", "ABCDE", "fetch", field1, "nil")
-    idd = json.loads(id)
-    res_list = idd["data"]
-    profile_id = get_next_pro_id(res_list)
-
-    company_field = {'owner': user, 'company': user, 'members': [
-    ], 'layer1': 0, 'layer2': 1, 'layer3': 1, 'layer4': 1, 'layer5': 1, 'layer6': 1}
-    company_res = dowellconnection("login", "bangalore", "login", "company",
-                                   "company", "1083", "ABCDE", "insert", company_field, "nil")
-    company_r = json.loads(company_res)
-
-    company_id = company_r['inserted_id']
-    org_id = []
-    project_id = []
-    subproject_id = []
-    dept_id = []
-    Memberof = {}
-
-    field = {"Username": user, "Password": dowell_hash.dowell_hash(password), "Profile_Image": image, "Firstname": first, "Lastname": last, "Email": email, "Role": role, "Team_Code": ccode, "phonecode": phonecode,
-             "Phone": phone, "profile_id": profile_id, 'org_id': org_id, 'company_id': company_id, 'project_id': project_id, 'subproject_id': subproject_id, 'dept_id': dept_id, 'Memberof': Memberof}
-    id = dowellconnection("login", "bangalore", "login", "registration",
-                          "registration", "10004545", "ABCDE", "insert", field, "nil")
-    idd = json.loads(id)
-    inserted_id = idd['inserted_id']
-
-    return Response({
-        'message': f"{user}, registration success",
-        'inserted_id': f"{inserted_id}"
-    })
-
 
 @api_view(['GET', 'POST'])
 def new_userinfo(request):
@@ -366,7 +265,6 @@ def all_users(request):
     if request.method == 'POST':
         username = request.data["username"]
         password1 = request.data["password"]
-        # password=base64.b64decode(password1.encode('utf-8')).decode()
         user = authenticate(request, username=username, password=password1)
         if user is not None:
             userfield = {}
@@ -470,7 +368,6 @@ def profile_update(request):
     Lastname = request.data.get("last_name")
     Email = request.data.get("email")
     Phone = request.data.get("phone")
-    # User_type=request.data.get("user_type")
     Profile_Image = request.data.get("image")
     obj = Account.objects.filter(username=username).first()
     field = {"document_name": username}
@@ -509,24 +406,18 @@ def profile_update(request):
         up_field["Firstname"] = Firstname
         update_data1 = {"first_name": Firstname}
         data1["profile_info"].update(update_data1)
-        # update_data2={"first_name":Firstname}
-        # data1["members"]["team_members"]["accept_members"][0].update(update_data2)
     if Lastname is not None:
         obj.last_name = Lastname
         update_fields.append("last_name")
         up_field["Lastname"] = Lastname
         update_data1 = {"last_name": Lastname}
         data1["profile_info"].update(update_data1)
-        # update_data2={"last_name":Lastname}
-        # data1["members"]["team_members"]["accept_members"][0].update(update_data2)
     if Email is not None:
         obj.email = Email
         update_fields.append("email")
         up_field["Email"] = Email
         update_data1 = {"email": Email}
         data1["profile_info"].update(update_data1)
-        # update_data2={"email":Email}
-        # data1["members"]["team_members"]["accept_members"][0].update(update_data2)
     if Phone is not None:
         obj.phone = Phone
         update_fields.append("phone")
@@ -571,7 +462,6 @@ def profile_view(request):
     username = request.data.get("username")
     password = request.data.get("password")
     obj = "OK"
-    # obj=authenticate(request, username = username, password = password)
     if obj is not None:
         resp = dowellconnection("login", "bangalore", "login", "registration",
                                 "registration", "10004545", "ABCDE", "find", {"Username": username}, "nil")
