@@ -118,7 +118,7 @@ def register_legal_policy(request):
             }
             requests.post(policy_url, data=data)
             response = {'msg': f'Accepted'}
-            return Response(response, status=status.HTTP_200_OK)
+            return JsonResponse(response, status=status.HTTP_200_OK)
 
 
 @method_decorator(xframe_options_exempt, name='dispatch')
@@ -246,7 +246,7 @@ def register(request):
                 requests.request("POST", url, headers=headers, data=payload)
 
                 response = {}
-                return Response(response, status=status.HTTP_200_OK)
+                return JsonResponse(response, status=status.HTTP_200_OK)
 
     if request.method == 'POST':
         otp_status = request.POST.get('otp_status', None)
