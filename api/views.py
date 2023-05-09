@@ -18,8 +18,9 @@ from rest_framework.exceptions import AuthenticationFailed
 
 from dateutil import parser
 from PIL import Image
+
 from loginapp.views import country_city_name
-from loginapp.models import CustomSession, Account
+from loginapp.models import CustomSession, Account, LiveStatus
 
 from server.utils.dowell_func import dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -86,16 +87,16 @@ def MobileLogin(request):
                 event_id = res['event_id']
             except:
                 event_id = None
-            profile_image="https://100014.pythonanywhere.com/media/user.png"
+            profile_image = "https://100014.pythonanywhere.com/media/user.png"
             first_name = response["data"]['Firstname']
             last_name = response["data"]['Lastname']
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
-                if response["data"]['Profile_Image'] =="https://100014.pythonanywhere.com/media/":
-                    profile_image="https://100014.pythonanywhere.com/media/user.png"
+                if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
+                    profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
-                    profile_image=response["data"]['Profile_Image']
+                    profile_image = response["data"]['Profile_Image']
                 User_type = response["data"]['User_type']
                 client_admin_id = response["data"]['client_admin_id']
                 user_id = response["data"]['_id']
@@ -117,12 +118,12 @@ def MobileLogin(request):
                 dowell_time = ''
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
-            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email,"profile_img":profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
+            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
                              'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': user_id, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info = {"role": role_res, "username": username, "email": email,"profile_img":profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
+            info = {"role": role_res, "username": username, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
                     "regional_time": final_ltime, "server_time": serverclock, "userIP": ipuser, "browser": browser, "userOS": osver, "userDevice": device, "userBrowser": "", "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id}
             info1 = json.dumps(info)
             infoo = str(info1)
@@ -162,6 +163,7 @@ def MobileLogout(request):
     logout(request)
     return Response({'msg': 'Logged out Successfully..'})
 
+
 @api_view(['GET', 'POST'])
 def LinkBased(request):
     if request.method == 'POST':
@@ -185,6 +187,7 @@ def LinkBased(request):
         #     return redirect(f'{url}?qrid={respj["inserted_id"]}')
         # return HttpResponse("pl provide redirect url")
     return Response({"message": "its working"})
+
 
 @api_view(['GET', 'POST'])
 def new_userinfo(request):
@@ -472,3 +475,14 @@ def profile_view(request):
             return Response({"Error": "Credentials wrong1"})
     else:
         return Response({"Error": "Credentials wrong"})
+
+
+@api_view(['GET'])
+def live_users(request):
+    time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    obj_notlive = LiveStatus.objects.filter(status="login", date_updated__lte=time_threshold.strftime(
+        '%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    obj_live = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
+        '%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    final = {'liveusers': obj_live, 'non_liveusers': obj_notlive}
+    return Response(final)

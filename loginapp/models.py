@@ -25,6 +25,7 @@ class Account(AbstractUser):
     def __str__(self):
         return self.username
 
+
 class GuestAccount(models.Model):
     username = models.CharField(max_length=20, unique=True)
     email = models.CharField(max_length=30, unique=True)
@@ -69,3 +70,12 @@ class QR_Creation(models.Model):
     qrid = models.CharField(max_length=2000)
     password = models.CharField(max_length=2000)
     status = models.CharField(max_length=50, null=True, blank=True)
+
+
+class LiveStatus(models.Model):
+    sessionID = models.CharField(max_length=2000)
+    username = models.CharField(max_length=2000)
+    product = models.CharField(max_length=100)
+    status = models.CharField(max_length=50, null=True, blank=True)
+    date_created = models.CharField(max_length=1000)
+    date_updated = models.CharField(max_length=1000, null=True, blank=True)

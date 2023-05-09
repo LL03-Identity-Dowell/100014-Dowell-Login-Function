@@ -24,7 +24,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 # loginapp
-from loginapp.models import Account, GuestAccount, mobile_sms, CustomSession, QR_Creation, RandomSession
+from loginapp.models import Account, GuestAccount, mobile_sms, CustomSession, QR_Creation, RandomSession, LiveStatus
 
 # server utility functions
 from server.utils.dowellconnection import dowellconnection
@@ -515,11 +515,11 @@ def login(request):
             phone = None
             User_type = None
             payment_status = None
-            newsletter=None
-            user_country=None
-            privacy_policy=None
-            other_policy=None
-            profile_image="https://100014.pythonanywhere.com/media/user.png"
+            newsletter = None
+            user_country = None
+            privacy_policy = None
+            other_policy = None
+            profile_image = "https://100014.pythonanywhere.com/media/user.png"
             client_admin_id = ""
             field = {"Username": username}
             id = dowellconnection("login", "bangalore", "login", "registration",
@@ -537,18 +537,18 @@ def login(request):
                 email = response["data"]['Email']
                 phone = response["data"]['Phone']
                 try:
-                    if response["data"]['Profile_Image'] =="https://100014.pythonanywhere.com/media/":
-                        profile_image="https://100014.pythonanywhere.com/media/user.png"
+                    if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
+                        profile_image = "https://100014.pythonanywhere.com/media/user.png"
                     else:
-                        profile_image=response["data"]['Profile_Image']
+                        profile_image = response["data"]['Profile_Image']
                     User_type = response["data"]['User_type']
                     client_admin_id = response["data"]['client_admin_id']
                     user_id = response["data"]['_id']
                     payment_status = response["data"]['payment_status']
-                    newsletter=response["data"]['newsletter_subscription']
-                    user_country=response["data"]['user_country']
-                    privacy_policy=response["data"]['Policy_status']
-                    other_policy=response["data"]['safety_security_policy']
+                    newsletter = response["data"]['newsletter_subscription']
+                    user_country = response["data"]['user_country']
+                    privacy_policy = response["data"]['Policy_status']
+                    other_policy = response["data"]['safety_security_policy']
                     role_res = response["data"]['Role']
                     company = response["data"]['company_id']
                     member = response["data"]['Memberof']
@@ -568,8 +568,8 @@ def login(request):
                 dowell_time = ''
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
-            field_session={'sessionID':session,'role':role_res,'username':username,'Email':email,'profile_img':profile_image,'Phone':phone,"User_type":User_type,'language':language,'city':city,'country':country,'org':org,'company_id':company,'project':project,'subproject':subproject,'dept':dept,'Memberof':member,'status':'login','dowell_time':dowell_time,'timezone':zone,
-                           'regional_time':final_ltime,'server_time':serverclock,'userIP':ipuser,'userOS':osver,'userdevice':device,'userbrowser':brow,'UserID':user_id,'login_eventID':event_id,"redirect_url":redirect_url,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, 'profile_img': profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member, 'status': 'login', 'dowell_time': dowell_time, 'timezone': zone,
+                             'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'userdevice': device, 'userbrowser': brow, 'UserID': user_id, 'login_eventID': event_id, "redirect_url": redirect_url, "client_admin_id": client_admin_id, "payment_status": payment_status, "user_country": user_country, "newsletter_subscription": newsletter, "Privacy_policy": privacy_policy, "Safety,Security_policy": other_policy}
 
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
@@ -580,8 +580,8 @@ def login(request):
             except:
                 pass
 
-            info={"role":role_res,"username":username,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,
-                  "userOS":osver,"userDevice":device,"userBrowser":brow,"language":language,"userID":user_id,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            info = {"role": role_res, "username": username, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone, "regional_time": final_ltime, "server_time": serverclock, "userIP": ipuser,
+                    "userOS": osver, "userDevice": device, "userBrowser": brow, "language": language, "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id, "payment_status": payment_status, "user_country": user_country, "newsletter_subscription": newsletter, "Privacy_policy": privacy_policy, "Safety,Security_policy": other_policy}
 
             info1 = json.dumps(info)
             infoo = str(info1)
@@ -590,13 +590,12 @@ def login(request):
 
             if "org" in main_params:
                 return HttpResponse(f"Logged in successfully, SessionID is = {session}")
-                if url=="https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" and "portfolio" in main_params and "product" in main_params:
+                if url == "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" and "portfolio" in main_params and "product" in main_params:
                     return redirect(f'https://100093.pythonanywhere.com/exportfolio?session_id={session}&{main_params}')
                 elif "linktype=common" in main_params:
                     return redirect(f'https://100093.pythonanywhere.com/commoninvitelink?session_id={session}&{main_params}')
                 else:
                     return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{main_params}')
-
 
             if url == "None":
                 return HttpResponse(f"Logged in successfully, SessionID is = {session}")
@@ -619,11 +618,13 @@ def login(request):
             context["main_logo"] = 'logos/dowelllogo.png'
     return render(request, 'login_v2.html', context)
 
+
 def before_logout(request):
-    context={}
-    returnurl=request.GET.get('returnurl',None)
-    context["returnurl"]=returnurl
-    return render(request, 'beforelogout_v2.html',context)
+    context = {}
+    returnurl = request.GET.get('returnurl', None)
+    context["returnurl"] = returnurl
+    return render(request, 'beforelogout_v2.html', context)
+
 
 def logout(request):
     context = {}
@@ -813,12 +814,32 @@ def forgot_username(request):
                 return JsonResponse(response)
     return render(request, 'forgot_username.html', context)
 
-@method_decorator(xframe_options_exempt,name='dispatch')
+
+@method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 def check_status(request):
-    username=request.GET.get('username')
+    username = request.GET.get('username')
     if username is not None:
-        obj=Account.objects.filter(username=username).first()
-        status=obj.current_task
-        return render(request,'check_status.html',{'status':status})
-    return render(request,'check_status.html')
+        obj = Account.objects.filter(username=username).first()
+        status = obj.current_task
+        return render(request, 'check_status.html', {'status': status})
+    return render(request, 'check_status.html')
+
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def live_status(request):
+    if request.method == "POST":
+        sessionID = request.POST.get('session_id')
+        product = request.POST.get('product')
+        obj = LiveStatus.objects.filter(sessionID=sessionID).first()
+        if obj is not None:
+            serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+            obj.product = product
+            obj.date_updated = serverclock
+            obj.save(update_fields=['product', 'date_updated'])
+            return JsonResponse({"msg": "OK"})
+        else:
+            return JsonResponse({"msg": "Given session_id not found in database!"})
+    else:
+        return HttpResponse("You don't have permission to access this page")
