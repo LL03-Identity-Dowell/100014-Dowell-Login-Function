@@ -79,3 +79,25 @@ class LiveStatus(models.Model):
     status = models.CharField(max_length=50, null=True, blank=True)
     date_created = models.CharField(max_length=1000)
     date_updated = models.CharField(max_length=1000, null=True, blank=True)
+
+
+class LiveUser(models.Model):
+    session_id = models.CharField(max_length=2000)
+    username = models.CharField(max_length=2000)
+    product = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_created=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return self.username
+
+
+class ProductUser(models.Model):
+    unique_id = models.CharField(max_length=2000)
+    username = models.CharField(max_length=2000)
+    product = models.CharField(max_length=255)
+    created = models.DateTimeField(auto_created=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return self.username

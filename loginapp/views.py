@@ -838,7 +838,7 @@ def live_status(request):
             obj.product = product
             obj.date_updated = serverclock
             obj.save(update_fields=['product', 'date_updated'])
-            return JsonResponse({"msg": "OK"})
+            return JsonResponse({"msg": "true"})
         else:
             return JsonResponse({"msg": "Given session_id not found in database!"})
     else:

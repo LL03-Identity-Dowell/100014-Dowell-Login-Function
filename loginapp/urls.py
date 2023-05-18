@@ -1,5 +1,6 @@
 from django.urls import path
 from loginapp import views
+from django.views.generic.base import TemplateView
 
 urlpatterns = [
     path('register/', views.register, name="register"),
@@ -20,4 +21,6 @@ urlpatterns = [
     path('link_based/', views.linked_based, name="link_based"),
     path('check_status/', views.check_status, name="check_status"),
     path("live_status/", views.live_status, name="live_status"),
+
+    path("user_chart/", TemplateView.as_view(template_name="chart.html"))
 ]

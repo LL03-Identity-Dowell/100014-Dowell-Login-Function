@@ -12,5 +12,10 @@ urlpatterns = [
     path('all_users/', views.all_users, name="all_users"),
     path('lastlogins/', views.lastlogins, name="lastlogins"),
     path('activeusers/', views.activeusers, name="activeusers"),
-    path('/live_users/', views.live_users, name="live_users"),
+    path('live_users/', views.live_users, name="live_users"),
+
+    path("create_live_user/", views.live_user, name='live_user'),
+    path("create_product_user/", views.product_users, name='product_user'),
+    path("all_liveusers/", views.all_liveusers, name='all_liveusers')
+
 ]

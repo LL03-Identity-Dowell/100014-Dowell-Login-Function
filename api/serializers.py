@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from loginapp.models import Account, CustomSession
+from loginapp.models import Account, CustomSession, LiveUser, ProductUser
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -46,3 +46,15 @@ class CustomSessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomSession
         fields = "__all__"
+
+
+class LiveUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LiveUser
+        fields = '__all__'
+
+
+class ProductUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductUser
+        fields = '__all__'

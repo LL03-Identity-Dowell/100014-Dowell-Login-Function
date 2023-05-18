@@ -20,7 +20,9 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name
-from loginapp.models import CustomSession, Account, LiveStatus
+from loginapp.models import CustomSession, Account, LiveStatus, LiveUser, ProductUser
+
+from api.serializers import LiveUserSerializer, ProductUserSerializer
 
 from server.utils.dowell_func import dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -486,3 +488,53 @@ def live_users(request):
         '%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
     final = {'liveusers': obj_live, 'non_liveusers': obj_notlive}
     return Response(final)
+
+
+@api_view(['GET', 'POST'])
+def live_user(request):
+    if request.method == 'POST':
+        serializer = LiveUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    users = LiveUser.objects.all()
+    return Response()
+
+
+@api_view(['GET', 'POST'])
+def product_users(request):
+    if request.method == 'POST':
+        serializer = ProductUserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+    return Response()
+
+
+@api_view(['POST', 'GET'])
+def all_liveusers(request):
+    details = dowellconnection("login", "bangalore", "login", "client_admin",
+                               "client_admin", "1159", "ABCDE", "fetch", {}, "nil")
+    document = json.loads(details)
+    users = []
+    team_members = []
+    public_members = []
+    for data in document["data"]:
+        for team in data["members"]["team_members"]["accept_members"]:
+            if team["name"] == "owner":
+                team_members.append(data["document_name"])
+            else:
+                team_members.append(team["name"])
+        for guest in data["members"]["guest_members"]["accept_members"]:
+            users.append(guest["name"])
+        for public in data["members"]["public_members"]["accept_members"]:
+            try:
+                public_members.append(public)
+            except:
+                pass
+    response = {
+        'team_members': len(team_members),
+        'users': len(users),
+        'public_members': len(public_members)
+    }
+    return Response(response)
