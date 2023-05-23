@@ -2180,7 +2180,28 @@
                                                                         newsletter?</label>
                                                                     <input type="checkbox" name="newsletter"
                                                                         value="Accepted"><br>
-                                                                </div> 
+                                                                </div>
+<script>
+  const password1 = document.querySelector('#password1');
+  const password2 = document.querySelector('#password2');
+
+  password1.addEventListener('focus', e => {
+    if (password2.nextElementSibling) {
+      password2.nextElementSibling.remove();
+    }
+  })
+  password2.addEventListener('focusout', e => {
+    if (password1.value !== password2.value) {
+      const pElem = document.createElement('p');
+      pElem.style.color = '#ff0000';
+      pElem.style.textAlign = 'center';
+      pElem.style.width = '100%';
+      const errorNode = document.createTextNode("The password did not match");
+      pElem.appendChild(errorNode);
+      password2.insertAdjacentElement('afterend', pElem);
+    }
+  })
+</script>
                                                                 <script>
                                                                     $("#policy_status").change(function (e) {
                                                                         if (document.getElementById("username").value != "") {
