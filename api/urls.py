@@ -16,6 +16,7 @@ urlpatterns = [
 
     path("create_live_user/", views.live_user, name='live_user'),
     path("create_product_user/", views.product_users, name='product_user'),
-    path("all_liveusers/", views.all_liveusers, name='all_liveusers')
+    path("all_liveusers/", views.all_liveusers, name='all_liveusers'),
+    path("country_codes/", views.get_country_codes, name='country_codes')
 
 ]

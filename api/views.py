@@ -5,7 +5,7 @@ import jwt
 import io
 import base64
 import os
-
+import csv
 
 from django.shortcuts import render
 from django.core.files.base import ContentFile
@@ -511,20 +511,26 @@ def product_users(request):
     return Response()
 
 
-@api_view(['POST', 'GET'])
+@api_view(['GET'])
 def all_liveusers(request):
+    products_list = ["Client_admin", "Exhibitoe form", "Living Lab Admin"]
+    field = {}
     details = dowellconnection("login", "bangalore", "login", "client_admin",
-                               "client_admin", "1159", "ABCDE", "fetch", {}, "nil")
-    document = json.loads(details)
+                               "client_admin", "1159", "ABCDE", "fetch", field, "nil")
+    ok = json.loads(details)
     users = []
+    count = 0
     team_members = []
     public_members = []
-    for data in document["data"]:
+    owners = []
+    for data in ok["data"]:
+        count += 1
         for team in data["members"]["team_members"]["accept_members"]:
-            if team["name"] == "owner":
-                team_members.append(data["document_name"])
-            else:
-                team_members.append(team["name"])
+            if not team["name"] in team_members:
+                if not team["name"] == "owner":
+                    team_members.append(team["name"])
+                else:
+                    owners.append(data["document_name"])
         for guest in data["members"]["guest_members"]["accept_members"]:
             users.append(guest["name"])
         for public in data["members"]["public_members"]["accept_members"]:
@@ -532,9 +538,39 @@ def all_liveusers(request):
                 public_members.append(public)
             except:
                 pass
-    response = {
-        'team_members': len(team_members),
-        'users': len(users),
-        'public_members': len(public_members)
-    }
+    team_members = list(set(team_members))
+    owners = list(set(owners))
+    time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    obj_live = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
+        '%d %b %Y %H:%M:%S')).values_list('username', flat=True).order_by('username').distinct()
+    response = {'team_members': len(team_members), 'users': len(users), 'public_members': len(public_members), 'live_team_members': len(
+        set(obj_live).intersection(team_members)), 'live_owners': len(set(obj_live).intersection(owners))}
+    current = {}
+    weekly = {}
+    for product in products_list:
+        product_wise = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
+            '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
+        current[product] = len(product_wise)
+        weekly[product] = {}
+        for r in range(0, 7):
+            date_start = datetime.datetime.now()-datetime.timedelta(days=r+1)
+            date_end = datetime.datetime.now()-datetime.timedelta(days=r)
+            obj = LiveStatus.objects.filter(date_updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), date_updated__lte=date_end.strftime(
+                '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
+            weekly[product][r] = obj
+    response["current"] = current
+    response["weekly"] = weekly
     return Response(response)
+
+
+@api_view(['GET'])
+def get_country_codes(request):
+    codes = []
+    with open('api/country-codes.csv', 'r') as file:
+        reader = csv.reader(file, delimiter=',')
+        for row in reader:
+            codes.append({
+                'country': row[0],
+                'code': row[1]
+            })
+    return Response(codes[1:])
