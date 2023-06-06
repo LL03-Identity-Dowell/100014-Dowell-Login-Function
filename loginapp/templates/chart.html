@@ -67,9 +67,14 @@
 
       async function asyncScope() {
         document.body.style.overflow = "hidden";
-
-        res = await fetch("/api/all_liveusers");
-        data = await res.json();
+        let data = {};
+        try {
+          const res = await fetch("/api/all_liveusers/");
+          data = await res.json();
+        } catch (err) {
+          console.log("Something went wrong");
+          console.log(err);
+        }
 
         loader.style.display = "none";
         document.body.style.overflow = "auto";

@@ -3,8 +3,8 @@ from loginapp import views
 from django.views.generic.base import TemplateView
 
 urlpatterns = [
-    path('register/', views.register, name="register"),
     path('', views.login, name="login"),
+    path('register/', views.register, name="register"),
     path('logout/', views.logout, name="logout"),
     path('sign-out/', views.before_logout, name="before_logout"),
     path('register/legalpolicy/', views.register_legal_policy,

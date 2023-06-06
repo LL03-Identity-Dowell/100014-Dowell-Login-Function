@@ -15,30 +15,29 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import handler404, handler500
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
+from server.views import error_404, error_500
 
-urlpatterns=[
-    path('i18n/',include('django.conf.urls.i18n')),
+urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
-    path('api/',include('api.urls'))
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/', include('api.urls'))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-urlpatterns+= i18n_patterns(
+urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += i18n_patterns(
     path('server/', include("server.urls")),
-    path('', include("loginapp.urls")), 
-    # prefix_default_language=False,   
+    path('', include("loginapp.urls")),
+    prefix_default_language=True,
 )
-
-# urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('server/', include("server.urls")),
-#     path('api/', include('api.urls')),
-#     path('', include("loginapp.urls")),
-
-# ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
+
+
+handler404 = error_404
+handler500 = error_500
