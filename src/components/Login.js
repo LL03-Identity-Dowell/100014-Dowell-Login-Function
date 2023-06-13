@@ -1,5 +1,5 @@
 import React from "react";
-import IonIcon from "@reacticons/ionicons";
+import { FaBeer } from "react-icons/fa";
 
 const Login = () => {
   return (
@@ -12,8 +12,20 @@ const Login = () => {
                 <h1 className="font-bold text-4xl tracking-wide">Contact us</h1>
                 <p> This dowell react form </p>
               </div>
-              <div>
-                <IonIcon name="call" size="large" className="text-teal-300" />
+              <div className="flex flex-col space-y-6">
+                <div className="inline-flex space-x-2 items-center">
+                  <FaBeer className="text-teal-300 text-xl" />
+
+                  <span>+(123) 456 7890</span>
+                </div>
+                <div className="inline-flex space-x-2 items-center">
+                  <FaBeer className="text-teal-300 text-xl" />
+                  <span>+(123) 456 7890</span>
+                </div>
+                <div className="inline-flex space-x-2 items-center">
+                  <FaBeer className="text-teal-300 text-xl" />
+                  <span>+(123) 456 7890</span>
+                </div>
               </div>
             </div>
 
