@@ -1,5 +1,5 @@
 import React from "react";
-import { FaBeer } from "react-icons/fa";
+import { MdCall, MdEmail, MdLocationOn } from "react-icons/md";
 
 const Login = () => {
   return (
@@ -14,17 +14,17 @@ const Login = () => {
               </div>
               <div className="flex flex-col space-y-6">
                 <div className="inline-flex space-x-2 items-center">
-                  <FaBeer className="text-teal-300 text-xl" />
+                  <MdCall className="text-teal-300 text-xl" />
 
                   <span>+(123) 456 7890</span>
                 </div>
                 <div className="inline-flex space-x-2 items-center">
-                  <FaBeer className="text-teal-300 text-xl" />
+                  <MdEmail className="text-teal-300 text-xl" />
                   <span>+(123) 456 7890</span>
                 </div>
                 <div className="inline-flex space-x-2 items-center">
-                  <FaBeer className="text-teal-300 text-xl" />
-                  <span>+(123) 456 7890</span>
+                  <MdLocationOn className="text-teal-300 text-xl" />
+                  <span>India, keleketa </span>
                 </div>
               </div>
             </div>
