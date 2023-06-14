@@ -14,7 +14,7 @@ const PasswordForget = () => {
               className="h-36 w-44"
             />
             <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-gray-900">
-              Join us new member
+              Forget Password
             </h3>
           </div>
 
