@@ -3,6 +3,8 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import LogIn from "./components/LogIn";
 import SignUp from "./components/SignUp";
+import PasswordForget from "./components/PasswordForget";
+import UserNameForget from "./components/UserNameForget";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
           <Route exact path="/" element={<Home />} />
           <Route path="/signin" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/password" element={<PasswordForget />} />
+          <Route path="/username" element={<UserNameForget />} />
         </Routes>
       </Router>
     </>

@@ -1,18 +1,24 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const SignUp = () => {
   return (
-    <div className="flex relative flex-col md:text-left md:flex-row  max-w-7xl px-10 justify-evenly mx-auto items-center">
+    <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
       <div className="py-8 md:col-span-2 space-y-8 my-10">
-        <div className="px-4 sm:px-0">
-          <h3 className="text-xl uppercase md:text-2xl text-center font-bold leading-6 text-gray-900">
+        <div className="flex items-center justify-center space-x-2 px-2 sm:px-0">
+          <img
+            src={DoWellVerticalLogo}
+            alt="DoWell logo"
+            className="h-36 w-44"
+          />
+          <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-gray-900">
             Join us new member
           </h3>
         </div>
         <form>
-          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-amber-100 ">
-            <div className=" px-4 py-5 sm:p-6">
+          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-amber-100">
+            <div className=" px-4 py-4 sm:p-6">
               <div className="grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <label
