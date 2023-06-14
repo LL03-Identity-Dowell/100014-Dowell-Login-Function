@@ -1,143 +1,241 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
 const SignUp = () => {
   return (
-    <>
-      <div className="antialiased bg-gray-100">
-        <div className="flex w-full min-h-screen items-center justify-center">
-          <div className="flex flex-col justify-between md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-amber-50 w-full max-w-3xl p-8 md:p-10 rounded-xl shadow-lg text-gray-500 overflow-hidden">
-            <div className="flex flex-col space-y-8">
-              <div className="self-start">
-                <h1 className="font-medium text-xl tracking-wide bg-green-500 text-white px-4 py-2 rounded-2xl">
-                  Registration new
-                </h1>
-              </div>
+    <div className="flex relative flex-col md:text-left md:flex-row  max-w-7xl px-10 justify-evenly mx-auto items-center">
+      <div className="py-24 md:col-span-2 space-y-8 my-10">
+        <div className="px-4 sm:px-0">
+          <h3 className="text-2xl md:text-4xl text-center font-bold leading-6 text-gray-900">
+            Get In Touch
+          </h3>
+        </div>
+        <form>
+          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl">
+            <div className="bg-white px-4 py-5 sm:p-6">
+              <div className="grid grid-cols-6 gap-6">
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    First Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Sender name"
+                    id="name"
+                    autoComplete="name"
+                    className="form-input"
+                  />
+                </div>
 
-              <div className="flex flex-col space-y-2">
-                <p className="pt-2 text-gray-500 text-sm">
-                  Don't remember username and password?
-                </p>
-                <span className="bg-green-500 text-white px-3 py-2 rounded-xl self-start">
-                  Click here
-                </span>
-              </div>
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Sender name"
+                    id="name"
+                    autoComplete="name"
+                    className="form-input"
+                  />
+                </div>
 
-              <div className="flex flex-col space-y-2">
-                <p>Already have an account?</p>
-                <Link to="/signin">
-                  <span className="bg-green-500 text-white px-3 py-2 rounded-xl self-start">
-                    Sign in
-                  </span>
-                </Link>
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    User Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Sender name"
+                    id="name"
+                    autoComplete="name"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    User Type
+                  </label>
+
+                  <select
+                    name="product"
+                    placeholder="Products"
+                    required
+                    className="mt-1 block w-full border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  >
+                    <option selected>Live User</option>
+                    <option value="betatester">Beta Tester</option>
+                  </select>
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Password
+                  </label>
+                  <input
+                    type="text"
+                    name=" Password"
+                    placeholder="Password"
+                    id=" Password"
+                    autoComplete=" Password"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Confirm Password
+                  </label>
+                  <input
+                    type="text"
+                    name="Confirm Password"
+                    placeholder="Confirm Password"
+                    id="Confirm Password"
+                    autoComplete="Confirm Password"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Country
+                  </label>
+
+                  <select
+                    name="product"
+                    placeholder="Products"
+                    required
+                    className="mt-1 block w-full border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                  >
+                    <option selected>India</option>
+                    <option value="Ethiopia">Ethiopia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="USA">USA</option>
+                    <option value="Ghana">Ghana</option>
+                    <option value="England">England</option>
+                    <option value="Bangladish">Bangladish</option>
+                  </select>
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Country Code
+                  </label>
+                  <input
+                    type="text"
+                    name="country-code"
+                    placeholder="Country Code"
+                    id="country-code"
+                    autoComplete="country-ode"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="phone"
+                  >
+                    Phone
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="text"
+                    placeholder="Phone"
+                    autoComplete="phone"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="phone"
+                  >
+                    Enter OTP from SMS
+                  </label>
+                  <input
+                    type="text"
+                    name="receiver-name"
+                    placeholder="Enter OTP from SMS"
+                    id="receiver-name"
+                    autoComplete="receiver-name"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Email
+                  </label>
+                  <input
+                    type="text"
+                    name="email-address"
+                    placeholder="Sender Email"
+                    id="email-address"
+                    autoComplete="email"
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="col-span-6 sm:col-span-3">
+                  <label
+                    className="block text-gray-700 text-sm font-medium mb-2"
+                    for="name"
+                  >
+                    Enter OTP from email
+                  </label>
+                  <input
+                    type="text"
+                    name="email-address"
+                    placeholder="Receiver Email"
+                    id="email-address"
+                    autoComplete="email"
+                    className="form-input"
+                  />
+                </div>
               </div>
             </div>
-
-            <div className="relative">
-              <div className="relative z-10 bg-amber-100 rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
-                <form className="flex flex-col space-y-4">
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      username
-                    </label>
-                    <input
-                      className="form-input"
-                      id="name"
-                      type="text"
-                      placeholder="Enter your username"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="email"
-                    >
-                      Email
-                    </label>
-                    <input
-                      className="form-input"
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email address"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Password
-                    </label>
-                    <input
-                      className="form-input"
-                      id="password"
-                      type="text"
-                      placeholder="Enter your password"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Confirm Password
-                    </label>
-                    <input
-                      className="form-input"
-                      id="confirm-password"
-                      type="text"
-                      placeholder="Confirm your password"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Country
-                    </label>
-                    <input
-                      className="form-input"
-                      id="country"
-                      type="text"
-                      placeholder="Country"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Phone
-                    </label>
-                    <input
-                      className="form-input"
-                      id="phone"
-                      type="number"
-                      placeholder="Phone number"
-                    />
-                  </div>
-
-                  <div className="flex items-center">
-                    <button className="btn-send" type="button">
-                      Sign Up
-                    </button>
-                  </div>
-                </form>
-              </div>
+            <div className="bg-gray-50 px-4 py-3 text-center md:text-left sm:px-6">
+              <button type="submit" className="btn-send">
+                SignUp
+              </button>
             </div>
           </div>
-        </div>
+        </form>
       </div>
-    </>
+    </div>
   );
 };
 
