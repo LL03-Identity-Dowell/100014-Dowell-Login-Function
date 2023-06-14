@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const SignUpPage = () => {
+const LogIn = () => {
   return (
     <>
       <div className="antialiased bg-gray-100">
@@ -10,12 +10,12 @@ const SignUpPage = () => {
             <div className="flex flex-col space-y-8">
               <div className="self-start">
                 <h1 className="font-medium text-xl tracking-wide bg-green-500 text-white px-4 py-2 rounded-2xl">
-                  Registration new
+                  Member Login
                 </h1>
               </div>
 
               <div className="flex flex-col space-y-2">
-                <p className="pt-2 text-gray-500 text-sm">
+                <p className="pt-2 text-gray-500 text-base">
                   Don't remember username and password?
                 </p>
                 <span className="bg-green-500 text-white px-3 py-2 rounded-xl self-start">
@@ -24,10 +24,12 @@ const SignUpPage = () => {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <p>Already have an account?</p>
-                <Link to="/signin">
+                <p className="pt-2 text-gray-500 text-base">
+                  Don't have an account?
+                </p>
+                <Link to="/signup">
                   <span className="bg-green-500 text-white px-3 py-2 rounded-xl self-start">
-                    Sign in
+                    Sign up
                   </span>
                 </Link>
               </div>
@@ -41,28 +43,13 @@ const SignUpPage = () => {
                       className="block text-gray-700 text-sm font-medium mb-2"
                       for="name"
                     >
-                      username
+                      User Name
                     </label>
                     <input
                       className="form-input"
                       id="name"
                       type="text"
                       placeholder="Enter your username"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="email"
-                    >
-                      Email
-                    </label>
-                    <input
-                      className="form-input"
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email address"
                     />
                   </div>
 
@@ -81,54 +68,9 @@ const SignUpPage = () => {
                     />
                   </div>
 
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Confirm Password
-                    </label>
-                    <input
-                      className="form-input"
-                      id="confirm-password"
-                      type="text"
-                      placeholder="Confirm your password"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Country
-                    </label>
-                    <input
-                      className="form-input"
-                      id="country"
-                      type="text"
-                      placeholder="Country"
-                    />
-                  </div>
-
-                  <div className="mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
-                      for="name"
-                    >
-                      Phone
-                    </label>
-                    <input
-                      className="form-input"
-                      id="phone"
-                      type="number"
-                      placeholder="Phone number"
-                    />
-                  </div>
-
                   <div className="flex items-center">
                     <button className="btn-send" type="button">
-                      Sign Up
+                      Log in
                     </button>
                   </div>
                 </form>
@@ -141,4 +83,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default LogIn;

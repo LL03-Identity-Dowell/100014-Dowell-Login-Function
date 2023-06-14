@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const SignInPage = () => {
+const SignUp = () => {
   return (
     <>
       <div className="antialiased bg-gray-100">
@@ -10,12 +10,12 @@ const SignInPage = () => {
             <div className="flex flex-col space-y-8">
               <div className="self-start">
                 <h1 className="font-medium text-xl tracking-wide bg-green-500 text-white px-4 py-2 rounded-2xl">
-                  Member Login
+                  Registration new
                 </h1>
               </div>
 
               <div className="flex flex-col space-y-2">
-                <p className="pt-2 text-gray-500 text-base">
+                <p className="pt-2 text-gray-500 text-sm">
                   Don't remember username and password?
                 </p>
                 <span className="bg-green-500 text-white px-3 py-2 rounded-xl self-start">
@@ -24,12 +24,10 @@ const SignInPage = () => {
               </div>
 
               <div className="flex flex-col space-y-2">
-                <p className="pt-2 text-gray-500 text-base">
-                  Don't have an account?
-                </p>
-                <Link to="/signup">
+                <p>Already have an account?</p>
+                <Link to="/signin">
                   <span className="bg-green-500 text-white px-3 py-2 rounded-xl self-start">
-                    Sign up
+                    Sign in
                   </span>
                 </Link>
               </div>
@@ -43,13 +41,28 @@ const SignInPage = () => {
                       className="block text-gray-700 text-sm font-medium mb-2"
                       for="name"
                     >
-                      User Name
+                      username
                     </label>
                     <input
                       className="form-input"
                       id="name"
                       type="text"
                       placeholder="Enter your username"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="email"
+                    >
+                      Email
+                    </label>
+                    <input
+                      className="form-input"
+                      id="email"
+                      type="email"
+                      placeholder="Enter your email address"
                     />
                   </div>
 
@@ -68,9 +81,54 @@ const SignInPage = () => {
                     />
                   </div>
 
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Confirm Password
+                    </label>
+                    <input
+                      className="form-input"
+                      id="confirm-password"
+                      type="text"
+                      placeholder="Confirm your password"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Country
+                    </label>
+                    <input
+                      className="form-input"
+                      id="country"
+                      type="text"
+                      placeholder="Country"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Phone
+                    </label>
+                    <input
+                      className="form-input"
+                      id="phone"
+                      type="number"
+                      placeholder="Phone number"
+                    />
+                  </div>
+
                   <div className="flex items-center">
                     <button className="btn-send" type="button">
-                      Log in
+                      Sign Up
                     </button>
                   </div>
                 </form>
@@ -83,4 +141,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default SignUp;
