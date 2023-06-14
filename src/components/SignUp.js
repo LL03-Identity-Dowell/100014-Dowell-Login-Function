@@ -2,7 +2,7 @@ import React from "react";
 import { MdCall, MdEmail, MdLocationOn } from "react-icons/md";
 import { SocialIcon } from "react-social-icons";
 
-const Login = () => {
+const SignUp = () => {
   return (
     <>
       <div className="antialiased bg-gray-100">
@@ -127,9 +127,39 @@ const Login = () => {
                     />
                   </div>
 
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Country
+                    </label>
+                    <input
+                      className="form-input"
+                      id="country"
+                      type="text"
+                      placeholder="Country"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Phone
+                    </label>
+                    <input
+                      className="form-input"
+                      id="phone"
+                      type="number"
+                      placeholder="Phone number"
+                    />
+                  </div>
+
                   <div className="flex items-center">
                     <button className="btn-send" type="button">
-                      Sign in
+                      Sign Up
                     </button>
                   </div>
                 </form>
@@ -142,4 +172,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default SignUp;
