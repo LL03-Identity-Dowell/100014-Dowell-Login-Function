@@ -1,17 +1,18 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const SignUp = () => {
   return (
     <div className="flex relative flex-col md:text-left md:flex-row  max-w-7xl px-10 justify-evenly mx-auto items-center">
-      <div className="py-24 md:col-span-2 space-y-8 my-10">
+      <div className="py-8 md:col-span-2 space-y-8 my-10">
         <div className="px-4 sm:px-0">
-          <h3 className="text-2xl md:text-4xl text-center font-bold leading-6 text-gray-900">
-            Get In Touch
+          <h3 className="text-xl uppercase md:text-2xl text-center font-bold leading-6 text-gray-900">
+            Join us new member
           </h3>
         </div>
         <form>
-          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl">
-            <div className="bg-white px-4 py-5 sm:p-6">
+          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-amber-100 ">
+            <div className=" px-4 py-5 sm:p-6">
               <div className="grid grid-cols-6 gap-6">
                 <div className="col-span-6 sm:col-span-3">
                   <label
@@ -227,10 +228,17 @@ const SignUp = () => {
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 px-4 py-3 text-center md:text-left sm:px-6">
+            <div className="px-4 py-3 text-center md:text-left sm:px-6">
               <button type="submit" className="btn-send">
                 SignUp
               </button>
+            </div>
+
+            <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
+              Do have an account?
+              <Link to="/signin">
+                <span className="text-gray-800"> Log in</span>
+              </Link>
             </div>
           </div>
         </form>
