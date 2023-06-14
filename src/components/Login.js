@@ -10,7 +10,9 @@ const Login = () => {
           <div className="flex flex-col justify-between md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-cyan-700 w-full max-w-4xl p-8 md:p-10 rounded-xl shadow-lg text-white overflow-hidden">
             <div className="flex flex-col space-y-8">
               <div>
-                <h1 className="font-bold text-4xl tracking-wide">Contact us</h1>
+                <h1 className="font-bold text-4xl tracking-wide">
+                  Registration Form
+                </h1>
                 <p className="pt-2 text-cyan-200 text-sm">
                   This dowell react form
                 </p>
@@ -70,19 +72,19 @@ const Login = () => {
                       className="block text-gray-700 text-sm font-medium mb-2"
                       for="name"
                     >
-                      Name
+                      username
                     </label>
                     <input
                       className="form-input"
                       id="name"
                       type="text"
-                      placeholder="Enter your name"
+                      placeholder="Enter your username"
                     />
                   </div>
 
                   <div className="mb-3">
                     <label
-                      className="block text-gray-700 text-sm font-bold mb-2"
+                      className="block text-gray-700 text-sm font-medium mb-2"
                       for="email"
                     >
                       Email
@@ -92,6 +94,36 @@ const Login = () => {
                       id="email"
                       type="email"
                       placeholder="Enter your email address"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Password
+                    </label>
+                    <input
+                      className="form-input"
+                      id="password"
+                      type="text"
+                      placeholder="Enter your password"
+                    />
+                  </div>
+
+                  <div className="mb-3">
+                    <label
+                      className="block text-gray-700 text-sm font-medium mb-2"
+                      for="name"
+                    >
+                      Confirm Password
+                    </label>
+                    <input
+                      className="form-input"
+                      id="confirm-password"
+                      type="text"
+                      placeholder="Confirm your password"
                     />
                   </div>
 
