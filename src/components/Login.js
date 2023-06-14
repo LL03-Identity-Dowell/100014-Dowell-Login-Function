@@ -11,7 +11,9 @@ const Login = () => {
             <div className="flex flex-col justify-between space-y-8">
               <div>
                 <h1 className="font-bold text-4xl tracking-wide">Contact us</h1>
-                <p> This dowell react form </p>
+                <p className="pt-2 text-cyan-200 text-sm">
+                  This dowell react form
+                </p>
               </div>
               <div className="flex flex-col space-y-6">
                 <div className="inline-flex space-x-2 items-center">
@@ -61,9 +63,9 @@ const Login = () => {
             <div className="relative">
               <div className="absolute z-0 w-40 h-40 bg-teal-400 rounded-full -right-28 -top-28"></div>
               <div className="absolute z-0 w-40 h-40 bg-teal-400 rounded-full -left-28 -bottom-16"></div>
-              <div className="bg-white rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
+              <div className="relative z-10 bg-white rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
                 <form className="flex flex-col space-y-4">
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <label
                       className="block text-gray-700 text-sm font-medium mb-2"
                       for="name"
@@ -78,7 +80,7 @@ const Login = () => {
                     />
                   </div>
 
-                  <div className="mb-4">
+                  <div className="mb-3">
                     <label
                       className="block text-gray-700 text-sm font-bold mb-2"
                       for="email"
