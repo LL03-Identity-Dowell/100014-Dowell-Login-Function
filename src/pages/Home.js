@@ -17,8 +17,8 @@ const Home = () => {
               <div className="absolute z-0 w-40 h-40 bg-teal-400 rounded-full -right-28 -top-28"></div>
               <div className="absolute z-0 w-40 h-40 bg-teal-400 rounded-full -left-28 -bottom-16"></div>
               <div className="relative z-10 bg-white rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
-                {/* <Login /> */}
-                <SignUp />
+                <Login />
+                {/* <SignUp /> */}
               </div>
             </div>
           </div>

@@ -22,21 +22,6 @@ const Login = () => {
         <div className="mb-3">
           <label
             className="block text-gray-700 text-sm font-medium mb-2"
-            for="email"
-          >
-            Email
-          </label>
-          <input
-            className="form-input"
-            id="email"
-            type="email"
-            placeholder="Enter your email address"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label
-            className="block text-gray-700 text-sm font-medium mb-2"
             for="name"
           >
             Password
@@ -46,21 +31,6 @@ const Login = () => {
             id="password"
             type="text"
             placeholder="Enter your password"
-          />
-        </div>
-
-        <div className="mb-3">
-          <label
-            className="block text-gray-700 text-sm font-medium mb-2"
-            for="name"
-          >
-            Confirm Password
-          </label>
-          <input
-            className="form-input"
-            id="confirm-password"
-            type="text"
-            placeholder="Confirm your password"
           />
         </div>
 
