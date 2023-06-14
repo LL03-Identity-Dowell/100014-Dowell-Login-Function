@@ -7,8 +7,8 @@ const Login = () => {
     <>
       <div className="antialiased bg-gray-100">
         <div className="flex w-full min-h-screen items-center justify-center">
-          <div className="flex flex-col md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-cyan-700 w-full max-w-4xl p-8 md:p-10 rounded-xl shadow-lg text-white overflow-hidden">
-            <div className="flex flex-col justify-between space-y-8">
+          <div className="flex flex-col justify-between md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-cyan-700 w-full max-w-4xl p-8 md:p-10 rounded-xl shadow-lg text-white overflow-hidden">
+            <div className="flex flex-col space-y-8">
               <div>
                 <h1 className="font-bold text-4xl tracking-wide">Contact us</h1>
                 <p className="pt-2 text-cyan-200 text-sm">
