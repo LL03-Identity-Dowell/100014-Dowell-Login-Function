@@ -11,8 +11,9 @@ const Side = () => {
           <img src={DoWellLogo} alt="DoWell logo" className="h-16 w-24" />
           <h1 className="font-bold text-4xl tracking-wide">DoWell</h1>
         </div>
-        <p className="pt-2 text-cyan-200 text-sm">This dowell react form</p>
+        <p className="pt-2 text-gray-500 text-sm">This dowell react form</p>
       </div>
+
       <div className="flex flex-col space-y-6">
         <div className="inline-flex space-x-2 items-center">
           <MdCall className="text-teal-300 text-xl" />
