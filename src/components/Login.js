@@ -3,6 +3,9 @@ import React from "react";
 const Login = () => {
   return (
     <>
+      <div>
+        <h1 className="font-bold text-3xl tracking-wide mb-2 -mt-2">Log in</h1>
+      </div>
       <form className="flex flex-col space-y-4">
         <div className="mb-3">
           <label

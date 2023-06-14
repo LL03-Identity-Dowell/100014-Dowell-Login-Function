@@ -1,12 +1,16 @@
 import React from "react";
 import { MdCall, MdEmail, MdLocationOn } from "react-icons/md";
 import { SocialIcon } from "react-social-icons";
+import DoWellLogo from "../assets/images/Dowell-logo.webp";
 
 const Side = () => {
   return (
     <div className="flex flex-col space-y-8">
       <div>
-        <h1 className="font-bold text-4xl tracking-wide">Member Login</h1>
+        <div className="flex items-center justify-center space-x-2">
+          <img src={DoWellLogo} alt="DoWell logo" className="h-16 w-24" />
+          <h1 className="font-bold text-4xl tracking-wide">DoWell</h1>
+        </div>
         <p className="pt-2 text-cyan-200 text-sm">This dowell react form</p>
       </div>
       <div className="flex flex-col space-y-6">
