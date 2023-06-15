@@ -8,7 +8,7 @@ const SignUp = () => {
     <div className="isolate bg-gray-50 px-6 py-14 sm:py-18 lg:px-8">
       <div className="flex items-center mx-auto max-w-2xl justify-center space-x-2 px-2 sm:px-0">
         <img src={DoWellVerticalLogo} alt="DoWell logo" className="h-36 w-44" />
-        <h2 className="text-3xl font-bold tracking-tight text-green-600 sm:text-4xl">
+        <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-4xl">
           Join us new member
         </h2>
       </div>

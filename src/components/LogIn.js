@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const LogIn = () => {
   return (
@@ -8,10 +9,15 @@ const LogIn = () => {
         <div className="flex w-full min-h-screen items-center justify-center">
           <div className="flex flex-col justify-between md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-gray-50 w-full max-w-3xl p-8 md:p-10 rounded-xl shadow-lg text-gray-500 overflow-hidden">
             <div className="flex flex-col space-y-8">
-              <div className="self-start">
-                <h1 className="font-medium text-xl tracking-wide bg-green-500 text-white px-4 py-2 rounded-2xl">
+              <div className="flex items-center mx-auto max-w-2xl justify-center space-x-2 px-2 sm:px-0">
+                <img
+                  src={DoWellVerticalLogo}
+                  alt="DoWell logo"
+                  className="h-28 w-38"
+                />
+                <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-3xl">
                   Member Login
-                </h1>
+                </h2>
               </div>
 
               <div className="flex flex-col space-y-2">
