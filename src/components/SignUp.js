@@ -6,12 +6,12 @@ import { Link } from "react-router-dom";
 const SignUp = () => {
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
-      <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-3 md:px-4">
+      <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center mx-auto max-w-2xl justify-center space-x-2 px-2 sm:px-0">
           <img
             src={DoWellVerticalLogo}
             alt="DoWell logo"
-            className="h-38 w-44 rounded-full drop-shadow-sm mt-3 "
+            className="h-38 w-44 rounded-full drop-shadow-sm"
           />
           <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-4xl">
             Join us new member
@@ -89,7 +89,7 @@ const SignUp = () => {
                   name="user-type"
                   placeholder="user-type"
                   required
-                  className="input-filed"
+                  className="select-btn"
                 >
                   <option selected>Live User</option>
                   <option value="beta-tester">Beta Tester</option>
@@ -146,15 +146,11 @@ const SignUp = () => {
                   name="product"
                   placeholder="Products"
                   required
-                  className="input-filed"
+                  className="select-btn"
                 >
-                  <option selected>India</option>
-                  <option value="Ethiopia">Ethiopia</option>
-                  <option value="Germany">Germany</option>
-                  <option value="USA">USA</option>
-                  <option value="Ghana">Ghana</option>
-                  <option value="England">England</option>
-                  <option value="Bangladish">Bangladish</option>
+                  <option>United States</option>
+                  <option>Canada</option>
+                  <option>Mexico</option>
                 </select>
               </div>
             </div>
@@ -208,7 +204,7 @@ const SignUp = () => {
                   name="phone-number"
                   id="phone-number"
                   autoComplete="tel"
-                  className="block w-full rounded-md border-0 px-3.5 py-2 pl-20 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className="input-filed"
                 />
               </div>
             </div>
