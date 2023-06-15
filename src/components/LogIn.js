@@ -25,14 +25,14 @@ const LogIn = () => {
                   Don't remember username and password?
                 </p>
                 <Link to="/password">
-                  <span className="text-gray-800 text-center">Click here</span>
+                  <span className="text-green-600 text-center">Click here</span>
                 </Link>
               </div>
 
               <div className="flex text-gray-500 text-base space-x-2">
                 <p>Don't have an account?</p>
                 <Link to="/signup">
-                  <span className="text-gray-800">Sign up</span>
+                  <span className="text-green-600">Sign up</span>
                 </Link>
               </div>
             </div>

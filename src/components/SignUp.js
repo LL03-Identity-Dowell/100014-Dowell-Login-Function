@@ -245,7 +245,7 @@ const SignUp = () => {
                       htmlFor="file-upload"
                       className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
-                      <span>Upload a file</span>
+                      <span>Click here</span>
                       <input
                         id="file-upload"
                         name="file-upload"
@@ -310,9 +310,9 @@ const SignUp = () => {
             </div>
           </div>
 
-          <div className="mt-10 space-y-10">
+          <div className="mt-6 space-y-10">
             <fieldset>
-              <div className="mt-6 space-y-6">
+              <div className="mt-4 space-y-6">
                 <div className="relative flex gap-x-3">
                   <div className="flex h-6 items-center">
                     <input
@@ -323,7 +323,7 @@ const SignUp = () => {
                     />
                   </div>
                   <div className="text-sm leading-6">
-                    <p className="text-gray-500">Do you accept our policies?</p>
+                    <p className="text-gray-600">Do you accept our policies?</p>
                   </div>
                 </div>
 
@@ -337,7 +337,7 @@ const SignUp = () => {
                     />
                   </div>
                   <div className="text-sm leading-6">
-                    <p className="text-gray-500">
+                    <p className="text-gray-600">
                       Do you want to subscribe to our newsletter?
                     </p>
                   </div>
@@ -358,7 +358,7 @@ const SignUp = () => {
           <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
             Do have an account?
             <Link to="/signin">
-              <span className="text-gray-800"> Log in</span>
+              <span className="text-green-600"> Log in</span>
             </Link>
           </div>
         </form>
