@@ -20,7 +20,7 @@ const SignUp = () => {
         <form
           action="#"
           method="POST"
-          className="mx-auto mt-16 max-w-xl sm:mt-20"
+          className="mx-auto mt-8 max-w-xl sm:mt-12"
         >
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
             <div>
@@ -243,7 +243,7 @@ const SignUp = () => {
                   <div className="text-sm leading-6 text-gray-600">
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                      className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-600 focus-within:ring-offset-2 hover:text-green-500"
                     >
                       <span>Click here</span>
                       <input
@@ -310,7 +310,7 @@ const SignUp = () => {
             </div>
           </div>
 
-          <div className="mt-6 space-y-10">
+          <div className="mt-4 space-y-6">
             <fieldset>
               <div className="mt-4 space-y-6">
                 <div className="relative flex gap-x-3">
@@ -346,7 +346,7 @@ const SignUp = () => {
             </fieldset>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-8">
             <button
               type="submit"
               className="block w-full rounded-md bg-gray-700 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
@@ -355,7 +355,7 @@ const SignUp = () => {
             </button>
           </div>
 
-          <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
+          <div className="text-gray-500 space-x-2 py-3 px-6 text-right">
             Do have an account?
             <Link to="/signin">
               <span className="text-green-600"> Log in</span>
