@@ -1,11 +1,11 @@
 import React from "react";
-import LogIn from "../components/LogIn";
+import MyTabs from "../components/MyTabs";
 
 const Home = () => {
   return (
     <>
       <div>
-        <LogIn />
+        <MyTabs />
       </div>
     </>
   );
