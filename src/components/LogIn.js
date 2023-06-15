@@ -13,7 +13,7 @@ const LogIn = () => {
                 <img
                   src={DoWellVerticalLogo}
                   alt="DoWell logo"
-                  className="h-28 w-38"
+                  className="h-28 w-38 rounded-full drop-shadow-sm"
                 />
                 <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-3xl">
                   Member Login

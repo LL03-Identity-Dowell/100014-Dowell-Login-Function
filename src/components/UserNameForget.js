@@ -11,7 +11,7 @@ const UserNameForget = () => {
             <img
               src={DoWellVerticalLogo}
               alt="DoWell logo"
-              className="h-36 w-44"
+              className="h-28 w-34 rounded-full drop-shadow-sm"
             />
             <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
               Forget Username

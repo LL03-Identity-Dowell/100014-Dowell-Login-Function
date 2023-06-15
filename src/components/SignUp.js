@@ -11,7 +11,7 @@ const SignUp = () => {
           <img
             src={DoWellVerticalLogo}
             alt="DoWell logo"
-            className="h-36 w-44"
+            className="h-38 w-44 rounded-full drop-shadow-sm mt-3 "
           />
           <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-4xl">
             Join us new member
