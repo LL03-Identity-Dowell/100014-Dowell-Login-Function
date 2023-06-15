@@ -18,10 +18,10 @@ const PasswordForget = () => {
             </h3>
           </div>
 
-          <div className="flex text-green-600 space-x-2 py-2 px-2 text-left">
-            <p>If you forget username</p>
+          <div className="flex text-gray-600 space-x-2 py-2 px-2 text-left">
+            <p>Do you forget username?</p>
             <Link to="/username">
-              <span className="text-gray-900">Click Here</span>
+              <span className="text-green-600">Click here</span>
             </Link>
           </div>
         </div>
@@ -34,7 +34,7 @@ const PasswordForget = () => {
                   htmlFor="name"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
-                  username
+                  Username
                 </label>
                 <div className="mt-2.5">
                   <input
@@ -64,6 +64,17 @@ const PasswordForget = () => {
                 </div>
               </div>
 
+              <div>
+                <div className="mt-2.5">
+                  <div className="flex flex-row space-x-3 items-center">
+                    <button className="btn-send px-2 self-start">
+                      Get OTP
+                    </button>
+                    <p className="text-green-500 font-base">message</p>
+                  </div>
+                </div>
+              </div>
+
               <div className="">
                 <label
                   className="block text-sm font-semibold leading-6 text-green-700"
@@ -74,7 +85,6 @@ const PasswordForget = () => {
                 <input
                   type="text"
                   name="otp-email"
-                  placeholder="otp-email"
                   id="otp-email"
                   autoComplete="otp-email"
                   className="input-filed"
@@ -124,10 +134,10 @@ const PasswordForget = () => {
               </button>
             </div>
 
-            <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
+            <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
               Do have an account?
               <Link to="/signin">
-                <span className="text-gray-800"> Log in</span>
+                <span className="text-green-600"> Log in</span>
               </Link>
             </div>
           </div>

@@ -39,6 +39,17 @@ const UserNameForget = () => {
                   </div>
                 </div>
 
+                <div>
+                  <div className="mt-2.5">
+                    <div className="flex flex-row space-x-3 items-center">
+                      <button className="btn-send px-2 self-start">
+                        Get OTP
+                      </button>
+                      <p className="text-green-500 font-base">message</p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="otp-email"
@@ -63,10 +74,10 @@ const UserNameForget = () => {
                 </button>
               </div>
 
-              <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
+              <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
                 Do have an account?
                 <Link to="/signin">
-                  <span className="text-gray-800"> Log in</span>
+                  <span className="text-green-600"> Log in</span>
                 </Link>
               </div>
             </div>
