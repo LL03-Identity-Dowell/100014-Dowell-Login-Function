@@ -1,5 +1,5 @@
 import React from "react";
-import { MdCall } from "react-icons/md";
+import { MdAddAPhoto, MdCall } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
 
@@ -28,7 +28,7 @@ const SignUp = () => {
                 htmlFor="first-name"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                First name
+                First Name
               </label>
               <div className="mt-2.5">
                 <input
@@ -46,7 +46,7 @@ const SignUp = () => {
                 htmlFor="last-name"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Last name
+                Last Name
               </label>
               <div className="mt-2.5">
                 <input
@@ -64,7 +64,7 @@ const SignUp = () => {
                 htmlFor="user-name"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                user name
+                User Name
               </label>
               <div className="mt-2.5">
                 <input
@@ -82,7 +82,7 @@ const SignUp = () => {
                 htmlFor="user-type"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                user type
+                User Type
               </label>
               <div className="mt-2.5">
                 <select
@@ -102,7 +102,7 @@ const SignUp = () => {
                 htmlFor="password"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                password
+                Password
               </label>
               <div className="mt-2.5">
                 <input
@@ -154,58 +154,58 @@ const SignUp = () => {
                 </select>
               </div>
             </div>
+
             <div>
-              <label
-                htmlFor="country-code"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
-                Country Code
-              </label>
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="country-code"
-                  id="country-code"
-                  autoComplete="country-code"
-                  className="input-filed"
-                />
+              <div>
+                <label
+                  htmlFor="phone-number"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  Phone Number
+                </label>
+
+                <div className="relative mt-2.5">
+                  <div className="absolute inset-y-0 left-0 flex items-center">
+                    <label htmlFor="country" className="sr-only">
+                      Country
+                    </label>
+                    <select
+                      id="country"
+                      name="country"
+                      className="h-full rounded-md border border-green-200 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm"
+                    >
+                      <option>US</option>
+                      <option>CA</option>
+                      <option>EU</option>
+                    </select>
+                    <MdCall
+                      className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <input
+                    type="tel"
+                    name="phone-number"
+                    id="phone-number"
+                    autoComplete="tel"
+                    className="input-filed"
+                  />
+                </div>
               </div>
             </div>
 
             <div>
               <label
-                htmlFor="phone-number"
+                htmlFor="OTP-code"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Phone number
+                Get OTP
               </label>
-
-              <div className="relative mt-2.5">
-                <div className="absolute inset-y-0 left-0 flex items-center">
-                  <label htmlFor="country" className="sr-only">
-                    Country
-                  </label>
-                  <select
-                    id="country"
-                    name="country"
-                    className="h-full rounded-md border-0 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-                  >
-                    <option>US</option>
-                    <option>CA</option>
-                    <option>EU</option>
-                  </select>
-                  <MdCall
-                    className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
-                    aria-hidden="true"
-                  />
+              <div className="mt-2.5">
+                <div className="flex flex-row space-x-3 items-center">
+                  <button className="btn-send px-2 self-start">Get OTP</button>
+                  <p className="text-green-500 font-base">message</p>
                 </div>
-                <input
-                  type="tel"
-                  name="phone-number"
-                  id="phone-number"
-                  autoComplete="tel"
-                  className="input-filed"
-                />
               </div>
             </div>
 
@@ -227,7 +227,38 @@ const SignUp = () => {
               </div>
             </div>
 
-            <div className="sm:col-span-2">
+            <div>
+              <label
+                htmlFor="OTP-code"
+                className="block text-sm font-semibold leading-6 text-green-700"
+              >
+                Upload Photo
+              </label>
+              <div className="mt-2.5">
+                <div className="flex flex-row items-center space-x-3">
+                  <MdAddAPhoto
+                    className="h-8 w-8 text-green-500"
+                    aria-hidden="true"
+                  />
+                  <div className="text-sm leading-6 text-gray-600">
+                    <label
+                      htmlFor="file-upload"
+                      className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                    >
+                      <span>Upload a file</span>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-semibold leading-6 text-green-700"
@@ -242,6 +273,21 @@ const SignUp = () => {
                   autoComplete="email"
                   className="input-filed"
                 />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="OTP-code"
+                className="block text-sm font-semibold leading-6 text-green-700"
+              >
+                Get OTP
+              </label>
+              <div className="mt-2.5">
+                <div className="flex flex-row space-x-3 items-center">
+                  <button className="btn-send px-2 self-start">Get OTP</button>
+                  <p className="text-green-500 font-base">message</p>
+                </div>
               </div>
             </div>
 
@@ -263,6 +309,43 @@ const SignUp = () => {
               </div>
             </div>
           </div>
+
+          <div className="mt-10 space-y-10">
+            <fieldset>
+              <div className="mt-6 space-y-6">
+                <div className="relative flex gap-x-3">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="comments"
+                      name="comments"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                    />
+                  </div>
+                  <div className="text-sm leading-6">
+                    <p className="text-gray-500">Do you accept our policies?</p>
+                  </div>
+                </div>
+
+                <div className="relative flex gap-x-3">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="candidates"
+                      name="candidates"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                    />
+                  </div>
+                  <div className="text-sm leading-6">
+                    <p className="text-gray-500">
+                      Do you want to subscribe to our newsletter?
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+
           <div className="mt-10">
             <button
               type="submit"
