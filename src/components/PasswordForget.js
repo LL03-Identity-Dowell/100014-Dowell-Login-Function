@@ -13,12 +13,12 @@ const PasswordForget = () => {
               alt="DoWell logo"
               className="h-36 w-44"
             />
-            <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-gray-900">
+            <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
               Forget Password
             </h3>
           </div>
 
-          <div className="flex text-gray-600 space-x-2 py-2 px-2 text-left">
+          <div className="flex text-green-600 space-x-2 py-2 px-2 text-left">
             <p>If you forget username</p>
             <Link to="/username">
               <span className="text-gray-900">Click Here</span>
@@ -32,7 +32,7 @@ const PasswordForget = () => {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="name"
-                  className="block text-sm font-semibold leading-6 text-gray-900"
+                  className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   username
                 </label>
@@ -49,7 +49,7 @@ const PasswordForget = () => {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="email"
-                  className="block text-sm font-semibold leading-6 text-gray-900"
+                  className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   Email
                 </label>
@@ -66,8 +66,8 @@ const PasswordForget = () => {
 
               <div className="">
                 <label
-                  className="block text-gray-700 text-sm font-medium mb-2"
-                  for="name"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                  for="otp-email"
                 >
                   Enter OTP from Email
                 </label>
@@ -84,7 +84,7 @@ const PasswordForget = () => {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="new-password"
-                  className="block text-sm font-semibold leading-6 text-gray-900"
+                  className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   New Password
                 </label>
@@ -102,7 +102,7 @@ const PasswordForget = () => {
               <div className="sm:col-span-2">
                 <label
                   htmlFor="confirm-password"
-                  className="block text-sm font-semibold leading-6 text-gray-900"
+                  className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   Confirm Password
                 </label>

@@ -36,7 +36,7 @@ const LogIn = () => {
                 <form className="flex flex-col space-y-4">
                   <div className="mb-3">
                     <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
+                      className="block text-green-700 text-sm font-medium mb-2"
                       for="name"
                     >
                       User Name
@@ -51,7 +51,7 @@ const LogIn = () => {
 
                   <div className="mb-3">
                     <label
-                      className="block text-gray-700 text-sm font-medium mb-2"
+                      className="block text-green-700 text-sm font-medium mb-2"
                       for="name"
                     >
                       Password

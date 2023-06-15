@@ -13,7 +13,7 @@ const UserNameForget = () => {
               alt="DoWell logo"
               className="h-36 w-44"
             />
-            <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-gray-900">
+            <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
               Forget Username
             </h3>
           </div>
@@ -24,7 +24,7 @@ const UserNameForget = () => {
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="email"
-                    className="block text-sm font-semibold leading-6 text-gray-900"
+                    className="block text-sm font-semibold leading-6 text-green-700"
                   >
                     Email
                   </label>
@@ -42,7 +42,7 @@ const UserNameForget = () => {
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="otp-email"
-                    className="block text-sm font-semibold leading-6 text-gray-900"
+                    className="block text-sm font-semibold leading-6 text-green-700"
                   >
                     Enter OTP from email
                   </label>

@@ -1,5 +1,5 @@
 import React from "react";
-import { MdEmail } from "react-icons/md";
+import { MdCall } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
 
@@ -8,7 +8,7 @@ const SignUp = () => {
     <div className="isolate bg-gray-50 px-6 py-24 sm:py-32 lg:px-8">
       <div className="flex items-center mx-auto max-w-2xl justify-center space-x-2 px-2 sm:px-0">
         <img src={DoWellVerticalLogo} alt="DoWell logo" className="h-36 w-44" />
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        <h2 className="text-3xl font-bold tracking-tight text-green-600 sm:text-4xl">
           Join us new member
         </h2>
       </div>
@@ -21,7 +21,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="first-name"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               First name
             </label>
@@ -39,7 +39,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="last-name"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Last name
             </label>
@@ -57,7 +57,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="user-name"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               user name
             </label>
@@ -75,7 +75,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="user-type"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               user type
             </label>
@@ -95,7 +95,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               password
             </label>
@@ -113,7 +113,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="confirm-password"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Confirm Password
             </label>
@@ -131,7 +131,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="confirm-password"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Country
             </label>
@@ -156,7 +156,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="country-code"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Country Code
             </label>
@@ -174,7 +174,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="phone-number"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Phone number
             </label>
@@ -193,7 +193,7 @@ const SignUp = () => {
                   <option>CA</option>
                   <option>EU</option>
                 </select>
-                <MdEmail
+                <MdCall
                   className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
                   aria-hidden="true"
                 />
@@ -211,7 +211,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="otp-sms"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Enter OTP from sms
             </label>
@@ -229,7 +229,7 @@ const SignUp = () => {
           <div className="sm:col-span-2">
             <label
               htmlFor="email"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Email
             </label>
@@ -247,7 +247,7 @@ const SignUp = () => {
           <div>
             <label
               htmlFor="otp-email"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-green-700"
             >
               Enter OTP from email
             </label>
