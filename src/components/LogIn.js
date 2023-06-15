@@ -6,7 +6,7 @@ const LogIn = () => {
     <>
       <div className="antialiased bg-gray-100">
         <div className="flex w-full min-h-screen items-center justify-center">
-          <div className="flex flex-col justify-between md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-amber-50 w-full max-w-3xl p-8 md:p-10 rounded-xl shadow-lg text-gray-500 overflow-hidden">
+          <div className="flex flex-col justify-between md:flex-row md:space-x-6 space-y-6 md:space-y-0 bg-gray-50 w-full max-w-3xl p-8 md:p-10 rounded-xl shadow-lg text-gray-500 overflow-hidden">
             <div className="flex flex-col space-y-8">
               <div className="self-start">
                 <h1 className="font-medium text-xl tracking-wide bg-green-500 text-white px-4 py-2 rounded-2xl">
@@ -32,7 +32,7 @@ const LogIn = () => {
             </div>
 
             <div className="relative">
-              <div className="relative z-10 bg-amber-100 rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
+              <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
                 <form className="flex flex-col space-y-4">
                   <div className="mb-3">
                     <label
@@ -42,7 +42,7 @@ const LogIn = () => {
                       User Name
                     </label>
                     <input
-                      className="form-input"
+                      className="input-filed"
                       id="name"
                       type="text"
                       placeholder="Enter your username"
@@ -57,7 +57,7 @@ const LogIn = () => {
                       Password
                     </label>
                     <input
-                      className="form-input"
+                      className="input-filed"
                       id="password"
                       type="text"
                       placeholder="Enter your password"
