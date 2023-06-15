@@ -1,254 +1,265 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { MdEmail } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { Link } from "react-router-dom";
 
 const SignUp = () => {
   return (
-    <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
-      <div className="py-8 md:col-span-2 space-y-8 my-10">
-        <div className="flex items-center justify-center space-x-2 px-2 sm:px-0">
-          <img
-            src={DoWellVerticalLogo}
-            alt="DoWell logo"
-            className="h-36 w-44"
-          />
-          <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-gray-900">
-            Join us new member
-          </h3>
-        </div>
-        <form>
-          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-amber-100">
-            <div className=" px-4 py-4 sm:p-6">
-              <div className="grid grid-cols-6 gap-6">
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Sender name"
-                    id="name"
-                    autoComplete="name"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Sender name"
-                    id="name"
-                    autoComplete="name"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    User Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    placeholder="Sender name"
-                    id="name"
-                    autoComplete="name"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    User Type
-                  </label>
-
-                  <select
-                    name="product"
-                    placeholder="Products"
-                    required
-                    className="mt-1 block w-full border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  >
-                    <option selected>Live User</option>
-                    <option value="betatester">Beta Tester</option>
-                  </select>
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="text"
-                    name=" Password"
-                    placeholder="Password"
-                    id=" Password"
-                    autoComplete=" Password"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Confirm Password
-                  </label>
-                  <input
-                    type="text"
-                    name="Confirm Password"
-                    placeholder="Confirm Password"
-                    id="Confirm Password"
-                    autoComplete="Confirm Password"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Country
-                  </label>
-
-                  <select
-                    name="product"
-                    placeholder="Products"
-                    required
-                    className="mt-1 block w-full border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-                  >
-                    <option selected>India</option>
-                    <option value="Ethiopia">Ethiopia</option>
-                    <option value="Germany">Germany</option>
-                    <option value="USA">USA</option>
-                    <option value="Ghana">Ghana</option>
-                    <option value="England">England</option>
-                    <option value="Bangladish">Bangladish</option>
-                  </select>
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Country Code
-                  </label>
-                  <input
-                    type="text"
-                    name="country-code"
-                    placeholder="Country Code"
-                    id="country-code"
-                    autoComplete="country-ode"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="phone"
-                  >
-                    Phone
-                  </label>
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="text"
-                    placeholder="Phone"
-                    autoComplete="phone"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="phone"
-                  >
-                    Enter OTP from SMS
-                  </label>
-                  <input
-                    type="text"
-                    name="receiver-name"
-                    placeholder="Enter OTP from SMS"
-                    id="receiver-name"
-                    autoComplete="receiver-name"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="text"
-                    name="email-address"
-                    placeholder="Sender Email"
-                    id="email-address"
-                    autoComplete="email"
-                    className="form-input"
-                  />
-                </div>
-
-                <div className="col-span-6 sm:col-span-3">
-                  <label
-                    className="block text-gray-700 text-sm font-medium mb-2"
-                    for="name"
-                  >
-                    Enter OTP from email
-                  </label>
-                  <input
-                    type="text"
-                    name="email-address"
-                    placeholder="Receiver Email"
-                    id="email-address"
-                    autoComplete="email"
-                    className="form-input"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="px-4 py-3 text-center md:text-left sm:px-6">
-              <button type="submit" className="btn-send">
-                SignUp
-              </button>
-            </div>
-
-            <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
-              Do have an account?
-              <Link to="/signin">
-                <span className="text-gray-800"> Log in</span>
-              </Link>
+    <div className="isolate bg-gray-50 px-6 py-24 sm:py-32 lg:px-8">
+      <div className="flex items-center mx-auto max-w-2xl justify-center space-x-2 px-2 sm:px-0">
+        <img src={DoWellVerticalLogo} alt="DoWell logo" className="h-36 w-44" />
+        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          Join us new member
+        </h2>
+      </div>
+      <form
+        action="#"
+        method="POST"
+        className="mx-auto mt-16 max-w-xl sm:mt-20"
+      >
+        <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="first-name"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              First name
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="first-name"
+                id="first-name"
+                autoComplete="given-name"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
             </div>
           </div>
-        </form>
-      </div>
+
+          <div>
+            <label
+              htmlFor="last-name"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Last name
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="last-name"
+                id="last-name"
+                autoComplete="family-name"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="user-name"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              user name
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="user-name"
+                id="user-name"
+                autoComplete="user-name"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="user-type"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              user type
+            </label>
+            <div className="mt-2.5">
+              <select
+                name="user-type"
+                placeholder="user-type"
+                required
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              >
+                <option selected>Live User</option>
+                <option value="beta-tester">Beta Tester</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              password
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="password"
+                id="password"
+                autoComplete="password"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirm-password"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Confirm Password
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="confirm-password"
+                id="confirm-password"
+                autoComplete="confirm-password"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="confirm-password"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Country
+            </label>
+
+            <div className="mt-2.5">
+              <select
+                name="product"
+                placeholder="Products"
+                required
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              >
+                <option selected>India</option>
+                <option value="Ethiopia">Ethiopia</option>
+                <option value="Germany">Germany</option>
+                <option value="USA">USA</option>
+                <option value="Ghana">Ghana</option>
+                <option value="England">England</option>
+                <option value="Bangladish">Bangladish</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label
+              htmlFor="country-code"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Country Code
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="country-code"
+                id="country-code"
+                autoComplete="country-code"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="phone-number"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Phone number
+            </label>
+
+            <div className="relative mt-2.5">
+              <div className="absolute inset-y-0 left-0 flex items-center">
+                <label htmlFor="country" className="sr-only">
+                  Country
+                </label>
+                <select
+                  id="country"
+                  name="country"
+                  className="h-full rounded-md border-0 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+                >
+                  <option>US</option>
+                  <option>CA</option>
+                  <option>EU</option>
+                </select>
+                <MdEmail
+                  className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </div>
+              <input
+                type="tel"
+                name="phone-number"
+                id="phone-number"
+                autoComplete="tel"
+                className="block w-full rounded-md border-0 px-3.5 py-2 pl-20 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="otp-sms"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Enter OTP from sms
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="otp-sms"
+                id="otp-sms"
+                autoComplete="otp-sms"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+
+          <div className="sm:col-span-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-semibold leading-6 text-gray-900"
+            >
+              Email
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="email"
+                name="email"
+                id="email"
+                autoComplete="email"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-10">
+          <button
+            type="submit"
+            className="block w-full rounded-md bg-gray-700 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+          >
+            Sign up
+          </button>
+        </div>
+
+        <div className="text-gray-500 space-x-2 py-2 px-6 text-right">
+          Do have an account?
+          <Link to="/signin">
+            <span className="text-gray-800"> Log in</span>
+          </Link>
+        </div>
+      </form>
     </div>
   );
 };

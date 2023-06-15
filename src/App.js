@@ -2,9 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import LogIn from "./components/LogIn";
-import SignUp from "./components/SignUp";
 import PasswordForget from "./components/PasswordForget";
 import UserNameForget from "./components/UserNameForget";
+import SignUp from "./components/SignUp";
 
 function App() {
   return (
