@@ -1,9 +1,12 @@
-import React from "react";
-import { MdAddAPhoto, MdCall } from "react-icons/md";
+import React, { useState } from "react";
+import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const SignUp = () => {
+  const [value, setValue] = useState();
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
       <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-2 py-6 md:px-4">
@@ -163,32 +166,24 @@ const SignUp = () => {
                 >
                   Phone Number
                 </label>
+              </div>
+              <div className="relative mt-2.5">
+                <div className="absolute inset-y-0 left-0 flex items-center">
+                  <label htmlFor="country" className="sr-only">
+                    Country
+                  </label>
 
-                <div className="relative mt-2.5">
-                  <div className="absolute inset-y-0 left-0 flex items-center">
-                    <label htmlFor="country" className="sr-only">
-                      Country
-                    </label>
-                    <select
-                      id="country"
-                      name="country"
-                      className="h-full rounded-md border border-green-200 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm"
-                    >
-                      <option>US</option>
-                      <option>CA</option>
-                      <option>EU</option>
-                    </select>
-                    <MdCall
-                      className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <input
-                    type="tel"
-                    name="phone-number"
+                  <PhoneInput
                     id="phone-number"
+                    name="phone-number"
                     autoComplete="tel"
-                    className="input-filed"
+                    value={value}
+                    onChange={setValue}
+                    countrySelectProps={{
+                      className:
+                        "h-full rounded-md ring-1 ring-inset border border-green-300 bg-transparent bg-none py-1.5 pl-4 pr-9 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm",
+                    }}
+                    inputProps={{ className: "input-filed" }}
                   />
                 </div>
               </div>
