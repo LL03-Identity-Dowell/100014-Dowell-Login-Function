@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
-import Navbar from "./components/Navbar";
 import LogIn from "./components/LogIn";
 import PasswordForget from "./components/PasswordForget";
 import UserNameForget from "./components/UserNameForget";
@@ -13,7 +12,6 @@ import FAQ from "./pages/FAQ";
 function App() {
   return (
     <>
-      {/* <Navbar /> */}
       <Router>
         <Routes>
           <Route exact path="/" element={<Home />} />

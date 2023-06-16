@@ -15,31 +15,31 @@ const MyTabs = () => {
     LogIn: [
       {
         id: 1,
-        title: <LogIn />,
+        content: <LogIn />,
       },
     ],
     Chat: [
       {
         id: 1,
-        title: <Chat />,
+        content: <Chat />,
       },
     ],
     Policy: [
       {
         id: 1,
-        title: <Policy />,
+        content: <Policy />,
       },
     ],
     Help: [
       {
         id: 1,
-        title: <Help />,
+        content: <Help />,
       },
     ],
     FAQ: [
       {
         id: 1,
-        title: <FAQ />,
+        content: <FAQ />,
       },
     ],
   });
@@ -81,7 +81,7 @@ const MyTabs = () => {
                     className="relative rounded-md p-3 hover:bg-gray-100"
                   >
                     <h3 className="text-sm font-medium leading-5">
-                      {post.title}
+                      {post.content}
                     </h3>
                   </li>
                 ))}

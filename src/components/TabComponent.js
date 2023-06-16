@@ -4,14 +4,25 @@ import Chat from "../pages/Chat";
 import Policy from "../pages/Policy";
 import Help from "../pages/Help";
 import FAQ from "../pages/FAQ";
+import { AiOutlineWechat } from "react-icons/ai";
 
 export default function TabsComponent() {
   const tabs = [
-    { name: "Login", link: "#", content: <LogIn /> },
-    { name: "Chat", link: "/chat", content: <Chat /> },
-    { name: "Policy", link: "/policy", content: "Policy" },
-    { name: "Help", link: "/help", content: "Help" },
-    { name: "FAQ", link: "/faq", content: "FAQ" },
+    { name: "Login", icon: <AiOutlineWechat />, link: "#", content: <LogIn /> },
+    {
+      name: "Chat",
+      icon: <AiOutlineWechat />,
+      link: "/chat",
+      content: <Chat />,
+    },
+    {
+      name: "Policy",
+      icon: <AiOutlineWechat />,
+      link: "/policy",
+      content: "Policy",
+    },
+    { name: "Help", icon: <AiOutlineWechat />, link: "/help", content: "Help" },
+    { name: "FAQ", icon: <AiOutlineWechat />, link: "/faq", content: "FAQ" },
   ];
   const [openTab, setOpenTab] = useState("Home");
 
@@ -27,7 +38,7 @@ export default function TabsComponent() {
                   onClick={() => setOpenTab(tab.name)}
                   className="inline-block px-4 py-2 text-gray-600 bg-white rounded shadow"
                 >
-                  {tab.name}
+                  {tab.name} {tab.icon}
                 </a>
               </li>
             ))}
