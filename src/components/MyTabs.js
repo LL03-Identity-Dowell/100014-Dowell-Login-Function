@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { Tab } from "@headlessui/react";
 import LogIn from "./LogIn";
+import Chat from "../pages/Chat";
+import Policy from "../pages/Policy";
+import Help from "../pages/Help";
+import FAQ from "../pages/FAQ";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -17,32 +21,32 @@ const MyTabs = () => {
     Chat: [
       {
         id: 1,
-        title: "Do you want to chat with me?",
+        title: <Chat />,
       },
     ],
     Policy: [
       {
         id: 1,
-        title: "Policy",
+        title: <Policy />,
       },
     ],
     Help: [
       {
         id: 1,
-        title: "Please help me.",
+        title: <Help />,
       },
     ],
     FAQ: [
       {
         id: 1,
-        title: "Frequently asked questions",
+        title: <FAQ />,
       },
     ],
   });
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-2 py-16 sm:px-0">
-      <Tab.Group>
+    <Tab.Group>
+      <div className="w-full max-w-7xl mx-auto px-2 py-16 sm:px-0">
         <Tab.List className="flex space-x-1 rounded-xl bg-green-900/20 p-1">
           {Object.keys(categories).map((category) => (
             <Tab
@@ -85,8 +89,8 @@ const MyTabs = () => {
             </Tab.Panel>
           ))}
         </Tab.Panels>
-      </Tab.Group>
-    </div>
+      </div>
+    </Tab.Group>
   );
 };
 
