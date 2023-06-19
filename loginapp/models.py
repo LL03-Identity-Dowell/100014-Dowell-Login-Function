@@ -81,23 +81,17 @@ class LiveStatus(models.Model):
     date_updated = models.CharField(max_length=1000, null=True, blank=True)
 
 
-class LiveUser(models.Model):
-    session_id = models.CharField(max_length=2000)
-    username = models.CharField(max_length=2000)
-    product = models.CharField(max_length=255)
-    created = models.DateTimeField(auto_created=True)
-    updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self) -> str:
-        return self.username
+class Live_QR_Status(models.Model):
+    qrid = models.CharField(max_length=2000)
+    product = models.CharField(max_length=100)
+    status = models.CharField(max_length=50, null=True, blank=True)
+    updated = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(null=True, blank=True)
 
 
-class ProductUser(models.Model):
-    unique_id = models.CharField(max_length=2000)
-    username = models.CharField(max_length=2000)
-    product = models.CharField(max_length=255)
-    created = models.DateTimeField(auto_created=True)
-    updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self) -> str:
-        return self.username
+class Live_Public_Status(models.Model):
+    unique_key = models.CharField(max_length=2000)
+    product = models.CharField(max_length=100)
+    status = models.CharField(max_length=50, null=True, blank=True)
+    updated = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(null=True, blank=True)
