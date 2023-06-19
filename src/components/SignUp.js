@@ -159,7 +159,7 @@ const SignUp = () => {
                 >
                   {countries.map((country) => (
                     <option key={country.id} value={country.name}>
-                      {country.name}
+                      {country.name} ({country.country_code})
                     </option>
                   ))}
                 </select>

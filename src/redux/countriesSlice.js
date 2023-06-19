@@ -5,7 +5,7 @@ export const fetchCountries = createAsyncThunk(
   "countries/fetchCountries",
   async () => {
     const response = await axios.get(
-      "https://100074.pythonanywhere.com/countries"
+      "https://100074.pythonanywhere.com/countries/johnDoe123/haikalsb1234/100074"
     );
     return response.data;
   }
