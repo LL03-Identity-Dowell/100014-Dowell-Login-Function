@@ -1,13 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MdAddAPhoto, MdCall } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "../redux/countriesSlice";
+import { useForm } from "react-hook-form";
+import "react-phone-number-input/style.css";
+import PhoneInputWithCountry from "react-phone-number-input/react-hook-form";
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
+  const { control, handleSubmit } = useForm();
 
   useEffect(() => {
     dispatch(fetchCountries());
@@ -30,6 +34,7 @@ const SignUp = () => {
           action="#"
           method="POST"
           className="mx-auto mt-8 max-w-xl sm:mt-12"
+          onSubmit={handleSubmit()}
         >
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
             <div>
@@ -176,50 +181,21 @@ const SignUp = () => {
                 >
                   Phone Number
                 </label>
-
                 <div className="relative mt-2.5">
-                  <div className="absolute inset-y-0 left-0 flex items-center">
-                    <label htmlFor="country" className="sr-only">
-                      Country
-                    </label>
-                    <select
-                      id="country"
-                      name="country"
-                      className="h-full rounded-md border border-green-200 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm"
-                    >
-                      {countries.map((country) => (
-                        <option key={country.id} value={country.country_code}>
-                          + {country.country_code}
-                        </option>
-                      ))}
-                    </select>
-                    <MdCall
-                      className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
-                      aria-hidden="true"
-                    />
-                  </div>
-                  <input
-                    type="tel"
-                    name="phone-number"
-                    id="phone-number"
-                    autoComplete="tel"
-                    className="input-filed"
+                  <PhoneInputWithCountry
+                    name="phoneInputWithCountrySelect"
+                    control={control}
+                    rules={{ required: true }}
+                    className="border border-green-300 ring-green-300 ring-inset"
                   />
                 </div>
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="OTP-code"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
-                Get OTP
-              </label>
-              <div className="mt-2.5">
-                <div className="flex flex-row space-x-3 items-center">
-                  <button className="btn-send px-2 self-start">Get OTP</button>
-                  <p className="text-green-500 font-base">message</p>
+                <div className="mt-2.5">
+                  <div className="flex flex-row space-x-3 items-center">
+                    <button className="btn-send px-2 py-1 self-start">
+                      Get OTP
+                    </button>
+                    <p className="text-green-500 font-base">message</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -289,18 +265,11 @@ const SignUp = () => {
                   className="input-filed"
                 />
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="OTP-code"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
-                Get OTP
-              </label>
               <div className="mt-2.5">
                 <div className="flex flex-row space-x-3 items-center">
-                  <button className="btn-send px-2 self-start">Get OTP</button>
+                  <button className="btn-send px-2 py-1 self-start">
+                    Get OTP
+                  </button>
                   <p className="text-green-500 font-base">message</p>
                 </div>
               </div>
