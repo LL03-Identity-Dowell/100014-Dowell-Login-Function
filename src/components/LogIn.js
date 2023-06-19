@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
 
-const schema = yup.object({
+const schema = yup.object().shape({
   userName: yup
     .string()
     .required("User Name is required")
@@ -28,6 +28,7 @@ const LogIn = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const onSubmit = (data) => console.log(data);
+
   return (
     <>
       <div className="antialiased bg-gray-100">
@@ -81,7 +82,9 @@ const LogIn = () => {
                         name="userName"
                         id="userName"
                         autoComplete="userName"
-                        className="input-filed"
+                        className={`input-filed ${
+                          errors.userName ? "border-red-500" : ""
+                        }`}
                         {...register("userName")}
                       />
                       {errors.userName && (
@@ -105,7 +108,9 @@ const LogIn = () => {
                         name="password"
                         id="password"
                         autoComplete="password"
-                        className="input-filed"
+                        className={`input-filed ${
+                          errors.password ? "border-red-500" : ""
+                        }`}
                         {...register("password")}
                       />
                       {errors.password && (
@@ -117,7 +122,7 @@ const LogIn = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <button className="btn-send" type="button">
+                    <button className="btn-send" type="submit">
                       Log in
                     </button>
                   </div>
