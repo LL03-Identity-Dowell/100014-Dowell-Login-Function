@@ -21,7 +21,7 @@ const UserNameForget = () => {
           <form>
             <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
               <div className="px-4 py-2 sm:p-6 space-y-4">
-                <div className="sm:col-span-2">
+                <div>
                   <label
                     htmlFor="email"
                     className="block text-sm font-semibold leading-6 text-green-700"
@@ -37,12 +37,9 @@ const UserNameForget = () => {
                       className="input-filed"
                     />
                   </div>
-                </div>
-
-                <div>
                   <div className="mt-2.5">
                     <div className="flex flex-row space-x-3 items-center">
-                      <button className="btn-send px-2 self-start">
+                      <button className="btn-send px-2 py-1 self-start">
                         Get OTP
                       </button>
                       <p className="text-green-500 font-base">message</p>

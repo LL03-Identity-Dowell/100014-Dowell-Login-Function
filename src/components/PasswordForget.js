@@ -46,7 +46,8 @@ const PasswordForget = () => {
                   />
                 </div>
               </div>
-              <div className="sm:col-span-2">
+
+              <div>
                 <label
                   htmlFor="email"
                   className="block text-sm font-semibold leading-6 text-green-700"
@@ -62,12 +63,9 @@ const PasswordForget = () => {
                     className="input-filed"
                   />
                 </div>
-              </div>
-
-              <div>
                 <div className="mt-2.5">
                   <div className="flex flex-row space-x-3 items-center">
-                    <button className="btn-send px-2 self-start">
+                    <button className="btn-send px-2 py-1 self-start">
                       Get OTP
                     </button>
                     <p className="text-green-500 font-base">message</p>
