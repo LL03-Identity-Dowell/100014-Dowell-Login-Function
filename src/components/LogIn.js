@@ -65,7 +65,7 @@ const LogIn = () => {
                     <input
                       className="input-filed"
                       id="password"
-                      type="text"
+                      type="password"
                       placeholder="Enter your password"
                     />
                   </div>

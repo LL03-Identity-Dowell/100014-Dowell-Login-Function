@@ -100,7 +100,7 @@ const PasswordForget = () => {
                 </label>
                 <div className="mt-2.5">
                   <input
-                    type="text"
+                    type="password"
                     name="new-password"
                     id="new-password"
                     autoComplete="new-password"
@@ -118,7 +118,7 @@ const PasswordForget = () => {
                 </label>
                 <div className="mt-2.5">
                   <input
-                    type="text"
+                    type="password"
                     name="confirm-password"
                     id="confirm-password"
                     autoComplete="confirm-password"

@@ -96,6 +96,7 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <select
                   name="user-type"
+                  type="text"
                   placeholder="user-type"
                   required
                   className="select-btn"
@@ -115,7 +116,7 @@ const SignUp = () => {
               </label>
               <div className="mt-2.5">
                 <input
-                  type="text"
+                  type="password"
                   name="password"
                   id="password"
                   autoComplete="password"
@@ -133,7 +134,7 @@ const SignUp = () => {
               </label>
               <div className="mt-2.5">
                 <input
-                  type="text"
+                  type="password"
                   name="confirm-password"
                   id="confirm-password"
                   autoComplete="confirm-password"
@@ -153,13 +154,14 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <select
                   name="country"
+                  type="text"
                   placeholder="countries"
                   required
                   className="select-btn"
                 >
                   {countries.map((country) => (
                     <option key={country.id} value={country.name}>
-                      {country.name} ({country.country_code})
+                      {country.name}
                     </option>
                   ))}
                 </select>
@@ -187,7 +189,7 @@ const SignUp = () => {
                     >
                       {countries.map((country) => (
                         <option key={country.id} value={country.country_code}>
-                          {country.country_code}
+                          + {country.country_code}
                         </option>
                       ))}
                     </select>
