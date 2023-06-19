@@ -183,10 +183,13 @@ const SignUp = () => {
                 </label>
                 <div className="relative mt-2.5">
                   <PhoneInputWithCountry
-                    name="phoneInputWithCountrySelect"
+                    name="phone"
                     control={control}
                     rules={{ required: true }}
-                    className="border border-green-300 ring-green-300 ring-inset"
+                    numberInputProps={{
+                      className:
+                        "rounded-sm bg-white py-1 px-2 text-gray-700 shadow-sm ring-1 border border-green-300",
+                    }}
                   />
                 </div>
                 <div className="mt-2.5">
