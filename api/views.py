@@ -1,7 +1,6 @@
 import json
 import datetime
 import time
-import jwt
 import io
 import base64
 import os
@@ -377,15 +376,34 @@ def profile_update(request):
     Email = request.data.get("email")
     Phone = request.data.get("phone")
     Profile_Image = request.data.get("image")
+    otp = request.data.get('otp')
+
     obj = Account.objects.filter(username=username).first()
     field = {"document_name": username}
+
+    if username and Email and not Profile_Image and not Phone and not Lastname and not Firstname and not vision \
+        and not language_preferences and not nationality and not native_language and not user_country and not user_location \
+            and not user_city and not zip_code and not address:
+        otp_input = generateOTP()
+        message = get_html_msg(username, otp_input)
+
+        def send_otp(): return send_mail(
+            'Your otp for chaning password of Dowell account', otp, settings.EMAIL_HOST_USER, [Email], fail_silently=False, html_message=message)
+
+        send_otp()
+        return Response({'msg': 'OTP sent successfully'})
+
+    # Get user data from mongodb cluster
     client_admin = dowellconnection(
         "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "fetch", field, "nil")
     data2 = json.loads(client_admin)
-    print(data2)
+
     data1 = data2["data"][0]
+
     up_field = {}
     update_fields = []
+
+    # Update fields
     if Profile_Image is not None:
         img = Image.open(io.BytesIO(
             base64.decodebytes(bytes(Profile_Image, "utf-8"))))
