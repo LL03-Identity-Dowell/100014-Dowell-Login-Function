@@ -1,7 +1,12 @@
 import React from "react";
 
 const Help = () => {
-  return <div>Help TODO: Add help video</div>;
+  return (
+    <div>
+      {/* TODO: Add help video */}
+      Help
+    </div>
+  );
 };
 
 export default Help;
