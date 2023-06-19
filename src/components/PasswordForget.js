@@ -1,8 +1,41 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  userName: yup
+    .string()
+    .required("User Name is required")
+    .max(20)
+    .notOneOf(
+      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
+      "Username not allowed"
+    ),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(99),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match"),
+});
 
 const PasswordForget = () => {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
+
+  const onSubmit = (data) => console.log(data);
+
   return (
     <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
       <div className="py-8 md:col-span-2 space-y-4 my-10">
@@ -26,24 +59,32 @@ const PasswordForget = () => {
           </div>
         </div>
 
-        <form>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
             <div className="px-4 py-2 sm:p-6 space-y-4">
-              <div className="sm:col-span-2">
+              <div>
                 <label
-                  htmlFor="name"
+                  htmlFor="userName"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
-                  Username
+                  User Name
                 </label>
                 <div className="mt-2.5">
                   <input
                     type="text"
-                    name="username"
-                    id="username"
-                    autoComplete="username"
-                    className="input-filed"
+                    name="userName"
+                    id="userName"
+                    autoComplete="userName"
+                    className={`input-filed ${
+                      errors.userName ? "border-red-500" : ""
+                    }`}
+                    {...register("userName")}
                   />
+                  {errors.userName && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.userName.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -60,8 +101,16 @@ const PasswordForget = () => {
                     name="email"
                     id="email"
                     autoComplete="email"
-                    className="input-filed"
+                    className={`input-filed ${
+                      errors.email ? "border-red-500" : ""
+                    }`}
+                    {...register("email")}
                   />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
                 </div>
                 <div className="mt-2.5">
                   <div className="flex flex-row space-x-3 items-center">
@@ -89,25 +138,31 @@ const PasswordForget = () => {
                 />
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label
-                  htmlFor="new-password"
+                  htmlFor="password"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
-                  New Password
+                  Password
                 </label>
                 <div className="mt-2.5">
                   <input
                     type="password"
-                    name="new-password"
-                    id="new-password"
-                    autoComplete="new-password"
+                    name="password"
+                    id="password"
+                    autoComplete="password"
                     className="input-filed"
+                    {...register("password")}
                   />
+                  {errors.password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.password.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <label
                   htmlFor="confirm-password"
                   className="block text-sm font-semibold leading-6 text-green-700"
@@ -117,11 +172,17 @@ const PasswordForget = () => {
                 <div className="mt-2.5">
                   <input
                     type="password"
-                    name="confirm-password"
+                    name="confirmPassword"
                     id="confirm-password"
                     autoComplete="confirm-password"
                     className="input-filed"
+                    {...register("confirmPassword", { min: 8, max: 99 })}
                   />
+                  {errors.confirmPassword && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
