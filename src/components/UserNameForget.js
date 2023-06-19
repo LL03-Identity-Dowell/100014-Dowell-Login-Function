@@ -1,8 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  otp: yup.string().required("OTP required"),
+});
 
 const UserNameForget = () => {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
+
+  const onSubmit = (data) => console.log(data);
+
   return (
     <div>
       <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
@@ -18,7 +37,7 @@ const UserNameForget = () => {
             </h3>
           </div>
 
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
               <div className="px-4 py-2 sm:p-6 space-y-4">
                 <div>
@@ -34,8 +53,16 @@ const UserNameForget = () => {
                       name="email"
                       id="email"
                       autoComplete="email"
-                      className="input-filed"
+                      className={`input-filed ${
+                        errors.email ? "border-red-500" : ""
+                      }`}
+                      {...register("email")}
                     />
+                    {errors.email && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.email.message}
+                      </p>
+                    )}
                   </div>
                   <div className="mt-2.5">
                     <div className="flex flex-row space-x-3 items-center">
@@ -61,7 +88,13 @@ const UserNameForget = () => {
                       id="otp-email"
                       autoComplete="otp-email"
                       className="input-filed"
+                      {...register("otp")}
                     />
+                    {errors.otp && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.otp.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

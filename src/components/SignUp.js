@@ -32,6 +32,7 @@ const schema = yup.object({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
+  otp: yup.string().required("OTP required"),
 });
 
 const SignUp = () => {
@@ -200,7 +201,7 @@ const SignUp = () => {
                   id="confirm-password"
                   autoComplete="confirm-password"
                   className="input-filed"
-                  {...register("confirmPassword", { min: 8, max: 99 })}
+                  {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-xs mt-1">
@@ -279,7 +280,13 @@ const SignUp = () => {
                   id="otp-sms"
                   autoComplete="otp-sms"
                   className="input-filed"
+                  {...register("otp")}
                 />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -362,7 +369,13 @@ const SignUp = () => {
                   id="otp-email"
                   autoComplete="otp-email"
                   className="input-filed"
+                  {...register("otp")}
                 />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
               </div>
             </div>
           </div>

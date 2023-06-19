@@ -25,6 +25,7 @@ const schema = yup.object().shape({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
+  otp: yup.string().required("OTP required"),
 });
 
 const PasswordForget = () => {
@@ -135,7 +136,13 @@ const PasswordForget = () => {
                   id="otp-email"
                   autoComplete="otp-email"
                   className="input-filed"
+                  {...register("otp")}
                 />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
               </div>
 
               <div>
