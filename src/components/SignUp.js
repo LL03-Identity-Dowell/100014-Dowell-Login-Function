@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { MdAddAPhoto, MdCall } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCountries } from "../redux/countriesSlice";
 
 const SignUp = () => {
+  const dispatch = useDispatch();
+  const countries = useSelector((state) => state.countries);
+
+  useEffect(() => {
+    dispatch(fetchCountries());
+  }, [dispatch]);
+
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
       <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-2 py-6 md:px-4">
@@ -143,14 +152,16 @@ const SignUp = () => {
 
               <div className="mt-2.5">
                 <select
-                  name="product"
-                  placeholder="Products"
+                  name="country"
+                  placeholder="countries"
                   required
                   className="select-btn"
                 >
-                  <option>United States</option>
-                  <option>Canada</option>
-                  <option>Mexico</option>
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.name}>
+                      {country.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -174,9 +185,11 @@ const SignUp = () => {
                       name="country"
                       className="h-full rounded-md border border-green-200 bg-transparent bg-none py-0 pl-4 pr-9 text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm"
                     >
-                      <option>US</option>
-                      <option>CA</option>
-                      <option>EU</option>
+                      {countries.map((country) => (
+                        <option key={country.id} value={country.country_code}>
+                          {country.country_code}
+                        </option>
+                      ))}
                     </select>
                     <MdCall
                       className="pointer-events-none absolute right-3 top-0 h-full w-5 text-gray-400"
