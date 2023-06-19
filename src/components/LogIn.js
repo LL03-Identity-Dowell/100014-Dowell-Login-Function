@@ -1,8 +1,33 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+
+const schema = yup.object({
+  userName: yup
+    .string()
+    .required("User Name is required")
+    .max(20)
+    .notOneOf(
+      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
+      "Username not allowed"
+    ),
+  password: yup
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(99),
+});
 
 const LogIn = () => {
+  const {
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
+
+  const onSubmit = (data) => console.log(data);
   return (
     <>
       <div className="antialiased bg-gray-100">
@@ -39,35 +64,56 @@ const LogIn = () => {
 
             <div className="relative">
               <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
-                <form className="flex flex-col space-y-4">
-                  <div className="mb-3">
+                <form
+                  className="flex flex-col space-y-4"
+                  onSubmit={handleSubmit(onSubmit)}
+                >
+                  <div>
                     <label
-                      className="block text-green-700 text-sm font-medium mb-2"
-                      for="name"
+                      htmlFor="userName"
+                      className="block text-sm font-semibold leading-6 text-green-700"
                     >
                       User Name
                     </label>
-                    <input
-                      className="input-filed"
-                      id="name"
-                      type="text"
-                      placeholder="Enter your username"
-                    />
+                    <div className="mt-2.5">
+                      <input
+                        type="text"
+                        name="userName"
+                        id="userName"
+                        autoComplete="userName"
+                        className="input-filed"
+                        {...register("userName")}
+                      />
+                      {errors.userName && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.userName.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="mb-3">
+                  <div>
                     <label
-                      className="block text-green-700 text-sm font-medium mb-2"
-                      for="name"
+                      htmlFor="password"
+                      className="block text-sm font-semibold leading-6 text-green-700"
                     >
                       Password
                     </label>
-                    <input
-                      className="input-filed"
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                    />
+                    <div className="mt-2.5">
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        autoComplete="password"
+                        className="input-filed"
+                        {...register("password")}
+                      />
+                      {errors.password && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.password.message}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center">

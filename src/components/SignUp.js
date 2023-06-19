@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { MdAddAPhoto, MdCall } from "react-icons/md";
+import React, { useEffect } from "react";
+import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,16 +7,48 @@ import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
 import "react-phone-number-input/style.css";
 import PhoneInputWithCountry from "react-phone-number-input/react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const schema = yup.object({
+  firstName: yup.string().required("First Name is required").max(20),
+  lastName: yup.string().required("Last Name is required").max(20),
+  userName: yup
+    .string()
+    .required("User Name is required")
+    .max(20)
+    .notOneOf(
+      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
+      "Username not allowed"
+    ),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(99),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords must match"),
+});
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { control, handleSubmit } = useForm();
+  const {
+    control,
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm({ resolver: yupResolver(schema) });
 
   useEffect(() => {
     dispatch(fetchCountries());
   }, [dispatch]);
 
+  const onSubmit = (data) => console.log(data);
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
       <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-2 py-6 md:px-4">
@@ -34,7 +66,7 @@ const SignUp = () => {
           action="#"
           method="POST"
           className="mx-auto mt-8 max-w-xl sm:mt-12"
-          onSubmit={handleSubmit()}
+          onSubmit={handleSubmit(onSubmit)}
         >
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
             <div>
@@ -47,11 +79,17 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="first-name"
-                  id="first-name"
-                  autoComplete="given-name"
+                  name="firstName"
+                  id="firstName"
+                  autoComplete="firstName"
                   className="input-filed"
+                  {...register("firstName")}
                 />
+                {errors.firstName && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.firstName.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -69,13 +107,19 @@ const SignUp = () => {
                   id="last-name"
                   autoComplete="family-name"
                   className="input-filed"
+                  {...register("lastName")}
                 />
+                {errors.lastName && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.lastName.message}
+                  </p>
+                )}
               </div>
             </div>
 
             <div>
               <label
-                htmlFor="user-name"
+                htmlFor="userName"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 User Name
@@ -83,11 +127,17 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="user-name"
-                  id="user-name"
-                  autoComplete="user-name"
+                  name="userName"
+                  id="userName"
+                  autoComplete="userName"
                   className="input-filed"
+                  {...register("userName")}
                 />
+                {errors.userName && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.userName.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -126,7 +176,13 @@ const SignUp = () => {
                   id="password"
                   autoComplete="password"
                   className="input-filed"
+                  {...register("password")}
                 />
+                {errors.password && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.password.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -140,11 +196,17 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="password"
-                  name="confirm-password"
+                  name="confirmPassword"
                   id="confirm-password"
                   autoComplete="confirm-password"
                   className="input-filed"
+                  {...register("confirmPassword", { min: 8, max: 99 })}
                 />
+                {errors.confirmPassword && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -265,8 +327,16 @@ const SignUp = () => {
                   name="email"
                   id="email"
                   autoComplete="email"
-                  className="input-filed"
+                  className={`input-filed ${
+                    errors.email ? "border-red-500" : ""
+                  }`}
+                  {...register("email")}
                 />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
+                )}
               </div>
               <div className="mt-2.5">
                 <div className="flex flex-row space-x-3 items-center">
