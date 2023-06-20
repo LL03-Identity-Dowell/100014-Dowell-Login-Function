@@ -50,6 +50,7 @@ const SignUp = () => {
   }, [dispatch]);
 
   const onSubmit = (data) => console.log(data);
+
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
       <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-2 py-6 md:px-4">
@@ -156,8 +157,9 @@ const SignUp = () => {
                   placeholder="user-type"
                   required
                   className="select-btn"
+                  defaultValue="live-user"
                 >
-                  <option selected>Live User</option>
+                  <option value="live-user">Live User</option>
                   <option value="beta-tester">Beta Tester</option>
                 </select>
               </div>
@@ -250,8 +252,7 @@ const SignUp = () => {
                     control={control}
                     rules={{ required: true }}
                     numberInputProps={{
-                      className:
-                        "rounded-sm bg-white py-1 px-2 text-gray-700 shadow-sm ring-1 border border-green-300",
+                      className: "input-filed",
                     }}
                   />
                 </div>

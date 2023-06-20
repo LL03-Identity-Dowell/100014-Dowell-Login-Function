@@ -150,7 +150,7 @@ const PasswordForget = () => {
                   htmlFor="password"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
-                  Password
+                  New Password
                 </label>
                 <div className="mt-2.5">
                   <input
