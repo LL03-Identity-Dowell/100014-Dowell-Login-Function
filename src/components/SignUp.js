@@ -33,6 +33,7 @@ const schema = yup.object({
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
   otp: yup.string().required("OTP required"),
+  uploadPhoto: yup.string().required("Upload profile photo"),
 });
 
 const SignUp = () => {
@@ -315,7 +316,13 @@ const SignUp = () => {
                         name="file-upload"
                         type="file"
                         className="sr-only"
+                        {...register("uploadPhoto")}
                       />
+                      {errors.uploadPhoto && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.uploadPhoto.message}
+                        </p>
+                      )}
                     </label>
                   </div>
                 </div>
