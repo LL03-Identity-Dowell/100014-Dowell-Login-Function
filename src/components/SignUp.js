@@ -294,7 +294,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="OTP-code"
+                htmlFor="file-upload"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Upload Photo

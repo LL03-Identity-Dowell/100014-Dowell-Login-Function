@@ -183,7 +183,7 @@ const PasswordForget = () => {
                     id="confirm-password"
                     autoComplete="confirm-password"
                     className="input-filed"
-                    {...register("confirmPassword", { min: 8, max: 99 })}
+                    {...register("confirmPassword")}
                   />
                   {errors.confirmPassword && (
                     <p className="text-red-500 text-xs mt-1">
