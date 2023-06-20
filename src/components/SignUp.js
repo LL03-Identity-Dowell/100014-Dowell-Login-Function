@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
-import "react-phone-number-input/style.css";
-import PhoneInputWithCountry from "react-phone-number-input/react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
@@ -34,13 +32,20 @@ const schema = yup.object({
     .oneOf([yup.ref("password"), null], "Passwords must match"),
   otp: yup.string().required("OTP required"),
   uploadPhoto: yup.string().required("Upload profile photo"),
+  phoneNumber: yup
+    .number()
+    .positive("Phone number must be positive")
+    .integer("Phone number must be an integer")
+    .transform((value, originalValue) =>
+      originalValue < 0 ? undefined : value
+    )
+    .required("Phone number is required"),
 });
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
   const {
-    control,
     handleSubmit,
     register,
     formState: { errors },
@@ -216,7 +221,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="confirm-password"
+                htmlFor="country"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Country
@@ -240,6 +245,31 @@ const SignUp = () => {
             </div>
 
             <div>
+              <label
+                htmlFor="county-code"
+                className="block text-sm font-semibold leading-6 text-green-700"
+              >
+                Country Code
+              </label>
+
+              <div className="mt-2.5">
+                <select
+                  name="country"
+                  type="text"
+                  placeholder="countries code"
+                  required
+                  className="select-btn"
+                >
+                  {countries.map((country) => (
+                    <option key={country.id} value={country.country_code}>
+                      {country.name}(+{country.country_code})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
               <div>
                 <label
                   htmlFor="phone-number"
@@ -248,13 +278,11 @@ const SignUp = () => {
                   Phone Number
                 </label>
                 <div className="relative mt-2.5">
-                  <PhoneInputWithCountry
+                  <input
                     name="phone"
-                    control={control}
-                    rules={{ required: true }}
-                    numberInputProps={{
-                      className: "input-filed",
-                    }}
+                    type="number"
+                    className="input-filed"
+                    {...register("phoneNumber")}
                   />
                 </div>
                 <div className="mt-2.5">
