@@ -4,6 +4,9 @@ env = environ.Env()
 environ.Env.read_env()
 
 
+USE_I18N = True
+USE_TZ = True
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
