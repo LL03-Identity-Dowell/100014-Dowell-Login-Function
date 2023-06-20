@@ -22,9 +22,7 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, LiveUser, ProductUser, GuestAccount
-
-from api.serializers import LiveUserSerializer, ProductUserSerializer
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -509,27 +507,6 @@ def live_users(request):
         '%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
     final = {'liveusers': obj_live, 'non_liveusers': obj_notlive}
     return Response(final)
-
-
-@api_view(['GET', 'POST'])
-def live_user(request):
-    if request.method == 'POST':
-        serializer = LiveUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    users = LiveUser.objects.all()
-    return Response()
-
-
-@api_view(['GET', 'POST'])
-def product_users(request):
-    if request.method == 'POST':
-        serializer = ProductUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    return Response()
 
 
 @api_view(['GET'])

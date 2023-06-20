@@ -79,6 +79,8 @@ class LiveStatus(models.Model):
     status = models.CharField(max_length=50, null=True, blank=True)
     date_created = models.CharField(max_length=1000)
     date_updated = models.CharField(max_length=1000, null=True, blank=True)
+    updated = models.DateTimeField(null=True, blank=True)
+    created = models.DateTimeField(null=True, blank=True)
 
 
 class Live_QR_Status(models.Model):

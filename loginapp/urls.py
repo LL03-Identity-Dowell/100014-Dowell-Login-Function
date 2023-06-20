@@ -21,6 +21,10 @@ urlpatterns = [
     path('link_based/', views.linked_based, name="link_based"),
     path('check_status/', views.check_status, name="check_status"),
     path("live_status/", views.live_status, name="live_status"),
+    path("live_qr_status/", views.live_qr_status, name="live_qr_status"),
+    path("live_public_status/", views.live_public_status,
+         name="live_public_status"),
+    path("user_details/", views.user_info, name="userdetails"),
 
     path("user_chart/", TemplateView.as_view(template_name="chart.html"))
 ]
