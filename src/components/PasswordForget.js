@@ -126,7 +126,7 @@ const PasswordForget = () => {
               <div className="">
                 <label
                   className="block text-sm font-semibold leading-6 text-green-700"
-                  for="otp-email"
+                  htmlFor="otp-email"
                 >
                   Enter OTP from Email
                 </label>
