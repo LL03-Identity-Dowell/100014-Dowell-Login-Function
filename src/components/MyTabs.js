@@ -65,7 +65,7 @@ const MyTabs = () => {
                 }
               >
                 <div className="flex items-center justify-center space-x-1">
-                  {Icon && <Icon className="w-5 h-5" />}
+                  {Icon && <Icon className="w-6 h-6" />}
                   <span>{category}</span>
                 </div>
               </Tab>
