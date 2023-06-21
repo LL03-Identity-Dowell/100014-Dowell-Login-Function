@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { faqs } from "../components/AccordionData";
+import { faqs } from "../libs/AccordionData";
 
 const FAQ = () => {
   const [activeTab, setActiveTab] = useState(null);
