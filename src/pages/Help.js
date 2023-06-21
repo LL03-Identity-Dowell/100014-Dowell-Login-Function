@@ -1,14 +1,12 @@
 import React from "react";
+import YouTube from "react-youtube";
 
 const Help = () => {
+  const videoId = "PSmX-A5Cn_E";
+
   return (
     <div className="relative">
-      <video className="w-full" controls>
-        <source
-          src="https://www.youtube.com/watch?v=PSmX-A5Cn_E"
-          type="video/mp4"
-        />
-      </video>
+      <YouTube videoId={videoId} className="w-full" />
     </div>
   );
 };

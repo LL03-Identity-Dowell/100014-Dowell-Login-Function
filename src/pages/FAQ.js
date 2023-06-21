@@ -19,7 +19,7 @@ const FAQ = () => {
               className="flex justify-between w-full p-3 bg-gradient-to-r from-cyan-200 to-green-400 rounded-md focus:outline-none"
               onClick={() => toggleAccordion(index)}
             >
-              <span className="font-medium">{faq.question}</span>
+              <span className="font-semibold text-lg">{faq.question}</span>
               <span>{activeTab === index ? "-" : "+"}</span>
             </button>
             {activeTab === index && (
