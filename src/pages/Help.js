@@ -6,10 +6,11 @@ const Help = () => {
 
   return (
     <div className="relative">
-      <YouTube
-        videoId={videoId}
-        className="w-full items-center justify-center"
-      />
+      <div className="w-full flex justify-center items-center">
+        <div className="max-w-2xl">
+          <YouTube videoId={videoId} />
+        </div>
+      </div>
     </div>
   );
 };
