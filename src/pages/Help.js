@@ -6,7 +6,10 @@ const Help = () => {
 
   return (
     <div className="relative">
-      <YouTube videoId={videoId} className="w-full" />
+      <YouTube
+        videoId={videoId}
+        className="w-full items-center justify-center"
+      />
     </div>
   );
 };
