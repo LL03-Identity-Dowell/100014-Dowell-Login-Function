@@ -35,7 +35,7 @@ const PasswordForget = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = async (data) => {};
 
   return (
     <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
