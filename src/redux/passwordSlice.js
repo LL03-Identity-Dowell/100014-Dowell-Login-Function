@@ -3,14 +3,28 @@ import { api } from "./api";
 
 export const resetPassword = createAsyncThunk(
   "password/reset",
-  async (data) => {
-    const response = await api.post("/api/forgot_password", {
-      username: data.username,
-      email: data.email,
-      opt: data.otp,
-      new_password: data.password,
-    });
-    return response.data;
+  async (data, { rejectWithValue }) => {
+    try {
+      const endpoint = data.otp ? "verify_otp" : "send_otp";
+      const response = await api.post(`/api/forgot_password/${endpoint}`, {
+        username: data.username,
+        email: data.email,
+        otp: data.otp,
+        new_password: data.newPassword,
+      });
+      const responseData = response.data;
+      return {
+        step: data.otp ? 2 : 1,
+        message:
+          responseData.msg === "success"
+            ? data.otp
+              ? "Password reset successfully"
+              : "OTP sent successfully"
+            : responseData.info,
+      };
+    } catch (error) {
+      return rejectWithValue("An error occurred");
+    }
   }
 );
 

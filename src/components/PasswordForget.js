@@ -130,9 +130,6 @@ const PasswordForget = () => {
                     {status === "succeeded" && (
                       <p className="text-green-500 font-base">{message}</p>
                     )}
-                    {status === "failed" && (
-                      <p className="text-red-500 font-base">Error: {error}</p>
-                    )}
                   </div>
                 </div>
               </div>
