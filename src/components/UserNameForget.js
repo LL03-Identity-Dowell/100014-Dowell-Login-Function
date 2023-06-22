@@ -120,7 +120,7 @@ const UserNameForget = () => {
                         >
                           {loading ? "Sending..." : "Get OTP"}
                         </button>
-                        <p className="text-green-500 font-base">{error}</p>
+                        <p className="text-red-500 font-base">{error}</p>
                       </div>
                     </div>
                   </div>
