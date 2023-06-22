@@ -38,7 +38,7 @@ const PasswordForget = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { message, status, error } = useSelector((state) => state.password);
+  const { step, message } = useSelector((state) => state.password);
 
   const onSubmit = (data) => {
     dispatch(resetPassword(data));
@@ -66,8 +66,6 @@ const PasswordForget = () => {
             </Link>
           </div>
         </div>
-
-        <div>{status === "loading" && <p>Loading...</p>}</div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
@@ -127,87 +125,91 @@ const PasswordForget = () => {
                     <button className="btn-send px-2 py-1 self-start">
                       Get OTP
                     </button>
-                    {status === "succeeded" && (
-                      <p className="text-green-500 font-base">{message}</p>
-                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="">
-                <label
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                  htmlFor="otp-email"
-                >
-                  Enter OTP from Email
-                </label>
-                <input
-                  type="text"
-                  name="otp-email"
-                  id="otp-email"
-                  autoComplete="otp-email"
-                  className="input-filed"
-                  {...register("otp")}
-                />
-                {errors.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
-                )}
-              </div>
+              {step === 2 && (
+                <>
+                  <div className="">
+                    <label
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                      htmlFor="otp-email"
+                    >
+                      Enter OTP from Email
+                    </label>
+                    <input
+                      type="text"
+                      name="otp-email"
+                      id="otp-email"
+                      autoComplete="otp-email"
+                      className="input-filed"
+                      {...register("otp")}
+                    />
+                    {errors.otp && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.otp.message}
+                      </p>
+                    )}
+                  </div>
 
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  New Password
-                </label>
-                <div className="mt-2.5">
-                  <input
-                    type="password"
-                    name="password"
-                    id="password"
-                    autoComplete="password"
-                    className="input-filed"
-                    {...register("password")}
-                  />
-                  {errors.password && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.password.message}
-                    </p>
-                  )}
-                </div>
-              </div>
+                  <div>
+                    <label
+                      htmlFor="password"
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                    >
+                      New Password
+                    </label>
+                    <div className="mt-2.5">
+                      <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        autoComplete="password"
+                        className="input-filed"
+                        {...register("password")}
+                      />
+                      {errors.password && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.password.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
 
-              <div>
-                <label
-                  htmlFor="confirm-password"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  Confirm Password
-                </label>
-                <div className="mt-2.5">
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    id="confirm-password"
-                    autoComplete="confirm-password"
-                    className="input-filed"
-                    {...register("confirmPassword")}
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.confirmPassword.message}
-                    </p>
+                  <div>
+                    <label
+                      htmlFor="confirm-password"
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                    >
+                      Confirm Password
+                    </label>
+                    <div className="mt-2.5">
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        id="confirm-password"
+                        autoComplete="confirm-password"
+                        className="input-filed"
+                        {...register("confirmPassword")}
+                      />
+                      {errors.confirmPassword && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.confirmPassword.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {message && (
+                    <div className="text-green-600 text-center">{message}</div>
                   )}
-                </div>
-              </div>
+                </>
+              )}
             </div>
 
             <div className="px-4 py-2 text-center md:text-left sm:px-6">
               <button type="submit" className="btn-send">
-                Change password
+                {step === 1 ? "Get OTP" : "Change password"}
               </button>
             </div>
 
