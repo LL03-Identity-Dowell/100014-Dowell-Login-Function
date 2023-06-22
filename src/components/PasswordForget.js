@@ -4,6 +4,8 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { resetPassword } from "../redux/passwordSlice";
 
 const schema = yup.object().shape({
   userName: yup
@@ -35,7 +37,12 @@ const PasswordForget = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = async (data) => {};
+  const dispatch = useDispatch();
+  const { message, status, error } = useSelector((state) => state.password);
+
+  const onSubmit = (data) => {
+    dispatch(resetPassword(data));
+  };
 
   return (
     <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
@@ -59,6 +66,8 @@ const PasswordForget = () => {
             </Link>
           </div>
         </div>
+
+        <div>{status === "loading" && <p>Loading...</p>}</div>
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
@@ -118,7 +127,12 @@ const PasswordForget = () => {
                     <button className="btn-send px-2 py-1 self-start">
                       Get OTP
                     </button>
-                    <p className="text-green-500 font-base">message</p>
+                    {status === "succeeded" && (
+                      <p className="text-green-500 font-base">{message}</p>
+                    )}
+                    {status === "failed" && (
+                      <p className="text-red-500 font-base">Error: {error}</p>
+                    )}
                   </div>
                 </div>
               </div>
