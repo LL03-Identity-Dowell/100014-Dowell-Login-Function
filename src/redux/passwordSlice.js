@@ -1,27 +1,40 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "./api";
+import axios from "axios";
+
+const BASE_URL = "https://100014.pythonanywhere.com/api/forgot_password/";
 
 export const resetPassword = createAsyncThunk(
   "password/reset",
   async (data, { rejectWithValue }) => {
     try {
-      const endpoint = data.otp ? "verify_otp" : "send_otp";
-      const response = await api.post(`/api/forgot_password/${endpoint}`, {
-        username: data.username,
-        email: data.email,
-        otp: data.otp,
-        new_password: data.newPassword,
-      });
+      let response;
+      if (!data.otp) {
+        // Step 1: Request OTP
+        response = await axios.post(`${BASE_URL}`, {
+          username: data.username,
+          email: data.email,
+        });
+      } else {
+        // Step 2: Reset Password
+        response = await axios.post(`${BASE_URL}`, {
+          username: data.username,
+          email: data.email,
+          otp: data.otp,
+          new_password: data.newPassword,
+        });
+      }
+
       const responseData = response.data;
-      return {
-        step: data.otp ? 2 : 1,
-        message:
-          responseData.msg === "success"
-            ? data.otp
-              ? "Password reset successfully"
-              : "OTP sent successfully"
-            : responseData.info,
-      };
+      if (responseData.msg === "success") {
+        return {
+          step: data.otp ? 2 : 1,
+          message: data.otp
+            ? "Password reset successfully"
+            : "OTP sent successfully",
+        };
+      } else {
+        return rejectWithValue(responseData.info);
+      }
     } catch (error) {
       return rejectWithValue("An error occurred");
     }
