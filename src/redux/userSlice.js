@@ -31,10 +31,30 @@ const userSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchUsernameByOtp.pending, (state) => {
-      state.loading = true;
-      state.error = null;
-    });
+    builder
+      .addCase(fetchUsernameByOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsernameByOtp.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        const { msg, info } = action.payload;
+        if (msg === "success") {
+          if (info === "OTP sent successfully") {
+            state.otpSent = true;
+          } else if (info === "Your username/s was sent to your mail") {
+            state.otpVerified = true;
+            state.usernames = action.payload.usernames; // Assuming usernames are returned in the response
+          }
+        } else {
+          state.error = info;
+        }
+      })
+      .addCase(fetchUsernameByOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      });
   },
 });
 
