@@ -18,6 +18,7 @@ export const fetchUsernameByOtp = createAsyncThunk(
   }
 );
 
+// Initial States
 const initialState = {
   loading: false,
   error: null,
@@ -39,13 +40,13 @@ const userSlice = createSlice({
       .addCase(fetchUsernameByOtp.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        const { msg, info } = action.payload;
+        const { msg, info, usernames } = action.payload;
         if (msg === "success") {
           if (info === "OTP sent successfully") {
             state.otpSent = true;
           } else if (info === "Your username/s was sent to your mail") {
             state.otpVerified = true;
-            state.usernames = action.payload.usernames; // Assuming usernames are returned in the response
+            state.usernames = usernames;
           }
         } else {
           state.error = info;

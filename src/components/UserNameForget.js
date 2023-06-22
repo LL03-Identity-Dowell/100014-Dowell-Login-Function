@@ -4,6 +4,8 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUsernameByOtp } from "../redux/userSlice";
 
 const schema = yup.object().shape({
   email: yup
@@ -20,7 +22,14 @@ const UserNameForget = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = (data) => console.log(data);
+  const dispatch = useDispatch();
+  const userState = useSelector((state) => state.user);
+  const { loading, error, otpSent, otpVerified, usernames } = userState || {};
+
+  const onSubmit = (data) => {
+    const { email, otp } = data;
+    dispatch(fetchUsernameByOtp({ email, otp }));
+  };
 
   return (
     <div>
@@ -37,81 +46,95 @@ const UserNameForget = () => {
             </h3>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
-              <div className="px-4 py-2 sm:p-6 space-y-4">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    Email
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      autoComplete="email"
-                      className={`input-filed ${
-                        errors.email ? "border-red-500" : ""
-                      }`}
-                      {...register("email")}
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.email.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-2.5">
-                    <div className="flex flex-row space-x-3 items-center">
-                      <button className="btn-send px-2 py-1 self-start">
-                        Get OTP
-                      </button>
-                      <p className="text-green-500 font-base">message</p>
+          {otpSent ? (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
+                <div className="px-4 py-2 sm:p-6 space-y-4">
+                  {/* OTP field */}
+                  <div className="sm:col-span-2">
+                    <label
+                      htmlFor="otp-email"
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                    >
+                      Enter OTP from email
+                    </label>
+                    <div className="mt-2.5">
+                      <input
+                        type="text"
+                        name="otp-email"
+                        id="otp-email"
+                        autoComplete="otp-email"
+                        className="input-filed"
+                        {...register("otp")}
+                      />
+                      {errors.otp && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.otp.message}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="otp-email"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    Enter OTP from email
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="text"
-                      name="otp-email"
-                      id="otp-email"
-                      autoComplete="otp-email"
-                      className="input-filed"
-                      {...register("otp")}
-                    />
-                    {errors.otp && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.otp.message}
-                      </p>
-                    )}
+                <div className="px-4 py-2 text-center md:text-left sm:px-6">
+                  <button type="submit" className="btn-send" disabled={loading}>
+                    Verify
+                  </button>
+                </div>
+              </div>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
+                <div className="px-4 py-2 sm:p-6 space-y-4">
+                  {/* Email field */}
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                    >
+                      Email
+                    </label>
+                    <div className="mt-2.5">
+                      <input
+                        type="email"
+                        name="email"
+                        id="email"
+                        autoComplete="email"
+                        className={`input-filed ${
+                          errors.email ? "border-red-500" : ""
+                        }`}
+                        {...register("email")}
+                      />
+                      {errors.email && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.email.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-2.5">
+                      <div className="flex flex-row space-x-3 items-center">
+                        <button
+                          className="btn-send px-2 py-1 self-start"
+                          disabled={loading}
+                          type="submit"
+                        >
+                          {loading ? "Sending..." : "Get OTP"}
+                        </button>
+                        <p className="text-green-500 font-base">{error}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="px-4 py-2 text-center md:text-left sm:px-6">
-                <button type="submit" className="btn-send">
-                  Verify
-                </button>
-              </div>
+            </form>
+          )}
 
-              <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
-                Do have an account?
-                <Link to="/signin">
-                  <span className="text-green-600"> Log in</span>
-                </Link>
-              </div>
-            </div>
-          </form>
+          <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
+            Do you have an account?{" "}
+            <Link to="/signin">
+              <span className="text-green-600">Log in</span>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
