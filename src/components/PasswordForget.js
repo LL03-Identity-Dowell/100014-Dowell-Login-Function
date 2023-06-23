@@ -72,7 +72,7 @@ const PasswordForget = () => {
             <div className="px-4 py-2 sm:p-6 space-y-4">
               <div>
                 <label
-                  htmlFor="userName"
+                  htmlFor="username"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   User Name
@@ -84,13 +84,13 @@ const PasswordForget = () => {
                     id="username"
                     autoComplete="username"
                     className={`input-filed ${
-                      errors.userName ? "border-red-500" : ""
+                      errors.username ? "border-red-500" : ""
                     }`}
                     {...register("username")}
                   />
-                  {errors.userName && (
+                  {errors.username && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.userName.message}
+                      {errors.username.message}
                     </p>
                   )}
                 </div>
