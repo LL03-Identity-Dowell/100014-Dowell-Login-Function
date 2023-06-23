@@ -10,17 +10,19 @@ export const resetPassword = createAsyncThunk(
       let response;
       if (!data.otp) {
         // Step 1: Request OTP
+        const { username, email } = data;
         response = await axios.post(`${BASE_URL}`, {
-          username: data.username,
-          email: data.email,
+          username,
+          email,
         });
       } else {
         // Step 2: Reset Password
+        const { username, email, otp, new_password } = data;
         response = await axios.post(`${BASE_URL}`, {
-          username: data.username,
-          email: data.email,
-          otp: data.otp,
-          new_password: data.newPassword,
+          username,
+          email,
+          otp,
+          new_password,
         });
       }
 
