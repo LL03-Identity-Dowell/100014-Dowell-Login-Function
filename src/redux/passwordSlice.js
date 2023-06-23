@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "https://100014.pythonanywhere.com/api/forgot_password/";
+const BASE_URL = "https://100014.pythonanywhere.com/api/forgot_password";
 
 export const resetPassword = createAsyncThunk(
   "password/reset",
@@ -38,6 +38,9 @@ export const resetPassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue("An error occurred");
     }
+  },
+  {
+    payload: {},
   }
 );
 
