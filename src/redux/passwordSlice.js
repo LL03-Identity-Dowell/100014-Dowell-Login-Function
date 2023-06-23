@@ -5,10 +5,8 @@ const BASE_URL = "https://100014.pythonanywhere.com/api/forgot_password/";
 
 export const resetPassword = createAsyncThunk(
   "password/reset",
-  async (data, { rejectWithValue }) => {
+  async ({ username, email, otp, new_password }) => {
     try {
-      const { username, email, otp = "", new_password = "" } = data.payload;
-      // Request OTP or Reset Password
       const response = await axios.post(`${BASE_URL}`, {
         username,
         email,
@@ -24,14 +22,15 @@ export const resetPassword = createAsyncThunk(
             : "OTP sent successfully",
         };
       } else {
-        return rejectWithValue(responseData.info);
+        return {
+          error: responseData.info,
+        };
       }
     } catch (error) {
-      return rejectWithValue("An error occurred");
+      return {
+        error: error.message,
+      };
     }
-  },
-  {
-    payload: {},
   }
 );
 
@@ -52,10 +51,7 @@ const passwordSlice = createSlice({
       })
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.message =
-          action.payload.message === "success"
-            ? "Password reset successfully"
-            : "Wrong OTP";
+        state.message = action.payload.message;
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.status = "failed";

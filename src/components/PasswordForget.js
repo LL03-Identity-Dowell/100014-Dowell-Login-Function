@@ -41,8 +41,13 @@ const PasswordForget = () => {
   const { message } = useSelector((state) => state.password);
 
   const onSubmit = (data) => {
-    // call the resetPassword action creator
-    dispatch(resetPassword(data));
+    try {
+      // call the resetPassword action creator
+      dispatch(resetPassword(data));
+    } catch (error) {
+      // handle the error
+      console.log(error);
+    }
   };
 
   return (
