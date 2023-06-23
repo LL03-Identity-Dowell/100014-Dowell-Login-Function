@@ -77,9 +77,9 @@ const PasswordResetForm = () => {
         {error && <p>{error}</p>}
         {passwordReset && <p>Password reset successfully!</p>}
 
-        <form onSubmit={handleSubmit(handleSendOTP)}>
-          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
-            <div className="px-4 py-2 sm:p-6 space-y-4">
+        <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
+          <div className="px-4 py-2 sm:p-6 space-y-4">
+            <form onSubmit={handleSubmit(handleSendOTP)}>
               <>
                 <div>
                   <label
@@ -144,14 +144,10 @@ const PasswordResetForm = () => {
                   </div>
                 </div>
               </>
-            </div>
-          </div>
-        </form>
+            </form>
 
-        {otpSent && (
-          <form onSubmit={handleSubmit(handleResetPassword)}>
-            <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
-              <div className="px-4 py-2 sm:p-6 space-y-4">
+            {otpSent && (
+              <form onSubmit={handleSubmit(handleResetPassword)}>
                 <div>
                   <label
                     className="block text-sm font-semibold leading-6 text-green-700"
@@ -222,15 +218,15 @@ const PasswordResetForm = () => {
                   </div>
                 </div>
 
-                <div className="px-4 py-2 text-center md:text-left sm:px-6">
+                <div className="btn-send px-1 py-1 mt-2 self-start">
                   <button type="submit" className="btn-send" disabled={loading}>
                     Reset Password
                   </button>
                 </div>
-              </div>
-            </div>
-          </form>
-        )}
+              </form>
+            )}
+          </div>
+        </div>
 
         <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
           Do have an account?
