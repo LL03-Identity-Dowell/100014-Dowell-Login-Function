@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetPassword } from "../redux/passwordSlice";
 
 const schema = yup.object().shape({
-  userName: yup
+  username: yup
     .string()
     .required("User Name is required")
     .max(20)
@@ -80,13 +80,13 @@ const PasswordForget = () => {
                 <div className="mt-2.5">
                   <input
                     type="text"
-                    name="userName"
-                    id="userName"
-                    autoComplete="userName"
+                    name="username"
+                    id="username"
+                    autoComplete="username"
                     className={`input-filed ${
                       errors.userName ? "border-red-500" : ""
                     }`}
-                    {...register("userName")}
+                    {...register("username")}
                   />
                   {errors.userName && (
                     <p className="text-red-500 text-xs mt-1">
