@@ -1,35 +1,31 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const BASE_URL = "https://100014.pythonanywhere.com/api/forgot_password/";
+// Define the API endpoint URL
+const API_URL = "https://100014.pythonanywhere.com/api/forgot_password/";
 
-export const resetPassword = createAsyncThunk(
-  "password/reset",
-  async ({ username, email, otp, new_password }) => {
+// Async thunk for sending the POST request and getting OTP
+export const sendOTP = createAsyncThunk(
+  "password/sendOTP",
+  async ({ username, email }) => {
     try {
-      const response = await axios.post(`${BASE_URL}`, {
-        username,
-        email,
-        otp,
-        new_password,
-      });
-
-      const responseData = response.data;
-      if (responseData.message === "success") {
-        return {
-          message: otp
-            ? "Password reset successfully"
-            : "OTP sent successfully",
-        };
-      } else {
-        return {
-          error: responseData.info,
-        };
-      }
+      const response = await axios.post(API_URL, { username, email });
+      return response.data;
     } catch (error) {
-      return {
-        error: error.message,
-      };
+      throw new Error(error.response.data.info);
+    }
+  }
+);
+
+// Async thunk for submitting OTP and new password
+export const resetPassword = createAsyncThunk(
+  "password/resetPassword",
+  async ({ otp, new_password }) => {
+    try {
+      const response = await axios.post(API_URL, { otp, new_password });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response.data.info);
     }
   }
 );
@@ -37,24 +33,38 @@ export const resetPassword = createAsyncThunk(
 const passwordSlice = createSlice({
   name: "password",
   initialState: {
-    message: "",
-    status: "idle",
+    loading: false,
     error: null,
+    otpSent: false,
+    passwordReset: false,
   },
-
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(resetPassword.pending, (state) => {
-        state.status = "loading";
+      .addCase(sendOTP.pending, (state) => {
+        state.loading = true;
         state.error = null;
+        state.otpSent = false;
       })
-      .addCase(resetPassword.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.message = action.payload.message;
+      .addCase(sendOTP.fulfilled, (state) => {
+        state.loading = false;
+        state.otpSent = true;
+      })
+      .addCase(sendOTP.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.passwordReset = false;
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.passwordReset = true;
       })
       .addCase(resetPassword.rejected, (state, action) => {
-        state.status = "failed";
+        state.loading = false;
         state.error = action.error.message;
       });
   },

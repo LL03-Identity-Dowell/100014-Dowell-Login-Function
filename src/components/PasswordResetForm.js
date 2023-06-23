@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPassword } from "../redux/passwordSlice";
+import { resetPassword, sendOTP } from "../redux/passwordSlice";
 
 const schema = yup.object().shape({
   username: yup
@@ -30,7 +30,7 @@ const schema = yup.object().shape({
   otp: yup.string().required("OTP required"),
 });
 
-const PasswordForget = () => {
+const PasswordResetForm = () => {
   const {
     handleSubmit,
     register,
@@ -38,42 +38,44 @@ const PasswordForget = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { message } = useSelector((state) => state.password);
+  const { otpSent, passwordReset, loading, error } = useSelector(
+    (state) => state.password
+  );
 
-  const onSubmit = (data) => {
-    try {
-      // call the resetPassword action creator
-      dispatch(resetPassword(data));
-    } catch (error) {
-      // handle the error
-      console.log(error);
-    }
+  const handleSendOTP = () => {
+    // Dispatch the sendOTP async thunk
+    dispatch(sendOTP({ username: "example_username", email: "example_email" }));
+  };
+
+  const handleResetPassword = () => {
+    // Dispatch the resetPassword async thunk
+    dispatch(
+      resetPassword({ otp: "example_otp", new_password: "example_password" })
+    );
   };
 
   return (
     <div className="flex relative flex-col md:text-left md:flex-row max-w-7xl px-10 justify-evenly mx-auto items-center">
       <div className="py-8 md:col-span-2 space-y-4 my-10">
-        <div>
-          <div className="flex items-center justify-center space-x-2 px-2 sm:px-0">
-            <img
-              src={DoWellVerticalLogo}
-              alt="DoWell logo"
-              className="h-28 w-34 rounded-full drop-shadow-sm"
-            />
-            <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
-              Forget Password
-            </h3>
-          </div>
-
-          <div className="flex text-gray-600 space-x-2 py-2 px-2 text-left">
-            <p>Do you forget username?</p>
-            <Link to="/username">
-              <span className="text-green-600">Click here</span>
-            </Link>
-          </div>
+        <div className="flex items-center justify-center space-x-2 px-2 sm:px-0">
+          <img
+            src={DoWellVerticalLogo}
+            alt="DoWell logo"
+            className="h-28 w-34 rounded-full drop-shadow-sm"
+          />
+          <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
+            Forget Password
+          </h3>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <div className="flex text-gray-600 space-x-2 py-2 px-2 text-left">
+          <p>Do you forget username?</p>
+          <Link to="/username">
+            <span className="text-green-600">Click here</span>
+          </Link>
+        </div>
+
+        <form onSubmit={handleSubmit(handleResetPassword)}>
           <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
             <div className="px-4 py-2 sm:p-6 space-y-4">
               <div>
@@ -128,7 +130,11 @@ const PasswordForget = () => {
                 </div>
                 <div className="mt-2.5">
                   <div className="flex flex-row space-x-3 items-center">
-                    <button className="btn-send px-2 py-1 self-start">
+                    <button
+                      className="btn-send px-2 py-1 self-start"
+                      onClick={handleSendOTP}
+                      disabled={loading}
+                    >
                       Get OTP
                     </button>
                   </div>
@@ -207,8 +213,8 @@ const PasswordForget = () => {
             </div>
 
             <div className="px-4 py-2 text-center md:text-left sm:px-6">
-              <button type="submit" className="btn-send">
-                Change password
+              <button type="submit" className="btn-send" disabled={loading}>
+                Reset Password
               </button>
             </div>
 
@@ -219,13 +225,13 @@ const PasswordForget = () => {
               </Link>
             </div>
           </div>
-          {message && (
-            <div className="text-green-600 text-center">{message}</div>
-          )}
         </form>
+        {loading && <p>Loading...</p>}
+        {error && <p>{error}</p>}
+        {passwordReset && <p>Password reset successfully!</p>}
       </div>
     </div>
   );
 };
 
-export default PasswordForget;
+export default PasswordResetForm;
