@@ -91,7 +91,7 @@ const PasswordResetForm = () => {
                     name="username"
                     id="username"
                     autoComplete="username"
-                    className={`input-filed ${
+                    className={`input-field ${
                       errors.username ? "border-red-500" : ""
                     }`}
                     {...register("username")}
@@ -117,7 +117,7 @@ const PasswordResetForm = () => {
                     name="email"
                     id="email"
                     autoComplete="email"
-                    className={`input-filed ${
+                    className={`input-field ${
                       errors.email ? "border-red-500" : ""
                     }`}
                     {...register("email")}
@@ -153,7 +153,7 @@ const PasswordResetForm = () => {
                   name="otp-email"
                   id="otp-email"
                   autoComplete="otp-email"
-                  className="input-filed"
+                  className="input-field"
                   {...register("otp")}
                 />
                 {errors.otp && (
@@ -176,7 +176,7 @@ const PasswordResetForm = () => {
                     name="password"
                     id="password"
                     autoComplete="password"
-                    className="input-filed"
+                    className="input-field"
                     {...register("password")}
                   />
                   {errors.password && (
@@ -200,7 +200,7 @@ const PasswordResetForm = () => {
                     name="confirmPassword"
                     id="confirm-password"
                     autoComplete="confirm-password"
-                    className="input-filed"
+                    className="input-field"
                     {...register("confirmPassword")}
                   />
                   {errors.confirmPassword && (

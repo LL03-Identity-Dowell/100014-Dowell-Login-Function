@@ -82,7 +82,7 @@ const LogIn = () => {
                         name="userName"
                         id="userName"
                         autoComplete="userName"
-                        className={`input-filed ${
+                        className={`input-field ${
                           errors.userName ? "border-red-500" : ""
                         }`}
                         {...register("userName")}
@@ -108,7 +108,7 @@ const LogIn = () => {
                         name="password"
                         id="password"
                         autoComplete="password"
-                        className={`input-filed ${
+                        className={`input-field ${
                           errors.password ? "border-red-500" : ""
                         }`}
                         {...register("password")}

@@ -64,7 +64,7 @@ const UserNameForget = () => {
                         name="otp-email"
                         id="otp-email"
                         autoComplete="otp-email"
-                        className="input-filed"
+                        className="input-field"
                         {...register("otp")}
                       />
                       {errors.otp && (
@@ -100,7 +100,7 @@ const UserNameForget = () => {
                         name="email"
                         id="email"
                         autoComplete="email"
-                        className={`input-filed ${
+                        className={`input-field ${
                           errors.email ? "border-red-500" : ""
                         }`}
                         {...register("email")}

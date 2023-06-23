@@ -90,7 +90,7 @@ const SignUp = () => {
                   name="firstName"
                   id="firstName"
                   autoComplete="firstName"
-                  className="input-filed"
+                  className="input-field"
                   {...register("firstName")}
                 />
                 {errors.firstName && (
@@ -114,7 +114,7 @@ const SignUp = () => {
                   name="last-name"
                   id="last-name"
                   autoComplete="family-name"
-                  className="input-filed"
+                  className="input-field"
                   {...register("lastName")}
                 />
                 {errors.lastName && (
@@ -138,7 +138,7 @@ const SignUp = () => {
                   name="userName"
                   id="userName"
                   autoComplete="userName"
-                  className="input-filed"
+                  className="input-field"
                   {...register("userName")}
                 />
                 {errors.userName && (
@@ -184,7 +184,7 @@ const SignUp = () => {
                   name="password"
                   id="password"
                   autoComplete="password"
-                  className="input-filed"
+                  className="input-field"
                   {...register("password")}
                 />
                 {errors.password && (
@@ -208,7 +208,7 @@ const SignUp = () => {
                   name="confirmPassword"
                   id="confirm-password"
                   autoComplete="confirm-password"
-                  className="input-filed"
+                  className="input-field"
                   {...register("confirmPassword")}
                 />
                 {errors.confirmPassword && (
@@ -281,7 +281,7 @@ const SignUp = () => {
                   <input
                     name="phone"
                     type="number"
-                    className="input-filed"
+                    className="input-field"
                     {...register("phoneNumber")}
                   />
                 </div>
@@ -309,7 +309,7 @@ const SignUp = () => {
                   name="otp-sms"
                   id="otp-sms"
                   autoComplete="otp-sms"
-                  className="input-filed"
+                  className="input-field"
                   {...register("otp")}
                 />
                 {errors.otp && (
@@ -370,7 +370,7 @@ const SignUp = () => {
                   name="email"
                   id="email"
                   autoComplete="email"
-                  className={`input-filed ${
+                  className={`input-field ${
                     errors.email ? "border-red-500" : ""
                   }`}
                   {...register("email")}
@@ -404,7 +404,7 @@ const SignUp = () => {
                   name="otp-email"
                   id="otp-email"
                   autoComplete="otp-email"
-                  className="input-filed"
+                  className="input-field"
                   {...register("otp")}
                 />
                 {errors.otp && (
