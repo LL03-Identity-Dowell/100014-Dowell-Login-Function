@@ -10,7 +10,11 @@ export const sendOTP = createAsyncThunk(
   async ({ username, email }) => {
     try {
       const response = await axios.post(API_URL, { username, email });
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error(response.data.info);
+      }
     } catch (error) {
       throw new Error(error.response.data.info);
     }
@@ -23,7 +27,11 @@ export const resetPassword = createAsyncThunk(
   async ({ otp, new_password }) => {
     try {
       const response = await axios.post(API_URL, { otp, new_password });
-      return response.data;
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error(response.data.info);
+      }
     } catch (error) {
       throw new Error(error.response.data.info);
     }
