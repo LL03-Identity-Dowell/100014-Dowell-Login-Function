@@ -38,13 +38,11 @@ const PasswordForget = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { step, message } = useSelector((state) => state.password);
+  const { message } = useSelector((state) => state.password);
 
   const onSubmit = (data) => {
-    if (step === 2) {
-      // call the resetPassword action creator
-      dispatch(resetPassword(data));
-    }
+    // call the resetPassword action creator
+    dispatch(resetPassword(data));
   };
 
   return (
@@ -132,87 +130,80 @@ const PasswordForget = () => {
                 </div>
               </div>
 
-              {step === 2 && (
-                <>
-                  <div className="">
-                    <label
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                      htmlFor="otp-email"
-                    >
-                      Enter OTP from Email
-                    </label>
-                    <input
-                      type="text"
-                      name="otp-email"
-                      id="otp-email"
-                      autoComplete="otp-email"
-                      className="input-filed"
-                      {...register("otp")}
-                    />
-                    {errors.otp && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.otp.message}
-                      </p>
-                    )}
-                  </div>
+              <div className="">
+                <label
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                  htmlFor="otp-email"
+                >
+                  Enter OTP from Email
+                </label>
+                <input
+                  type="text"
+                  name="otp-email"
+                  id="otp-email"
+                  autoComplete="otp-email"
+                  className="input-filed"
+                  {...register("otp")}
+                />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
+              </div>
 
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                    >
-                      New Password
-                    </label>
-                    <div className="mt-2.5">
-                      <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        autoComplete="password"
-                        className="input-filed"
-                        {...register("password")}
-                      />
-                      {errors.password && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.password.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="confirm-password"
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                    >
-                      Confirm Password
-                    </label>
-                    <div className="mt-2.5">
-                      <input
-                        type="password"
-                        name="confirmPassword"
-                        id="confirm-password"
-                        autoComplete="confirm-password"
-                        className="input-filed"
-                        {...register("confirmPassword")}
-                      />
-                      {errors.confirmPassword && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.confirmPassword.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  {message && (
-                    <div className="text-green-600 text-center">{message}</div>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  New Password
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    autoComplete="password"
+                    className="input-filed"
+                    {...register("password")}
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.password.message}
+                    </p>
                   )}
-                </>
-              )}
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirm-password"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  Confirm Password
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirm-password"
+                    autoComplete="confirm-password"
+                    className="input-filed"
+                    {...register("confirmPassword")}
+                  />
+                  {errors.confirmPassword && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div className="px-4 py-2 text-center md:text-left sm:px-6">
               <button type="submit" className="btn-send">
-                {step === 1 ? "Get OTP" : "Change password"}
+                Change password
               </button>
             </div>
 
@@ -223,6 +214,9 @@ const PasswordForget = () => {
               </Link>
             </div>
           </div>
+          {message && (
+            <div className="text-green-600 text-center">{message}</div>
+          )}
         </form>
       </div>
     </div>

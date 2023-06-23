@@ -7,30 +7,19 @@ export const resetPassword = createAsyncThunk(
   "password/reset",
   async (data, { rejectWithValue }) => {
     try {
-      let response;
-      if (!data.otp) {
-        // Step 1: Request OTP
-        const { username, email } = data;
-        response = await axios.post(`${BASE_URL}`, {
-          username,
-          email,
-        });
-      } else {
-        // Step 2: Reset Password
-        const { username, email, otp, new_password } = data;
-        response = await axios.post(`${BASE_URL}`, {
-          username,
-          email,
-          otp,
-          new_password,
-        });
-      }
+      const { username, email, otp = "", new_password = "" } = data.payload;
+      // Request OTP or Reset Password
+      const response = await axios.post(`${BASE_URL}`, {
+        username,
+        email,
+        otp,
+        new_password,
+      });
 
       const responseData = response.data;
-      if (responseData.msg === "success") {
+      if (responseData.message === "success") {
         return {
-          step: data.otp ? 2 : 1,
-          message: data.otp
+          message: otp
             ? "Password reset successfully"
             : "OTP sent successfully",
         };
@@ -64,7 +53,7 @@ const passwordSlice = createSlice({
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.message =
-          action.payload.msg === "success"
+          action.payload.message === "success"
             ? "Password reset successfully"
             : "Wrong OTP";
       })
