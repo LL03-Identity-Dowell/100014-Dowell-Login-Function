@@ -36,6 +36,45 @@
     <meta property="og:description" content="&nbsp; Join as new Member Do you have an account? Sign." />
     <meta property="og:url" content="https://www.login.dowellstore.org/member-join/" />
     <meta property="og:site_name" content="Login" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        .Short {
+    width: 100%;
+    background-color: #dc3545;
+    margin-top: 5px;
+    height: 3px;
+    color: #dc3545;
+    font-weight: 500;
+    font-size: 12px;
+}
+.Weak {
+    width: 100%;
+    background-color: #ffc107;
+    margin-top: 5px;
+    height: 3px;
+    color: #ffc107;
+    font-weight: 500;
+    font-size: 12px;
+}
+.Good {
+    width: 100%;
+    background-color: #28a745;
+    margin-top: 5px;
+    height: 3px;
+    color: #28a745;
+    font-weight: 500;
+    font-size: 12px;
+}
+.Strong {
+    width: 100%;
+    background-color: #d39e00;
+    margin-top: 5px;
+    height: 3px;
+    color: #d39e00;
+    font-weight: 500;
+    font-size: 12px;
+}
+    </style>
     <script>
         function CheckData() {
             with (document.frmRecord) {
@@ -49,6 +88,47 @@
             document.getElementById("user").innerHTML = "";
             return true;
         }
+        //  edited by hira
+
+        function checkPasswordMatch() {
+        var password = $("#password1").val();
+        var confirmPassword = $("#password2").val();
+        if (password != confirmPassword){
+            $("#CheckPasswordMatch").html("Passwords does not match!").css('color','red');
+        }else{
+            $("#CheckPasswordMatch").html("Passwords match.").css('color','green');
+        }
+    }
+    $(document).ready(function () {
+       $("#password2").keyup(checkPasswordMatch);
+    });
+
+    // pattern matching
+    $(document).ready(function () {
+    $('#password1').keyup(function () {
+        $('#strengthMessage').html(CheckPassword($('#password1').val()))
+    })
+    function CheckPassword(inputtxt)
+{
+var paswd=  /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+if(inputtxt.match(paswd))
+{
+    window.password_strength="valid"
+    $('#strengthMessage').removeClass()
+    $('#strengthMessage').addClass('Strong')
+    return 'Pattern Satisfied'
+}
+else
+{
+    window.password_strength="invalid"
+    $('#strengthMessage').removeClass()
+    $('#strengthMessage').addClass('Weak')
+    return 'Atleast a Uppercase letter, a number and a special character is required'
+}
+}
+
+
+});
 
     </script>
     <link rel='dns-prefetch' href='//s.w.org' />
@@ -1649,8 +1729,8 @@
                                                                         id="username"
                                                                         class="elementor-field elementor-size-sm  elementor-field-textual"
                                                                         placeholder="Enter Your User Name"
-                                                                        required="required" aria-required="true"
-                                                                        minlength="8">
+                                                                        required="required" aria-required="true" pattern="[^()/<>[\]\\,'|\x22]+"
+                                                                        minlength="12" title="The minimum length is 12 and spaces are not allowed">
                                                                     <span id="user_error" style="color:red"></span>
                                                                 </div>
                                                                 <div
@@ -1666,6 +1746,8 @@
                                                                         minlength="8">
 
                                                                 </div>
+                                                                <div id="strengthMessage" style="margin-bottom: 30px;"></div>
+
                                                                 <div
                                                                     class="elementor-field-type-password elementor-field-group elementor-column elementor-field-group-field_e424c9b elementor-col-100 elementor-field-required elementor-mark-required">
                                                                     <label for="form-field-field_e424c9b"
@@ -1678,6 +1760,9 @@
                                                                         required="required" aria-required="true"
                                                                         minlength="8">
                                                                 </div>
+                                                                <!-- edited by hira  -->
+                                                                <div class="registrationFormAlert" style="color:green;" id="CheckPasswordMatch"></div>
+
                                                                 <div
                                                                     class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
                                                                     <label for="form-field-field_5a25b50"
@@ -2054,7 +2139,7 @@
                                                                             {% for x,y in country_resp %}
                                                                             <option value="{{x}}">{{y}}</option>
                                                                             {%endfor%}
-                                                                            <option value="+977">NEP(+977)</option>
+                                                                            <option value="+977">Nepal(+977)</option>
                                                                             <!--<option value="+91">+91</option>-->
                                                                             <!--<option value="+88">+88</option>-->
                                                                             <!--<option value="+92">+92</option>-->
@@ -2084,7 +2169,17 @@
                                                                 <div style=" margin-left:2%;color:green;height:30%"
                                                                     id="success1"></div>
 
-                                                                <div style="display:block"
+                                                                <br><br>
+                                                                <div style="padding:1%;display:none" id="sms_not_receiveDIV">
+                                                                    <label
+                                                                    class="elementor-field-label"
+                                                                        style=" font-family: 'Roboto', Sans-serif;font-weight: 400;color: #038625;font-style: italic;"
+                                                                        for="sms_not_receive">Did not recieve the otp?</label>
+                                                                    <input type="checkbox" id="sms_not_receive"
+                                                                        value="yes"><br>
+                                                                </div>
+
+                                                                <div id="smsDIV" style="display:block"
                                                                     class="elementor-field-type-tel elementor-field-group elementor-column elementor-field-group-field_a0b39ea elementor-col-100 elementor-field-required elementor-mark-required">
                                                                     <label for="form-field-field_a0b39ea"
                                                                         class="elementor-field-label ">
@@ -2165,14 +2260,14 @@
                                                                         name="policy_status" value="Accepted"><br><span
                                                                         id="policy_output"> </span>
                                                                 </div>
-                                                                <div style="padding:1%">
-                                                                    <label
-                                                                        style=" font-family: 'Roboto', Sans-serif;font-weight: 400;color: #038625;font-style: italic;"
-                                                                        for="other_policy">Do you accept our safety and
-                                                                        security policies?</label>
-                                                                    <input type="checkbox" name="other_policy"
-                                                                        value="Accepted"><br>
-                                                                </div>
+                                                                <!--<div style="padding:1%">-->
+                                                                <!--    <label-->
+                                                                <!--        style=" font-family: 'Roboto', Sans-serif;font-weight: 400;color: #038625;font-style: italic;"-->
+                                                                <!--        for="other_policy">Do you accept our safety and-->
+                                                                <!--        security policies?</label>-->
+                                                                <!--    <input type="checkbox" name="other_policy"-->
+                                                                <!--        value="Accepted"><br>-->
+                                                                <!--</div>-->
                                                                 <div style="padding:1%">
                                                                     <label
                                                                         style=" font-family: 'Roboto', Sans-serif;font-weight: 400;color: #038625;font-style: italic;"
@@ -2180,28 +2275,7 @@
                                                                         newsletter?</label>
                                                                     <input type="checkbox" name="newsletter"
                                                                         value="Accepted"><br>
-                                                                </div>
-<script>
-  const password1 = document.querySelector('#password1');
-  const password2 = document.querySelector('#password2');
-
-  password1.addEventListener('focus', e => {
-    if (password2.nextElementSibling) {
-      password2.nextElementSibling.remove();
-    }
-  })
-  password2.addEventListener('focusout', e => {
-    if (password1.value !== password2.value) {
-      const pElem = document.createElement('p');
-      pElem.style.color = '#ff0000';
-      pElem.style.textAlign = 'center';
-      pElem.style.width = '100%';
-      const errorNode = document.createTextNode("The password did not match");
-      pElem.appendChild(errorNode);
-      password2.insertAdjacentElement('afterend', pElem);
-    }
-  })
-</script>
+                                                                </div> 
                                                                 <script>
                                                                     $("#policy_status").change(function (e) {
                                                                         if (document.getElementById("username").value != "") {
@@ -2359,6 +2433,15 @@
                                                                 }
                                                             </script>
                                                             <script type="text/javascript">
+                                                            $("#username").on({
+                                                              keydown: function(e) {
+                                                                if (e.which === 32)
+                                                                  return false;
+                                                              },
+                                                              change: function() {
+                                                                this.value = this.value.replace(/\s/g, "");
+                                                              }
+                                                            });
                                                                 var mainparams = ""
                                                                 let urlString = window.location.href;
                                                                 let paramString = urlString.split('?')[1];
@@ -2371,10 +2454,11 @@
                                                             </script>
 
                                                             <script>
+                                                            var mobile_otp_remains=4
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
-                                                                var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 var email_otp_restricted = localStorage.getItem('email_otp_restricted');
-                                                                var mobile_otp_restricted = localStorage.getItem('mobile_otp_restricted');
+                                                                // var mobile_otp_restricted = localStorage.getItem('mobile_otp_restricted');
                                                                 if (email_otp_remains == null) {
                                                                     localStorage.setItem('email_otp_remains', 5)
                                                                 }
@@ -2401,33 +2485,33 @@
                                                                         }, 300 * 1000 - email_diff);
                                                                     }
                                                                 }
-                                                                if (mobile_otp_remains == null) {
-                                                                    localStorage.setItem('mobile_otp_remains', 5)
-                                                                }
-                                                                else if (mobile_otp_remains == 0) {
-                                                                    if (mobile_otp_restricted == null) {
-                                                                        mobile_otp_restricted = Date()
-                                                                    }
-                                                                    mobile_diff = Date.parse(Date()) - Date.parse(mobile_otp_restricted)
-                                                                    if (mobile_diff >= 300000) {
-                                                                        $('#sms_btn').prop('disabled', false);
-                                                                        localStorage.setItem("mobile_otp_remains", 5);
-                                                                        mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                        localStorage.removeItem('mobile_otp_restricted');
-                                                                        $('#output1').html("");
-                                                                        $('#success1').html("You can send otp now..");
-                                                                    } else {
-                                                                        setTimeout(function () {
-                                                                            $('#sms_btn').prop('disabled', false);
-                                                                            localStorage.setItem("mobile_otp_remains", 5);
-                                                                            mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                            localStorage.removeItem('mobile_otp_restricted');
-                                                                            $('#success1').html("You can send otp now..");
-                                                                        }, 300 * 1000 - mobile_diff);
-                                                                    }
-                                                                }
+                                                                // if (mobile_otp_remains == null) {
+                                                                //     localStorage.setItem('mobile_otp_remains', 5)
+                                                                // }
+                                                                // else if (mobile_otp_remains == 0) {
+                                                                //     if (mobile_otp_restricted == null) {
+                                                                //         mobile_otp_restricted = Date()
+                                                                //     }
+                                                                //     mobile_diff = Date.parse(Date()) - Date.parse(mobile_otp_restricted)
+                                                                //     if (mobile_diff >= 300000) {
+                                                                //         $('#sms_btn').prop('disabled', false);
+                                                                //         localStorage.setItem("mobile_otp_remains", 5);
+                                                                //         mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                //         localStorage.removeItem('mobile_otp_restricted');
+                                                                //         $('#output1').html("");
+                                                                //         $('#success1').html("You can send otp now..");
+                                                                //     } else {
+                                                                //         setTimeout(function () {
+                                                                //             $('#sms_btn').prop('disabled', false);
+                                                                //             localStorage.setItem("mobile_otp_remains", 5);
+                                                                //             mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                //             localStorage.removeItem('mobile_otp_restricted');
+                                                                //             $('#success1').html("You can send otp now..");
+                                                                //         }, 300 * 1000 - mobile_diff);
+                                                                //     }
+                                                                // }
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
-                                                                var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 $('#sms_btn').on('click', function (e) {
                                                                     $("#success1").html("");
                                                                     $("#output1").html("");
@@ -2451,26 +2535,30 @@
                                                                                     dataType: "json",
                                                                                 },
                                                                                 success: function (data) {
+                                                                                    $('#sms_status').val("")
                                                                                     mobile_otp_remains--;
-                                                                                    localStorage.setItem("mobile_otp_remains", mobile_otp_remains);
+                                                                                    // localStorage.setItem("mobile_otp_remains", mobile_otp_remains);
                                                                                     $('#output1').html("");
                                                                                     $('#sms_verify').css('display', 'block');
                                                                                     if (mobile_otp_remains < 1) {
-                                                                                        $('#success1').html("SMS Sent Successfully!!" + "<br>" + "<span style='color:red'>No chances left, try after five minutes..</span>" + "<span style='color:red' id='sms_counter'></span>");
-                                                                                        document.getElementById('sms_counter').innerHTML = " (" + mobile_otp_remains + " chances left)";
+                                                                                        $('#success1').html("SMS Sent Successfully!!" + "<br>" + "<span style='color:green' id='sms_counter'>You can proceed without OTP</span>");
+                                                                                        // document.getElementById('sms_counter').innerHTML = " (" + mobile_otp_remains + " chances left)";
                                                                                         $('#sms_btn').html("Resend");
-                                                                                        localStorage.setItem("mobile_otp_restricted", Date());
-                                                                                        setTimeout(function () {
-                                                                                            $('#sms_btn').prop('disabled', false);
-                                                                                            localStorage.setItem("mobile_otp_remains", 5);
-                                                                                            mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                                            $('#success1').html("You can click Get OTP now..");
-                                                                                            localStorage.removeItem('mobile_otp_restricted');
-                                                                                        }, 300 * 1000);
+                                                                                        $('#sms').removeAttr('required');
+                                                                                        $('#sms_status').val("verified");
+                                                                                        $('#sms_not_receiveDIV').css('display','block');
+                                                                                        // localStorage.setItem("mobile_otp_restricted", Date());
+                                                                                        // setTimeout(function () {
+                                                                                        //     $('#sms_btn').prop('disabled', false);
+                                                                                        //     localStorage.setItem("mobile_otp_remains", 5);
+                                                                                        //     mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                                        //     $('#success1').html("You can click Get OTP now..");
+                                                                                        //     localStorage.removeItem('mobile_otp_restricted');
+                                                                                        // }, 300 * 1000);
                                                                                     } else {
                                                                                         sms_countdown();
-                                                                                        $('#success1').html("SMS Sent Successfully!! " + " Resend after " + "<span style='color:black' id='js-timeout-sms'>1:00</span> mins." + "<span style='color:red' id='sms_counter'></span>");
-                                                                                        document.getElementById('sms_counter').innerHTML = " (" + mobile_otp_remains + " chances left)";
+                                                                                        $('#success1').html("SMS Sent Successfully!! " + "<br> Resend after " + "<span style='color:black' id='js-timeout-sms'>1:00</span> mins." + "<span style='color:red' id='sms_counter'></span><br>");
+                                                                                        document.getElementById('sms_counter').innerHTML = " <br>(" + mobile_otp_remains + " attempts left. You can signup with unverified mobile number after all attempts)";
                                                                                         $('#sms_btn').html("Resend");
                                                                                     };
                                                                                 },
@@ -2558,6 +2646,7 @@
 
                                                                                 },
                                                                                 success: function (data) {
+                                                                                    $('#otp_status').val("")
                                                                                     email_otp_remains--;
                                                                                     localStorage.setItem("email_otp_remains", email_otp_remains);
                                                                                     $('#output').html("");
@@ -2649,45 +2738,75 @@
                                                                 });
 
                                                                 $('#email').on('change', function () {
+                                                                    if (!otp_timer_status){
+																		$('#success').html("");
+																	}
                                                                     $('#otp_status').val("")
                                                                     $('#success_otp').html("")
-                                                                    $('#success').html("")
                                                                     $('#output_otp').html("")
                                                                     $('#output').html("")
                                                                     $('#error_msg').html("")
 
                                                                 });
                                                                 $('#phone').on('change', function () {
+                                                                    if (!sms_timer_status){
+																		$('#success1').html("");
+																	}
                                                                     $('#sms_status').val("")
                                                                     $('#success_sms').html("")
-                                                                    $('#success1').html("")
                                                                     $('#output_sms').html("")
                                                                     $('#output1').html("")
                                                                     $('#error_msg').html("")
 
                                                                 });
-
+function containsSpecialChars(str) {
+  const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+  return specialChars.test(str);
+}
                                                                 function form_validation() {
                                                                     $('#success_otp').html("")
                                                                     $('#success').html("")
                                                                     $('#output_otp').html("")
                                                                     $('#output').html("")
                                                                     $('#error_msg').html("")
-                                                                    if ($('#otp_status').val() == "verified") {
-                                                                        if ($('#sms_status').val() == "verified") {
-                                                                            return true
-                                                                        } else {
-                                                                            $('#error_msg').html("Verify the mobile OTP first!")
+                                                                    if ($('#password1').val() == $('#password2').val()) {
+                                                                        if(password_strength == "valid"){
+                                                                            if ($('#otp_status').val() == "verified") {
+                                                                                if ($('#sms_status').val() == "verified") {
+                                                                                    if( $('#username').val().length >=8){
+                                                                                        if (containsSpecialChars($('#username').val())) {
+                                                                                            $('#error_msg').html("Space and special characters not allowed in username")
+                                                                                            return false
+                                                                                        } else {
+                                                                                            return true
+                                                                                        }
+                                                                                    }else{
+                                                                                        $('#error_msg').html("Length of username must be greater than 8")
+                                                                                        return false
+                                                                                    }
+                                                                                } else {
+                                                                                    $('#error_msg').html("Verify the mobile OTP first!")
+                                                                                    return false
+                                                                                }
+                                                                            } else {
+                                                                                $('#error_msg').html("Verify the email OTP first!")
+                                                                                return false
+                                                                            }
+                                                                        }else{
+                                                                            $('#error_msg').html('Passwords not matching patterns').css('color', 'red');
                                                                             return false
                                                                         }
-                                                                    } else {
-                                                                        $('#error_msg').html("Verify the email OTP first!")
+                                                                    }else{
+                                                                        $('#error_msg').html('Passwords Not Matching').css('color', 'red');
                                                                         return false
+
                                                                     }
                                                                 }
 
                                                             </script>
                                                             <script>
+                                                                window.otp_timer_status= false;
+                                                                window.sms_timer_status= false;
                                                                 var interval_otp;
                                                                 function otp_countdown() {
 																	window.otp_timer_status= true;
@@ -2739,10 +2858,33 @@
                                                                             window.sms_timer_status= false;
 																			clearInterval(interval_sms);
                                                                             console.log("over");
+                                                                            if (mobile_otp_remains < 1){
+                                                                                $('#sms_counter').html("Proceed without OTP");
+                                                                                $('#sms_not_receiveDIV').css('display','block');
+                                                                            }
                                                                             $('#sms_btn').prop('disabled', false);
                                                                         };
                                                                     }, 1000);
                                                                 };
+                                                            $("#sms_not_receive").change(function (e){
+                                                                    $('#success_sms').html("")
+                                                                    $('#output_sms').html("")
+                                                                    $('#output1').html("")
+                                                                if(this.checked){
+                                                                    $('#sms_verify').css("display","none");
+                                                                    $('#success1').html("")
+                                                                    $('#smsDIV').css("display","none");
+                                                                    $('#sms').removeAttr("required");
+                                                                    $('#sms_status').val("verified");
+                                                                    $('#sms').val("");
+                                                                }else{
+                                                                    $('#sms_verify').css("display","block")
+                                                                    $('#smsDIV').css("display","block");
+                                                                    $('#success1').html("SMS tried 3 times!" + "<br>" + "<span style='color:green' id='sms_counter'>You can now proceed without OTP</span>");
+                                                                    $('#sms').prop("required",true);
+                                                                    $('#sms_status').val("verified");
+                                                                }
+                                                            })
                                                             </script>
                                                             <!-- <div class="elementor-field-type-text elementor-field-group elementor-column elementor-field-group-field_9d41611 elementor-col-100 elementor-field-required elementor-mark-required">
 												<label for="form-field-field_9d41611" class="elementor-field-label">
