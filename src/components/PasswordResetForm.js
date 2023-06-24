@@ -27,7 +27,7 @@ const schema = yup.object().shape({
     .max(99),
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match"),
+    .oneOf([yup.ref("new_password"), null], "Passwords must match"),
 });
 
 const PasswordResetForm = () => {
@@ -134,7 +134,6 @@ const PasswordResetForm = () => {
                   <div className="flex flex-row space-x-3 items-center">
                     <button
                       className="btn-send px-2 py-1 self-start"
-                      disabled={loading}
                       onClick={handleSubmit(handleSendOTP)}
                     >
                       Get OTP
@@ -203,11 +202,7 @@ const PasswordResetForm = () => {
                     id="confirm-password"
                     autoComplete="confirm-password"
                     className="input-field"
-                    {...register("confirmPassword", {
-                      validate: (value) =>
-                        value === getValues().new_password ||
-                        "Passwords must match",
-                    })}
+                    {...register("confirmPassword")}
                   />
                   {errors.confirmPassword && (
                     <p className="text-red-500 text-xs mt-1">
@@ -218,7 +213,7 @@ const PasswordResetForm = () => {
               </div>
 
               <div className="btn-send px-1 py-1 mt-2 self-start">
-                <button type="submit" className="btn-send" disabled={loading}>
+                <button type="submit" className="btn-send">
                   Reset Password
                 </button>
               </div>
