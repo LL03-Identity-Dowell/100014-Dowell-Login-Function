@@ -1,11 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { submitOTP } from "../redux/forgotUsernameSlice";
+import { forgotUsername } from "../redux/authSlice";
 
 const schema = yup.object().shape({
   email: yup
@@ -15,7 +15,7 @@ const schema = yup.object().shape({
   otp: yup.string().required("OTP is required"),
 });
 
-const UserNameForget = () => {
+const ForgotUsername = () => {
   const {
     handleSubmit,
     register,
@@ -23,12 +23,10 @@ const UserNameForget = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { loading, error, usernameList } = useSelector(
-    (state) => state.forgotUsername
-  );
+  const usernameList = useSelector((state) => state.auth);
 
-  const onSubmit = (data) => {
-    dispatch(submitOTP({ email: data.email, otp: data.otp }));
+  const onSubmit = ({ email, otp }) => {
+    dispatch(forgotUsername({ email, otp }));
   };
 
   return (
@@ -46,13 +44,9 @@ const UserNameForget = () => {
             </h3>
           </div>
 
-          {loading && <p>Loading...</p>}
-          {error && <p>Error: {error}</p>}
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
               <div className="px-4 py-2 sm:p-6 space-y-4">
-                {/* Email field */}
                 <div>
                   <label
                     htmlFor="email"
@@ -77,61 +71,51 @@ const UserNameForget = () => {
                       </p>
                     )}
                   </div>
-                  <div className="mt-2.5">
-                    <div className="flex flex-row space-x-3 items-center">
-                      <button
-                        className="btn-send px-2 py-1 self-start"
-                        type="submit"
-                      >
-                        Get OTP
-                      </button>
-                    </div>
-                  </div>
+                </div>
 
-                  <div className="sm:col-span-2">
-                    <label
-                      htmlFor="otp"
-                      className="block text-sm font-semibold leading-6 text-green-700"
+                <div className="mt-2.5">
+                  <div className="flex flex-row space-x-3 items-center">
+                    <button
+                      className="btn-send px-2 py-1 self-start"
+                      type="submit"
                     >
-                      Enter OTP from email
-                    </label>
-                    <div className="mt-2.5">
-                      <input
-                        type="text"
-                        name="otp"
-                        id="otp"
-                        autoComplete="otp"
-                        className="input-field"
-                        {...register("otp")}
-                      />
-                      {errors.otp && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.otp.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="px-4 py-2 text-center md:text-left sm:px-6">
-                    <button type="submit" className="btn-send">
-                      Verify
+                      Get OTP
                     </button>
                   </div>
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="otp"
+                    className="block text-sm font-semibold leading-6 text-green-700"
+                  >
+                    Enter OTP from email
+                  </label>
+                  <div className="mt-2.5">
+                    <input
+                      type="text"
+                      name="otp"
+                      id="otp"
+                      autoComplete="otp"
+                      className="input-field"
+                      {...register("otp")}
+                    />
+                    {errors.otp && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.otp.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="px-4 py-2 text-center md:text-left sm:px-6">
+                  <button type="submit" className="btn-send">
+                    Verify
+                  </button>
                 </div>
               </div>
             </div>
           </form>
-
-          {usernameList.length > 0 && (
-            <div>
-              <p>Your username/s:</p>
-              <ul>
-                {usernameList.map((username) => (
-                  <li key={username}>{username}</li>
-                ))}
-              </ul>
-            </div>
-          )}
 
           <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
             Do you have an account?{" "}
@@ -145,4 +129,4 @@ const UserNameForget = () => {
   );
 };
 
-export default UserNameForget;
+export default ForgotUsername;

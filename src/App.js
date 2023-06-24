@@ -7,7 +7,7 @@ import Chat from "./pages/Chat";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
 import PasswordResetForm from "./components/PasswordResetForm";
-import UserNameForget from "./components/UserNameForget";
+import ForgotUsername from "./components/ForgetUsername";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
           <Route path="/signin" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/password" element={<PasswordResetForm />} />
-          <Route path="/username" element={<UserNameForget />} />
+          <Route path="/username" element={<ForgotUsername />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/policy" element={<Policy />} />
           <Route path="/help" element={<Help />} />
