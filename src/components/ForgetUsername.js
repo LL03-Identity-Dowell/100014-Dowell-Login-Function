@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { verifyOTP } from "../redux/authSlice";
+import { sendOTP, verifyOTP } from "../redux/authSlice";
 
 const schema = yup.object().shape({
   email: yup
@@ -20,13 +20,21 @@ const ForgotUsername = () => {
     handleSubmit,
     register,
     formState: { errors },
+    getValues, // Add getValues to access form values
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  // const { usernameList, loading, error } = useSelector((state) => state.auth);
+  const { usernameList, loading, error, sentOTP } = useSelector(
+    (state) => state.auth || {}
+  );
 
-  const onSubmit = (data) => {
-    dispatch(verifyOTP({ email: data.email, otp: data.otp }));
+  const handleSendOTP = ({ email }) => {
+    // Dispatch the sendOTP async thunk
+    dispatch(sendOTP(email));
+  };
+  const handleVerifyOTP = ({ otp }) => {
+    const { email } = getValues();
+    dispatch(verifyOTP({ email, otp }));
   };
 
   return (
@@ -43,7 +51,7 @@ const ForgotUsername = () => {
               Forget Username
             </h3>
           </div>
-          <form onSubmit={handleSubmit(onSubmit)}>
+          <form onSubmit={handleSubmit(handleVerifyOTP)}>
             <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
               <div className="px-4 py-2 sm:p-6 space-y-4">
                 <div>
@@ -76,7 +84,8 @@ const ForgotUsername = () => {
                   <div className="flex flex-row space-x-3 items-center">
                     <button
                       className="btn-send px-2 py-1 self-start"
-                      type="submit"
+                      type="button"
+                      onClick={handleSubmit(handleSendOTP)}
                     >
                       Get OTP
                     </button>
@@ -116,7 +125,12 @@ const ForgotUsername = () => {
             </div>
           </form>
 
-          {/* {usernameList.length > 0 && (
+          {/* Show loading and error messages */}
+          {loading && <p>Loading...</p>}
+          {error && <p>Error: {error}</p>}
+
+          {/* Show the list of usernames if available */}
+          {usernameList?.length > 0 && (
             <div>
               <p>Your username/s:</p>
               <ul>
@@ -125,7 +139,8 @@ const ForgotUsername = () => {
                 ))}
               </ul>
             </div>
-          )} */}
+          )}
+
           <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
             Do you have an account?{" "}
             <Link to="/signin">

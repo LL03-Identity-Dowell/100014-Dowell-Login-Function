@@ -3,7 +3,7 @@ import axios from "axios";
 
 const apiBaseUrl = "https://100014.pythonanywhere.com/api/forgot_username/";
 
-export const sendOTP = createAsyncThunk("auth/sendOTP", async ({ email }) => {
+export const sendOTP = createAsyncThunk("auth/sendOTP", async (email) => {
   try {
     const response = await axios.post(apiBaseUrl, { email });
     if (response.data.msg === "success") {
@@ -36,7 +36,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     usernameList: [],
-    success: false,
+    otpSent: false,
     loading: false,
     error: null,
   },
@@ -46,10 +46,11 @@ const authSlice = createSlice({
       .addCase(sendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.otpSent = false;
       })
       .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = true;
+        state.otpSent = action.payload;
       })
       .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;
@@ -58,6 +59,7 @@ const authSlice = createSlice({
       .addCase(verifyOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.usernameList = [];
       })
       .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
