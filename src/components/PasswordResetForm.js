@@ -20,14 +20,14 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  password: yup
+  otp: yup.string().required("OTP required"),
+  new_password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(99),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
-  otp: yup.string().required("OTP required"),
 });
 
 const PasswordResetForm = () => {
@@ -35,6 +35,7 @@ const PasswordResetForm = () => {
     handleSubmit,
     register,
     formState: { errors },
+    getValues, // Add getValues to access form values
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
@@ -42,14 +43,14 @@ const PasswordResetForm = () => {
     (state) => state.password
   );
 
-  const handleSendOTP = (data) => {
+  const handleSendOTP = ({ username, email }) => {
     // Dispatch the sendOTP async thunk
-    dispatch(sendOTP(data));
+    dispatch(sendOTP({ username, email }));
   };
 
-  const handleResetPassword = (data) => {
-    // Dispatch the resetPassword async thunk
-    dispatch(resetPassword(data));
+  const handleResetPassword = ({ otp, new_password }) => {
+    const { username, email } = getValues(); // Get form values
+    dispatch(resetPassword({ username, email, otp, new_password }));
   };
 
   return (

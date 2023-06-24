@@ -11,7 +11,8 @@ export const sendOTP = createAsyncThunk(
     try {
       const response = await axios.post(API_URL, { username, email });
       if (response.status === 200) {
-        return response.data;
+        console.log("response", response);
+        // return response.data;
       } else {
         throw new Error(response.data.info);
       }
@@ -24,9 +25,14 @@ export const sendOTP = createAsyncThunk(
 // Async thunk for submitting OTP and new password
 export const resetPassword = createAsyncThunk(
   "password/resetPassword",
-  async ({ otp, new_password }) => {
+  async ({ username, email, otp, new_password }) => {
     try {
-      const response = await axios.post(API_URL, { otp, new_password });
+      const response = await axios.post(API_URL, {
+        username,
+        email,
+        otp,
+        new_password,
+      });
       if (response.status === 200) {
         return response.data;
       } else {
@@ -54,9 +60,9 @@ const passwordSlice = createSlice({
         state.error = null;
         state.otpSent = false;
       })
-      .addCase(sendOTP.fulfilled, (state) => {
+      .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.otpSent = true;
+        state.otpSent = action.payload;
       })
       .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;
@@ -67,9 +73,9 @@ const passwordSlice = createSlice({
         state.error = null;
         state.passwordReset = false;
       })
-      .addCase(resetPassword.fulfilled, (state) => {
+      .addCase(resetPassword.fulfilled, (state, action) => {
         state.loading = false;
-        state.passwordReset = true;
+        state.passwordReset = action.payload;
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;
