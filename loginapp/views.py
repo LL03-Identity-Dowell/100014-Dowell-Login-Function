@@ -1,4 +1,6 @@
 # standard
+from django.db.models import Count
+from django.db.models.functions import TruncDay
 import json
 import requests
 import datetime
@@ -22,9 +24,20 @@ from django.views.decorators.clickjacking import xframe_options_exempt
 # rest_framework
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 # loginapp
-from loginapp.models import Account, GuestAccount, mobile_sms, CustomSession, QR_Creation, RandomSession, LiveStatus
+from loginapp.models import (
+    Account,
+    GuestAccount,
+    mobile_sms,
+    CustomSession,
+    QR_Creation,
+    RandomSession,
+    LiveStatus,
+    Live_Public_Status,
+    Live_QR_Status
+)
 
 # server utility functions
 from server.utils.dowellconnection import dowellconnection
@@ -278,6 +291,8 @@ def register(request):
         if password1 != password2:
             context["error"] = "Passwords Not Matching.."
             return render(request, "register_v2.html", context)
+        if Account.objects.filter(username=user).exists():
+            context['error'] = 'Username is already taken'
 
         if otp_status is not None:
             try:
@@ -826,20 +841,160 @@ def check_status(request):
     return render(request, 'check_status.html')
 
 
+@api_view(['POST'])
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 def live_status(request):
     if request.method == "POST":
-        sessionID = request.POST.get('session_id')
+        sessionID = request.data.get('session_id')
+        qrid = request.data.get('qrcode_id')
+        uid = request.data.get('device_unique_id')
+        product = request.data.get('product')
+        print(sessionID)
+        if sessionID is not None:
+            obj = LiveStatus.objects.filter(sessionID=sessionID).first()
+            if obj is not None:
+                serverclock = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                obj.product = product
+                obj.updated = serverclock
+                obj.save(update_fields=['product', 'updated'])
+                return JsonResponse({"msg": "OK"})
+            else:
+                return JsonResponse({"msg": "Given session_id not found in database!"})
+        elif qrid is not None:
+            obj = Live_QR_Status.objects.filter(qrid=qrid).first()
+            if obj is not None:
+                serverclock = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                obj.product = product
+                obj.updated = serverclock
+                obj.save(update_fields=['product', 'updated'])
+                return JsonResponse({"msg": "OK", "remarks": "Old object updated"})
+            else:
+                serverclock = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                Live_QR_Status.objects.create(
+                    qrid=qrid, product=product, created=serverclock, updated=serverclock, status="online")
+                return JsonResponse({"msg": "OK", "remarks": "New object created"})
+        elif uid is not None:
+            obj = Live_Public_Status.objects.filter(unique_key=uid).first()
+            if obj is not None:
+                serverclock = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                obj.product = product
+                obj.updated = serverclock
+                obj.save(update_fields=['product', 'updated'])
+                return JsonResponse({"msg": "OK", "remarks": "Old object updated"})
+            else:
+                serverclock = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                Live_Public_Status.objects.create(
+                    unique_key=uid, product=product, created=serverclock, updated=serverclock, status="install")
+                return JsonResponse({"msg": "OK", "remarks": "New object created"})
+        else:
+            return JsonResponse({"msg": "Error", "remarks": "One among session_id,qrcode_id and device_unique_id is required"})
+    else:
+        return HttpResponse("You don't have permission to access this page")
+
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def live_qr_status(request):
+    if request.method == "POST":
+        qrid = request.POST.get('qrid')
         product = request.POST.get('product')
-        obj = LiveStatus.objects.filter(sessionID=sessionID).first()
+        obj = Live_QR_Status.objects.filter(qrid=qrid).first()
         if obj is not None:
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
             obj.product = product
             obj.date_updated = serverclock
             obj.save(update_fields=['product', 'date_updated'])
-            return JsonResponse({"msg": "true"})
+            return JsonResponse({"msg": "OK", "remarks": "Old object updated"})
         else:
-            return JsonResponse({"msg": "Given session_id not found in database!"})
+            serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+            Live_QR_Status.objects.create(
+                qrid=qrid, product=product, date_created=serverclock, date_updated=serverclock, status="online")
+            return JsonResponse({"msg": "OK", "remarks": "New object created"})
     else:
         return HttpResponse("You don't have permission to access this page")
+
+
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def live_public_status(request):
+    if request.method == "POST":
+        uid = request.POST.get('uid')
+        product = request.POST.get('product')
+        obj = Live_Public_Status.objects.filter(unique_key=uid).first()
+        if obj is not None:
+            serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+            obj.product = product
+            obj.date_updated = serverclock
+            obj.save(update_fields=['product', 'date_updated'])
+            return JsonResponse({"msg": "OK", "remarks": "Old object updated"})
+        else:
+            serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+            Live_Public_Status.objects.create(
+                unique_key=uid, product=product, date_created=serverclock, date_updated=serverclock, status="install")
+            return JsonResponse({"msg": "OK", "remarks": "New object created"})
+    else:
+        return HttpResponse("You don't have permission to access this page")
+
+
+def user_info(request):
+    products_list = ["Client_admin", "Exhibitoe form",
+                     "Living Lab Admin", "Workflow AI"]
+    field = {}
+    details = dowellconnection("login", "bangalore", "login", "client_admin",
+                               "client_admin", "1159", "ABCDE", "fetch", field, "nil")
+    ok = json.loads(details)
+    users = []
+    count = 0
+    team_members = []
+    public_members = []
+    owners = []
+    for data in ok["data"]:
+        count += 1
+        for team in data["members"]["team_members"]["accept_members"]:
+            if not team["name"] in team_members:
+                if not team["name"] == "owner":
+                    team_members.append(team["name"])
+                else:
+                    owners.append(data["document_name"])
+        for guest in data["members"]["guest_members"]["accept_members"]:
+            users.append(guest["name"])
+        for public in data["members"]["public_members"]["accept_members"]:
+            try:
+                public_members.append(public["username"])
+            except:
+                pass
+    team_members = list(set(team_members))
+    owners = list(set(owners))
+    public_members = list(set(public_members))
+    users = list(set(users))
+    time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    obj_live = LiveStatus.objects.filter(status="login", updated__gte=time_threshold.strftime(
+        "%Y-%m-%d %H:%M:%S")).values_list('username', flat=True).order_by('username').distinct()
+    print(obj_live)
+    response = {'users': len(set(obj_live).intersection(users)), 'live_team_members': len(set(obj_live).intersection(
+        team_members)), 'live_public_members': len(set(obj_live).intersection(public_members)), 'live_owners': len(set(obj_live).intersection(owners))}
+    current = {}
+    weekly = {}
+    for product in products_list:
+        product_wise = LiveStatus.objects.filter(status="login", updated__gte=time_threshold.strftime(
+            "%Y-%m-%d %H:%M:%S"), product=product).values_list('username', flat=True).order_by('username').distinct()
+
+        current[product] = {'team_members': len(set(product_wise).intersection(team_members)), 'public_members': len(set(product_wise).intersection(
+            public_members)), 'users': len(set(product_wise).intersection(users)), 'owners': len(set(product_wise).intersection(owners))}
+
+        weekly[product] = {}
+
+        for r in range(0, 7):
+            date_start = datetime.datetime.now()-datetime.timedelta(days=r+1)
+            date_end = datetime.datetime.now()-datetime.timedelta(days=r)
+            if r == 0:
+                date_end = datetime.datetime.now()+datetime.timedelta(days=1)
+            obj = LiveStatus.objects.filter(updated__gt=date_start.strftime("%Y-%m-%d %H:%M:%S"), updated__lte=date_end.strftime(
+                "%Y-%m-%d %H:%M:%S"), product=product).values_list('username', flat=True).order_by('username').distinct()
+            weekly[product][r] = len(obj)
+
+    response["current"] = current
+    response["weekly"] = weekly
+    resp = response
+    return render(request, 'user_detail.html', {"resp": resp})

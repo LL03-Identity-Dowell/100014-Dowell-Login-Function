@@ -1,7 +1,6 @@
 import json
 import datetime
 import time
-import jwt
 import io
 import base64
 import os
@@ -10,6 +9,9 @@ import csv
 from django.shortcuts import render
 from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate, login, logout
+from django.core.mail import send_mail
+from django.template import RequestContext, Template
+from django.conf import settings
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -19,12 +21,10 @@ from rest_framework.exceptions import AuthenticationFailed
 from dateutil import parser
 from PIL import Image
 
-from loginapp.views import country_city_name
-from loginapp.models import CustomSession, Account, LiveStatus, LiveUser, ProductUser
+from loginapp.views import country_city_name, get_html_msg
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount
 
-from api.serializers import LiveUserSerializer, ProductUserSerializer
-
-from server.utils.dowell_func import dowellconnection, dowellclock, get_next_pro_id
+from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import qrcodegen
@@ -374,15 +374,34 @@ def profile_update(request):
     Email = request.data.get("email")
     Phone = request.data.get("phone")
     Profile_Image = request.data.get("image")
+    otp = request.data.get('otp')
+
     obj = Account.objects.filter(username=username).first()
     field = {"document_name": username}
+
+    if username and Email and not Profile_Image and not Phone and not Lastname and not Firstname and not vision \
+        and not language_preferences and not nationality and not native_language and not user_country and not user_location \
+            and not user_city and not zip_code and not address:
+        otp_input = generateOTP()
+        message = get_html_msg(username, otp_input)
+
+        def send_otp(): return send_mail(
+            'Your otp for chaning password of Dowell account', otp, settings.EMAIL_HOST_USER, [Email], fail_silently=False, html_message=message)
+
+        send_otp()
+        return Response({'msg': 'OTP sent successfully'})
+
+    # Get user data from mongodb cluster
     client_admin = dowellconnection(
         "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "fetch", field, "nil")
     data2 = json.loads(client_admin)
-    print(data2)
+
     data1 = data2["data"][0]
+
     up_field = {}
     update_fields = []
+
+    # Update fields
     if Profile_Image is not None:
         img = Image.open(io.BytesIO(
             base64.decodebytes(bytes(Profile_Image, "utf-8"))))
@@ -490,27 +509,6 @@ def live_users(request):
     return Response(final)
 
 
-@api_view(['GET', 'POST'])
-def live_user(request):
-    if request.method == 'POST':
-        serializer = LiveUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    users = LiveUser.objects.all()
-    return Response()
-
-
-@api_view(['GET', 'POST'])
-def product_users(request):
-    if request.method == 'POST':
-        serializer = ProductUserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-    return Response()
-
-
 @api_view(['GET'])
 def all_liveusers(request):
     products_list = ["Client_admin", "Exhibitoe form", "Living Lab Admin"]
@@ -574,3 +572,132 @@ def get_country_codes(request):
                 'code': row[1]
             })
     return Response(codes[1:])
+
+
+@api_view(['POST'])
+def forgot_password(request):
+    username = request.data.get('username', None)
+    email = request.data.get('email', None)
+    otp_input = request.data.get('otp', None)
+    new_password = request.data.get('new_password', None)
+    new_password_confirmation = request.data.get(
+        'new_password2', None)
+
+    # Send OTP
+    if username and email and not otp_input:
+        otp = generateOTP()
+        message = get_html_msg(username, otp)
+
+        user_qs = Account.objects.filter(email=email, username=username)
+        email_qs = GuestAccount.objects.filter(email=email)
+
+        def send_otp(): return send_mail(
+            'Your otp for chaning password of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
+
+        if user_qs.exists():
+            if email_qs.exists():
+                GuestAccount.objects.filter(email=email).update(
+                    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
+                send_otp()
+                return Response({'msg': 'OTP sent successfully'})
+            else:
+                guest_account = GuestAccount(
+                    username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
+                guest_account.save()
+                send_otp()
+                return Response({'msg': 'OTP sent successfully'})
+        else:
+            return Response({'msg': 'User, email combination is incorrect'})
+
+    # Create new password
+    elif username and email and otp_input and new_password \
+            and new_password_confirmation:
+        if new_password != new_password_confirmation:  # Verify if the passwords matches
+            return Response({'msg': 'The passwords did not match'})
+
+        try:
+            guest = GuestAccount.objects.get(
+                otp=otp_input, username=username)
+        except GuestAccount.DoesNotExist:
+            guest = None
+
+        if guest is not None:
+            acct = Account.objects.filter(
+                email=email, username=username).first()
+            acct.set_password(new_password)
+            acct.save()
+            fields = {'Username': username, 'Email': email}
+            user_json = dowellconnection(
+                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
+            user = json.loads(user_json)
+            if len(user['data']) >= 1:
+                update_fields = {
+                    'Password': dowell_hash.dowell_hash(new_password)}
+                dowellconnection(
+                    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
+                return Response({'msg': 'Password reset successfully'})
+        else:
+            return Response({'msg': 'Wrong OTP'})
+    else:
+        return Response({'msg': 'Username, email combination is incorrect'})
+    return Response({'msg': 'Something went wrong'})
+
+
+@api_view(['POST'])
+def forgot_username(request):
+    email = request.data.get('email', None)
+    otp_input = request.data.get('otp', None)
+
+    # Send OTP
+    if email and not otp_input:
+        otp = generateOTP()
+        message = get_html_msg('User', otp)
+
+        user_qs = Account.objects.filter(email=email)
+        email_qs = GuestAccount.objects.filter(email=email)
+
+        def send_otp(): return send_mail(
+            'Your otp for chaning password of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
+
+        if user_qs.exists():
+            if email_qs.exists():
+                GuestAccount.objects.filter(email=email).update(
+                    otp=otp, expiry=datetime.datetime.utcnow())
+                send_otp()
+                return Response({'msg': 'OTP sent successfully'})
+            else:
+                return Response({'msg': 'Email not found'})
+        else:
+            return Response({'msg': 'Email not found'})
+
+    # Create new password
+    elif email and otp_input:
+        try:
+            guest = GuestAccount.objects.filter(
+                otp=otp_input, email=email)
+        except GuestAccount.DoesNotExist:
+            guest = None
+
+        if guest is not None:
+            fields = {'Email': email}
+            user_json = dowellconnection(
+                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
+            user = json.loads(user_json)
+            username_list = []
+            if len(user['data']) > 1:
+                json_data = dowellconnection(
+                    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
+                data = json.loads(json_data)
+                if len(data['data']) >= 1:
+                    for obj in data['data']:
+                        if obj['Username'] not in username_list:
+                            username_list.append(obj['Username'])
+                    context = RequestContext(
+                        request, {'email': email, 'username_list': username_list})
+                    html_msg = 'Dear user, <br> The list of username associated with your email: <strong>{{email}}</strong> as dowell account are as follows: <br><h3>{% for a in username_list %}<ul><li>{{a}}</li></ul>{%endfor%}</h3><br>You can proceed to login now!'
+                    template = Template(html_msg)
+                    send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
+                              email], fail_silently=False, html_message=template.render(context))
+                return Response({'msg': 'Your username/s was sent to your mail'})
+    else:
+        return Response({'msg': 'Email was not found'})

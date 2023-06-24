@@ -12,11 +12,9 @@ urlpatterns = [
     path('all_users/', views.all_users, name="all_users"),
     path('lastlogins/', views.lastlogins, name="lastlogins"),
     path('activeusers/', views.activeusers, name="activeusers"),
-    path('live_users/', views.live_users, name="live_users"),
-
-    path("create_live_user/", views.live_user, name='live_user'),
-    path("create_product_user/", views.product_users, name='product_user'),
     path("all_liveusers/", views.all_liveusers, name='all_liveusers'),
-    path("country_codes/", views.get_country_codes, name='country_codes')
+    path("country_codes/", views.get_country_codes, name='country_codes'),
+    path("forgot_password/", views.forgot_password, name='api_forgot_password'),
+    path("forgot_username/", views.forgot_username, name='api_forgot_username'),
 
 ]
