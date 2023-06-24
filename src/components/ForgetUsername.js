@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotUsername } from "../redux/authSlice";
+import { verifyOTP } from "../redux/authSlice";
 
 const schema = yup.object().shape({
   email: yup
@@ -23,10 +23,10 @@ const ForgotUsername = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const usernameList = useSelector((state) => state.auth);
+  // const { usernameList, loading, error } = useSelector((state) => state.auth);
 
-  const onSubmit = ({ email, otp }) => {
-    dispatch(forgotUsername({ email, otp }));
+  const onSubmit = (data) => {
+    dispatch(verifyOTP({ email: data.email, otp: data.otp }));
   };
 
   return (
@@ -43,7 +43,6 @@ const ForgotUsername = () => {
               Forget Username
             </h3>
           </div>
-
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
               <div className="px-4 py-2 sm:p-6 space-y-4">
@@ -117,6 +116,16 @@ const ForgotUsername = () => {
             </div>
           </form>
 
+          {/* {usernameList.length > 0 && (
+            <div>
+              <p>Your username/s:</p>
+              <ul>
+                {usernameList.map((username) => (
+                  <li key={username}>{username}</li>
+                ))}
+              </ul>
+            </div>
+          )} */}
           <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
             Do you have an account?{" "}
             <Link to="/signin">

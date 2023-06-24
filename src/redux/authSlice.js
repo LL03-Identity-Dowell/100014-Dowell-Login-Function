@@ -1,17 +1,33 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const forgotUsername = createAsyncThunk(
-  "auth/forgotUsername",
+const apiBaseUrl = "https://100014.pythonanywhere.com/api/forgot_username/";
+
+export const sendOTP = createAsyncThunk("auth/sendOTP", async ({ email }) => {
+  try {
+    const response = await axios.post(apiBaseUrl, { email });
+    if (response.data.msg === "success") {
+      return response.data.info;
+    } else {
+      throw new Error(response.data.info);
+    }
+  } catch (error) {
+    throw new Error(error.response.data.info);
+  }
+});
+
+export const verifyOTP = createAsyncThunk(
+  "auth/verifyOTP",
   async ({ email, otp }) => {
     try {
-      const response = await axios.post(
-        "https://100014.pythonanywhere.com/api/forgot_username/",
-        { email, otp }
-      );
-      return response.data;
+      const response = await axios.post(apiBaseUrl, { email, otp });
+      if (response.data.msg === "success") {
+        return response.data.info;
+      } else {
+        throw new Error(response.data.info);
+      }
     } catch (error) {
-      throw new Error(error.message);
+      throw new Error(error.response.data.info);
     }
   }
 );
@@ -19,23 +35,35 @@ export const forgotUsername = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
+    usernameList: [],
+    success: false,
     loading: false,
     error: null,
-    usernameList: [],
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(forgotUsername.pending, (state) => {
+      .addCase(sendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.usernameList = null;
       })
-      .addCase(forgotUsername.fulfilled, (state, action) => {
+      .addCase(sendOTP.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(sendOTP.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(verifyOTP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
         state.usernameList = action.payload;
       })
-      .addCase(forgotUsername.rejected, (state, action) => {
+      .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });
