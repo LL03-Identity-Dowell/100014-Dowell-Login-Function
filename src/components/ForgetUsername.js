@@ -24,14 +24,14 @@ const ForgotUsername = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { usernameList, loading, error, sentOTP } = useSelector(
+  const { usernameList, loading, error } = useSelector(
     (state) => state.auth || {}
   );
 
   const handleSendOTP = ({ email }) => {
-    // Dispatch the sendOTP async thunk
     dispatch(sendOTP(email));
   };
+
   const handleVerifyOTP = ({ otp }) => {
     const { email } = getValues();
     dispatch(verifyOTP({ email, otp }));

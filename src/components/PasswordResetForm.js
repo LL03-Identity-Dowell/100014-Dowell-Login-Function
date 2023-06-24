@@ -49,7 +49,6 @@ const PasswordResetForm = () => {
 
   const handleResetPassword = ({ otp, new_password }) => {
     const { username, email } = getValues();
-
     dispatch(resetPassword({ username, email, otp, new_password }));
   };
 

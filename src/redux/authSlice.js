@@ -7,8 +7,7 @@ export const sendOTP = createAsyncThunk("auth/sendOTP", async (email) => {
   try {
     const response = await axios.post(apiBaseUrl, { email });
     if (response.data.msg === "success") {
-      console.log("response", response.data.info);
-      // return response.data.info;
+      return response.data.info;
     } else {
       throw new Error(response.data.info);
     }
