@@ -39,17 +39,17 @@ const PasswordResetForm = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { otpSent, passwordReset, loading, error } = useSelector(
+  const { passwordReset, loading, error } = useSelector(
     (state) => state.password
   );
 
   const handleSendOTP = ({ username, email }) => {
-    // Dispatch the sendOTP async thunk
     dispatch(sendOTP({ username, email }));
   };
 
   const handleResetPassword = ({ otp, new_password }) => {
-    const { username, email } = getValues(); // Get form values
+    const { username, email } = getValues();
+
     dispatch(resetPassword({ username, email, otp, new_password }));
   };
 
@@ -80,152 +80,150 @@ const PasswordResetForm = () => {
 
         <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
           <div className="px-4 py-2 sm:p-6 space-y-4">
-            <form onSubmit={handleSubmit(handleSendOTP)}>
-              <>
-                <div>
-                  <label
-                    htmlFor="username"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    User Name
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="text"
-                      name="username"
-                      id="username"
-                      autoComplete="username"
-                      className={`input-field ${
-                        errors.username ? "border-red-500" : ""
-                      }`}
-                      {...register("username")}
-                    />
-                    {errors.username && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.username.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    Email
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      autoComplete="email"
-                      className={`input-field ${
-                        errors.email ? "border-red-500" : ""
-                      }`}
-                      {...register("email")}
-                    />
-                    {errors.email && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.email.message}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-2.5">
-                    <div className="flex flex-row space-x-3 items-center">
-                      <button
-                        className="btn-send px-2 py-1 self-start"
-                        onClick={handleSendOTP}
-                        disabled={loading}
-                      >
-                        Get OTP
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </>
-            </form>
-
-            {otpSent && (
-              <form onSubmit={handleSubmit(handleResetPassword)}>
-                <div>
-                  <label
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                    htmlFor="otp"
-                  >
-                    Enter OTP from Email
-                  </label>
+            <form onSubmit={handleSubmit(handleResetPassword)}>
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  User Name
+                </label>
+                <div className="mt-2.5">
                   <input
                     type="text"
-                    name="otp"
-                    id="otp"
-                    autoComplete="otp"
-                    className="input-field"
-                    {...register("otp")}
+                    name="username"
+                    id="username"
+                    autoComplete="username"
+                    className={`input-field ${
+                      errors.username ? "border-red-500" : ""
+                    }`}
+                    {...register("username")}
                   />
-                  {errors.otp && (
+                  {errors.username && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.otp.message}
+                      {errors.username.message}
                     </p>
                   )}
                 </div>
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    New Password
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="password"
-                      name="password"
-                      id="password"
-                      autoComplete="password"
-                      className="input-field"
-                      {...register("password")}
-                    />
-                    {errors.password && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.password.message}
-                      </p>
-                    )}
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  Email
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    autoComplete="email"
+                    className={`input-field ${
+                      errors.email ? "border-red-500" : ""
+                    }`}
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.email.message}
+                    </p>
+                  )}
+                </div>
+                <div className="mt-2.5">
+                  <div className="flex flex-row space-x-3 items-center">
+                    <button
+                      className="btn-send px-2 py-1 self-start"
+                      disabled={loading}
+                      onClick={handleSubmit(handleSendOTP)}
+                    >
+                      Get OTP
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                <div>
-                  <label
-                    htmlFor="confirm-password"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    Confirm Password
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      id="confirm-password"
-                      autoComplete="confirm-password"
-                      className="input-field"
-                      {...register("confirmPassword")}
-                    />
-                    {errors.confirmPassword && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.confirmPassword.message}
-                      </p>
-                    )}
-                  </div>
-                </div>
+              <div>
+                <label
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                  htmlFor="otp"
+                >
+                  Enter OTP from Email
+                </label>
+                <input
+                  type="text"
+                  name="otp"
+                  id="otp"
+                  autoComplete="otp"
+                  className="input-field"
+                  {...register("otp")}
+                />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
+              </div>
 
-                <div className="btn-send px-1 py-1 mt-2 self-start">
-                  <button type="submit" className="btn-send" disabled={loading}>
-                    Reset Password
-                  </button>
+              <div>
+                <label
+                  htmlFor="new_password"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  New Password
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="password"
+                    name="new_password"
+                    id="new_password"
+                    autoComplete="new_password"
+                    className="input-field"
+                    {...register("new_password")}
+                  />
+                  {errors.new_password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.new_password.message}
+                    </p>
+                  )}
                 </div>
-              </form>
-            )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirm-password"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  Confirm Password
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    id="confirm-password"
+                    autoComplete="confirm-password"
+                    className="input-field"
+                    {...register("confirmPassword", {
+                      validate: (value) =>
+                        value === getValues().new_password ||
+                        "Passwords must match",
+                    })}
+                  />
+                  {errors.confirmPassword && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.confirmPassword.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="btn-send px-1 py-1 mt-2 self-start">
+                <button type="submit" className="btn-send" disabled={loading}>
+                  Reset Password
+                </button>
+              </div>
+            </form>
           </div>
         </div>
 

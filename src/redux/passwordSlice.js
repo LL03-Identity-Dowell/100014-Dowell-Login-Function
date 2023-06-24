@@ -10,9 +10,8 @@ export const sendOTP = createAsyncThunk(
   async ({ username, email }) => {
     try {
       const response = await axios.post(API_URL, { username, email });
-      if (response.status === 200) {
-        console.log("response", response);
-        // return response.data;
+      if (response.data.msg === "success") {
+        return response.data;
       } else {
         throw new Error(response.data.info);
       }
@@ -33,7 +32,7 @@ export const resetPassword = createAsyncThunk(
         otp,
         new_password,
       });
-      if (response.status === 200) {
+      if (response.data.msg === "success") {
         return response.data;
       } else {
         throw new Error(response.data.info);
@@ -62,7 +61,7 @@ const passwordSlice = createSlice({
       })
       .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.otpSent = action.payload;
+        state.otpSent = true;
       })
       .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;

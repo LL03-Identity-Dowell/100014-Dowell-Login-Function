@@ -7,7 +7,8 @@ export const sendOTP = createAsyncThunk("auth/sendOTP", async (email) => {
   try {
     const response = await axios.post(apiBaseUrl, { email });
     if (response.data.msg === "success") {
-      return response.data.info;
+      console.log("response", response.data.info);
+      // return response.data.info;
     } else {
       throw new Error(response.data.info);
     }
@@ -50,7 +51,7 @@ const authSlice = createSlice({
       })
       .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.otpSent = action.payload;
+        state.otpSent = true;
       })
       .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;
