@@ -1,13 +1,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import LogIn from "./components/LogIn";
-import UserNameForget from "./components/UserNameForget";
 import SignUp from "./components/SignUp";
 import Policy from "./pages/Policy";
 import Chat from "./pages/Chat";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
 import PasswordResetForm from "./components/PasswordResetForm";
+import UserNameForget from "./components/UserNameForget";
 
 function App() {
   return (

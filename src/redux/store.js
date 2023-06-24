@@ -1,13 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import countriesReducer from "./countriesSlice";
 import passwordReducer from "./passwordSlice";
-import userReducer from "./userSlice";
+import forgotUsernameReducer from "./forgotUsernameSlice";
 
 const store = configureStore({
   reducer: {
     countries: countriesReducer,
     password: passwordReducer,
-    username: userReducer,
+    forgetUsername: forgotUsernameReducer,
   },
 });
 
