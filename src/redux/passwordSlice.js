@@ -11,12 +11,12 @@ export const sendOTP = createAsyncThunk(
     try {
       const response = await axios.post(API_URL, { username, email });
       if (response.data.msg === "success") {
-        return response.data;
+        return response?.data;
       } else {
-        throw new Error(response.data.info);
+        throw new Error(response?.data?.info);
       }
     } catch (error) {
-      throw new Error(error.response.data.info);
+      throw new Error(error?.response?.data?.info);
     }
   }
 );
@@ -33,12 +33,13 @@ export const resetPassword = createAsyncThunk(
         new_password,
       });
       if (response.data.msg === "success") {
-        return response.data;
+        // console.log("response", response.data);
+        return response?.data;
       } else {
-        throw new Error(response.data.info);
+        throw new Error(response?.data?.info);
       }
     } catch (error) {
-      throw new Error(error.response.data.info);
+      throw new Error(error?.response?.data?.info);
     }
   }
 );

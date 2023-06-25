@@ -96,9 +96,9 @@ const PasswordResetForm = () => {
                     className="input-field "
                     {...register("username")}
                   />
-                  {errors.username && (
+                  {errors?.username && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.username?.message}
+                      {errors?.username?.message}
                     </p>
                   )}
                 </div>
@@ -120,9 +120,9 @@ const PasswordResetForm = () => {
                     className="input-field"
                     {...register("email")}
                   />
-                  {errors.email && (
+                  {errors?.email && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.email.message}
+                      {errors?.email?.message}
                     </p>
                   )}
                 </div>
@@ -153,9 +153,9 @@ const PasswordResetForm = () => {
                   className="input-field"
                   {...register("otp")}
                 />
-                {errors.otp && (
+                {errors?.otp && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
+                    {errors?.otp?.message}
                   </p>
                 )}
               </div>
@@ -176,9 +176,9 @@ const PasswordResetForm = () => {
                     className="input-field"
                     {...register("new_password")}
                   />
-                  {errors.new_password && (
+                  {errors?.new_password && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.new_password.message}
+                      {errors?.new_password?.message}
                     </p>
                   )}
                 </div>
@@ -200,9 +200,9 @@ const PasswordResetForm = () => {
                     className="input-field"
                     {...register("confirmPassword")}
                   />
-                  {errors.confirmPassword && (
+                  {errors?.confirmPassword && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.confirmPassword.message}
+                      {errors?.confirmPassword?.message}
                     </p>
                   )}
                 </div>
