@@ -7,7 +7,7 @@ const store = configureStore({
   reducer: {
     countries: countriesReducer,
     password: passwordReducer,
-    forgetUsername: authReducer,
+    username: authReducer,
   },
 });
 

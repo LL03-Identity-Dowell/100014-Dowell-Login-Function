@@ -33,13 +33,13 @@ const ForgotUsername = () => {
   );
 
   const handleSendOTP = ({ email }) => {
-    dispatch(sendOTP(email));
+    dispatch(sendOTP({ email }));
     setStep(2);
   };
 
-  const handleVerifyOTP = ({ otp }) => {
+  const handleVerifyOTP = ({ email, otp }) => {
     if (step === 2) {
-      dispatch(verifyOTP({ otp }));
+      dispatch(verifyOTP({ email, otp }));
     }
   };
 
@@ -100,9 +100,11 @@ const ForgotUsername = () => {
                     >
                       Get OTP
                     </button>
-                    <p className="text-base font-normal text-green-600">
-                      {otpSent}
-                    </p>
+                    {otpSent && (
+                      <p className="text-base font-normal text-green-600">
+                        {otpSent}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -139,7 +141,13 @@ const ForgotUsername = () => {
                         Verify
                       </button>
                       <p className="text-base font-normal text-green-600">
-                        {usernameList}
+                        {usernameList?.map((username) => (
+                          <ul>
+                            <li>
+                              <p>{username}</p>
+                            </li>
+                          </ul>
+                        ))}
                       </p>
                     </div>
                   </>
