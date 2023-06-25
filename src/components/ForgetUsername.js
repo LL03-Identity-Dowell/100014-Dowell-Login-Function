@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,7 +12,10 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  otp: yup.string().required("OTP is required"),
+  otp: yup.string().when("step", {
+    is: 2,
+    then: yup.string().required("OTP required"),
+  }),
 });
 
 const ForgotUsername = () => {
@@ -20,21 +23,24 @@ const ForgotUsername = () => {
     handleSubmit,
     register,
     formState: { errors },
-    getValues, // Add getValues to access form values
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { usernameList, loading, error } = useSelector(
+  const { usernameList, loading, error, otpSent } = useSelector(
     (state) => state.auth || {}
   );
 
+  const [step, setStep] = useState(1);
+
   const handleSendOTP = ({ email }) => {
     dispatch(sendOTP(email));
+    setStep(2);
   };
 
   const handleVerifyOTP = ({ otp }) => {
-    const { email } = getValues();
-    dispatch(verifyOTP({ email, otp }));
+    if (step === 2) {
+      dispatch(verifyOTP({ otp }));
+    }
   };
 
   return (
@@ -48,9 +54,14 @@ const ForgotUsername = () => {
               className="h-28 w-34 rounded-full drop-shadow-sm"
             />
             <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
-              Forget Username
+              Forgot Username
             </h3>
           </div>
+
+          {/* Show loading and error messages */}
+          {loading && <p>Loading...</p>}
+          {error && <p>Error: {error}</p>}
+
           <form onSubmit={handleSubmit(handleVerifyOTP)}>
             <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
               <div className="px-4 py-2 sm:p-6 space-y-4">
@@ -89,57 +100,53 @@ const ForgotUsername = () => {
                     >
                       Get OTP
                     </button>
+                    <p className="text-base font-normal text-green-600">
+                      {otpSent}
+                    </p>
                   </div>
                 </div>
 
-                <div className="sm:col-span-2">
-                  <label
-                    htmlFor="otp"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    Enter OTP from email
-                  </label>
-                  <div className="mt-2.5">
-                    <input
-                      type="text"
-                      name="otp"
-                      id="otp"
-                      autoComplete="otp"
-                      className="input-field"
-                      {...register("otp")}
-                    />
-                    {errors.otp && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.otp.message}
+                {step === 2 && (
+                  <>
+                    <div className="sm:col-span-2">
+                      <label
+                        htmlFor="otp"
+                        className="block text-sm font-semibold leading-6 text-green-700"
+                      >
+                        Enter OTP from email
+                      </label>
+                      <div className="mt-2.5">
+                        <input
+                          type="text"
+                          name="otp"
+                          id="otp"
+                          autoComplete="otp"
+                          className={`input-field ${
+                            errors.otp ? "border-red-500" : ""
+                          }`}
+                          {...register("otp")}
+                        />
+                        {errors.otp && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.otp.message}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="px-4 py-2 text-center md:text-left sm:px-6">
+                      <button type="submit" className="btn-send">
+                        Verify
+                      </button>
+                      <p className="text-base font-normal text-green-600">
+                        {usernameList}
                       </p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="px-4 py-2 text-center md:text-left sm:px-6">
-                  <button type="submit" className="btn-send">
-                    Verify
-                  </button>
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </form>
-
-          {/* Show loading and error messages */}
-          {loading && <p>Loading...</p>}
-          {error && <p>Error: {error}</p>}
-
-          {/* Show the list of usernames if available */}
-          {usernameList?.length > 0 && (
-            <div>
-              <p>Your username/s:</p>
-              <ul>
-                {usernameList.map((username) => (
-                  <li key={username}>{username}</li>
-                ))}
-              </ul>
-            </div>
-          )}
 
           <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
             Do you have an account?{" "}

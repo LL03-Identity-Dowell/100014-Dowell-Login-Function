@@ -105,7 +105,9 @@ const PasswordResetForm = () => {
                     name="username"
                     id="username"
                     autoComplete="username"
-                    className="input-field "
+                    className={`input-field ${
+                      errors.email ? "border-red-500" : ""
+                    }`}
                     {...register("username")}
                   />
                   {errors?.username && (
@@ -129,7 +131,9 @@ const PasswordResetForm = () => {
                     name="email"
                     id="email"
                     autoComplete="email"
-                    className="input-field"
+                    className={`input-field ${
+                      errors.email ? "border-red-500" : ""
+                    }`}
                     {...register("email")}
                   />
                   {errors?.email && (
@@ -168,7 +172,9 @@ const PasswordResetForm = () => {
                       name="otp"
                       id="otp"
                       autoComplete="otp"
-                      className="input-field"
+                      className={`input-field ${
+                        errors.email ? "border-red-500" : ""
+                      }`}
                       {...register("otp")}
                     />
                     {errors?.otp && (
@@ -191,7 +197,9 @@ const PasswordResetForm = () => {
                         name="new_password"
                         id="new_password"
                         autoComplete="new_password"
-                        className="input-field"
+                        className={`input-field ${
+                          errors.email ? "border-red-500" : ""
+                        }`}
                         {...register("new_password")}
                       />
                       {errors?.new_password && (
@@ -215,7 +223,9 @@ const PasswordResetForm = () => {
                         name="confirmPassword"
                         id="confirm-password"
                         autoComplete="confirm-password"
-                        className="input-field"
+                        className={`input-field ${
+                          errors.email ? "border-red-500" : ""
+                        }`}
                         {...register("confirmPassword")}
                       />
                       {errors?.confirmPassword && (

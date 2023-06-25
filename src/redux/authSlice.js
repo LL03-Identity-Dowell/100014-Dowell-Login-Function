@@ -7,12 +7,12 @@ export const sendOTP = createAsyncThunk("auth/sendOTP", async (email) => {
   try {
     const response = await axios.post(apiBaseUrl, { email });
     if (response.data.msg === "success") {
-      return response.data.info;
+      return response?.data?.info;
     } else {
-      throw new Error(response.data.info);
+      throw new Error(response?.data?.info);
     }
   } catch (error) {
-    throw new Error(error.response.data.info);
+    throw new Error(error?.response?.data?.info);
   }
 });
 
@@ -22,12 +22,12 @@ export const verifyOTP = createAsyncThunk(
     try {
       const response = await axios.post(apiBaseUrl, { email, otp });
       if (response.data.msg === "success") {
-        return response.data.info;
+        return response?.data?.info;
       } else {
-        throw new Error(response.data.info);
+        throw new Error(response?.data?.info);
       }
     } catch (error) {
-      throw new Error(error.response.data.info);
+      throw new Error(error?.response?.data?.info);
     }
   }
 );
@@ -35,7 +35,7 @@ export const verifyOTP = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    usernameList: [],
+    usernameList: false,
     otpSent: false,
     loading: false,
     error: null,
@@ -50,7 +50,7 @@ const authSlice = createSlice({
       })
       .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.otpSent = true;
+        state.otpSent = action.payload;
       })
       .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;
@@ -59,7 +59,7 @@ const authSlice = createSlice({
       .addCase(verifyOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.usernameList = [];
+        state.usernameList = false;
       })
       .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
