@@ -93,14 +93,12 @@ const PasswordResetForm = () => {
                     name="username"
                     id="username"
                     autoComplete="username"
-                    className={`input-field ${
-                      errors.username ? "border-red-500" : ""
-                    }`}
+                    className="input-field "
                     {...register("username")}
                   />
                   {errors.username && (
                     <p className="text-red-500 text-xs mt-1">
-                      {errors.username.message}
+                      {errors.username?.message}
                     </p>
                   )}
                 </div>
@@ -119,9 +117,7 @@ const PasswordResetForm = () => {
                     name="email"
                     id="email"
                     autoComplete="email"
-                    className={`input-field ${
-                      errors.email ? "border-red-500" : ""
-                    }`}
+                    className="input-field"
                     {...register("email")}
                   />
                   {errors.email && (
