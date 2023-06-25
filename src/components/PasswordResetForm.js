@@ -35,11 +35,10 @@ const PasswordResetForm = () => {
     handleSubmit,
     register,
     formState: { errors },
-    getValues, // Add getValues to access form values
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { passwordReset, loading, error } = useSelector(
+  const { passwordReset, loading, error, otpSent } = useSelector(
     (state) => state.password
   );
 
@@ -47,8 +46,7 @@ const PasswordResetForm = () => {
     dispatch(sendOTP({ username, email }));
   };
 
-  const handleResetPassword = ({ otp, new_password }) => {
-    const { username, email } = getValues();
+  const handleResetPassword = ({ username, email, otp, new_password }) => {
     dispatch(resetPassword({ username, email, otp, new_password }));
   };
 
@@ -76,6 +74,7 @@ const PasswordResetForm = () => {
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {passwordReset && <p>Password reset successfully!</p>}
+        {otpSent && <p>otp sent successfully!</p>}
 
         <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
           <div className="px-4 py-2 sm:p-6 space-y-4">
