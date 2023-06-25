@@ -4,7 +4,7 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { sendOTP, verifyOTP } from "../redux/authSlice";
 
 const schema = yup.object().shape({
@@ -25,12 +25,12 @@ const ForgotUsername = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
+  const [step, setStep] = useState(1);
   const dispatch = useDispatch();
   const { usernameList, loading, error, otpSent } = useSelector(
-    (state) => state.auth || {}
+    (state) => state.auth || {},
+    shallowEqual
   );
-
-  const [step, setStep] = useState(1);
 
   const handleSendOTP = ({ email }) => {
     dispatch(sendOTP(email));
