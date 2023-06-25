@@ -29,6 +29,18 @@ from server.utils import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import qrcodegen
 
+from api.serializers import UserSerializer
+
+
+class RegisterView(APIView):
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        # field={"Username":user,"Password":password,"Firstname":first,"Lastname":last,"Email":email,"Role":role,"Team_Code":ccode,"phonecode":phonecode,"Phone":phone,"user_id":"userid"}
+        # id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
+        return Response(serializer.data["username"])
+
 
 @api_view(["POST"])
 def MobileLogin(request):
