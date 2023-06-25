@@ -74,7 +74,7 @@ const PasswordResetForm = () => {
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
         {passwordReset && <p>Password reset successfully!</p>}
-        {otpSent && <p>otp sent successfully!</p>}
+        {otpSent && <p>OTP sent successfully!</p>}
 
         <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
           <div className="px-4 py-2 sm:p-6 space-y-4">
