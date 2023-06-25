@@ -27,7 +27,7 @@ const ForgotUsername = () => {
 
   const [step, setStep] = useState(1);
   const dispatch = useDispatch();
-  const { usernameList, loading, error, otpSent } = useSelector(
+  const { loading, error, usernameList, otpSent } = useSelector(
     (state) => state.auth || {},
     shallowEqual
   );
@@ -97,12 +97,13 @@ const ForgotUsername = () => {
                       className="btn-send px-2 py-1 self-start"
                       type="button"
                       onClick={handleSubmit(handleSendOTP)}
+                      disabled={loading || step === 2} // Disable button after OTP is sent
                     >
                       Get OTP
                     </button>
-                    {otpSent && (
+                    {otpSent && step === 1 && (
                       <p className="text-base font-normal text-green-600">
-                        {otpSent}
+                        OTP sent successfully
                       </p>
                     )}
                   </div>
@@ -140,15 +141,16 @@ const ForgotUsername = () => {
                       <button type="submit" className="btn-send">
                         Verify
                       </button>
-                      <p className="text-base font-normal text-green-600">
+
+                      <ul>
                         {usernameList?.map((username) => (
-                          <ul>
-                            <li>
-                              <p>{username}</p>
-                            </li>
-                          </ul>
+                          <li key={username}>
+                            <p className="text-base font-normal text-green-600">
+                              {username}
+                            </p>
+                          </li>
                         ))}
-                      </p>
+                      </ul>
                     </div>
                   </>
                 )}
