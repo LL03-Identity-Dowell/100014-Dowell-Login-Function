@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
@@ -20,14 +20,25 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  otp: yup.string().required("OTP required"),
-  new_password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(99),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("new_password"), null], "Passwords must match"),
+  otp: yup.string().when("step", {
+    is: (step) => step === 2,
+    then: yup.string().required("OTP required"),
+  }),
+  new_password: yup.string().when("step", {
+    is: (step) => step === 2,
+    then: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(99)
+      .required("Password is required"),
+  }),
+  confirmPassword: yup.string().when("step", {
+    is: (step) => step === 2,
+    then: yup
+      .string()
+      .oneOf([yup.ref("new_password"), null], "Passwords must match")
+      .required("Confirm Password is required"),
+  }),
 });
 
 const PasswordResetForm = () => {
@@ -36,6 +47,7 @@ const PasswordResetForm = () => {
     register,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
+  const [step, setStep] = useState(1);
 
   const dispatch = useDispatch();
   const { passwordReset, loading, error, otpSent } = useSelector(
@@ -44,10 +56,13 @@ const PasswordResetForm = () => {
 
   const handleSendOTP = ({ username, email }) => {
     dispatch(sendOTP({ username, email }));
+    setStep(2);
   };
 
   const handleResetPassword = ({ username, email, otp, new_password }) => {
-    dispatch(resetPassword({ username, email, otp, new_password }));
+    if (step === 2) {
+      dispatch(resetPassword({ username, email, otp, new_password }));
+    }
   };
 
   return (
@@ -73,8 +88,6 @@ const PasswordResetForm = () => {
 
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
-        {passwordReset && <p>Password reset successfully!</p>}
-        {otpSent && <p>OTP sent successfully!</p>}
 
         <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
           <div className="px-4 py-2 sm:p-6 space-y-4">
@@ -133,85 +146,96 @@ const PasswordResetForm = () => {
                     >
                       Get OTP
                     </button>
+                    <p className="text-base font-normal text-green-600">
+                      {otpSent}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                  htmlFor="otp"
-                >
-                  Enter OTP from Email
-                </label>
-                <input
-                  type="text"
-                  name="otp"
-                  id="otp"
-                  autoComplete="otp"
-                  className="input-field"
-                  {...register("otp")}
-                />
-                {errors?.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors?.otp?.message}
+              {/* Step 2: Password */}
+              {step === 2 && (
+                <>
+                  <div>
+                    <label
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                      htmlFor="otp"
+                    >
+                      Enter OTP from Email
+                    </label>
+                    <input
+                      type="text"
+                      name="otp"
+                      id="otp"
+                      autoComplete="otp"
+                      className="input-field"
+                      {...register("otp")}
+                    />
+                    {errors?.otp && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors?.otp?.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="new_password"
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                    >
+                      New Password
+                    </label>
+                    <div className="mt-2.5">
+                      <input
+                        type="password"
+                        name="new_password"
+                        id="new_password"
+                        autoComplete="new_password"
+                        className="input-field"
+                        {...register("new_password")}
+                      />
+                      {errors?.new_password && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors?.new_password?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="confirm-password"
+                      className="block text-sm font-semibold leading-6 text-green-700"
+                    >
+                      Confirm Password
+                    </label>
+                    <div className="mt-2.5">
+                      <input
+                        type="password"
+                        name="confirmPassword"
+                        id="confirm-password"
+                        autoComplete="confirm-password"
+                        className="input-field"
+                        {...register("confirmPassword")}
+                      />
+                      {errors?.confirmPassword && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors?.confirmPassword?.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="btn-send px-1 py-1 mt-2 self-start">
+                    <button type="submit" className="btn-send">
+                      Reset Password
+                    </button>
+                  </div>
+                  <p className="text-base font-normal text-green-600">
+                    {passwordReset}
                   </p>
-                )}
-              </div>
-
-              <div>
-                <label
-                  htmlFor="new_password"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  New Password
-                </label>
-                <div className="mt-2.5">
-                  <input
-                    type="password"
-                    name="new_password"
-                    id="new_password"
-                    autoComplete="new_password"
-                    className="input-field"
-                    {...register("new_password")}
-                  />
-                  {errors?.new_password && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors?.new_password?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="confirm-password"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  Confirm Password
-                </label>
-                <div className="mt-2.5">
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    id="confirm-password"
-                    autoComplete="confirm-password"
-                    className="input-field"
-                    {...register("confirmPassword")}
-                  />
-                  {errors?.confirmPassword && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors?.confirmPassword?.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              <div className="btn-send px-1 py-1 mt-2 self-start">
-                <button type="submit" className="btn-send">
-                  Reset Password
-                </button>
-              </div>
+                </>
+              )}
             </form>
           </div>
         </div>
