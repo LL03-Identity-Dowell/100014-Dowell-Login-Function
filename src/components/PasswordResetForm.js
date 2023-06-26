@@ -30,9 +30,13 @@ const schema = yup.object().shape({
       .string()
       .min(8, "Password must be at least 8 characters")
       .max(99)
-      .required("Password is required"),
+      .required("Password is required")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+        "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 digit"
+      ),
   }),
-  confirmPassword: yup.string().when("step", {
+  confirm_password: yup.string().when("step", {
     is: (step) => step === 2,
     then: yup
       .string()
@@ -105,9 +109,7 @@ const PasswordResetForm = () => {
                     name="username"
                     id="username"
                     autoComplete="username"
-                    className={`input-field ${
-                      errors.username ? "border-red-500" : ""
-                    }`}
+                    className="input-field"
                     {...register("username")}
                   />
                   {errors?.username && (
@@ -131,9 +133,7 @@ const PasswordResetForm = () => {
                     name="email"
                     id="email"
                     autoComplete="email"
-                    className={`input-field ${
-                      errors.email ? "border-red-500" : ""
-                    }`}
+                    className="input-field"
                     {...register("email")}
                   />
                   {errors?.email && (
@@ -172,9 +172,7 @@ const PasswordResetForm = () => {
                       name="otp"
                       id="otp"
                       autoComplete="otp"
-                      className={`input-field ${
-                        errors.otp ? "border-red-500" : ""
-                      }`}
+                      className="input-field"
                       {...register("otp")}
                     />
                     {errors?.otp && (
@@ -197,9 +195,7 @@ const PasswordResetForm = () => {
                         name="new_password"
                         id="new_password"
                         autoComplete="new_password"
-                        className={`input-field ${
-                          errors.new_password ? "border-red-500" : ""
-                        }`}
+                        className="input-field"
                         {...register("new_password")}
                       />
                       {errors?.new_password && (
@@ -212,7 +208,7 @@ const PasswordResetForm = () => {
 
                   <div>
                     <label
-                      htmlFor="confirm-password"
+                      htmlFor="confirm_password"
                       className="block text-sm font-semibold leading-6 text-green-700"
                     >
                       Confirm Password
@@ -220,17 +216,15 @@ const PasswordResetForm = () => {
                     <div className="mt-2.5">
                       <input
                         type="password"
-                        name="confirmPassword"
-                        id="confirm-password"
-                        autoComplete="confirm-password"
-                        className={`input-field ${
-                          errors.confirmPassword ? "border-red-500" : ""
-                        }`}
-                        {...register("confirmPassword")}
+                        name="confirm_password"
+                        id="confirm_password"
+                        autoComplete="confirm_password"
+                        className="input-field"
+                        {...register("confirm_password")}
                       />
-                      {errors.confirmPassword && (
+                      {errors.confirm_password && (
                         <p className="text-red-500 text-xs mt-1">
-                          {errors.confirmPassword.message}
+                          {errors.confirm_password.message}
                         </p>
                       )}
                     </div>

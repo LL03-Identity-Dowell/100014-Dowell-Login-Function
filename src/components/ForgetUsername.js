@@ -83,27 +83,24 @@ const ForgotUsername = () => {
                       }`}
                       {...register("email")}
                     />
-                    {errors.email && (
+                    {errors?.email && (
                       <p className="text-red-500 text-xs mt-1">
-                        {errors.email.message}
+                        {errors?.email?.message}
                       </p>
                     )}
                   </div>
-                </div>
-
-                <div className="mt-2.5">
-                  <div className="flex flex-row space-x-3 items-center">
-                    <button
-                      className="btn-send px-2 py-1 self-start"
-                      type="button"
-                      onClick={handleSubmit(handleSendOTP)}
-                      disabled={loading || step === 2} // Disable button after OTP is sent
-                    >
-                      Get OTP
-                    </button>
-                    <p className="text-base font-normal text-green-600">
-                      {otpSent}
-                    </p>
+                  <div className="mt-2.5">
+                    <div className="flex flex-row space-x-3 items-center">
+                      <button
+                        className="btn-send px-2 py-1 self-start"
+                        onClick={handleSubmit(handleSendOTP)}
+                      >
+                        Get OTP
+                      </button>
+                      <p className="text-base font-normal text-green-600">
+                        {otpSent}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -135,21 +132,14 @@ const ForgotUsername = () => {
                       </div>
                     </div>
 
-                    <div className="px-4 py-2 text-center md:text-left sm:px-6">
+                    <div className="btn-send px-1 py-1 mt-2 self-start">
                       <button type="submit" className="btn-send">
                         Verify
                       </button>
-
-                      <ul>
-                        {usernameList?.map((username) => (
-                          <li key={username}>
-                            <p className="text-base font-normal text-green-600">
-                              {username}
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
                     </div>
+                    <p className="text-base font-normal text-green-600">
+                      {usernameList}
+                    </p>
                   </>
                 )}
               </div>
