@@ -6,6 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { resetPassword, sendOTP } from "../redux/passwordSlice";
+import { Radio } from "react-loader-spinner";
 
 const schema = yup.object().shape({
   username: yup
@@ -90,7 +91,17 @@ const PasswordResetForm = () => {
           </Link>
         </div>
 
-        {loading && <p>Loading...</p>}
+        {loading && (
+          <Radio
+            visible={true}
+            height="60"
+            width="60"
+            ariaLabel="radio-loading"
+            wrapperStyle={{}}
+            wrapperClass="radio-wrapper"
+            color="#4fa94d"
+          />
+        )}
         {error && <p>{error}</p>}
 
         <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">

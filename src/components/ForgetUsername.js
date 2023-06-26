@@ -6,6 +6,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { sendOTP, verifyOTP } from "../redux/authSlice";
+import { Radio } from "react-loader-spinner";
 
 const schema = yup.object().shape({
   email: yup
@@ -59,7 +60,17 @@ const ForgotUsername = () => {
           </div>
 
           {/* Show loading and error messages */}
-          {loading && <p>Loading...</p>}
+          {loading && (
+            <Radio
+              visible={true}
+              height="60"
+              width="60"
+              ariaLabel="radio-loading"
+              wrapperStyle={{}}
+              wrapperClass="radio-wrapper"
+              color="#4fa94d"
+            />
+          )}
           {error && <p>Error: {error}</p>}
 
           <form onSubmit={handleSubmit(handleVerifyOTP)}>
@@ -97,9 +108,11 @@ const ForgotUsername = () => {
                       >
                         Get OTP
                       </button>
-                      <p className="text-base font-normal text-green-600">
-                        {otpSent}
-                      </p>
+                      {step === 1 && (
+                        <p className="text-base font-normal text-green-600">
+                          {otpSent}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -137,9 +150,11 @@ const ForgotUsername = () => {
                         Verify
                       </button>
                     </div>
-                    <p className="text-base font-normal text-green-600">
-                      {usernameList}
-                    </p>
+                    {usernameList !== null && (
+                      <p className="text-base font-normal text-green-600">
+                        {usernameList}
+                      </p>
+                    )}
                   </>
                 )}
               </div>
