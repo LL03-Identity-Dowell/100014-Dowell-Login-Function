@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -13,9 +13,9 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  otp: yup.string().when("step", {
-    is: (step) => step === 2,
-    then: yup.string().required("OTP required"),
+  otp: yup.string().when("otpSent", {
+    is: true,
+    then: yup.string().required("OTP is required"),
   }),
 });
 
@@ -26,7 +26,7 @@ const ForgotUsername = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const [step, setStep] = useState(1);
+  // const [step, setStep] = useState(1);
 
   const dispatch = useDispatch();
   const { loading, error, usernameList, otpSent } = useSelector(
@@ -36,13 +36,10 @@ const ForgotUsername = () => {
 
   const handleSendOTP = ({ email }) => {
     dispatch(userSendOTP({ email }));
-    setStep(2);
   };
 
   const handleVerifyOTP = ({ email, otp }) => {
-    if (step === 2) {
-      dispatch(verifyOTP({ email, otp }));
-    }
+    dispatch(verifyOTP({ email, otp }));
   };
 
   return (
@@ -115,41 +112,37 @@ const ForgotUsername = () => {
                   </div>
                 </div>
 
-                {step === 2 && (
-                  <>
-                    <div>
-                      <label
-                        className="block text-sm font-semibold leading-6 text-green-700"
-                        htmlFor="otp"
-                      >
-                        Enter OTP from Email
-                      </label>
-                      <input
-                        type="text"
-                        name="otp"
-                        id="otp"
-                        autoComplete="otp"
-                        className="input-field"
-                        {...register("otp")}
-                      />
-                      {errors?.otp && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.otp.message}
-                        </p>
-                      )}
-                    </div>
+                <div>
+                  <label
+                    className="block text-sm font-semibold leading-6 text-green-700"
+                    htmlFor="otp"
+                  >
+                    Enter OTP from Email
+                  </label>
+                  <input
+                    type="text"
+                    name="otp"
+                    id="otp"
+                    autoComplete="otp"
+                    className="input-field"
+                    {...register("otp", { required: otpSent })}
+                  />
+                  {errors?.otp && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.otp.message}
+                    </p>
+                  )}
+                </div>
 
-                    <div className="btn-send px-1 py-1 mt-2 self-start">
-                      <button type="submit" className="btn-send">
-                        Verify
-                      </button>
-                    </div>
-                    {usernameList !== null && (
-                      <p className="text-base font-normal text-green-600">
-                        {usernameList}
-                      </p>
-                    )}
-                  </>
+                <div className="btn-send px-1 py-1 mt-2 self-start">
+                  <button type="submit" className="btn-send">
+                    Verify
+                  </button>
+                </div>
+                {usernameList !== null && (
+                  <p className="text-base font-normal text-green-600">
+                    {usernameList}
+                  </p>
                 )}
               </form>
             </div>
