@@ -732,11 +732,31 @@ def forgot_username(request):
     else:
         return Response({'msg':'error','info':"Request must have field 'email' for getting otp in mail and then add field 'otp' for getting list of username in mail.."})
 
+def processApikey(api_key, api_services):
+    url = 'https://100105.pythonanywhere.com/api/v1/process-api-key/'
+    payload = {
+        "api_key" : api_key,
+        "api_services" : api_services
+    }
+    response = requests.post(url, json=payload)
+    return response.text
+
 @api_view(["POST"])
 def PublicApi(request):
     mdata = request.data.get
     username = mdata('username')
     password = mdata('password')
+    if mdata('api_key')!=None and mdata('api_services')!=None:
+        api_resp=processApikey(mdata('api_key'),mdata('api_services'))
+    else:
+        return Response({"msg":"error","info":"api_key and api_services fields are needed.."})
+    api_resp=api_resp.replace("false", "False")
+    api_resp1=eval(api_resp)
+    if api_resp1["success"] == False:
+       return Response({"msg":"error","info":api_resp1["message"]})
+    else:
+        if not "count" in api_resp1:
+            return Response({"msg":"error","info":api_resp1["message"]})
     loc = mdata("location")
     try:
         lo = loc.split(" ")
@@ -835,7 +855,7 @@ def PublicApi(request):
                 sessionID=session, info=infoo, document="", status="login")
 
             # resp={'userinfo':info}
-            resp = {'session_id': session}
+            resp = {'session_id': session,'remaining_times':api_resp1["count"]}
             return Response(resp)
         else:
             resp = {"data": "Username not found in database"}
