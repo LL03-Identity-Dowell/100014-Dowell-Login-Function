@@ -106,9 +106,11 @@ const ForgotUsername = () => {
                       >
                         Get OTP
                       </button>
-                      <p className="text-base font-normal text-green-600">
-                        {otpSent}
-                      </p>
+                      {otpSent && (
+                        <p className="text-base font-normal text-green-600">
+                          {otpSent}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
