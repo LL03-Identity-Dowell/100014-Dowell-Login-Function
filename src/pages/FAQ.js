@@ -14,7 +14,7 @@ const FAQ = () => {
       </h1>
       <div>
         {faqs.map((faq, index) => (
-          <div className="mb-4" key={faq.id}>
+          <div className="mb-4" key={index}>
             <button
               className="flex justify-between w-full p-3 bg-gradient-to-r from-cyan-200 to-green-400 rounded-md focus:outline-none"
               onClick={() => toggleAccordion(index)}
