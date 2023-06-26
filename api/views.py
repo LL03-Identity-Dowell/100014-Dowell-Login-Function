@@ -5,12 +5,14 @@ import io
 import base64
 import os
 import csv
+import requests
 
 from django.shortcuts import render
 from django.core.files.base import ContentFile
 from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.template import RequestContext, Template
+from django.contrib.auth.hashers import make_password
 from django.conf import settings
 
 from rest_framework.response import Response
@@ -32,14 +34,123 @@ from server.utils import qrcodegen
 from api.serializers import UserSerializer
 
 
-class RegisterView(APIView):
-    def post(self, request):
-        serializer = UserSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        # field={"Username":user,"Password":password,"Firstname":first,"Lastname":last,"Email":email,"Role":role,"Team_Code":ccode,"phonecode":phonecode,"Phone":phone,"user_id":"userid"}
-        # id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
-        return Response(serializer.data["username"])
+@api_view(["POST"])
+def register(request):
+    username = request.data.get("Username")
+    otp_input = request.data.get("otp")
+    image = request.FILES.get("Profile_Image")
+    password = request.data.get("Password")
+    first = request.data.get("Firstname")
+    last = request.data.get("Lastname")
+    email = request.data.get("Email")
+    role1 = "guest"
+    phonecode = request.data.get("phonecode")
+    phone = request.data.get("Phone")
+    user_type = request.data.get('user_type')
+    user_country = request.data.get('user_country')
+    policy_status = request.data.get('policy_status')
+    other_policy = request.data.get('other_policy')
+    newsletter = request.data.get('newsletter')
+
+    if email and not username and not image and not password and not first \
+            and not last and not phone and not phonecode and not user_type and not user_country \
+            and not policy_status and not other_policy and not newsletter:
+        otp = generateOTP()
+        message = get_html_msg(username, otp)
+
+        def send_otp(): return send_mail(
+            'Your otp for chaning password of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
+
+        send_otp()
+        return Response({'msg': 'OTP sent successfully'})
+
+    user_exists = Account.objects.filter(username=username).first()
+    if user_exists:
+        return Response({'message': "Username already taken"})
+
+    name = ""
+    try:
+        accounts = Account.objects.filter(email=email)
+
+        for account in accounts:
+            if email == account.email and role1 == account.role:
+                account = Account.objects.filter(email=email).update(password=make_password(
+                    password), first_name=first, last_name=last, email=email, phonecode=phonecode, phone=phone, profile_image=image)
+    except Account.DoesNotExist:
+        name = None
+    if name is not None:
+        if image:
+            new_user = Account.objects.create(email=email, username=username, password=make_password(
+                password), first_name=first, last_name=last, phonecode=phonecode, phone=phone, profile_image=image)
+        else:
+            new_user = Account.objects.create(email=email, username=username, password=make_password(
+                password), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
+
+        profile_image = new_user.profile_image
+        json_data = open('dowell_login/static/newnaga2.json')
+        data1 = json.load(json_data)
+        json_data.close()
+        data1["document_name"] = username
+        data1["Username"] = username
+        update_data1 = {"first_name": first, "last_name": last, "profile_img": f'https://100014.pythonanywhere.com/media/{profile_image}',
+                        "email": email, "phonecode": phonecode, "phone": phone}
+        data1["profile_info"].update(update_data1)
+        data1["organisations"][0]["org_name"] = username
+        update_data2 = {"first_name": first, "last_name": last, "email": email}
+        data1["members"]["team_members"]["accept_members"][0].update(
+            update_data2)
+        client_admin = dowellconnection(
+            "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "insert", data1, "nil")
+        client_admin_res = json.loads(client_admin)
+        org_id = client_admin_res["inserted_id"]
+
+        userfield = {}
+        userresp = dowellconnection("login", "bangalore", "login", "registration",
+                                    "registration", "10004545", "ABCDE", "fetch", userfield, "nil")
+        idd = json.loads(userresp)
+        res_list = idd["data"]
+        profile_id = get_next_pro_id(res_list)
+
+        event_id = None
+        try:
+            res = create_event()
+            event_id = res['event_id']
+        except:
+            pass
+
+        field = {"Profile_Image": f"https://100014.pythonanywhere.com/media/{profile_image}", "Username": username, "Password": dowell_hash.dowell_hash(password), "Firstname": first, "Lastname": last, "Email": email, "phonecode": phonecode, "Phone": phone, "profile_id": profile_id, "client_admin_id": client_admin_res[
+            "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter}
+        id = dowellconnection("login", "bangalore", "login", "registration",
+                              "registration", "10004545", "ABCDE", "insert", field, "nil")
+        id_res = json.loads(id)
+        inserted_idd = id_res['inserted_id']
+
+        url = "https://100085.pythonanywhere.com/api/signup-feedback/"
+        payload = json.dumps({
+            "topic": "Signupfeedback",
+            "toEmail": email,
+            "toName": first + " " + last,
+            "firstname": first,
+            "lastname": last,
+            "username": username,
+            "phoneCode": phonecode,
+            "phoneNumber": phone,
+            "usertype": user_type,
+            "country": user_country,
+            "verified_phone": "unverified",
+            "verified_email": "verified"
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response1 = requests.request(
+            "POST", url, headers=headers, data=payload)
+
+        return Response({
+            'message': f"{username}, registration success",
+            'inserted_id': f"{inserted_idd}"
+        })
+    return Response("Internal server error")
 
 
 @api_view(["POST"])

@@ -4,7 +4,7 @@ urlpatterns = [
     path('mobilelogin/', views.MobileLogin, name='mobilelogin'),
     path('mobilelogout/', views.MobileLogout, name='mobilelogout'),
     path('linkbased/', views.LinkBased, name='linkbased'),
-    path('register/', views.RegisterView.as_view(), name='register'),
+    path('register/', views.register, name='register'),
 
     path('profile_view/', views.profile_view, name='profile_view'),
     path('profile_update/', views.profile_update, name='profile_update'),
