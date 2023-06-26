@@ -8,7 +8,7 @@ export const sendOTP = createAsyncThunk("auth/sendOTP", async ({ email }) => {
     const response = await axios.post(apiBaseUrl, { email });
     if (response.data.msg === "success") {
       console.log("response", response?.data?.info);
-      return response?.data?.info; // Update the state with the otpSent value
+      // return response?.data?.info;
     } else {
       throw new Error(response?.data?.info);
     }
@@ -23,13 +23,14 @@ export const verifyOTP = createAsyncThunk(
     try {
       const response = await axios.post(apiBaseUrl, { email, otp });
       if (response.data.msg === "success") {
-        // console.log("response", response?.data?.info);
-        return response?.data?.info; // Update the state with the usernameList value
+        console.log("response", response?.data?.info);
+        // return response?.data?.info;
       } else {
+        console.log("response", response?.data?.info);
         throw new Error(response?.data?.info);
       }
     } catch (error) {
-      // console.log("response", error?.response?.data?.info);
+      console.log("response", error?.response?.data?.info);
       throw new Error(error?.response?.data?.info);
     }
   }
@@ -38,8 +39,8 @@ export const verifyOTP = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    usernameList: [],
-    otpSent: null, // Set otpSent initial value to null
+    usernameList: null,
+    otpSent: null,
     loading: false,
     error: null,
   },
@@ -49,7 +50,7 @@ const authSlice = createSlice({
       .addCase(sendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.otpSent = null; // Reset otpSent when sending OTP
+        state.otpSent = null;
       })
       .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;

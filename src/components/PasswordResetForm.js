@@ -106,7 +106,7 @@ const PasswordResetForm = () => {
                     id="username"
                     autoComplete="username"
                     className={`input-field ${
-                      errors.email ? "border-red-500" : ""
+                      errors.username ? "border-red-500" : ""
                     }`}
                     {...register("username")}
                   />
@@ -173,13 +173,13 @@ const PasswordResetForm = () => {
                       id="otp"
                       autoComplete="otp"
                       className={`input-field ${
-                        errors.email ? "border-red-500" : ""
+                        errors.otp ? "border-red-500" : ""
                       }`}
                       {...register("otp")}
                     />
                     {errors?.otp && (
                       <p className="text-red-500 text-xs mt-1">
-                        {errors?.otp?.message}
+                        {errors.otp.message}
                       </p>
                     )}
                   </div>
@@ -198,13 +198,13 @@ const PasswordResetForm = () => {
                         id="new_password"
                         autoComplete="new_password"
                         className={`input-field ${
-                          errors.email ? "border-red-500" : ""
+                          errors.new_password ? "border-red-500" : ""
                         }`}
                         {...register("new_password")}
                       />
                       {errors?.new_password && (
                         <p className="text-red-500 text-xs mt-1">
-                          {errors?.new_password?.message}
+                          {errors.new_password.message}
                         </p>
                       )}
                     </div>
@@ -224,13 +224,13 @@ const PasswordResetForm = () => {
                         id="confirm-password"
                         autoComplete="confirm-password"
                         className={`input-field ${
-                          errors.email ? "border-red-500" : ""
+                          errors.confirmPassword ? "border-red-500" : ""
                         }`}
                         {...register("confirmPassword")}
                       />
-                      {errors?.confirmPassword && (
+                      {errors.confirmPassword && (
                         <p className="text-red-500 text-xs mt-1">
-                          {errors?.confirmPassword?.message}
+                          {errors.confirmPassword.message}
                         </p>
                       )}
                     </div>

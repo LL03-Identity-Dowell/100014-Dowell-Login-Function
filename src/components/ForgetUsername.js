@@ -101,11 +101,9 @@ const ForgotUsername = () => {
                     >
                       Get OTP
                     </button>
-                    {otpSent && step === 1 && (
-                      <p className="text-base font-normal text-green-600">
-                        OTP sent successfully
-                      </p>
-                    )}
+                    <p className="text-base font-normal text-green-600">
+                      {otpSent}
+                    </p>
                   </div>
                 </div>
 
