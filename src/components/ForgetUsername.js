@@ -60,7 +60,6 @@ const ForgotUsername = () => {
             </h3>
           </div>
 
-          {/* Show loading and error messages */}
           {loading && (
             <Radio
               visible={true}
@@ -72,11 +71,11 @@ const ForgotUsername = () => {
               color="#4fa94d"
             />
           )}
-          {error && <p>Error: {error}</p>}
+          {error && <p>{error}</p>}
 
-          <form onSubmit={handleSubmit(handleVerifyOTP)}>
-            <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
-              <div className="px-4 py-2 sm:p-6 space-y-4">
+          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
+            <div className="px-4 py-2 sm:p-6 space-y-4">
+              <form onSubmit={handleSubmit(handleVerifyOTP)}>
                 <div>
                   <label
                     htmlFor="email"
@@ -90,7 +89,7 @@ const ForgotUsername = () => {
                       name="email"
                       id="email"
                       autoComplete="email"
-                      className="input-field "
+                      className="input-field"
                       {...register("email")}
                     />
                     {errors?.email && (
@@ -107,39 +106,35 @@ const ForgotUsername = () => {
                       >
                         Get OTP
                       </button>
-                      {step === 1 && (
-                        <p className="text-base font-normal text-green-600">
-                          {otpSent}
-                        </p>
-                      )}
+                      <p className="text-base font-normal text-green-600">
+                        {otpSent}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 {step === 2 && (
                   <>
-                    <div className="sm:col-span-2">
+                    <div>
                       <label
-                        htmlFor="otp"
                         className="block text-sm font-semibold leading-6 text-green-700"
+                        htmlFor="otp"
                       >
-                        Enter OTP from email
+                        Enter OTP from Email
                       </label>
-                      <div className="mt-2.5">
-                        <input
-                          type="text"
-                          name="otp"
-                          id="otp"
-                          autoComplete="otp"
-                          className="input-field "
-                          {...register("otp")}
-                        />
-                        {errors.otp && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.otp.message}
-                          </p>
-                        )}
-                      </div>
+                      <input
+                        type="text"
+                        name="otp"
+                        id="otp"
+                        autoComplete="otp"
+                        className="input-field"
+                        {...register("otp")}
+                      />
+                      {errors?.otp && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.otp.message}
+                        </p>
+                      )}
                     </div>
 
                     <div className="btn-send px-1 py-1 mt-2 self-start">
@@ -154,9 +149,9 @@ const ForgotUsername = () => {
                     )}
                   </>
                 )}
-              </div>
+              </form>
             </div>
-          </form>
+          </div>
 
           <div className="text-gray-500 space-x-2 py-4 px-6 text-right">
             Do you have an account?{" "}
