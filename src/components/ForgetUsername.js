@@ -30,7 +30,7 @@ const ForgotUsername = () => {
 
   const dispatch = useDispatch();
   const { loading, error, usernameList, otpSent } = useSelector(
-    (state) => state?.auth || {},
+    (state) => state.username || {},
     shallowEqual
   );
 
