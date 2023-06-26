@@ -22,11 +22,11 @@ const schema = yup.object().shape({
     .email("Invalid email format")
     .required("Email is required"),
   otp: yup.string().when("step", {
-    is: (step) => step === 2,
+    is: 2,
     then: yup.string().required("OTP required"),
   }),
   new_password: yup.string().when("step", {
-    is: (step) => step === 2,
+    is: 2,
     then: yup
       .string()
       .min(8, "Password must be at least 8 characters")
@@ -38,10 +38,10 @@ const schema = yup.object().shape({
       ),
   }),
   confirm_password: yup.string().when("step", {
-    is: (step) => step === 2,
+    is: 2,
     then: yup
       .string()
-      .oneOf([yup.ref("new_password"), null], "Passwords must match")
+      .oneOf([yup.ref("new_password")], "Passwords must match")
       .required("Confirm Password is required"),
   }),
 });
@@ -64,9 +64,17 @@ const PasswordResetForm = () => {
     setStep(2);
   };
 
-  const handleResetPassword = ({ username, email, otp, new_password }) => {
+  const handleResetPassword = ({
+    username,
+    email,
+    otp,
+    new_password,
+    confirm_password,
+  }) => {
     if (step === 2) {
-      dispatch(resetPassword({ username, email, otp, new_password }));
+      dispatch(
+        resetPassword({ username, email, otp, new_password, confirm_password })
+      );
     }
   };
 
