@@ -3,21 +3,24 @@ import axios from "axios";
 
 const apiBaseUrl = "https://100014.pythonanywhere.com/api/forgot_username/";
 
-export const sendOTP = createAsyncThunk("auth/sendOTP", async ({ email }) => {
-  try {
-    const response = await axios.post(apiBaseUrl, { email });
-    if (response.data.msg === "success") {
-      return response?.data?.info;
-    } else {
-      throw new Error(response?.data?.info);
+export const userSendOTP = createAsyncThunk(
+  "username/userSendOTP",
+  async ({ email }) => {
+    try {
+      const response = await axios.post(apiBaseUrl, { email });
+      if (response.data.msg === "success") {
+        return response?.data?.info;
+      } else {
+        throw new Error(response?.data?.info);
+      }
+    } catch (error) {
+      throw new Error(error?.response?.data?.info);
     }
-  } catch (error) {
-    throw new Error(error?.response?.data?.info);
   }
-});
+);
 
 export const verifyOTP = createAsyncThunk(
-  "auth/verifyOTP",
+  "username/verifyOTP",
   async ({ email, otp }) => {
     try {
       const response = await axios.post(apiBaseUrl, { email, otp });
@@ -32,33 +35,34 @@ export const verifyOTP = createAsyncThunk(
   }
 );
 
-const authSlice = createSlice({
-  name: "auth",
+const usernameSlice = createSlice({
+  name: "username",
   initialState: {
-    usernameList: null,
-    otpSent: null,
+    usernameList: false,
+    otpSent: false,
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(sendOTP.pending, (state) => {
+      .addCase(userSendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.otpSent = null;
+        state.otpSent = false;
       })
-      .addCase(sendOTP.fulfilled, (state, action) => {
+      .addCase(userSendOTP.fulfilled, (state, action) => {
         state.loading = false;
         state.otpSent = action.payload; // Update otpSent with the received value
       })
-      .addCase(sendOTP.rejected, (state, action) => {
+      .addCase(userSendOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
       .addCase(verifyOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.usernameList = false;
       })
       .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
@@ -71,4 +75,4 @@ const authSlice = createSlice({
   },
 });
 
-export default authSlice.reducer;
+export default usernameSlice.reducer;

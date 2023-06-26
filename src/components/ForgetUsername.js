@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { sendOTP, verifyOTP } from "../redux/authSlice";
+import { userSendOTP, verifyOTP } from "../redux/usernameSlice";
 import { Radio } from "react-loader-spinner";
 
 const schema = yup.object().shape({
@@ -14,7 +14,7 @@ const schema = yup.object().shape({
     .email("Invalid email format")
     .required("Email is required"),
   otp: yup.string().when("step", {
-    is: 2,
+    is: (step) => step === 2,
     then: yup.string().required("OTP required"),
   }),
 });
@@ -27,14 +27,15 @@ const ForgotUsername = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const [step, setStep] = useState(1);
+
   const dispatch = useDispatch();
   const { loading, error, usernameList, otpSent } = useSelector(
-    (state) => state.auth || {},
+    (state) => state?.auth || {},
     shallowEqual
   );
 
   const handleSendOTP = ({ email }) => {
-    dispatch(sendOTP({ email }));
+    dispatch(userSendOTP({ email }));
     setStep(2);
   };
 
@@ -89,9 +90,7 @@ const ForgotUsername = () => {
                       name="email"
                       id="email"
                       autoComplete="email"
-                      className={`input-field ${
-                        errors.email ? "border-red-500" : ""
-                      }`}
+                      className="input-field "
                       {...register("email")}
                     />
                     {errors?.email && (
@@ -132,9 +131,7 @@ const ForgotUsername = () => {
                           name="otp"
                           id="otp"
                           autoComplete="otp"
-                          className={`input-field ${
-                            errors.otp ? "border-red-500" : ""
-                          }`}
+                          className="input-field "
                           {...register("otp")}
                         />
                         {errors.otp && (
