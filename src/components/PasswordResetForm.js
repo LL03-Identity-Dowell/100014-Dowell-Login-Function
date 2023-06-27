@@ -8,51 +8,57 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetPassword, sendOTP } from "../redux/passwordSlice";
 import { Radio } from "react-loader-spinner";
 
-const schema = yup.object().shape({
-  username: yup
-    .string()
-    .required("User Name is required")
-    .max(20)
-    .notOneOf(
-      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
-      "Username not allowed"
-    ),
-  email: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email is required"),
-  otp: yup.string().when("step", {
-    is: 2,
-    then: yup.string().required("OTP required"),
-  }),
-  new_password: yup.string().when("step", {
-    is: 2,
-    then: yup
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(99)
-      .required("Password is required")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-        "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 digit"
-      ),
-  }),
-  confirm_password: yup.string().when("step", {
-    is: 2,
-    then: yup
-      .string()
-      .oneOf([yup.ref("new_password")], "Passwords must match")
-      .required("Confirm Password is required"),
-  }),
-});
-
 const PasswordResetForm = () => {
+  const schema = yup.object().shape({
+    username: yup
+      .string()
+      .required("User Name is required")
+      .max(20)
+      .notOneOf(
+        [
+          "administrator",
+          "uxlivinglab",
+          "dowellresearch",
+          "dowellteam",
+          "admin",
+        ],
+        "Username not allowed"
+      ),
+    email: yup
+      .string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    otp: yup.string().when("otpSent", {
+      is: true,
+      then: yup.string().required("OTP is required"),
+    }),
+    new_password: yup.string().when("otpSent", {
+      is: true,
+      then: yup
+        .string()
+        .min(8, "Password must be at least 8 characters")
+        .max(99)
+        .required("Password is required")
+        .matches(
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+          "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 digit"
+        ),
+    }),
+    confirm_password: yup.string().when("otpSent", {
+      is: true,
+      then: yup
+        .string()
+        .oneOf([yup.ref("new_password")], "Passwords must match")
+        .required("Confirm Password is required"),
+    }),
+  });
+
   const {
     handleSubmit,
     register,
     formState: { errors },
+    setValue,
   } = useForm({ resolver: yupResolver(schema) });
-  const [step, setStep] = useState(1);
 
   const dispatch = useDispatch();
   const { passwordReset, loading, error, otpSent } = useSelector(
@@ -60,13 +66,16 @@ const PasswordResetForm = () => {
   );
 
   const handleSendOTP = ({ username, email }) => {
+    setValue("otp", "", { shouldValidate: false }); // Disable validation for otp field
+    setValue("new_password", "", { shouldValidate: false }); // Disable validation for new_password field
+    setValue("confirm_password", "", { shouldValidate: false }); // Disable validation for confirm_password field
+
     dispatch(sendOTP({ username, email }));
-    setStep(2);
   };
 
   const handleResetPassword = (data) => {
-    if (step === 2) {
-      const { username, email, otp, new_password, confirm_password } = data;
+    const { username, email, otp, new_password, confirm_password } = data;
+    if (otp && new_password && confirm_password) {
       dispatch(
         resetPassword({ username, email, otp, new_password, confirm_password })
       );
@@ -97,8 +106,8 @@ const PasswordResetForm = () => {
         {loading && (
           <Radio
             visible={true}
-            height="60"
-            width="60"
+            height="50"
+            width="50"
             ariaLabel="radio-loading"
             wrapperStyle={{}}
             wrapperClass="radio-wrapper"
@@ -171,89 +180,84 @@ const PasswordResetForm = () => {
                 </div>
               </div>
 
-              {/* Step 2: Password */}
-              {step === 2 && (
-                <>
-                  <div>
-                    <label
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                      htmlFor="otp"
-                    >
-                      Enter OTP from Email
-                    </label>
-                    <input
-                      type="text"
-                      name="otp"
-                      id="otp"
-                      autoComplete="otp"
-                      className="input-field"
-                      {...register("otp")}
-                    />
-                    {errors?.otp && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.otp.message}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="new_password"
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                    >
-                      New Password
-                    </label>
-                    <div className="mt-2.5">
-                      <input
-                        type="password"
-                        name="new_password"
-                        id="new_password"
-                        autoComplete="new_password"
-                        className="input-field"
-                        {...register("new_password")}
-                      />
-                      {errors?.new_password && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.new_password.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="confirm_password"
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                    >
-                      Confirm Password
-                    </label>
-                    <div className="mt-2.5">
-                      <input
-                        type="password"
-                        name="confirm_password"
-                        id="confirm_password"
-                        autoComplete="confirm_password"
-                        className="input-field"
-                        {...register("confirm_password")}
-                      />
-                      {errors.confirm_password && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.confirm_password.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="btn-send px-1 py-1 mt-2 self-start">
-                    <button type="submit" className="btn-send">
-                      Reset Password
-                    </button>
-                  </div>
-                  <p className="text-base font-normal text-green-600">
-                    {passwordReset}
+              <div>
+                <label
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                  htmlFor="otp"
+                >
+                  Enter OTP from Email
+                </label>
+                <input
+                  type="text"
+                  name="otp"
+                  id="otp"
+                  autoComplete="otp"
+                  className="input-field"
+                  {...register("otp", { required: otpSent })}
+                />
+                {errors?.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
                   </p>
-                </>
-              )}
+                )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor="new_password"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  New Password
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="password"
+                    name="new_password"
+                    id="new_password"
+                    autoComplete="new_password"
+                    className="input-field"
+                    {...register("new_password", { required: otpSent })}
+                  />
+                  {errors?.new_password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.new_password.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="confirm_password"
+                  className="block text-sm font-semibold leading-6 text-green-700"
+                >
+                  Confirm Password
+                </label>
+                <div className="mt-2.5">
+                  <input
+                    type="password"
+                    name="confirm_password"
+                    id="confirm_password"
+                    autoComplete="confirm_password"
+                    className="input-field"
+                    {...register("confirm_password", { required: otpSent })}
+                  />
+                  {errors.confirm_password && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.confirm_password.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="btn-send px-1 py-1 mt-2 self-start">
+                <button type="submit" className="btn-send">
+                  Reset Password
+                </button>
+              </div>
+              <p className="text-base font-normal text-green-600">
+                {passwordReset}
+              </p>
             </form>
           </div>
         </div>

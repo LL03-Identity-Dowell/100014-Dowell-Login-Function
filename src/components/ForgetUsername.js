@@ -26,8 +26,6 @@ const ForgotUsername = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  // const [step, setStep] = useState(1);
-
   const dispatch = useDispatch();
   const { loading, error, usernameList, otpSent } = useSelector(
     (state) => state.username || {},
@@ -60,8 +58,8 @@ const ForgotUsername = () => {
           {loading && (
             <Radio
               visible={true}
-              height="60"
-              width="60"
+              height="50"
+              width="50"
               ariaLabel="radio-loading"
               wrapperStyle={{}}
               wrapperClass="radio-wrapper"
