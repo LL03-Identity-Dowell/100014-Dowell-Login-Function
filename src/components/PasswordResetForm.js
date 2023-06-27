@@ -157,12 +157,12 @@ const PasswordResetForm = () => {
                       {loading ? (
                         <Radio
                           visible={true}
-                          height={50}
-                          width={50}
+                          height={30}
+                          width={30}
                           ariaLabel="radio-loading"
                           wrapperStyle={{}}
                           wrapperClassName="radio-wrapper"
-                          color="#4fa94d"
+                          color="#1ff507"
                         />
                       ) : (
                         "Get OTP"
@@ -247,7 +247,19 @@ const PasswordResetForm = () => {
 
               <div className="btn-send px-1 py-1 mt-2 self-start">
                 <button type="submit" className="btn-send" disabled={loading}>
-                  {loading ? "Resetting Password..." : "Reset Password"}
+                  {loading ? (
+                    <Radio
+                      visible={true}
+                      height={30}
+                      width={30}
+                      ariaLabel="radio-loading"
+                      wrapperStyle={{}}
+                      wrapperClassName="radio-wrapper"
+                      color="#1ff507"
+                    />
+                  ) : (
+                    "Reset Password"
+                  )}
                 </button>
               </div>
               <p className="text-base font-normal text-green-600">

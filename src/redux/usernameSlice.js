@@ -69,7 +69,7 @@ const usernameSlice = createSlice({
       })
       .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.usernameList = action.payload.usernameList; // Update usernameList with the received value
+        state.usernameList = action.payload; // Update usernameList with the received value
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;

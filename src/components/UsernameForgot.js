@@ -103,12 +103,12 @@ const UsernameForgot = () => {
                         {loading ? (
                           <Radio
                             visible={true}
-                            height={50}
-                            width={50}
+                            height={30}
+                            width={30}
                             ariaLabel="radio-loading"
                             wrapperStyle={{}}
                             wrapperClassName="radio-wrapper"
-                            color="#4fa94d"
+                            color="#1ff507"
                           />
                         ) : (
                           "Get OTP"
@@ -154,7 +154,19 @@ const UsernameForgot = () => {
                         className="btn-send"
                         disabled={loading}
                       >
-                        {loading ? "Verifying..." : "Verify"}
+                        {loading ? (
+                          <Radio
+                            visible={true}
+                            height={30}
+                            width={30}
+                            ariaLabel="radio-loading"
+                            wrapperStyle={{}}
+                            wrapperClassName="radio-wrapper"
+                            color="#1ff507"
+                          />
+                        ) : (
+                          "Verify"
+                        )}
                       </button>
                     </div>
                   </>
