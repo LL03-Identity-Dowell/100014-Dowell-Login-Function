@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -32,13 +32,26 @@ const UsernameForgot = () => {
     shallowEqual
   );
 
-  const handleSendOTP = ({ email }) => {
-    dispatch(userSendOTP({ email }));
+  const [isOTPSent, setOTPSent] = useState(false);
+
+  const onSubmit = ({ email, otp }) => {
+    if (isOTPSent && otp) {
+      // Verify OTP
+      dispatch(verifyOTP({ email, otp }));
+    } else {
+      // Send OTP
+      dispatch(userSendOTP({ email }));
+      setOTPSent(true);
+    }
   };
 
-  const handleVerifyOTP = ({ email, otp }) => {
-    dispatch(verifyOTP({ email, otp }));
-  };
+  // const handleSendOTP = ({ email }) => {
+  //   dispatch(userSendOTP({ email }));
+  // };
+
+  // const handleVerifyOTP = ({ email, otp }) => {
+  //   dispatch(verifyOTP({ email, otp }));
+  // };
 
   return (
     <div>
@@ -55,22 +68,9 @@ const UsernameForgot = () => {
             </h3>
           </div>
 
-          {loading && (
-            <Radio
-              visible={true}
-              height="50"
-              width="50"
-              ariaLabel="radio-loading"
-              wrapperStyle={{}}
-              wrapperClass="radio-wrapper"
-              color="#4fa94d"
-            />
-          )}
-          {error && <p>{error}</p>}
-
           <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
             <div className="px-4 py-2 sm:p-6 space-y-4">
-              <form onSubmit={handleSubmit(handleVerifyOTP)}>
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
                   <label
                     htmlFor="email"
@@ -96,11 +96,25 @@ const UsernameForgot = () => {
                   <div className="mt-2.5">
                     <div className="flex flex-row space-x-3 items-center">
                       <button
+                        type="submit"
                         className="btn-send px-2 py-1 self-start"
-                        onClick={handleSubmit(handleSendOTP)}
+                        disabled={loading}
                       >
-                        Get OTP
+                        {loading ? (
+                          <Radio
+                            visible={true}
+                            height={50}
+                            width={50}
+                            ariaLabel="radio-loading"
+                            wrapperStyle={{}}
+                            wrapperClassName="radio-wrapper"
+                            color="#4fa94d"
+                          />
+                        ) : (
+                          "Get OTP"
+                        )}
                       </button>
+
                       {otpSent && (
                         <p className="text-base font-normal text-green-600">
                           {otpSent}
@@ -110,33 +124,43 @@ const UsernameForgot = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                    htmlFor="otp"
-                  >
-                    Enter OTP from Email
-                  </label>
-                  <input
-                    type="text"
-                    name="otp"
-                    id="otp"
-                    autoComplete="otp"
-                    className="input-field"
-                    {...register("otp", { required: otpSent })}
-                  />
-                  {errors?.otp && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.otp.message}
-                    </p>
-                  )}
-                </div>
+                {isOTPSent && (
+                  <>
+                    <div>
+                      <label
+                        className="block text-sm font-semibold leading-6 text-green-700"
+                        htmlFor="otp"
+                      >
+                        Enter OTP from Email
+                      </label>
+                      <input
+                        type="text"
+                        name="otp"
+                        id="otp"
+                        autoComplete="otp"
+                        className="input-field"
+                        {...register("otp")}
+                      />
+                      {errors?.otp && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.otp.message}
+                        </p>
+                      )}
+                    </div>
 
-                <div className="btn-send px-1 py-1 mt-2 self-start">
-                  <button type="submit" className="btn-send">
-                    Verify
-                  </button>
-                </div>
+                    <div className="btn-send px-1 py-1 mt-2 self-start">
+                      <button
+                        type="submit"
+                        className="btn-send"
+                        disabled={loading}
+                      >
+                        {loading ? "Verifying..." : "Verify"}
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {error && <p>{error}</p>}
                 {usernameList && (
                   <p className="text-base font-normal text-green-600">
                     {usernameList}

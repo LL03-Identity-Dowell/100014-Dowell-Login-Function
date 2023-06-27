@@ -23,10 +23,13 @@ export const verifyOTP = createAsyncThunk(
   "username/verifyOTP",
   async ({ email, otp }) => {
     try {
-      const response = await axios.post(apiBaseUrl, { email, otp });
+      const response = await axios.post(apiBaseUrl, {
+        email,
+        otp,
+      });
       if (response.data.msg === "success") {
-        // console.log("response", response?.data?.info);
-        return response?.data.info; // Return the value
+        // console.log("response", response.data.info);
+        return response?.data.info;
       } else {
         throw new Error(response?.data?.info);
       }
@@ -39,7 +42,7 @@ export const verifyOTP = createAsyncThunk(
 const usernameSlice = createSlice({
   name: "username",
   initialState: {
-    usernameList: [],
+    usernameList: null,
     otpSent: false,
     loading: false,
     error: null,
@@ -66,7 +69,7 @@ const usernameSlice = createSlice({
       })
       .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
-        state.usernameList = action.payload; // Update usernameList with the received value
+        state.usernameList = action.payload.usernameList; // Update usernameList with the received value
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.loading = false;

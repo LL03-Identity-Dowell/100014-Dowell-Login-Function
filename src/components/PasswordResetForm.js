@@ -98,19 +98,6 @@ const PasswordResetForm = () => {
           </Link>
         </div>
 
-        {loading && (
-          <Radio
-            visible={true}
-            height="50"
-            width="50"
-            ariaLabel="radio-loading"
-            wrapperStyle={{}}
-            wrapperClass="radio-wrapper"
-            color="#4fa94d"
-          />
-        )}
-        {error && <p>{error}</p>}
-
         <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
           <div className="px-4 py-2 sm:p-6 space-y-4">
             <form onSubmit={handleSubmit(handleResetPassword)}>
@@ -165,8 +152,21 @@ const PasswordResetForm = () => {
                     <button
                       className="btn-send px-2 py-1 self-start"
                       onClick={handleSubmit(handleSendOTP)}
+                      disabled={loading}
                     >
-                      Get OTP
+                      {loading ? (
+                        <Radio
+                          visible={true}
+                          height={50}
+                          width={50}
+                          ariaLabel="radio-loading"
+                          wrapperStyle={{}}
+                          wrapperClassName="radio-wrapper"
+                          color="#4fa94d"
+                        />
+                      ) : (
+                        "Get OTP"
+                      )}
                     </button>
                     <p className="text-base font-normal text-green-600">
                       {otpSent}
@@ -246,13 +246,15 @@ const PasswordResetForm = () => {
               </div>
 
               <div className="btn-send px-1 py-1 mt-2 self-start">
-                <button type="submit" className="btn-send">
-                  Reset Password
+                <button type="submit" className="btn-send" disabled={loading}>
+                  {loading ? "Resetting Password..." : "Reset Password"}
                 </button>
               </div>
               <p className="text-base font-normal text-green-600">
                 {passwordReset}
               </p>
+
+              {error && <p>{error}</p>}
             </form>
           </div>
         </div>

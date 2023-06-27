@@ -24,13 +24,14 @@ export const sendOTP = createAsyncThunk(
 // Async thunk for submitting OTP and new password
 export const resetPassword = createAsyncThunk(
   "password/resetPassword",
-  async ({ username, email, otp, new_password }) => {
+  async ({ username, email, otp, new_password, confirm_password }) => {
     try {
       const response = await axios.post(API_URL, {
         username,
         email,
         otp,
         new_password,
+        confirm_password,
       });
       if (response.data.msg === "success") {
         // console.log("response", response.data.info);
