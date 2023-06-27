@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { userSendOTP, verifyOTP } from "../redux/usernameSlice";
+import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { Radio } from "react-loader-spinner";
 
 const schema = yup.object().shape({
@@ -137,7 +137,7 @@ const UsernameForgot = () => {
                     Verify
                   </button>
                 </div>
-                {usernameList !== null && (
+                {usernameList && (
                   <p className="text-base font-normal text-green-600">
                     {usernameList}
                   </p>
