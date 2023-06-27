@@ -19,7 +19,7 @@ const schema = yup.object().shape({
   }),
 });
 
-const ForgotUsername = () => {
+const UsernameForgot = () => {
   const {
     handleSubmit,
     register,
@@ -51,7 +51,7 @@ const ForgotUsername = () => {
               className="h-28 w-34 rounded-full drop-shadow-sm"
             />
             <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
-              Forgot Username
+              Username Forgot
             </h3>
           </div>
 
@@ -158,4 +158,4 @@ const ForgotUsername = () => {
   );
 };
 
-export default ForgotUsername;
+export default UsernameForgot;
