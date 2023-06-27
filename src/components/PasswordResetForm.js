@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
@@ -57,7 +57,6 @@ const PasswordResetForm = () => {
     handleSubmit,
     register,
     formState: { errors },
-    setValue,
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
@@ -66,10 +65,6 @@ const PasswordResetForm = () => {
   );
 
   const handleSendOTP = ({ username, email }) => {
-    setValue("otp", "", { shouldValidate: false }); // Disable validation for otp field
-    setValue("new_password", "", { shouldValidate: false }); // Disable validation for new_password field
-    setValue("confirm_password", "", { shouldValidate: false }); // Disable validation for confirm_password field
-
     dispatch(sendOTP({ username, email }));
   };
 
