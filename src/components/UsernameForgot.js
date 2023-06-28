@@ -32,12 +32,12 @@ const UsernameForgot = () => {
   );
 
   const onSubmit = ({ email, otp }) => {
-    if (otp) {
-      // Verify OTP
-      dispatch(verifyOTP({ email, otp }));
-    } else {
+    if (otpSent === false) {
       // Send OTP
       dispatch(userSendOTP({ email }));
+    } else {
+      // Verify OTP
+      dispatch(verifyOTP({ email, otp }));
     }
   };
 
