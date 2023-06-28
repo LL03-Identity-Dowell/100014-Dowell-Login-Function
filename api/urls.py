@@ -17,5 +17,6 @@ urlpatterns = [
     path("country_codes/", views.get_country_codes, name='country_codes'),
     path("forgot_password/", views.forgot_password, name='api_forgot_password'),
     path("forgot_username/", views.forgot_username, name='api_forgot_username'),
+    path('loginapi/',views.PublicApi,name="loginapi")
 
 ]

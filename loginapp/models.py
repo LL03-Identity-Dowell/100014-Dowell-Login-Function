@@ -27,7 +27,7 @@ class Account(AbstractUser):
 
 
 class GuestAccount(models.Model):
-    username = models.CharField(max_length=20, unique=True)
+    username = models.CharField(max_length=20, unique=False)
     email = models.CharField(max_length=30, unique=True)
     is_activated = models.BooleanField(default=False)
     otp = models.IntegerField(null=True)

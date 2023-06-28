@@ -266,6 +266,7 @@ def register(request):
         main_params = request.POST.get('mainparams', None)
         _type = request.POST.get('type', None)
         otp = request.POST.get('otp')
+        sms=request.POST.get('sms')
         org = request.POST.get('org', None)
         policy_status = request.POST.get('policy_status')
         other_policy = request.POST.get('other_policy')
@@ -359,7 +360,12 @@ def register(request):
 
             field = {"Profile_Image": f"https://100014.pythonanywhere.com/media/{profile_image}", "Username": user, "Password": dowell_hash(password1), "Firstname": first, "Lastname": last, "Email": email, "phonecode": phonecode, "Phone": phone, "profile_id": profile_id, "client_admin_id": client_admin_res[
                 "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter}
-
+            if sms == "" or sms==None:
+                sms_verified="unverified"
+                field["verified"]="False"
+            else:
+                sms_verified="verified"
+                field["verified"]="True"
             # Insert user registration
             id = dowellconnection("login", "bangalore", "login", "registration",
                                   "registration", "10004545", "ABCDE", "insert", field, "nil")
@@ -375,7 +381,9 @@ def register(request):
                 "phoneCode": phonecode,
                 "phoneNumber": phone,
                 "usertype": user_type,
-                "country": user_country
+                "country": user_country,
+                "verified_phone":sms_verified,
+                "verified_email": "verified"
             })
             headers = {
                 'Content-Type': 'application/json'
@@ -552,13 +560,13 @@ def login(request):
                 email = response["data"]['Email']
                 phone = response["data"]['Phone']
                 try:
+                    user_id = response["data"]['_id']
                     if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                         profile_image = "https://100014.pythonanywhere.com/media/user.png"
                     else:
                         profile_image = response["data"]['Profile_Image']
                     User_type = response["data"]['User_type']
                     client_admin_id = response["data"]['client_admin_id']
-                    user_id = response["data"]['_id']
                     payment_status = response["data"]['payment_status']
                     newsletter = response["data"]['newsletter_subscription']
                     user_country = response["data"]['user_country']
@@ -602,6 +610,9 @@ def login(request):
             infoo = str(info1)
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
+
+            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
 
             if "org" in main_params:
                 return HttpResponse(f"Logged in successfully, SessionID is = {session}")
