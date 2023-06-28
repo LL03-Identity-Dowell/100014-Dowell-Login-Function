@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useForm } from "react-hook-form";
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { Radio } from "react-loader-spinner";
+import { useDispatch, useSelector } from "react-redux";
 
 const schema = yup.object().shape({
   email: yup
@@ -28,30 +28,18 @@ const UsernameForgot = () => {
 
   const dispatch = useDispatch();
   const { loading, error, usernameList, otpSent } = useSelector(
-    (state) => state.username || {},
-    shallowEqual
+    (state) => state?.username
   );
 
-  const [isOTPSent, setOTPSent] = useState(false);
-
   const onSubmit = ({ email, otp }) => {
-    if (isOTPSent && otp) {
+    if (otp) {
       // Verify OTP
       dispatch(verifyOTP({ email, otp }));
     } else {
       // Send OTP
       dispatch(userSendOTP({ email }));
-      setOTPSent(true);
     }
   };
-
-  // const handleSendOTP = ({ email }) => {
-  //   dispatch(userSendOTP({ email }));
-  // };
-
-  // const handleVerifyOTP = ({ email, otp }) => {
-  //   dispatch(verifyOTP({ email, otp }));
-  // };
 
   return (
     <div>
@@ -115,69 +103,58 @@ const UsernameForgot = () => {
                         )}
                       </button>
 
-                      {otpSent && (
-                        <p className="text-base font-normal text-green-600">
-                          {otpSent}
-                        </p>
-                      )}
+                      <p className="text-base font-normal text-green-600">
+                        {otpSent}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                {isOTPSent && (
-                  <>
-                    <div>
-                      <label
-                        className="block text-sm font-semibold leading-6 text-green-700"
-                        htmlFor="otp"
-                      >
-                        Enter OTP from Email
-                      </label>
-                      <input
-                        type="text"
-                        name="otp"
-                        id="otp"
-                        autoComplete="otp"
-                        className="input-field"
-                        {...register("otp")}
-                      />
-                      {errors?.otp && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.otp.message}
-                        </p>
-                      )}
-                    </div>
+                <div>
+                  <label
+                    className="block text-sm font-semibold leading-6 text-green-700"
+                    htmlFor="otp"
+                  >
+                    Enter OTP from Email
+                  </label>
+                  <input
+                    type="text"
+                    name="otp"
+                    id="otp"
+                    autoComplete="otp"
+                    className="input-field"
+                    {...register("otp", { required: otpSent })}
+                  />
+                  {errors?.otp && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.otp.message}
+                    </p>
+                  )}
+                </div>
 
-                    <div className="btn-send px-1 py-1 mt-2 self-start">
-                      <button
-                        type="submit"
-                        className="btn-send"
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <Radio
-                            visible={true}
-                            height={30}
-                            width={30}
-                            ariaLabel="radio-loading"
-                            wrapperStyle={{}}
-                            wrapperClassName="radio-wrapper"
-                            color="#1ff507"
-                          />
-                        ) : (
-                          "Verify"
-                        )}
-                      </button>
-                    </div>
-                  </>
-                )}
+                <div className="btn-send px-1 py-1 mt-2 self-start">
+                  <button type="submit" className="btn-send" disabled={loading}>
+                    {loading ? (
+                      <Radio
+                        visible={true}
+                        height={30}
+                        width={30}
+                        ariaLabel="radio-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName="radio-wrapper"
+                        color="#1ff507"
+                      />
+                    ) : (
+                      "Verify"
+                    )}
+                  </button>
+                </div>
+
+                <p className="text-base font-normal text-green-600">
+                  {usernameList}
+                </p>
 
                 {error && <p>{error}</p>}
-                {usernameList && (
-                  <p className="text-base font-normal text-green-600">
-                    {usernameList}
-                  </p>
-                )}
               </form>
             </div>
           </div>
