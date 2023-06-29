@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -10,9 +9,10 @@ import { getOperatingSystem, getDeviceType } from "../libs/deviceUtils";
 import { getUserIP } from "../libs/ipUtils";
 import Coordinate from "../libs/Coordinate";
 import { detectBrowser } from "../libs/browserUtils";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const schema = yup.object().shape({
-  userName: yup
+  username: yup
     .string()
     .required("User Name is required")
     .max(20)
@@ -38,40 +38,33 @@ const LogIn = () => {
 
   // Retrieves the current local time in the user's browser
   const currentTime = new Date().toLocaleTimeString();
-
   // retrieved IP address in your code
   const IPAddress = getUserIP();
-
   // Operating System
   const operatingSystem = getOperatingSystem();
   const device = getDeviceType();
-
   // Retrieves the user's location in latitude and longitude format
   const location = Coordinate();
-
   // Retrieves the user's timezone
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
   // Retrieves the user's preferred language
   const userLanguage = navigator.language;
-
   // Use the detectBrowser
   const browserType = detectBrowser();
 
-  const userData = {
-    username,
-    password,
-    time: currentTime,
-    ip: IPAddress,
-    os: operatingSystem,
-    device: device,
-    location: location,
-    timezone: userTimezone,
-    language: userLanguage,
-    browser: browserType,
-  };
-
   const onSubmit = ({ username, password }) => {
+    const userData = {
+      username,
+      password,
+      time: currentTime,
+      ip: IPAddress,
+      os: operatingSystem,
+      device: device,
+      location: location,
+      timezone: userTimezone,
+      language: userLanguage,
+      browser: browserType,
+    };
     dispatch(loginUser(userData));
   };
 
@@ -117,7 +110,7 @@ const LogIn = () => {
                 >
                   <div>
                     <label
-                      htmlFor="userName"
+                      htmlFor="username"
                       className="block text-sm font-semibold leading-6 text-green-700"
                     >
                       User Name
@@ -125,17 +118,17 @@ const LogIn = () => {
                     <div className="mt-2.5">
                       <input
                         type="text"
-                        name="userName"
-                        id="userName"
-                        autoComplete="userName"
+                        name="username"
+                        id="username"
+                        autoComplete="username"
                         className={`input-field ${
-                          errors.userName ? "border-red-500" : ""
+                          errors.username ? "border-red-500" : ""
                         }`}
-                        {...register("userName")}
+                        {...register("username")}
                       />
-                      {errors.userName && (
+                      {errors.username && (
                         <p className="text-red-500 text-xs mt-1">
-                          {errors.userName.message}
+                          {errors.username.message}
                         </p>
                       )}
                     </div>
@@ -168,9 +161,14 @@ const LogIn = () => {
                   </div>
 
                   <div className="flex items-center">
-                    <button className="btn-send" type="submit">
-                      Log in
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn-send"
+                    >
+                      {loading ? "Logging in..." : "Login"}
                     </button>
+                    {error && <p>{error}</p>}
                   </div>
                 </form>
               </div>

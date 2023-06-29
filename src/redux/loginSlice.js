@@ -5,9 +5,31 @@ const api_url = "https://100014.pythonanywhere.com/api/mobilelogin/";
 
 export const loginUser = createAsyncThunk(
   "login/loginUser",
-  async ({ username, password }) => {
+  async ({
+    username,
+    password,
+    time,
+    ip,
+    os,
+    device,
+    location,
+    timezone,
+    language,
+    browser,
+  }) => {
     try {
-      const response = await axios.post(api_url, { username, password });
+      const response = await axios.post(api_url, {
+        username,
+        password,
+        time,
+        ip,
+        os,
+        device,
+        location,
+        timezone,
+        language,
+        browser,
+      });
       return response?.data?.userinfo;
     } catch (error) {
       throw new Error(error.response.data);
