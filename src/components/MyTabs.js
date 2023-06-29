@@ -5,7 +5,7 @@ import Chat from "../pages/Chat";
 import Policy from "../pages/Policy";
 import Help from "../pages/Help";
 import FAQ from "../pages/FAQ";
-import { getCategoryIcon } from "../libs/getCategoryIcon";
+import { getCategoryIcon } from "../utils/getCategoryIcon";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");

@@ -5,10 +5,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
-import { getOperatingSystem, getDeviceType } from "../libs/deviceUtils";
-import { getUserIP } from "../libs/ipUtils";
-import Coordinate from "../libs/Coordinate";
-import { detectBrowser } from "../libs/browserUtils";
+import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
+import { getUserIP } from "../utils/ipUtils";
+import Coordinate from "../utils/Coordinate";
+import { detectBrowser } from "../utils/browserUtils";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const schema = yup.object().shape({
