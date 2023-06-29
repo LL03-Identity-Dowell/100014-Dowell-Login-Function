@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const api_url = "https://100014.pythonanywhere.com/api/mobilelogin/";
-// Define the async action for login
+
 export const loginUser = createAsyncThunk(
   "login/loginUser",
   async ({ username, password }) => {

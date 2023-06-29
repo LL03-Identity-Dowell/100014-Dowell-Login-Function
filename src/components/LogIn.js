@@ -4,6 +4,10 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../redux/loginSlice";
+import { getOperatingSystem, getDeviceType } from "../libs/deviceUtils";
+import { getUserIP } from "../libs/ipUtils";
 
 const schema = yup.object().shape({
   userName: yup
@@ -27,7 +31,53 @@ const LogIn = () => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = (data) => console.log(data);
+  const dispatch = useDispatch();
+  const { userInfo, loading, error } = useSelector((state) => state.login);
+
+  // Retrieves the current local time in the user's browser
+  const currentTime = new Date().toLocaleTimeString();
+
+  // retrieved IP address in your code
+  const IPAddress = async () => {
+    const ip = await getUserIP();
+    return ip;
+  };
+
+  // Operating System
+  const operatingSystem = getOperatingSystem();
+  const device = getDeviceType();
+
+  // Retrieves the user's location in latitude and longitude format
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition((position) => {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+      const location = `${latitude} ${longitude}`;
+    });
+  }
+
+  // Retrieves the user's timezone
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+  // Retrieves the user's preferred language
+  const userLanguage = navigator.language;
+
+  const userData = {
+    username,
+    password,
+    time: currentTime,
+    ip: IPAddress,
+    os: operatingSystem,
+    device: device,
+    location: location,
+    timezone: userTimezone,
+    language: userLanguage,
+    browser: "chrome", // Replace with the user's browser (optional)
+  };
+
+  const onSubmit = ({ username, password }) => {
+    dispatch(loginUser(userData));
+  };
 
   return (
     <>
