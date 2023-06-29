@@ -1,6 +1,6 @@
 import { getIP } from "ipify";
 
-export async function getUserIP() {
+export const getUserIP = async () => {
   try {
     const ip = await getIP();
     return ip; // Return the retrieved IP address
@@ -8,4 +8,4 @@ export async function getUserIP() {
     console.log(error);
     return null; // Return null or handle the error as needed
   }
-}
+};

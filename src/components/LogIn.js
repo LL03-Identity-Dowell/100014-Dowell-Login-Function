@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../libs/deviceUtils";
 import { getUserIP } from "../libs/ipUtils";
+import Coordinate from "../libs/Coordinate";
+import { detectBrowser } from "../libs/browserUtils";
 
 const schema = yup.object().shape({
   userName: yup
@@ -38,29 +40,23 @@ const LogIn = () => {
   const currentTime = new Date().toLocaleTimeString();
 
   // retrieved IP address in your code
-  const IPAddress = async () => {
-    const ip = await getUserIP();
-    return ip;
-  };
+  const IPAddress = getUserIP();
 
   // Operating System
   const operatingSystem = getOperatingSystem();
   const device = getDeviceType();
 
   // Retrieves the user's location in latitude and longitude format
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      const location = `${latitude} ${longitude}`;
-    });
-  }
+  const location = Coordinate();
 
   // Retrieves the user's timezone
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Retrieves the user's preferred language
   const userLanguage = navigator.language;
+
+  // Use the detectBrowser
+  const browserType = detectBrowser();
 
   const userData = {
     username,
@@ -72,7 +68,7 @@ const LogIn = () => {
     location: location,
     timezone: userTimezone,
     language: userLanguage,
-    browser: "chrome", // Replace with the user's browser (optional)
+    browser: browserType,
   };
 
   const onSubmit = ({ username, password }) => {
