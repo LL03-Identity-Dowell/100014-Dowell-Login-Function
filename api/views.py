@@ -924,7 +924,11 @@ def PublicApi(request):
         api_resp = processApikey(mdata('api_key'), mdata('api_services'))
     else:
         return Response({"msg": "error", "info": "api_key and api_services fields are needed.."})
-    api_resp = api_resp.replace("false", "False")
+    try:
+        api_resp = api_resp.replace("false", "False")
+        api_resp = api_resp.replace("true", "True")
+    except:
+        pass
     api_resp1 = eval(api_resp)
     if api_resp1["success"] == False:
         return Response({"msg": "error", "info": api_resp1["message"]})
