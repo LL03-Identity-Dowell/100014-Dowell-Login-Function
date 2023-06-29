@@ -9,12 +9,12 @@ export const userSendOTP = createAsyncThunk(
     try {
       const response = await axios.post(apiBaseUrl, { email });
       if (response.data.msg === "success") {
-        return response.data.info;
+        return response?.data?.info;
       } else {
-        throw new Error(response.data.info);
+        throw new Error(response?.data?.info);
       }
     } catch (error) {
-      throw new Error(error.response.data.info);
+      throw new Error(error?.response?.data?.info);
     }
   }
 );
@@ -28,7 +28,7 @@ export const verifyOTP = createAsyncThunk(
         otp,
       });
       if (response.data.msg === "success") {
-        return response.data.info;
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
