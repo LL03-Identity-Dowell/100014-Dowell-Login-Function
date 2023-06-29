@@ -14,6 +14,7 @@ from django.core.mail import send_mail
 from django.template import RequestContext, Template
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
+from django.http.response import JsonResponse
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -24,7 +25,7 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -63,6 +64,36 @@ def register(request):
 
         send_otp()
         return Response({'msg': 'OTP sent successfully'})
+
+    elif phone and phonecode and not email and not username and not image and not password \
+            and not first and not last and not user_type and not user_country and not policy_status \
+            and not other_policy and not newsletter:
+        sms = generateOTP()
+        full_number = phonecode + phone
+        time = datetime.datetime.utcnow()
+        try:
+            phone_exists = mobile_sms.objects.get(phone=full_number)
+        except mobile_sms.DoesNotExist:
+            phone_exists = None
+        if phone_exists is not None:
+            mobile_sms.objects.filter(
+                phone=full_number).update(sms=sms, expiry=time)
+        else:
+            mobile_sms.objects.create(
+                phone=full_number, sms=sms, expiry=time)
+        url = "https://100085.pythonanywhere.com/api/sms/"
+        payload = {
+            "sender": "DowellLogin",
+            "recipient": full_number,
+            "content": f"Enter the following OTP to create your dowell account: {sms}",
+            "created_by": "Manish"
+        }
+        response = requests.request("POST", url, data=payload)
+        print(response.json())
+        if len(response.json()) > 1:
+            return JsonResponse({'msg': 'SMS sent successfully!!'})
+        else:
+            return JsonResponse({'msg': 'error'})
 
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
@@ -348,7 +379,7 @@ def new_userinfo(request):
                     if type(i["username"]) is list:
                         if var2["username"] in i["username"] or "owner" in i["username"]:
                             var3.append(i)
-                    if i["username"]=="owner" and i["product"]!="owner":
+                    if i["username"] == "owner" and i["product"] != "owner":
                         var3.append(i)
             except:
                 pass
@@ -358,7 +389,7 @@ def new_userinfo(request):
                     if type(i["username"]) is list:
                         if var2["username"] in i["username"] or "owner" in i["username"] and product in i["product"]:
                             var3.append(i)
-                    if i["username"]=="owner" and i["product"]!="owner" and product in i["product"]:
+                    if i["username"] == "owner" and i["product"] != "owner" and product in i["product"]:
                         var3.append(i)
             except:
                 pass
@@ -406,9 +437,9 @@ def all_users(request):
                     username = a['Username']
                     payment_status = a['payment_status']
                     user_id = a['_id']
-                    user_type=a['User_type']
+                    user_type = a['User_type']
                     final2.append({"member_name": username, "org_name": username,
-                                  "payment_status": payment_status, "user_id": user_id,"user_type":user_type})
+                                  "payment_status": payment_status, "user_id": user_id, "user_type": user_type})
                 except:
                     pass
             return Response({"data": final2})
@@ -483,36 +514,37 @@ def password_change(request):
 
 @api_view(['POST'])
 def profile_update(request):
-    email_otp=request.data.get("email_otp")
-    address=request.data.get("address")
-    zip_code=request.data.get("zip_code")
-    user_city=request.data.get("city")
-    user_location=request.data.get("location")
-    user_country=request.data.get("country")
-    native_language=request.data.get("native_language")
-    nationality=request.data.get("nationality")
-    language_preferences=request.data.get("language_preferences")
-    vision=request.data.get("vision")
-    username=request.data.get("username")
-    Firstname=request.data.get("first_name")
-    Lastname=request.data.get("last_name")
-    Email=request.data.get("email")
-    Phone=request.data.get("phone")
-    Profile_Image=request.data.get("image")
-    obj=Account.objects.filter(username=username).first()
-    field={"document_name":username}
-    client_admin=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",field,"nil")
-    data2=json.loads(client_admin)
-    resp2={"success_fields":[],"error_fields":[]}
-    data1=data2["data"][0]
-    up_field={}
-    update_fields=[]
-    img_exists=""
+    email_otp = request.data.get("email_otp")
+    address = request.data.get("address")
+    zip_code = request.data.get("zip_code")
+    user_city = request.data.get("city")
+    user_location = request.data.get("location")
+    user_country = request.data.get("country")
+    native_language = request.data.get("native_language")
+    nationality = request.data.get("nationality")
+    language_preferences = request.data.get("language_preferences")
+    vision = request.data.get("vision")
+    username = request.data.get("username")
+    Firstname = request.data.get("first_name")
+    Lastname = request.data.get("last_name")
+    Email = request.data.get("email")
+    Phone = request.data.get("phone")
+    Profile_Image = request.data.get("image")
+    obj = Account.objects.filter(username=username).first()
+    field = {"document_name": username}
+    client_admin = dowellconnection(
+        "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "fetch", field, "nil")
+    data2 = json.loads(client_admin)
+    resp2 = {"success_fields": [], "error_fields": []}
+    data1 = data2["data"][0]
+    up_field = {}
+    update_fields = []
+    img_exists = ""
     if username and Email and not Profile_Image and not Phone and not Lastname and not Firstname and not vision \
         and not language_preferences and not nationality and not native_language and not user_country and not user_location \
             and not user_city and not zip_code and not address and not email_otp:
-        check=Account.objects.filter(username=username,email=Email)
-        check_guest=GuestAccount.objects.filter(email=Email).first()
+        check = Account.objects.filter(username=username, email=Email)
+        check_guest = GuestAccount.objects.filter(email=Email).first()
         if not check:
             otp_input = generateOTP()
             message = f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to use this email address in your existing dowell account <br><h2>Your OTP is <strong>{otp_input}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
@@ -521,113 +553,121 @@ def profile_update(request):
                 'Your otp for changing email in your Dowell account', otp_input, settings.EMAIL_HOST_USER, [Email], fail_silently=False, html_message=message)
 
             if check_guest:
-                check_guest.otp=otp_input
+                check_guest.otp = otp_input
                 check_guest.save(update_fields=['otp'])
             else:
-                guest_account=GuestAccount(username="user", email=Email, otp=otp_input, expiry=datetime.datetime.utcnow())
+                guest_account = GuestAccount(
+                    username="user", email=Email, otp=otp_input, expiry=datetime.datetime.utcnow())
                 guest_account.save()
             send_otp()
-            return Response({'msg':'success','info':'OTP sent successfully'})
+            return Response({'msg': 'success', 'info': 'OTP sent successfully'})
         else:
-            return Response({'msg':'error','info':'Given email is already in use with your account'})
+            return Response({'msg': 'error', 'info': 'Given email is already in use with your account'})
 
     if Profile_Image is not None:
-        img = Image.open(io.BytesIO(base64.decodebytes(bytes(Profile_Image, "utf-8"))))
+        img = Image.open(io.BytesIO(
+            base64.decodebytes(bytes(Profile_Image, "utf-8"))))
         if obj.profile_image == "":
             img.save(f"dowell_login/static/img/api_upload/{username}.png")
-            im = Image.open(f"dowell_login/static/img/api_upload/{username}.png")
+            im = Image.open(
+                f"dowell_login/static/img/api_upload/{username}.png")
             thumb_io = io.BytesIO()
             im.save(thumb_io, im.format, quality=60)
-            obj.profile_image.save(im.filename,ContentFile(thumb_io.getvalue()), save=False )
+            obj.profile_image.save(im.filename, ContentFile(
+                thumb_io.getvalue()), save=False)
             try:
                 os.remove(f"dowell_login/static/img/api_upload/{username}.png")
             except:
                 pass
             obj.save()
-            up_field["Profile_Image"]=f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
-            update_data1={"profile_img":f"https://100014.pythonanywhere.com/media/{obj.profile_image}"}
+            up_field["Profile_Image"] = f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
+            update_data1 = {
+                "profile_img": f"https://100014.pythonanywhere.com/media/{obj.profile_image}"}
             data1["profile_info"].update(update_data1)
             resp2["success_fields"].append("Profile Image")
         else:
             img.save(f"dowell_login/media/{obj.profile_image}")
             resp2["success_fields"].append("Profile Image")
-            up_field["Profile_Image"]=f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
+            up_field["Profile_Image"] = f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
     if Firstname is not None:
-        obj.first_name=Firstname
+        obj.first_name = Firstname
         update_fields.append("first_name")
-        up_field["Firstname"]=Firstname
-        update_data1={"first_name":Firstname}
+        up_field["Firstname"] = Firstname
+        update_data1 = {"first_name": Firstname}
         data1["profile_info"].update(update_data1)
         resp2["success_fields"].append("Firstname")
 
     if Lastname is not None:
-        obj.last_name=Lastname
+        obj.last_name = Lastname
         update_fields.append("last_name")
-        up_field["Lastname"]=Lastname
-        update_data1={"last_name":Lastname}
+        up_field["Lastname"] = Lastname
+        update_data1 = {"last_name": Lastname}
         data1["profile_info"].update(update_data1)
         resp2["success_fields"].append("Lastname")
 
     if Email is not None and email_otp is not None:
         try:
-            guest =GuestAccount.objects.get(
+            guest = GuestAccount.objects.get(
                 otp=email_otp, email=Email)
         except GuestAccount.DoesNotExist:
             guest = None
         print(guest)
         print(email_otp)
         if guest is not None:
-            obj.email=Email
+            obj.email = Email
             update_fields.append("email")
-            up_field["Email"]=Email
-            update_data1={"email":Email}
+            up_field["Email"] = Email
+            update_data1 = {"email": Email}
             data1["profile_info"].update(update_data1)
             resp2["success_fields"].append("Email")
         else:
-            resp2["error_fields"].append({"field":"Email",'msg':'Wrong OTP'})
+            resp2["error_fields"].append(
+                {"field": "Email", 'msg': 'Wrong OTP'})
 
     if Phone is not None:
-        obj.phone=Phone
+        obj.phone = Phone
         update_fields.append("phone")
-        up_field["Phone"]=Phone
-        update_data1={"phone":Phone}
+        up_field["Phone"] = Phone
+        update_data1 = {"phone": Phone}
         data1["profile_info"].update(update_data1)
         resp2["success_fields"].append("Phone")
     if address is not None:
-        up_field["address"]=address
+        up_field["address"] = address
         resp2["success_fields"].append("Address")
     if zip_code is not None:
-        up_field["zip_code"]=zip_code
+        up_field["zip_code"] = zip_code
         resp2["success_fields"].append("Zip_code")
     if user_city is not None:
-        up_field["user_city"]=user_city
+        up_field["user_city"] = user_city
         resp2["success_fields"].append("User_city")
     if user_location is not None:
-        up_field["user_location"]=user_location
+        up_field["user_location"] = user_location
         resp2["success_fields"].append("User_location")
     if user_country is not None:
-        up_field["user_country"]=user_country
+        up_field["user_country"] = user_country
         resp2["success_fields"].append("User_country")
     if native_language is not None:
-        up_field["native_language"]=native_language
+        up_field["native_language"] = native_language
         resp2["success_fields"].append("Native_language")
     if nationality is not None:
-        up_field["nationality"]=nationality
+        up_field["nationality"] = nationality
         resp2["success_fields"].append("Nationality")
     if language_preferences is not None:
-        up_field["language_preferences"]=language_preferences
+        up_field["language_preferences"] = language_preferences
         resp2["success_fields"].append("Language_preference")
     if vision is not None:
-        up_field["vision"]=vision
+        up_field["vision"] = vision
         resp2["success_fields"].append("Vision")
 
-    final_data1=data1.pop("_id")
-    if update_fields !=[]:
+    final_data1 = data1.pop("_id")
+    if update_fields != []:
         obj.save(update_fields=update_fields)
-    client_admin=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","update",{"document_name":username},{'profile_info':data1["profile_info"]})
+    client_admin = dowellconnection("login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "update", {
+                                    "document_name": username}, {'profile_info': data1["profile_info"]})
 
     if up_field != {}:
-        dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","update",{"Username":username},up_field)
+        dowellconnection("login", "bangalore", "login", "registration", "registration",
+                         "10004545", "ABCDE", "update", {"Username": username}, up_field)
     return Response(resp2)
 
 
@@ -650,42 +690,47 @@ def profile_view(request):
 
 @api_view(['GET'])
 def live_users(request):
-    total_products=[]
-    for_product=LiveStatus.objects.values_list('product', flat=True)
+    total_products = []
+    for_product = LiveStatus.objects.values_list('product', flat=True)
     for a in for_product:
         if not a in total_products:
             total_products.append(a)
-    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
-    obj_notlive=LiveStatus.objects.filter(status="login",date_updated__lte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
-    obj_live=LiveStatus.objects.filter(status="login",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
-    final={'liveusers':obj_live,'non_liveusers':obj_notlive,'total_products':total_products}
+    time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    obj_notlive = LiveStatus.objects.filter(status="login", date_updated__lte=time_threshold.strftime(
+        '%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    obj_live = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
+        '%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    final = {'liveusers': obj_live, 'non_liveusers': obj_notlive,
+             'total_products': total_products}
     return Response(final)
 
 
 @api_view(['POST'])
 def all_liveusers(request):
-    session_id=request.data.get("session_id")
-    mydata=CustomSession.objects.filter(sessionID=session_id).first()
+    session_id = request.data.get("session_id")
+    mydata = CustomSession.objects.filter(sessionID=session_id).first()
     if not mydata:
-        return Response({"message":"SessionID not found in database, Please check and try again!!"})
-    products_list=["Client_admin","Exhibitoe form","Living Lab Admin","Workflow AI"]
-    field={}
-    details=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",field,"nil")
-    ok=json.loads(details)
-    users=[]
-    count=0
-    team_members=[]
-    public_members=[]
-    owners=[]
+        return Response({"message": "SessionID not found in database, Please check and try again!!"})
+    products_list = ["Client_admin", "Exhibitoe form",
+                     "Living Lab Admin", "Workflow AI"]
+    field = {}
+    details = dowellconnection("login", "bangalore", "login", "client_admin",
+                               "client_admin", "1159", "ABCDE", "fetch", field, "nil")
+    ok = json.loads(details)
+    users = []
+    count = 0
+    team_members = []
+    public_members = []
+    owners = []
     for data in ok["data"]:
-        count+=1
+        count += 1
         for team in data["members"]["team_members"]["accept_members"]:
             if not team["name"] in team_members:
                 # if team["name"]=="owner":
                 #     if not data["document_name"] in team_members:
                 #         team_members.append(data["document_name"])
                 # else:
-                if not team["name"]=="owner":
+                if not team["name"] == "owner":
                     team_members.append(team["name"])
                 else:
                     owners.append(data["document_name"])
@@ -696,24 +741,28 @@ def all_liveusers(request):
                 public_members.append(public["username"])
             except:
                 pass
-    team_members=list(set(team_members))
-    owners=list(set(owners))
-    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
-    obj_live=LiveStatus.objects.filter(status="login",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', flat=True).order_by('username').distinct()
-    response={'products_used':json.dumps(products_list),'team_members':len(team_members),'users':len(users),'public_members':len(public_members),'live_team_members':len(set(obj_live).intersection(team_members)),'live_owners':len(set(obj_live).intersection(owners))}
-    current={}
-    weekly={}
+    team_members = list(set(team_members))
+    owners = list(set(owners))
+    time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=1)
+    obj_live = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
+        '%d %b %Y %H:%M:%S')).values_list('username', flat=True).order_by('username').distinct()
+    response = {'products_used': json.dumps(products_list), 'team_members': len(team_members), 'users': len(users), 'public_members': len(
+        public_members), 'live_team_members': len(set(obj_live).intersection(team_members)), 'live_owners': len(set(obj_live).intersection(owners))}
+    current = {}
+    weekly = {}
     for product in products_list:
-        product_wise=LiveStatus.objects.filter(status="login",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S'),product=product).values_list('username', flat=True).order_by('username').distinct()
-        current[product]=len(product_wise)
-        weekly[product]={}
-        for r in range(0,7):
-            date_start= datetime.datetime.now()-datetime.timedelta(days=r+1)
-            date_end=datetime.datetime.now()-datetime.timedelta(days=r)
-            obj=LiveStatus.objects.filter(date_updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'),date_updated__lte=date_end.strftime('%d %b %Y %H:%M:%S'),product=product).values_list('username', flat=True).order_by('username').distinct()
-            weekly[product][r]=obj
-    response["current"]=current
-    response["weekly"]=weekly
+        product_wise = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
+            '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
+        current[product] = len(product_wise)
+        weekly[product] = {}
+        for r in range(0, 7):
+            date_start = datetime.datetime.now()-datetime.timedelta(days=r+1)
+            date_end = datetime.datetime.now()-datetime.timedelta(days=r)
+            obj = LiveStatus.objects.filter(date_updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), date_updated__lte=date_end.strftime(
+                '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
+            weekly[product][r] = obj
+    response["current"] = current
+    response["weekly"] = weekly
     return Response(response)
 
 
@@ -753,15 +802,15 @@ def forgot_password(request):
                 GuestAccount.objects.filter(email=email).update(
                     otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 send_otp()
-                return Response({'msg':'success','info': 'OTP sent successfully'})
+                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
             else:
                 guest_account = GuestAccount(
                     username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
                 guest_account.save()
                 send_otp()
-                return Response({'msg': 'success','info':'OTP sent successfully'})
+                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
         else:
-            return Response({'msg':'error','info': 'Username, email combination is incorrect'})
+            return Response({'msg': 'error', 'info': 'Username, email combination is incorrect'})
 
     # Create new password
     elif username and email and otp_input and new_password:
@@ -785,11 +834,11 @@ def forgot_password(request):
                     'Password': dowell_hash.dowell_hash(new_password)}
                 dowellconnection(
                     "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
-                return Response({'msg':'success','info':'Password reset successfully'})
+                return Response({'msg': 'success', 'info': 'Password reset successfully'})
         else:
-            return Response({'msg':'error','info': 'Wrong OTP'})
+            return Response({'msg': 'error', 'info': 'Wrong OTP'})
     else:
-        return Response({'msg':'error','info':"Request must have 'username' and 'email' for getting otp and then 'otp' and new password for changing otp. "})
+        return Response({'msg': 'error', 'info': "Request must have 'username' and 'email' for getting otp and then 'otp' and new password for changing otp. "})
     return Response({'msg': 'Something went wrong'})
 
 
@@ -801,7 +850,7 @@ def forgot_username(request):
     # Send OTP
     if email and not otp_input:
         otp = generateOTP()
-        message = get_html_msg('User', otp , 'recover username')
+        message = get_html_msg('User', otp, 'recover username')
 
         user_qs = Account.objects.filter(email=email)
         email_qs = GuestAccount.objects.filter(email=email)
@@ -814,11 +863,11 @@ def forgot_username(request):
                 GuestAccount.objects.filter(email=email).update(
                     otp=otp, expiry=datetime.datetime.utcnow())
                 send_otp()
-                return Response({'msg':'success','info': 'OTP sent successfully'})
+                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
             else:
-                return Response({'msg':'error','info': 'Email not found'})
+                return Response({'msg': 'error', 'info': 'Email not found'})
         else:
-            return Response({'msg':'error','info': 'Email not found'})
+            return Response({'msg': 'error', 'info': 'Email not found'})
 
     # Create new password
     elif email and otp_input:
@@ -847,39 +896,41 @@ def forgot_username(request):
                     template = Template(html_msg)
                     send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
                               email], fail_silently=False, html_message=template.render(context))
-                return Response({'msg':'success','info':'Your username/s was sent to your mail'})
+                return Response({'msg': 'success', 'info': 'Your username/s was sent to your mail'})
             else:
-                return Response({'msg':'error','info': 'Email not found'})
+                return Response({'msg': 'error', 'info': 'Email not found'})
         else:
-            return Response({'msg':'error','info': 'Wrong OTP'})
+            return Response({'msg': 'error', 'info': 'Wrong OTP'})
     else:
-        return Response({'msg':'error','info':"Request must have field 'email' for getting otp in mail and then add field 'otp' for getting list of username in mail.."})
+        return Response({'msg': 'error', 'info': "Request must have field 'email' for getting otp in mail and then add field 'otp' for getting list of username in mail.."})
+
 
 def processApikey(api_key, api_services):
     url = 'https://100105.pythonanywhere.com/api/v1/process-api-key/'
     payload = {
-        "api_key" : api_key,
-        "api_services" : api_services
+        "api_key": api_key,
+        "api_services": api_services
     }
     response = requests.post(url, json=payload)
     return response.text
+
 
 @api_view(["POST"])
 def PublicApi(request):
     mdata = request.data.get
     username = mdata('username')
     password = mdata('password')
-    if mdata('api_key')!=None and mdata('api_services')!=None:
-        api_resp=processApikey(mdata('api_key'),mdata('api_services'))
+    if mdata('api_key') != None and mdata('api_services') != None:
+        api_resp = processApikey(mdata('api_key'), mdata('api_services'))
     else:
-        return Response({"msg":"error","info":"api_key and api_services fields are needed.."})
-    api_resp=api_resp.replace("false", "False")
-    api_resp1=eval(api_resp)
+        return Response({"msg": "error", "info": "api_key and api_services fields are needed.."})
+    api_resp = api_resp.replace("false", "False")
+    api_resp1 = eval(api_resp)
     if api_resp1["success"] == False:
-       return Response({"msg":"error","info":api_resp1["message"]})
+        return Response({"msg": "error", "info": api_resp1["message"]})
     else:
         if not "count" in api_resp1:
-            return Response({"msg":"error","info":api_resp1["message"]})
+            return Response({"msg": "error", "info": api_resp1["message"]})
     loc = mdata("location")
     try:
         lo = loc.split(" ")
@@ -978,7 +1029,8 @@ def PublicApi(request):
                 sessionID=session, info=infoo, document="", status="login")
 
             # resp={'userinfo':info}
-            resp = {'session_id': session,'remaining_times':api_resp1["count"]}
+            resp = {'session_id': session,
+                    'remaining_times': api_resp1["count"]}
             return Response(resp)
         else:
             resp = {"data": "Username not found in database"}
