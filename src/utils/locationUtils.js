@@ -9,11 +9,14 @@ export const getUserLocation = () =>
           resolve(location); // Resolve the promise with the retrieved location
         },
         (error) => {
-          console.log(error);
-          reject(error); // Reject the promise with the error message
+          if (error.code === 1) {
+            reject(new Error("User denied Geolocation"));
+          } else {
+            reject(error); // Reject the promise with the error message
+          }
         }
       );
     } else {
-      reject("Geolocation is not supported");
+      reject(new Error("Geolocation is not supported"));
     }
   });

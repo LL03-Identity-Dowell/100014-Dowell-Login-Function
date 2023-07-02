@@ -6,7 +6,7 @@ import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
-import { getUserIP } from "../utils/ipUtils";
+// import { getUserIP } from "../utils/ipUtils";
 import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
@@ -34,12 +34,13 @@ const LogIn = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { userInfo, loading, error } = useSelector((state) => state.login);
+  const { userInfo, loading, error } =
+    useSelector((state) => state.login) || {};
 
   // Retrieves the current local time in the user's browser
   const currentTime = new Date().toLocaleTimeString();
   // retrieved IP address in your code
-  const IPAddress = getUserIP();
+  // const IPAddress = getUserIP();
   // Operating System
   const operatingSystem = getOperatingSystem();
   const device = getDeviceType();
@@ -57,7 +58,7 @@ const LogIn = () => {
       username,
       password,
       time: currentTime,
-      ip: IPAddress,
+      ip: "",
       os: operatingSystem,
       device: device,
       location: location,

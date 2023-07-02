@@ -5,7 +5,7 @@ const Coordinate = async () => {
     const location = await getUserLocation();
     return location;
   } catch (error) {
-    console.log(error);
+    console.log(error.message); // Display the error message
   }
 };
 
