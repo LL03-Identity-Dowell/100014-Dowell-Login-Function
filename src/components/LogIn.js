@@ -43,6 +43,7 @@ const LogIn = () => {
   // const IPAddress = getUserIP();
   // Operating System
   const operatingSystem = getOperatingSystem();
+  // Device Type
   const device = getDeviceType();
   // Retrieves the user's location in latitude and longitude format
   const location = Coordinate();
