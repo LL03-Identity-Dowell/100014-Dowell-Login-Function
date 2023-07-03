@@ -6,10 +6,10 @@ import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
-// import { getUserIP } from "../utils/ipUtils";
 import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import { Radio } from "react-loader-spinner";
 
 const schema = yup.object().shape({
   username: yup
@@ -34,13 +34,10 @@ const LogIn = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { userInfo, loading, error } =
-    useSelector((state) => state.login) || {};
+  const { loading, error } = useSelector((state) => state.login) || {};
 
   // Retrieves the current local time in the user's browser
   const currentTime = new Date().toLocaleTimeString();
-  // retrieved IP address in your code
-  // const IPAddress = getUserIP();
   // Operating System
   const operatingSystem = getOperatingSystem();
   // Device Type
@@ -54,7 +51,7 @@ const LogIn = () => {
   // Use the detectBrowser
   const browserType = detectBrowser();
 
-  const onSubmit = ({ username, password }) => {
+  const handleUserInfo = async ({ username, password }) => {
     const userData = {
       username,
       password,
@@ -67,7 +64,7 @@ const LogIn = () => {
       language: userLanguage,
       browser: browserType,
     };
-    dispatch(loginUser(userData));
+    await dispatch(loginUser(userData));
   };
 
   return (
@@ -108,7 +105,7 @@ const LogIn = () => {
               <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-lg p-8 text-gray-700 md:w-80">
                 <form
                   className="flex flex-col space-y-4"
-                  onSubmit={handleSubmit(onSubmit)}
+                  onSubmit={handleSubmit(handleUserInfo)}
                 >
                   <div>
                     <label
@@ -162,13 +159,25 @@ const LogIn = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center">
+                  <div className="btn-send px-1 py-1 mt-2 self-start">
                     <button
                       type="submit"
+                      className="btn-send px-2 py-1 self-start"
                       disabled={loading}
-                      className="btn-send"
                     >
-                      {loading ? "Logging in..." : "Login"}
+                      {loading ? (
+                        <Radio
+                          visible={true}
+                          height={30}
+                          width={30}
+                          ariaLabel="radio-loading"
+                          wrapperStyle={{}}
+                          wrapperClassName="radio-wrapper"
+                          color="#1ff507"
+                        />
+                      ) : (
+                        "Login"
+                      )}
                     </button>
                     {error && <p>{error}</p>}
                   </div>
