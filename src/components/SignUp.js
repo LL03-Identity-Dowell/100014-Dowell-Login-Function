@@ -7,32 +7,48 @@ import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { registerUser, sendOTP } from "../redux/registrationSlice";
+import { Radio } from "react-loader-spinner";
 
 const schema = yup.object({
-  firstName: yup.string().required("First Name is required").max(20),
-  lastName: yup.string().required("Last Name is required").max(20),
-  userName: yup
+  first_name: yup.string().required("First Name is required").max(20),
+  last_name: yup.string().required("Last Name is required").max(20),
+  username: yup
     .string()
     .required("User Name is required")
     .max(20)
     .notOneOf(
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
-      "Username not allowed"
+      "username not allowed"
     ),
-  email: yup
-    .string()
-    .email("Invalid email format")
-    .required("Email is required"),
+  email: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .email("Invalid email format")
+      .required("Email is required"),
+  }),
   password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(99),
-  confirmPassword: yup
+  confirm_password: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
-  otp: yup.string().required("OTP required"),
-  uploadPhoto: yup.string().required("Upload profile photo"),
-  phoneNumber: yup
+  otp: yup.string().when("otpSent", {
+    is: true,
+    then: yup.string().required("OTP is required"),
+  }),
+  upload_photo: yup.string().required("Upload profile photo"),
+  country_code: yup
+    .number()
+    .positive("Phone number must be positive")
+    .integer("Phone number must be an integer")
+    .transform((value, originalValue) =>
+      originalValue < 0 ? undefined : value
+    )
+    .required("Country code is required"),
+  phone_number: yup
     .number()
     .positive("Phone number must be positive")
     .integer("Phone number must be an integer")
@@ -45,6 +61,10 @@ const schema = yup.object({
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
+  const { loading, error, registered, otpSent } = useSelector(
+    (state) => state.registration
+  );
+
   const {
     handleSubmit,
     register,
@@ -55,7 +75,12 @@ const SignUp = () => {
     dispatch(fetchCountries());
   }, [dispatch]);
 
-  const onSubmit = (data) => console.log(data);
+  const registeredUserInfo = (data) => {
+    dispatch(registerUser(data));
+  };
+  const handleSendOTP = ({ phone, email }) => {
+    dispatch(sendOTP({ phone, email }));
+  };
 
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
@@ -74,12 +99,12 @@ const SignUp = () => {
           action="#"
           method="POST"
           className="mx-auto mt-8 max-w-xl sm:mt-12"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(registeredUserInfo)}
         >
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
             <div>
               <label
-                htmlFor="first-name"
+                htmlFor="first_name"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 First Name
@@ -87,15 +112,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="firstName"
-                  id="firstName"
-                  autoComplete="firstName"
+                  name="first_name"
+                  id="first_name"
+                  autoComplete="first_name"
                   className="input-field"
-                  {...register("firstName")}
+                  {...register("first_name")}
                 />
-                {errors.firstName && (
+                {errors.first_name && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.firstName.message}
+                    {errors.first_name.message}
                   </p>
                 )}
               </div>
@@ -103,7 +128,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="last-name"
+                htmlFor="last_name"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Last Name
@@ -111,15 +136,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="last-name"
-                  id="last-name"
+                  name="last_name"
+                  id="last_name"
                   autoComplete="family-name"
                   className="input-field"
-                  {...register("lastName")}
+                  {...register("last_name")}
                 />
-                {errors.lastName && (
+                {errors.last_name && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.lastName.message}
+                    {errors.last_name.message}
                   </p>
                 )}
               </div>
@@ -127,7 +152,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="userName"
+                htmlFor="username"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 User Name
@@ -135,15 +160,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="userName"
-                  id="userName"
-                  autoComplete="userName"
+                  name="username"
+                  id="username"
+                  autoComplete="username"
                   className="input-field"
-                  {...register("userName")}
+                  {...register("username")}
                 />
-                {errors.userName && (
+                {errors.username && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.userName.message}
+                    {errors.username.message}
                   </p>
                 )}
               </div>
@@ -197,7 +222,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="confirm-password"
+                htmlFor="confirm_password"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Confirm Password
@@ -205,15 +230,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="password"
-                  name="confirmPassword"
-                  id="confirm-password"
-                  autoComplete="confirm-password"
+                  name="confirm_password"
+                  id="confirm_password"
+                  autoComplete="confirm_password"
                   className="input-field"
-                  {...register("confirmPassword")}
+                  {...register("confirm_password")}
                 />
-                {errors.confirmPassword && (
+                {errors.confirm_password && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.confirmPassword.message}
+                    {errors.confirm_password.message}
                   </p>
                 )}
               </div>
@@ -246,7 +271,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="county-code"
+                htmlFor="county_code"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Country Code
@@ -254,7 +279,7 @@ const SignUp = () => {
 
               <div className="mt-2.5">
                 <select
-                  name="country"
+                  name="country_code"
                   type="text"
                   placeholder="countries code"
                   required
@@ -272,25 +297,42 @@ const SignUp = () => {
             <div>
               <div>
                 <label
-                  htmlFor="phone-number"
+                  htmlFor="phone_number"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   Phone Number
                 </label>
                 <div className="relative mt-2.5">
                   <input
-                    name="phone"
+                    name="phone_number"
                     type="number"
                     className="input-field"
-                    {...register("phoneNumber")}
+                    {...register("phone_number")}
                   />
                 </div>
                 <div className="mt-2.5">
                   <div className="flex flex-row space-x-3 items-center">
-                    <button className="btn-send px-2 py-1 self-start">
-                      Get OTP
+                    <button
+                      className="btn-send px-2 py-1 self-start"
+                      onClick={handleSubmit(handleSendOTP)}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <Radio
+                          visible={true}
+                          height={30}
+                          width={30}
+                          ariaLabel="radio-loading"
+                          wrapperStyle={{}}
+                          wrapperClassName="radio-wrapper"
+                          color="#1ff507"
+                        />
+                      ) : (
+                        "Get OTP"
+                      )}
                     </button>
-                    <p className="text-green-500 font-base">message</p>
+
+                    <p className="text-green-500 font-base">{otpSent}</p>
                   </div>
                 </div>
               </div>
@@ -344,11 +386,11 @@ const SignUp = () => {
                         name="file-upload"
                         type="file"
                         className="sr-only"
-                        {...register("uploadPhoto")}
+                        {...register("upload_photo")}
                       />
-                      {errors.uploadPhoto && (
+                      {errors.upload_photo && (
                         <p className="text-red-500 text-xs mt-1">
-                          {errors.uploadPhoto.message}
+                          {errors.upload_photo.message}
                         </p>
                       )}
                     </label>
@@ -383,10 +425,28 @@ const SignUp = () => {
               </div>
               <div className="mt-2.5">
                 <div className="flex flex-row space-x-3 items-center">
-                  <button className="btn-send px-2 py-1 self-start">
-                    Get OTP
+                  <button
+                    className="btn-send px-2 py-1 self-start"
+                    onClick={handleSubmit(handleSendOTP)}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Radio
+                        visible={true}
+                        height={30}
+                        width={30}
+                        ariaLabel="radio-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName="radio-wrapper"
+                        color="#1ff507"
+                      />
+                    ) : (
+                      "Get OTP"
+                    )}
                   </button>
-                  <p className="text-green-500 font-base">message</p>
+                  <p className="text-base font-normal text-green-600">
+                    {otpSent}
+                  </p>
                 </div>
               </div>
             </div>
@@ -456,9 +516,25 @@ const SignUp = () => {
             <button
               type="submit"
               className="block w-full rounded-md bg-gray-700 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+              disabled={loading}
             >
-              Sign up
+              {loading ? (
+                <Radio
+                  visible={true}
+                  height={30}
+                  width={30}
+                  ariaLabel="radio-loading"
+                  wrapperStyle={{}}
+                  wrapperClassName="radio-wrapper"
+                  color="#1ff507"
+                />
+              ) : (
+                " Sign up"
+              )}
             </button>
+            <p className="text-base font-normal text-green-600">{registered}</p>
+
+            {error && <p>{error}</p>}
           </div>
 
           <div className="text-gray-500 space-x-2 py-3 px-6 text-right">
