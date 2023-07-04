@@ -54,6 +54,7 @@ export const registerUser = createAsyncThunk(
     phone_code,
     phone,
     otp,
+    sms,
   }) => {
     try {
       const response = await axios.post(API_URL, {
@@ -68,6 +69,7 @@ export const registerUser = createAsyncThunk(
         phone_code,
         phone,
         otp,
+        sms,
       });
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);

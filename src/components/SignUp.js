@@ -7,7 +7,11 @@ import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { registerUser, sendOTP } from "../redux/registrationSlice";
+import {
+  registerUser,
+  sendEmailOTP,
+  sendMobileOTP,
+} from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 
 const schema = yup.object({
@@ -21,13 +25,7 @@ const schema = yup.object({
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
       "username not allowed"
     ),
-  email: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .email("Invalid email format")
-      .required("Email is required"),
-  }),
+
   password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -35,10 +33,7 @@ const schema = yup.object({
   confirm_password: yup
     .string()
     .oneOf([yup.ref("password"), null], "Passwords must match"),
-  otp: yup.string().when("otpSent", {
-    is: true,
-    then: yup.string().required("OTP is required"),
-  }),
+
   upload_photo: yup.string().required("Upload profile photo"),
   country_code: yup
     .number()
@@ -48,6 +43,17 @@ const schema = yup.object({
       originalValue < 0 ? undefined : value
     )
     .required("Country code is required"),
+  email: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .email("Invalid email format")
+      .required("Email is required"),
+  }),
+  otp: yup.string().when("otpSent", {
+    is: true,
+    then: yup.string().required("OTP is required"),
+  }),
   phone_number: yup
     .number()
     .positive("Phone number must be positive")
@@ -56,12 +62,16 @@ const schema = yup.object({
       originalValue < 0 ? undefined : value
     )
     .required("Phone number is required"),
+  sms: yup.string().when("smsSent", {
+    is: true,
+    then: yup.string().required("SMS is required"),
+  }),
 });
 
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { loading, error, registered, otpSent } = useSelector(
+  const { loading, error, registered, otpSent, smsSent } = useSelector(
     (state) => state.registration
   );
 
@@ -75,12 +85,45 @@ const SignUp = () => {
     dispatch(fetchCountries());
   }, [dispatch]);
 
-  const registeredUserInfo = (data) => {
-    dispatch(registerUser(data));
+  const handleEmailOTP = ({ email }) => {
+    dispatch(sendEmailOTP({ email }));
   };
-
-  const handleSendOTP = ({ phone, email }) => {
-    dispatch(sendOTP({ phone, email }));
+  const handleMobileOTP = ({ phone }) => {
+    dispatch(sendMobileOTP({ phone }));
+  };
+  const registeredUserInfo = (data) => {
+    const {
+      first_name,
+      last_name,
+      username,
+      user_type,
+      email,
+      password,
+      confirm_password,
+      user_country,
+      phone_code,
+      phone,
+      otp,
+      sms,
+    } = data;
+    if (otp && sms && email) {
+      dispatch(
+        registerUser({
+          first_name,
+          last_name,
+          username,
+          user_type,
+          email,
+          password,
+          confirm_password,
+          user_country,
+          phone_code,
+          phone,
+          otp,
+          sms,
+        })
+      );
+    }
   };
 
   return (
@@ -315,7 +358,7 @@ const SignUp = () => {
                   <div className="flex flex-row space-x-3 items-center">
                     <button
                       className="btn-send px-2 py-1 self-start"
-                      onClick={handleSubmit(handleSendOTP)}
+                      onClick={handleSubmit(handleMobileOTP)}
                       disabled={loading}
                     >
                       {loading ? (
@@ -333,7 +376,7 @@ const SignUp = () => {
                       )}
                     </button>
 
-                    <p className="text-green-500 font-base">{otpSent}</p>
+                    <p className="text-green-500 font-base">{smsSent}</p>
                   </div>
                 </div>
               </div>
@@ -428,7 +471,7 @@ const SignUp = () => {
                 <div className="flex flex-row space-x-3 items-center">
                   <button
                     className="btn-send px-2 py-1 self-start"
-                    onClick={handleSubmit(handleSendOTP)}
+                    onClick={handleSubmit(handleEmailOTP)}
                     disabled={loading}
                   >
                     {loading ? (
