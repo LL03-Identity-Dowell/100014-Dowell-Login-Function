@@ -6,9 +6,9 @@ const API_URL = "https://100014.pythonanywhere.com/api/register/";
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "register/sendEmailOTP",
-  async ({ email }) => {
+  async ({ Email }) => {
     try {
-      const response = await axios.post(API_URL, { email });
+      const response = await axios.post(API_URL, { Email });
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);
         // return response?.data?.info;
@@ -43,33 +43,39 @@ export const sendMobileOTP = createAsyncThunk(
 export const registerUser = createAsyncThunk(
   "register/registerUser",
   async ({
-    first_name,
-    last_name,
-    username,
+    Firstname,
+    Lastname,
+    Username,
     user_type,
-    email,
-    password,
-    confirm_password,
+    Email,
+    Password,
+    confirm_Password,
     user_country,
-    phone_code,
-    phone,
+    phonecode,
+    Phone,
     otp,
     sms,
+    Profile_Image,
+    policy_status,
+    newsletter,
   }) => {
     try {
       const response = await axios.post(API_URL, {
-        first_name,
-        last_name,
-        username,
+        Firstname,
+        Lastname,
+        Username,
         user_type,
-        email,
-        password,
-        confirm_password,
+        Email,
+        Password,
+        confirm_Password,
         user_country,
-        phone_code,
-        phone,
+        phonecode,
+        Phone,
         otp,
         sms,
+        Profile_Image,
+        policy_status,
+        newsletter,
       });
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);

@@ -15,26 +15,24 @@ import {
 import { Radio } from "react-loader-spinner";
 
 const schema = yup.object({
-  first_name: yup.string().required("First Name is required").max(20),
-  last_name: yup.string().required("Last Name is required").max(20),
-  username: yup
+  Firstname: yup.string().required("First Name is required").max(20),
+  Lastname: yup.string().required("Last Name is required").max(20),
+  Username: yup
     .string()
     .required("User Name is required")
     .max(20)
     .notOneOf(
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
-      "username not allowed"
+      "Username not allowed"
     ),
 
-  password: yup
+  Password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
     .max(99),
-  confirm_password: yup
+  confirm_Password: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match"),
-
-  upload_photo: yup.string().required("Upload profile photo"),
+    .oneOf([yup.ref("Password"), null], "Passwords must match"),
   country_code: yup
     .number()
     .positive("Phone number must be positive")
@@ -43,18 +41,32 @@ const schema = yup.object({
       originalValue < 0 ? undefined : value
     )
     .required("Country code is required"),
-  email: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .email("Invalid email format")
-      .required("Email is required"),
-  }),
+
+  Profile_Image: yup
+    .mixed()
+    .required("Upload profile photo")
+    .test("fileFormat", "Unsupported file format", (value) => {
+      if (!value) return false;
+      return (
+        value[0].type === "image/jpeg" ||
+        value[0].type === "image/png" ||
+        value[0].type === "image/gif"
+      );
+    }),
   otp: yup.string().when("otpSent", {
     is: true,
     then: yup.string().required("OTP is required"),
   }),
-  phone_number: yup
+
+  Email: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .Email("Invalid Email format")
+      .required("Email is required"),
+  }),
+
+  Phone: yup
     .number()
     .positive("Phone number must be positive")
     .integer("Phone number must be an integer")
@@ -66,6 +78,10 @@ const schema = yup.object({
     is: true,
     then: yup.string().required("SMS is required"),
   }),
+  newsletter: yup.boolean().required("Please accept the newsletter policy"),
+  policy_status: yup
+    .boolean()
+    .oneOf([true], "Please accept the Terms & Conditions"),
 });
 
 const SignUp = () => {
@@ -85,42 +101,48 @@ const SignUp = () => {
     dispatch(fetchCountries());
   }, [dispatch]);
 
-  const handleEmailOTP = ({ email }) => {
-    dispatch(sendEmailOTP({ email }));
+  const handleEmailOTP = ({ Email }) => {
+    dispatch(sendEmailOTP({ Email }));
   };
-  const handleMobileOTP = ({ phone }) => {
-    dispatch(sendMobileOTP({ phone }));
+  const handleMobileOTP = ({ Phone }) => {
+    dispatch(sendMobileOTP({ Phone }));
   };
   const registeredUserInfo = (data) => {
     const {
-      first_name,
-      last_name,
-      username,
+      Firstname,
+      Lastname,
+      Username,
       user_type,
-      email,
-      password,
-      confirm_password,
+      Email,
+      Password,
+      confirm_Password,
       user_country,
-      phone_code,
-      phone,
+      phonecode,
+      Phone,
       otp,
       sms,
+      Profile_Image,
+      policy_status,
+      newsletter,
     } = data;
-    if (otp && sms && email) {
+    if (otp && sms && Email) {
       dispatch(
         registerUser({
-          first_name,
-          last_name,
-          username,
+          Firstname,
+          Lastname,
+          Username,
           user_type,
-          email,
-          password,
-          confirm_password,
+          Email,
+          Password,
+          confirm_Password,
           user_country,
-          phone_code,
-          phone,
+          phonecode,
+          Phone,
           otp,
           sms,
+          Profile_Image,
+          policy_status,
+          newsletter,
         })
       );
     }
@@ -148,7 +170,7 @@ const SignUp = () => {
           <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
             <div>
               <label
-                htmlFor="first_name"
+                htmlFor="Firstname"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 First Name
@@ -156,15 +178,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="first_name"
-                  id="first_name"
-                  autoComplete="first_name"
+                  name="Firstname"
+                  id="Firstname"
+                  autoComplete="Firstname"
                   className="input-field"
-                  {...register("first_name")}
+                  {...register("Firstname")}
                 />
-                {errors.first_name && (
+                {errors.Firstname && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.first_name.message}
+                    {errors.Firstname.message}
                   </p>
                 )}
               </div>
@@ -172,7 +194,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="last_name"
+                htmlFor="Lastname"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Last Name
@@ -180,15 +202,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="last_name"
-                  id="last_name"
+                  name="Lastname"
+                  id="Lastname"
                   autoComplete="family-name"
                   className="input-field"
-                  {...register("last_name")}
+                  {...register("Lastname")}
                 />
-                {errors.last_name && (
+                {errors.Lastname && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.last_name.message}
+                    {errors.Lastname.message}
                   </p>
                 )}
               </div>
@@ -196,7 +218,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="username"
+                htmlFor="Username"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 User Name
@@ -204,15 +226,15 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="username"
-                  id="username"
-                  autoComplete="username"
+                  name="Username"
+                  id="Username"
+                  autoComplete="Username"
                   className="input-field"
-                  {...register("username")}
+                  {...register("Username")}
                 />
-                {errors.username && (
+                {errors.Username && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.username.message}
+                    {errors.Username.message}
                   </p>
                 )}
               </div>
@@ -242,23 +264,23 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="password"
+                htmlFor="Password"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Password
               </label>
               <div className="mt-2.5">
                 <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  autoComplete="password"
+                  type="Password"
+                  name="Password"
+                  id="Password"
+                  autoComplete="Password"
                   className="input-field"
-                  {...register("password")}
+                  {...register("Password")}
                 />
-                {errors.password && (
+                {errors.Password && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.password.message}
+                    {errors.Password.message}
                   </p>
                 )}
               </div>
@@ -266,23 +288,23 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="confirm_password"
+                htmlFor="confirm_Password"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Confirm Password
               </label>
               <div className="mt-2.5">
                 <input
-                  type="password"
-                  name="confirm_password"
-                  id="confirm_password"
-                  autoComplete="confirm_password"
+                  type="Password"
+                  name="confirm_Password"
+                  id="confirm_Password"
+                  autoComplete="confirm_Password"
                   className="input-field"
-                  {...register("confirm_password")}
+                  {...register("confirm_Password")}
                 />
-                {errors.confirm_password && (
+                {errors.confirm_Password && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.confirm_password.message}
+                    {errors.confirm_Password.message}
                   </p>
                 )}
               </div>
@@ -341,17 +363,17 @@ const SignUp = () => {
             <div>
               <div>
                 <label
-                  htmlFor="phone_number"
+                  htmlFor="Phone"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
                   Phone Number
                 </label>
                 <div className="relative mt-2.5">
                   <input
-                    name="phone_number"
+                    name="Phone"
                     type="number"
                     className="input-field"
-                    {...register("phone_number")}
+                    {...register("Phone")}
                   />
                 </div>
                 <div className="mt-2.5">
@@ -421,20 +443,20 @@ const SignUp = () => {
                   />
                   <div className="text-sm leading-6 text-gray-600">
                     <label
-                      htmlFor="file-upload"
+                      htmlFor="Profile_Image"
                       className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-600 focus-within:ring-offset-2 hover:text-green-500"
                     >
                       <span>Click here</span>
                       <input
-                        id="file-upload"
-                        name="file-upload"
+                        id="Profile_Image"
+                        name="Profile_Image"
                         type="file"
                         className="sr-only"
-                        {...register("upload_photo")}
+                        {...register("Profile_Image")}
                       />
-                      {errors.upload_photo && (
+                      {errors.Profile_Image && (
                         <p className="text-red-500 text-xs mt-1">
-                          {errors.upload_photo.message}
+                          {errors.Profile_Image.message}
                         </p>
                       )}
                     </label>
@@ -445,25 +467,25 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="email"
+                htmlFor="Email"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Email
               </label>
               <div className="mt-2.5">
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  autoComplete="email"
+                  type="Email"
+                  name="Email"
+                  id="Email"
+                  autoComplete="Email"
                   className={`input-field ${
-                    errors.email ? "border-red-500" : ""
+                    errors.Email ? "border-red-500" : ""
                   }`}
-                  {...register("email")}
+                  {...register("Email")}
                 />
-                {errors.email && (
+                {errors.Email && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.email.message}
+                    {errors.Email.message}
                   </p>
                 )}
               </div>
@@ -497,17 +519,17 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="otp-email"
+                htmlFor="otp-Email"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Enter OTP from email
+                Enter OTP from Email
               </label>
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="otp-email"
-                  id="otp-email"
-                  autoComplete="otp-email"
+                  name="otp-Email"
+                  id="otp-Email"
+                  autoComplete="otp-Email"
                   className="input-field"
                   {...register("otp")}
                 />
