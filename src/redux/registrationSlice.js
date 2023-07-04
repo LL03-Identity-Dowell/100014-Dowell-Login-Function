@@ -5,7 +5,7 @@ const API_URL = "https://100014.pythonanywhere.com/api/register/";
 
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
-  "register/sendEmailOTP",
+  "registration/sendEmailOTP",
   async ({ Email }) => {
     try {
       const response = await axios.post(API_URL, { Email });
@@ -23,7 +23,7 @@ export const sendEmailOTP = createAsyncThunk(
 
 // Async thunk function to handle the mobile OTP request
 export const sendMobileOTP = createAsyncThunk(
-  "register/sendMobileOTP",
+  "registration/sendMobileOTP",
   async ({ phone }) => {
     try {
       const response = await axios.post(API_URL, { phone });
@@ -41,42 +41,10 @@ export const sendMobileOTP = createAsyncThunk(
 
 // Async thunk to handle registration API call
 export const registerUser = createAsyncThunk(
-  "register/registerUser",
-  async ({
-    Firstname,
-    Lastname,
-    Username,
-    user_type,
-    Email,
-    Password,
-    confirm_Password,
-    user_country,
-    phonecode,
-    Phone,
-    otp,
-    sms,
-    Profile_Image,
-    policy_status,
-    newsletter,
-  }) => {
+  "registration/registerUser",
+  async (data) => {
     try {
-      const response = await axios.post(API_URL, {
-        Firstname,
-        Lastname,
-        Username,
-        user_type,
-        Email,
-        Password,
-        confirm_Password,
-        user_country,
-        phonecode,
-        Phone,
-        otp,
-        sms,
-        Profile_Image,
-        policy_status,
-        newsletter,
-      });
+      const response = await axios.post(API_URL, data);
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);
         // return response?.data?.info;
@@ -91,11 +59,11 @@ export const registerUser = createAsyncThunk(
 
 // Create the registration slice
 const registrationSlice = createSlice({
-  name: "register",
+  name: "registration",
   initialState: {
     loading: false,
     error: null,
-    register: false,
+    registered: false,
     otpSent: null,
     smsSent: null,
   },
@@ -131,11 +99,11 @@ const registrationSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.register = false;
+        state.registered = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.register = action.payload;
+        state.registered = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -144,4 +112,5 @@ const registrationSlice = createSlice({
   },
 });
 
+// Export the registration slice reducer
 export default registrationSlice.reducer;

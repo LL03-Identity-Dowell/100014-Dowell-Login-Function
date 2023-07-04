@@ -41,7 +41,6 @@ const schema = yup.object({
       originalValue < 0 ? undefined : value
     )
     .required("Country code is required"),
-
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
@@ -52,6 +51,9 @@ const schema = yup.object({
         value[0].type === "image/png" ||
         value[0].type === "image/gif"
       );
+    })
+    .test("fileSize", "File size is too large", (value) => {
+      return value && value[0].size <= 1024 * 1024;
     }),
   otp: yup.string().when("otpSent", {
     is: true,
@@ -78,7 +80,9 @@ const schema = yup.object({
     is: true,
     then: yup.string().required("SMS is required"),
   }),
-  newsletter: yup.boolean().required("Please accept the newsletter policy"),
+  newsletter: yup
+    .boolean()
+    .oneOf([true], "Accept Newsletter Terms & Conditions"),
   policy_status: yup
     .boolean()
     .oneOf([true], "Please accept the Terms & Conditions"),
@@ -350,6 +354,7 @@ const SignUp = () => {
                   placeholder="countries code"
                   required
                   className="select-btn"
+                  {...register("country_code")}
                 >
                   {countries.map((country) => (
                     <option key={country.id} value={country.country_code}>
@@ -357,6 +362,11 @@ const SignUp = () => {
                     </option>
                   ))}
                 </select>
+                {errors.country_code && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.country_code.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -406,26 +416,28 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="otp-sms"
+                htmlFor="sms"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Enter OTP from sms
               </label>
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="otp-sms"
-                  id="otp-sms"
-                  autoComplete="otp-sms"
-                  className="input-field"
-                  {...register("otp")}
-                />
-                {errors.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
-                )}
-              </div>
+              {smsSent && (
+                <div className="mt-2.5">
+                  <input
+                    type="text"
+                    name="sms"
+                    id="ms"
+                    autoComplete="sms"
+                    className="input-field"
+                    {...register("sms")}
+                  />
+                  {errors.otp && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.otp.message}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div>
@@ -453,6 +465,7 @@ const SignUp = () => {
                         type="file"
                         className="sr-only"
                         {...register("Profile_Image")}
+                        accept="image/jpeg, image/png, image/gif"
                       />
                       {errors.Profile_Image && (
                         <p className="text-red-500 text-xs mt-1">
@@ -524,21 +537,23 @@ const SignUp = () => {
               >
                 Enter OTP from Email
               </label>
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="otp-Email"
-                  id="otp-Email"
-                  autoComplete="otp-Email"
-                  className="input-field"
-                  {...register("otp")}
-                />
-                {errors.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
-                )}
-              </div>
+              {otpSent && (
+                <div className="mt-2.5">
+                  <input
+                    type="text"
+                    name="otp"
+                    id="otp"
+                    autoComplete="otp"
+                    className="input-field"
+                    {...register("otp")}
+                  />
+                  {errors.otp && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.otp.message}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -548,10 +563,11 @@ const SignUp = () => {
                 <div className="relative flex gap-x-3">
                   <div className="flex h-6 items-center">
                     <input
-                      id="comments"
-                      name="comments"
+                      id="policy_status"
+                      name="policy_status"
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                      {...register("policy_status")}
                     />
                   </div>
                   <div className="text-sm leading-6">
@@ -562,10 +578,11 @@ const SignUp = () => {
                 <div className="relative flex gap-x-3">
                   <div className="flex h-6 items-center">
                     <input
-                      id="candidates"
-                      name="candidates"
+                      id="newsletter"
+                      name="newsletter"
                       type="checkbox"
                       className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                      {...register("newsletter")}
                     />
                   </div>
                   <div className="text-sm leading-6">
