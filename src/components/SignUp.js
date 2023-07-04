@@ -78,6 +78,7 @@ const SignUp = () => {
   const registeredUserInfo = (data) => {
     dispatch(registerUser(data));
   };
+
   const handleSendOTP = ({ phone, email }) => {
     dispatch(sendOTP({ phone, email }));
   };

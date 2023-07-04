@@ -1,28 +1,47 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "https://100014.pythonanywhere.com/api/registration/";
+const API_URL = "https://100014.pythonanywhere.com/api/register/";
 
-export const sendOTP = createAsyncThunk(
-  "registration/sendOTP",
-  async ({ email, phone }) => {
+// Async thunk function to handle the email OTP request.
+export const sendEmailOTP = createAsyncThunk(
+  "register/sendEmailOTP",
+  async ({ email }) => {
     try {
-      const response = await axios.post(API_URL, { email, phone });
-      if (response.data === 200) {
-        console.log("response", response?.data);
-        // return response?.data;
+      const response = await axios.post(API_URL, { email });
+      if (response.data.msg === "success") {
+        console.log("response", response?.data?.info);
+        // return response?.data?.info;
       } else {
-        throw new Error(response?.data);
+        throw new Error(response?.data?.info);
       }
     } catch (error) {
-      throw new Error(error?.response?.data);
+      throw new Error(error?.response?.data?.info);
+    }
+  }
+);
+
+// Async thunk function to handle the mobile OTP request
+export const sendMobileOTP = createAsyncThunk(
+  "register/sendMobileOTP",
+  async ({ phone }) => {
+    try {
+      const response = await axios.post(API_URL, { phone });
+      if (response.data.msg === "success") {
+        console.log("response", response?.data?.info);
+        // return response?.data?.info;
+      } else {
+        throw new Error(response?.data?.info);
+      }
+    } catch (error) {
+      throw new Error(error?.response?.data?.info);
     }
   }
 );
 
 // Async thunk to handle registration API call
 export const registerUser = createAsyncThunk(
-  "registration/registerUser",
+  "register/registerUser",
   async ({
     first_name,
     last_name,
@@ -50,50 +69,65 @@ export const registerUser = createAsyncThunk(
         phone,
         otp,
       });
-      if (response.data === 200) {
-        return response?.data;
+      if (response.data.msg === "success") {
+        console.log("response", response?.data?.info);
+        // return response?.data?.info;
       } else {
-        throw new Error(response?.data);
+        throw new Error(response?.data?.info);
       }
     } catch (error) {
-      throw new Error(error?.response?.data);
+      throw new Error(error?.response?.data?.info);
     }
   }
 );
 
 // Create the registration slice
 const registrationSlice = createSlice({
-  name: "registration",
+  name: "register",
   initialState: {
     loading: false,
     error: null,
-    registered: false,
+    register: false,
     otpSent: null,
+    smsSent: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(sendOTP.pending, (state) => {
+      .addCase(sendEmailOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.otpSent = false;
       })
-      .addCase(sendOTP.fulfilled, (state, action) => {
+      .addCase(sendEmailOTP.fulfilled, (state, action) => {
         state.loading = false;
         state.otpSent = action.payload;
       })
-      .addCase(sendOTP.rejected, (state, action) => {
+      .addCase(sendEmailOTP.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(sendMobileOTP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.smsSent = false;
+      })
+      .addCase(sendMobileOTP.fulfilled, (state, action) => {
+        state.loading = false;
+        state.smsSent = action.payload;
+      })
+      .addCase(sendMobileOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.registered = false;
+        state.register = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.registered = action.payload;
+        state.register = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
