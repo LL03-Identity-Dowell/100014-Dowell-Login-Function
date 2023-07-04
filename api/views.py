@@ -923,13 +923,13 @@ def PublicApi(request):
     if mdata('api_key') != None and mdata('api_services') != None:
         api_resp = processApikey(mdata('api_key'), mdata('api_services'))
     else:
-        return Response({"msg":"error","info":"api_key and api_services fields are needed.."})
+        return Response({"msg": "error", "info": "api_key and api_services fields are needed.."})
     try:
-        api_resp=api_resp.replace("false", "False")
-        api_resp=api_resp.replace("true","True")
+        api_resp = api_resp.replace("false", "False")
+        api_resp = api_resp.replace("true", "True")
     except:
         pass
-    api_resp1=eval(api_resp)
+    api_resp1 = eval(api_resp)
     if api_resp1["success"] == False:
         return Response({"msg": "error", "info": api_resp1["message"]})
     else:
@@ -1067,14 +1067,16 @@ def login_init_api(request):
     country = ""
     city = ""
     saved_browser_session = request.session.session_key
-    if saved_browser_session:
-        return Response({"session_id": saved_browser_session, "redirect_url": redirect_url})
-        if orgs:
-            return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
-        elif redirect_url:
-            return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={saved_browser_session}');</script>")
-        else:
-            return redirect(f'https://100093.pythonanywhere.com/home?session_id={saved_browser_session}')
+    # if saved_browser_session:
+    #   return Response({"session_id": saved_browser_session, "redirect_url": redirect_url})
+    # else:
+    # return Response({'msg': 'No session found'});
+    #  if orgs:
+    #     return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
+    # elif redirect_url:
+    #    return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={saved_browser_session}');</script>")
+    # else:
+    #   return redirect(f'https://100093.pythonanywhere.com/home?session_id={saved_browser_session}')
     random_text = passgen.generate_random_password1(24)
     context["random_session"] = random_text
     if request.COOKIES.get('qrid_login'):
@@ -1111,3 +1113,4 @@ def login_init_api(request):
             res.set_cookie('qrid_login', qrid_obj.qrid, max_age=365*24*60*60)
             res.data = context
             return res
+    return Response({'msg': 'No session found'})
