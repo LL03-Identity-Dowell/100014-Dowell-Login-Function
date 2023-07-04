@@ -25,13 +25,13 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import qrcodegen
-
+from server.utils import passgen
 from api.serializers import UserSerializer
 
 
@@ -923,13 +923,13 @@ def PublicApi(request):
     if mdata('api_key') != None and mdata('api_services') != None:
         api_resp = processApikey(mdata('api_key'), mdata('api_services'))
     else:
-        return Response({"msg":"error","info":"api_key and api_services fields are needed.."})
+        return Response({"msg": "error", "info": "api_key and api_services fields are needed.."})
     try:
-        api_resp=api_resp.replace("false", "False")
-        api_resp=api_resp.replace("true","True")
+        api_resp = api_resp.replace("false", "False")
+        api_resp = api_resp.replace("true", "True")
     except:
         pass
-    api_resp1=eval(api_resp)
+    api_resp1 = eval(api_resp)
     if api_resp1["success"] == False:
         return Response({"msg": "error", "info": api_resp1["message"]})
     else:
@@ -1043,3 +1043,74 @@ def PublicApi(request):
     else:
         resp = {"data": "Username, Password combination incorrect.."}
         return Response(resp)
+
+
+@api_view(['GET'])
+def login_init_api(request):
+    context = {}
+    try:
+        orgs = request.GET.get('org', None)
+        type1 = request.GET.get('type', None)
+        email1 = request.GET.get('email', None)
+        name1 = request.GET.get('name', None)
+        code = request.GET.get('code', None)
+        spec = request.GET.get('spec', None)
+        u_code = request.GET.get('u_code', None)
+        detail = request.GET.get('detail', None)
+    except:
+        pass
+    context["org"] = orgs
+    context["type"] = type1
+    urls = request.GET.get('next', None)
+    context["url"] = request.GET.get('redirect_url', None)
+    redirect_url = request.GET.get('redirect_url', None)
+    country = ""
+    city = ""
+    saved_browser_session = request.session.session_key
+    # if saved_browser_session:
+    #   return Response({"session_id": saved_browser_session, "redirect_url": redirect_url})
+    # else:
+    # return Response({'msg': 'No session found'});
+    #  if orgs:
+    #     return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
+    # elif redirect_url:
+    #    return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={saved_browser_session}');</script>")
+    # else:
+    #   return redirect(f'https://100093.pythonanywhere.com/home?session_id={saved_browser_session}')
+    random_text = passgen.generate_random_password1(24)
+    context["random_session"] = random_text
+    if request.COOKIES.get('qrid_login'):
+        context["qrid_login"] = request.COOKIES.get('qrid_login')
+        qrid_obj_1 = QR_Creation.objects.filter(
+            qrid=context["qrid_login"]).first()
+        if qrid_obj_1.info == "":
+            context["qrid_login_type"] = "new"
+        else:
+            context["qrid_login_type"] = "old"
+    else:
+        qrid_obj = QR_Creation.objects.filter(status="new").first()
+        if qrid_obj is None:
+            ruser = passgen.generate_random_password1(24)
+            rpass = "DoWell@123"
+            new_obj = QR_Creation.objects.create(
+                qrid=ruser, password=rpass, status="used")
+
+            context["qrid_login"] = new_obj.qrid
+            context["qrid_login_type"] = "new"
+
+            res = Response()
+            res.set_cookie('qrid_login', new_obj.qrid, max_age=365*24*60*60)
+            res.data = context
+            return res
+        else:
+            qrid_obj.status = "used"
+            qrid_obj.save(update_fields=['status'])
+
+            context["qrid_login"] = qrid_obj.qrid
+            context["qrid_login_type"] = "new"
+
+            res = Response()
+            res.set_cookie('qrid_login', qrid_obj.qrid, max_age=365*24*60*60)
+            res.data = context
+            return res
+    return Response({'msg': 'No session found'})
