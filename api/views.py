@@ -39,6 +39,7 @@ from api.serializers import UserSerializer
 def register(request):
     username = request.data.get("Username")
     otp_input = request.data.get("otp")
+    sms_input=request.data.get("sms")
     image = request.FILES.get("Profile_Image")
     password = request.data.get("Password")
     first = request.data.get("Firstname")
@@ -53,17 +54,31 @@ def register(request):
     other_policy = request.data.get('other_policy')
     newsletter = request.data.get('newsletter')
 
-    if email and not username and not image and not password and not first \
+    if email and username and not image and not password and not first \
             and not last and not phone and not phonecode and not user_type and not user_country \
             and not policy_status and not other_policy and not newsletter:
         otp = generateOTP()
-        message = get_html_msg(username, otp)
-
-        def send_otp(): return send_mail(
-            'Your otp for chaning password of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
-
-        send_otp()
-        return Response({'msg': 'OTP sent successfully'})
+        try:
+            emailexist = GuestAccount.objects.get(email=email)
+        except GuestAccount.DoesNotExist:
+            emailexist = None
+        if emailexist is not None:
+            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=username)
+        else:
+            data=GuestAccount(username=username,email=email,otp=otp)
+            data.save()
+        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+        payload = json.dumps({
+            "toEmail":email,
+            "toName":username,
+            "topic":"RegisterOtp",
+            "otp":otp
+            })
+        headers = {
+            'Content-Type': 'application/json'
+            }
+        response1 = requests.request("POST", url, headers=headers, data=payload)
+        return Response({'msg':'success','info':'OTP sent successfully'})
 
     elif phone and phonecode and not email and not username and not image and not password \
             and not first and not last and not user_type and not user_country and not policy_status \
@@ -89,15 +104,26 @@ def register(request):
             "created_by": "Manish"
         }
         response = requests.request("POST", url, data=payload)
-        print(response.json())
         if len(response.json()) > 1:
-            return JsonResponse({'msg': 'SMS sent successfully!!'})
+            return Response({'msg':'success','info':'SMS sent successfully!!'})
         else:
-            return JsonResponse({'msg': 'error'})
+            return Response({'msg': 'error','error':'The number is not valid'})
 
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
-        return Response({'message': "Username already taken"})
+        return Response({'msg':'error','info': 'Username already taken'})
+
+    try:
+        check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
+        check_sms= mobile_sms.objects.filter(sms=sms_input,phone=phonecode + phone)
+    except GuestAccount.DoesNotExist:
+        check_otp = None
+        check_sms = None
+
+    if not check_otp:
+        return Response({'msg':'error','info':'Wrong Email OTP'})
+    if not check_sms:
+        return Response({'msg':'error','info':'Wrong Mobile SMS'})
 
     name = ""
     try:
@@ -182,7 +208,6 @@ def register(request):
             'inserted_id': f"{inserted_idd}"
         })
     return Response("Internal server error")
-
 
 @api_view(["POST"])
 def MobileLogin(request):
