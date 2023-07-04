@@ -14,7 +14,7 @@ import {
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 
-const schema = yup.object({
+const schema = yup.object().shape({
   Firstname: yup.string().required("First Name is required").max(20),
   Lastname: yup.string().required("Last Name is required").max(20),
   Username: yup
@@ -25,7 +25,6 @@ const schema = yup.object({
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
       "Username not allowed"
     ),
-
   Password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -33,6 +32,7 @@ const schema = yup.object({
   confirm_Password: yup
     .string()
     .oneOf([yup.ref("Password"), null], "Passwords must match"),
+  user_country: yup.string().required("Country is required"),
   country_code: yup
     .number()
     .positive("Phone number must be positive")
@@ -59,15 +59,13 @@ const schema = yup.object({
     is: true,
     then: yup.string().required("OTP is required"),
   }),
-
   Email: yup.string().when("otpSent", {
     is: true,
     then: yup
       .string()
-      .Email("Invalid Email format")
+      .email("Invalid Email format")
       .required("Email is required"),
   }),
-
   Phone: yup
     .number()
     .positive("Phone number must be positive")
@@ -87,7 +85,6 @@ const schema = yup.object({
     .boolean()
     .oneOf([true], "Please accept the Terms & Conditions"),
 });
-
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -121,7 +118,7 @@ const SignUp = () => {
       Password,
       confirm_Password,
       user_country,
-      phonecode,
+      country_code,
       Phone,
       otp,
       sms,
@@ -129,7 +126,7 @@ const SignUp = () => {
       policy_status,
       newsletter,
     } = data;
-    if (otp && sms && Email) {
+    if (otp && sms && Email && Phone) {
       dispatch(
         registerUser({
           Firstname,
@@ -140,7 +137,7 @@ const SignUp = () => {
           Password,
           confirm_Password,
           user_country,
-          phonecode,
+          country_code,
           Phone,
           otp,
           sms,
@@ -299,10 +296,10 @@ const SignUp = () => {
               </label>
               <div className="mt-2.5">
                 <input
-                  type="Password"
                   name="confirm_Password"
-                  id="confirm_Password"
-                  autoComplete="confirm_Password"
+                  type="password"
+                  placeholder="Confirm Password"
+                  required
                   className="input-field"
                   {...register("confirm_Password")}
                 />
@@ -316,7 +313,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="country"
+                htmlFor="user_country"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Country
@@ -324,11 +321,12 @@ const SignUp = () => {
 
               <div className="mt-2.5">
                 <select
-                  name="country"
+                  name="user_country"
                   type="text"
                   placeholder="countries"
                   required
                   className="select-btn"
+                  {...register("user_country")}
                 >
                   {countries.map((country) => (
                     <option key={country.id} value={country.name}>
