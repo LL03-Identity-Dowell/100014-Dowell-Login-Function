@@ -42,16 +42,15 @@ const schema = yup.object().shape({
     is: true,
     then: yup.string().required("OTP is required"),
   }),
-  user_country: yup.string().required("Country is required"),
-  country_code: yup.string().required("Country Code is required"),
-  Phone: yup
-    .string()
-    .required("Phone number is required")
-    .matches(/^\d+$/, "Phone number must be numeric"),
-  sms: yup.string().when("smsSent", {
+  user_country: yup.string().when("otpSent", {
     is: true,
-    then: yup.string().required("SMS is required"),
+    then: yup.string().required("Country is required"),
   }),
+  country_code: yup.string().when("otpSent", {
+    is: true,
+    then: yup.string().required("Country Code is required"),
+  }),
+
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
@@ -67,12 +66,26 @@ const schema = yup.object().shape({
       if (!value || !value[0]) return true; // Allow empty value
       return value[0].size <= 1024 * 1024;
     }),
-  newsletter: yup
-    .boolean()
-    .oneOf([true], "Accept Newsletter Terms & Conditions"),
-  policy_status: yup
-    .boolean()
-    .oneOf([true], "Please accept the Terms & Conditions"),
+  Phone: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^\d+$/, "Phone number must be numeric"),
+  }),
+  sms: yup.string().when("smsSent", {
+    is: true,
+    then: yup.string().required("SMS is required"),
+  }),
+  newsletter: yup.boolean().when(["otpSent", "smsSent"], {
+    is: (otpSent, smsSent) => otpSent || smsSent,
+    then: yup.boolean().oneOf([true], "Accept Newsletter Terms & Conditions"),
+  }),
+
+  policy_status: yup.boolean().when(["otpSent", "smsSent"], {
+    is: (otpSent, smsSent) => otpSent || smsSent,
+    then: yup.boolean().oneOf([true], "Please accept the Terms & Conditions"),
+  }),
 });
 
 const SignUp = () => {
