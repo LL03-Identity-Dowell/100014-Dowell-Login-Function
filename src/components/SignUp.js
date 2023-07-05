@@ -35,19 +35,12 @@ const schema = yup.object().shape({
     .string()
     .oneOf([yup.ref("Password"), null], "Passwords must match"),
   user_country: yup.string().required("Country is required"),
-  country_code: yup
-    .number()
-    .positive("Phone number must be positive")
-    .integer("Phone number must be an integer")
-    .transform((value, originalValue) =>
-      originalValue < 0 ? undefined : value
-    )
-    .required("Country code is required"),
+  country_code: yup.string().required("Country Code is required"),
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
     .test("fileFormat", "Unsupported file format", (value) => {
-      if (!value) return false;
+      if (!value || !value[0]) return true; // Allow empty value
       return (
         value[0].type === "image/jpeg" ||
         value[0].type === "image/png" ||
@@ -55,7 +48,8 @@ const schema = yup.object().shape({
       );
     })
     .test("fileSize", "File size is too large", (value) => {
-      return value && value[0].size <= 1024 * 1024;
+      if (!value || !value[0]) return true; // Allow empty value
+      return value[0].size <= 1024 * 1024;
     }),
   otp: yup.string().required("OTP is required"),
   Email: yup
@@ -106,9 +100,7 @@ const SignUp = () => {
 
   // dispatch mobile otp
   const handleMobileOTP = ({ Phone }) => {
-    if (typeof Phone !== "undefined" && Phone !== null) {
-      dispatch(sendMobileOTP({ Phone }));
-    }
+    dispatch(sendMobileOTP({ Phone }));
   };
 
   // dispatch registered user
@@ -130,6 +122,7 @@ const SignUp = () => {
       policy_status,
       newsletter,
     } = data;
+
     if (otp && sms && Email && Phone) {
       dispatch(
         registerUser({
@@ -467,15 +460,15 @@ const SignUp = () => {
                         {...register("Profile_Image")}
                         accept="image/jpeg, image/png, image/gif"
                       />
-                      {errors.Profile_Image && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.Profile_Image.message}
-                        </p>
-                      )}
                     </label>
                   </div>
                 </div>
               </div>
+              {errors.Profile_Image && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.Profile_Image.message}
+                </p>
+              )}
             </div>
 
             <div>
