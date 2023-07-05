@@ -400,7 +400,6 @@ const SignUp = () => {
                         "Get OTP"
                       )}
                     </button>
-
                     <p className="text-green-500 font-base">{smsSent}</p>
                   </div>
                 </div>
@@ -412,25 +411,24 @@ const SignUp = () => {
                 htmlFor="sms"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Enter OTP from sms
+                OTP from SMS
               </label>
-              {smsSent && (
-                <div className="mt-2.5">
-                  <input
-                    type="text"
-                    name="sms"
-                    id="ms"
-                    autoComplete="sms"
-                    className="input-field"
-                    {...register("sms")}
-                  />
-                  {errors.otp && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.otp.message}
-                    </p>
-                  )}
-                </div>
-              )}
+
+              <div className="mt-2.5">
+                <input
+                  type="text"
+                  name="sms"
+                  id="sms"
+                  autoComplete="sms"
+                  className="input-field"
+                  {...register("sms")}
+                />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div>
