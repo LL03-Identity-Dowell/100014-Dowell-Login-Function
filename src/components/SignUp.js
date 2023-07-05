@@ -391,7 +391,7 @@ const SignUp = () => {
                   <div className="flex flex-row space-x-3 items-center">
                     <button
                       className="btn-send px-2 py-1 self-start"
-                      onClick={handleSubmit(handleMobileOTP)}
+                      onClick={handleMobileOTP}
                       disabled={loading}
                     >
                       {loading ? (
@@ -465,7 +465,7 @@ const SignUp = () => {
                 <div className="flex flex-row space-x-3 items-center">
                   <button
                     className="btn-send px-2 py-1 self-start"
-                    onClick={handleSubmit(handleEmailOTP)}
+                    onClick={handleEmailOTP}
                     disabled={loading}
                   >
                     {loading ? (
