@@ -6,12 +6,11 @@ const API_URL = "https://100014.pythonanywhere.com/api/register/";
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
-  async ({ Email }) => {
+  async ({ Username, Email }) => {
     try {
-      const response = await axios.post(API_URL, { Email });
+      const response = await axios.post(API_URL, { Username, Email });
       if (response.data.msg === "success") {
-        console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
@@ -24,12 +23,12 @@ export const sendEmailOTP = createAsyncThunk(
 // Async thunk function to handle the mobile OTP request
 export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
-  async ({ Phone }) => {
+  async ({ country_code, Phone }) => {
     try {
-      const response = await axios.post(API_URL, { Phone });
+      const response = await axios.post(API_URL, { country_code, Phone });
       if (response.data.msg === "success") {
-        console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        // console.log("response", response?.data?.info);
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
@@ -42,12 +41,46 @@ export const sendMobileOTP = createAsyncThunk(
 // Async thunk to handle registration API call
 export const registerUser = createAsyncThunk(
   "registration/registerUser",
-  async (data) => {
+  async ({
+    Firstname,
+    Lastname,
+    Username,
+    user_type,
+    Email,
+    Password,
+    confirm_Password,
+    user_country,
+    country_code,
+    Phone,
+    otp,
+    sms,
+    Profile_Image,
+    policy_status,
+    newsletter,
+  }) => {
     try {
-      const response = await axios.post(API_URL, data);
+      const response = await axios.post(API_URL, {
+        data: {
+          Firstname,
+          Lastname,
+          Username,
+          user_type,
+          Email,
+          Password,
+          confirm_Password,
+          user_country,
+          country_code,
+          Phone,
+          otp,
+          sms,
+          Profile_Image,
+          policy_status,
+          newsletter,
+        },
+      });
       if (response.data.msg === "success") {
-        console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        // console.log("response", response?.data?.info);
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
