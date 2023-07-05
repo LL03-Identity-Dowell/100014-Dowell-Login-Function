@@ -79,12 +79,17 @@ const schema = yup.object().shape({
   }),
   newsletter: yup.boolean().when(["otpSent", "smsSent"], {
     is: (otpSent, smsSent) => otpSent || smsSent,
-    then: yup.boolean().oneOf([true], "Accept Newsletter Terms & Conditions"),
+    then: yup
+      .boolean()
+      .required("Accept Newsletter Terms & Conditions")
+      .oneOf([true], "Accept Newsletter Terms & Conditions"),
   }),
-
   policy_status: yup.boolean().when(["otpSent", "smsSent"], {
     is: (otpSent, smsSent) => otpSent || smsSent,
-    then: yup.boolean().oneOf([true], "Please accept the Terms & Conditions"),
+    then: yup
+      .boolean()
+      .required("Please accept the Terms & Conditions")
+      .oneOf([true], "Please accept the Terms & Conditions"),
   }),
 });
 
@@ -481,7 +486,7 @@ const SignUp = () => {
                   <div className="flex flex-row space-x-3 items-center">
                     <button
                       className="btn-send px-2 py-1 self-start"
-                      onClick={handleMobileOTP}
+                      onClick={handleSubmit(handleMobileOTP)}
                       disabled={loading}
                     >
                       {loading ? (
