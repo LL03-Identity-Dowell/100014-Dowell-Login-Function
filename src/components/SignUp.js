@@ -14,6 +14,7 @@ import {
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 
+// Schema for validation inputs
 const schema = yup.object().shape({
   Firstname: yup.string().required("First Name is required").max(20),
   Lastname: yup.string().required("Last Name is required").max(20),
@@ -25,6 +26,7 @@ const schema = yup.object().shape({
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
       "Username not allowed"
     ),
+  user_type: yup.string().required("User Type is required"),
   Password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
@@ -55,17 +57,11 @@ const schema = yup.object().shape({
     .test("fileSize", "File size is too large", (value) => {
       return value && value[0].size <= 1024 * 1024;
     }),
-  otp: yup.string().when("otpSent", {
-    is: true,
-    then: yup.string().required("OTP is required"),
-  }),
-  Email: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .email("Invalid Email format")
-      .required("Email is required"),
-  }),
+  otp: yup.string().required("OTP is required"),
+  Email: yup
+    .string()
+    .email("Invalid Email format")
+    .required("Email is required"),
   Phone: yup
     .number()
     .positive("Phone number must be positive")
@@ -74,10 +70,7 @@ const schema = yup.object().shape({
       originalValue < 0 ? undefined : value
     )
     .required("Phone number is required"),
-  sms: yup.string().when("smsSent", {
-    is: true,
-    then: yup.string().required("SMS is required"),
-  }),
+  sms: yup.string().required("SMS is required"),
   newsletter: yup
     .boolean()
     .oneOf([true], "Accept Newsletter Terms & Conditions"),
@@ -85,6 +78,7 @@ const schema = yup.object().shape({
     .boolean()
     .oneOf([true], "Please accept the Terms & Conditions"),
 });
+
 const SignUp = () => {
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -96,18 +90,28 @@ const SignUp = () => {
     handleSubmit,
     register,
     formState: { errors },
-  } = useForm({ resolver: yupResolver(schema) });
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
+  // dispatch countries list
   useEffect(() => {
     dispatch(fetchCountries());
   }, [dispatch]);
 
+  // dispatch email otp
   const handleEmailOTP = ({ Email }) => {
     dispatch(sendEmailOTP({ Email }));
   };
+
+  // dispatch mobile otp
   const handleMobileOTP = ({ Phone }) => {
-    dispatch(sendMobileOTP({ Phone }));
+    if (typeof Phone !== "undefined" && Phone !== null) {
+      dispatch(sendMobileOTP({ Phone }));
+    }
   };
+
+  // dispatch registered user
   const registeredUserInfo = (data) => {
     const {
       Firstname,
@@ -163,8 +167,6 @@ const SignUp = () => {
           </h2>
         </div>
         <form
-          action="#"
-          method="POST"
           className="mx-auto mt-8 max-w-xl sm:mt-12"
           onSubmit={handleSubmit(registeredUserInfo)}
         >
@@ -256,6 +258,7 @@ const SignUp = () => {
                   required
                   className="select-btn"
                   defaultValue="live-user"
+                  {...register("user_type")}
                 >
                   <option value="live-user">Live User</option>
                   <option value="beta-tester">Beta Tester</option>
@@ -298,8 +301,7 @@ const SignUp = () => {
                 <input
                   name="confirm_Password"
                   type="password"
-                  placeholder="Confirm Password"
-                  required
+                  autoComplete="confirm_Password"
                   className="input-field"
                   {...register("confirm_Password")}
                 />
@@ -379,7 +381,7 @@ const SignUp = () => {
                 <div className="relative mt-2.5">
                   <input
                     name="Phone"
-                    type="number"
+                    type="text"
                     className="input-field"
                     {...register("Phone")}
                   />
@@ -388,7 +390,7 @@ const SignUp = () => {
                   <div className="flex flex-row space-x-3 items-center">
                     <button
                       className="btn-send px-2 py-1 self-start"
-                      onClick={handleSubmit(handleMobileOTP)}
+                      onClick={handleMobileOTP}
                       disabled={loading}
                     >
                       {loading ? (
@@ -489,9 +491,7 @@ const SignUp = () => {
                   name="Email"
                   id="Email"
                   autoComplete="Email"
-                  className={`input-field ${
-                    errors.Email ? "border-red-500" : ""
-                  }`}
+                  className="input-field"
                   {...register("Email")}
                 />
                 {errors.Email && (
@@ -504,7 +504,7 @@ const SignUp = () => {
                 <div className="flex flex-row space-x-3 items-center">
                   <button
                     className="btn-send px-2 py-1 self-start"
-                    onClick={handleSubmit(handleEmailOTP)}
+                    onClick={handleEmailOTP}
                     disabled={loading}
                   >
                     {loading ? (

@@ -24,9 +24,9 @@ export const sendEmailOTP = createAsyncThunk(
 // Async thunk function to handle the mobile OTP request
 export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
-  async ({ phone }) => {
+  async ({ Phone }) => {
     try {
-      const response = await axios.post(API_URL, { phone });
+      const response = await axios.post(API_URL, { Phone });
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);
         // return response?.data?.info;
