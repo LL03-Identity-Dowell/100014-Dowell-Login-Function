@@ -10,8 +10,8 @@ export const sendEmailOTP = createAsyncThunk(
     try {
       const response = await axios.post(API_URL, { Username, Email });
       if (response.data.msg === "success") {
-        console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        // console.log("response", response?.data?.info);
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }

@@ -34,8 +34,24 @@ const schema = yup.object().shape({
   confirm_Password: yup
     .string()
     .oneOf([yup.ref("Password"), null], "Passwords must match"),
+  Email: yup
+    .string()
+    .email("Invalid Email format")
+    .required("Email is required"),
+  otp: yup.string().when("otpSent", {
+    is: true,
+    then: yup.string().required("OTP is required"),
+  }),
   user_country: yup.string().required("Country is required"),
   country_code: yup.string().required("Country Code is required"),
+  Phone: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\d+$/, "Phone number must be numeric"),
+  sms: yup.string().when("smsSent", {
+    is: true,
+    then: yup.string().required("SMS is required"),
+  }),
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
@@ -51,26 +67,6 @@ const schema = yup.object().shape({
       if (!value || !value[0]) return true; // Allow empty value
       return value[0].size <= 1024 * 1024;
     }),
-  Email: yup
-    .string()
-    .email("Invalid Email format")
-    .required("Email is required"),
-  otp: yup.string().when("otpSent", {
-    is: true,
-    then: yup.string().required("OTP is required"),
-  }),
-  Phone: yup
-    .number()
-    .positive("Phone number must be positive")
-    .integer("Phone number must be an integer")
-    .transform((value, originalValue) =>
-      originalValue < 0 ? undefined : value
-    )
-    .required("Phone number is required"),
-  sms: yup.string().when("smsSent", {
-    is: true,
-    then: yup.string().required("SMS is required"),
-  }),
   newsletter: yup
     .boolean()
     .oneOf([true], "Accept Newsletter Terms & Conditions"),
@@ -100,13 +96,19 @@ const SignUp = () => {
   }, [dispatch]);
 
   // dispatch email otp
-  const handleEmailOTP = ({ Email, Username }) => {
-    dispatch(sendEmailOTP({ Email, Username }));
+  const handleEmailOTP = (data) => {
+    const { Email, Username } = data;
+    if (Email && Username) {
+      dispatch(sendEmailOTP({ Email, Username }));
+    }
   };
 
   // dispatch mobile otp
-  const handleMobileOTP = ({ country_code, Phone }) => {
-    dispatch(sendMobileOTP({ country_code, Phone }));
+  const handleMobileOTP = (data) => {
+    const { country_code, Phone } = data;
+    if (country_code && Phone) {
+      dispatch(sendMobileOTP({ country_code, Phone }));
+    }
   };
 
   // dispatch registered user
@@ -129,7 +131,7 @@ const SignUp = () => {
       newsletter,
     } = data;
 
-    if (otp && sms) {
+    if (otpSent && smsSent) {
       dispatch(
         registerUser({
           data: {
@@ -316,6 +318,81 @@ const SignUp = () => {
 
             <div>
               <label
+                htmlFor="Email"
+                className="block text-sm font-semibold leading-6 text-green-700"
+              >
+                Email
+              </label>
+              <div className="mt-2.5">
+                <input
+                  type="Email"
+                  name="Email"
+                  id="Email"
+                  autoComplete="Email"
+                  className="input-field"
+                  {...register("Email")}
+                />
+                {errors.Email && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.Email.message}
+                  </p>
+                )}
+              </div>
+              <div className="mt-2.5">
+                <div className="flex flex-row space-x-3 items-center">
+                  <button
+                    className="btn-send px-2 py-1 self-start"
+                    onClick={handleSubmit(handleEmailOTP)}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Radio
+                        visible={true}
+                        height={30}
+                        width={30}
+                        ariaLabel="radio-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName="radio-wrapper"
+                        color="#1ff507"
+                      />
+                    ) : (
+                      "Get OTP"
+                    )}
+                  </button>
+                  <p className="text-base font-normal text-green-600">
+                    {otpSent}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="otp-Email"
+                className="block text-sm font-semibold leading-6 text-green-700"
+              >
+                Enter OTP from Email
+              </label>
+
+              <div className="mt-2.5">
+                <input
+                  type="text"
+                  name="otp"
+                  id="otp"
+                  autoComplete="otp"
+                  className="input-field"
+                  {...register("otp")}
+                />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
                 htmlFor="user_country"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
@@ -430,81 +507,6 @@ const SignUp = () => {
                   autoComplete="sms"
                   className="input-field"
                   {...register("sms")}
-                />
-                {errors.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="Email"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
-                Email
-              </label>
-              <div className="mt-2.5">
-                <input
-                  type="Email"
-                  name="Email"
-                  id="Email"
-                  autoComplete="Email"
-                  className="input-field"
-                  {...register("Email")}
-                />
-                {errors.Email && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.Email.message}
-                  </p>
-                )}
-              </div>
-              <div className="mt-2.5">
-                <div className="flex flex-row space-x-3 items-center">
-                  <button
-                    className="btn-send px-2 py-1 self-start"
-                    onClick={handleEmailOTP}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <Radio
-                        visible={true}
-                        height={30}
-                        width={30}
-                        ariaLabel="radio-loading"
-                        wrapperStyle={{}}
-                        wrapperClassName="radio-wrapper"
-                        color="#1ff507"
-                      />
-                    ) : (
-                      "Get OTP"
-                    )}
-                  </button>
-                  <p className="text-base font-normal text-green-600">
-                    {otpSent}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="otp-Email"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
-                Enter OTP from Email
-              </label>
-
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="otp"
-                  id="otp"
-                  autoComplete="otp"
-                  className="input-field"
-                  {...register("otp")}
                 />
                 {errors.otp && (
                   <p className="text-red-500 text-xs mt-1">
