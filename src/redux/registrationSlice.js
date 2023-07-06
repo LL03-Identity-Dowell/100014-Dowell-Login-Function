@@ -10,7 +10,6 @@ export const sendEmailOTP = createAsyncThunk(
     try {
       const response = await axios.post(API_URL, { Username, Email });
       if (response.data.msg === "success") {
-        // console.log("response", response?.data?.info);
         return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
@@ -24,12 +23,11 @@ export const sendEmailOTP = createAsyncThunk(
 // Async thunk function to handle the mobile OTP request
 export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
-  async ({ country_code, Phone }) => {
+  async ({ phonecode, Phone }) => {
     try {
-      const response = await axios.post(API_URL, { country_code, Phone });
+      const response = await axios.post(API_URL, { phonecode, Phone });
       if (response.data.msg === "success") {
-        console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
@@ -51,7 +49,7 @@ export const registerUser = createAsyncThunk(
     Password,
     confirm_Password,
     user_country,
-    country_code,
+    phonecode,
     Phone,
     otp,
     sms,
@@ -70,7 +68,7 @@ export const registerUser = createAsyncThunk(
           Password,
           confirm_Password,
           user_country,
-          country_code,
+          phonecode,
           Phone,
           otp,
           sms,
@@ -80,8 +78,7 @@ export const registerUser = createAsyncThunk(
         },
       });
       if (response.data.msg === "success") {
-        console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }

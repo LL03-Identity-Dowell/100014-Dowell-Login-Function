@@ -46,11 +46,21 @@ const schema = yup.object().shape({
     is: true,
     then: yup.string().required("Country is required"),
   }),
-  country_code: yup.string().when("otpSent", {
+  phonecode: yup.string().when("otpSent", {
     is: true,
     then: yup.string().required("Country Code is required"),
   }),
-
+  Phone: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .required("Phone number is required")
+      .matches(/^\d+$/, "Phone number must be numeric"),
+  }),
+  sms: yup.string().when("smsSent", {
+    is: true,
+    then: yup.string().required("SMS is required"),
+  }),
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
@@ -66,17 +76,6 @@ const schema = yup.object().shape({
       if (!value || !value[0]) return true; // Allow empty value
       return value[0].size <= 1024 * 1024;
     }),
-  Phone: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .required("Phone number is required")
-      .matches(/^\d+$/, "Phone number must be numeric"),
-  }),
-  sms: yup.string().when("smsSent", {
-    is: true,
-    then: yup.string().required("SMS is required"),
-  }),
   newsletter: yup.boolean().when(["otpSent", "smsSent"], {
     is: (otpSent, smsSent) => otpSent || smsSent,
     then: yup
@@ -123,9 +122,9 @@ const SignUp = () => {
 
   // dispatch mobile otp
   const handleMobileOTP = (data) => {
-    const { country_code, Phone } = data;
-    if (country_code && Phone) {
-      dispatch(sendMobileOTP({ country_code, Phone }));
+    const { phonecode, Phone } = data;
+    if (phonecode && Phone && Phone.length > 0 && !smsSent) {
+      dispatch(sendMobileOTP({ phonecode, Phone }));
     }
   };
 
@@ -140,7 +139,7 @@ const SignUp = () => {
       Password,
       confirm_Password,
       user_country,
-      country_code,
+      phonecode,
       Phone,
       otp,
       sms,
@@ -161,7 +160,7 @@ const SignUp = () => {
             Password,
             confirm_Password,
             user_country,
-            country_code,
+            phonecode,
             Phone,
             otp,
             sms,
@@ -445,12 +444,12 @@ const SignUp = () => {
 
               <div className="mt-2.5">
                 <select
-                  name="country_code"
+                  name="phonecode"
                   type="text"
                   placeholder="countries code"
                   required
                   className="select-btn"
-                  {...register("country_code")}
+                  {...register("phonecode")}
                 >
                   {countries.map((country) => (
                     <option key={country.id} value={country.country_code}>
@@ -458,9 +457,9 @@ const SignUp = () => {
                     </option>
                   ))}
                 </select>
-                {errors.country_code && (
+                {errors.phonecode && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.country_code.message}
+                    {errors.phonecode.message}
                   </p>
                 )}
               </div>
@@ -536,7 +535,7 @@ const SignUp = () => {
 
             <div>
               <label
-                htmlFor="file-upload"
+                 htmlFor="Profile_Image"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Upload Photo
