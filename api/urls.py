@@ -18,6 +18,7 @@ urlpatterns = [
     path("forgot_password/", views.forgot_password, name='api_forgot_password'),
     path("forgot_username/", views.forgot_username, name='api_forgot_username'),
     path('loginapi/', views.PublicApi, name="loginapi"),
-    path('login_init_api/', views.login_init_api, name="login_init")
+    path('login_init_api/', views.login_init_api, name="login_init"),
+    path('login_legal_policy/',views.login_legal_policy,name="login_legal_policy")
 
 ]
