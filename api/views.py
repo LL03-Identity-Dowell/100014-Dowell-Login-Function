@@ -25,7 +25,7 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation, RandomSession
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -34,6 +34,37 @@ from server.utils import qrcodegen
 from server.utils import passgen
 from api.serializers import UserSerializer
 
+
+def register_legal_policy(user):
+    policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
+    RandomSession.objects.create(
+        sessionID=user, status="Accepted", username=user)
+    time = datetime.datetime.now()
+    data = {
+        "data": [
+            {
+                "event_id": "FB1010000000167475042357408025",
+                "session_id": user,
+                "i_agree": "true",
+                "log_datetime": time,
+                "i_agreed_datetime": time,
+                "legal_policy_type": "app-privacy-policy"
+            }
+        ],
+        "isSuccess": "true"
+    }
+    requests.post(policy_url, data=data)
+    return "success"
+
+@api_view(['POST'])
+def login_legal_policy(request):
+    session_id = request.data.get('s')
+    if session_id:
+        RandomSession.objects.create(
+            sessionID=session_id, status="Accepted", username="none")
+        return Response({'msg':'Success','info':'Policy accepted!!'})
+    else:
+        return Response({'msg':'errror','info':'Session_id is required'})
 
 @api_view(["POST"])
 def register(request):
@@ -112,6 +143,8 @@ def register(request):
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
         return Response({'msg':'error','info': 'Username already taken'})
+
+    register_legal_policy(username)
 
     try:
         check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
@@ -1139,3 +1172,4 @@ def login_init_api(request):
             res.data = context
             return res
     return Response({'msg': 'No session found'})
+
