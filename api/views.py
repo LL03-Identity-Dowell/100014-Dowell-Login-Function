@@ -56,21 +56,23 @@ def register_legal_policy(user):
     requests.post(policy_url, data=data)
     return "success"
 
+
 @api_view(['POST'])
 def login_legal_policy(request):
     session_id = request.data.get('s')
     if session_id:
         RandomSession.objects.create(
             sessionID=session_id, status="Accepted", username="none")
-        return Response({'msg':'Success','info':'Policy accepted!!'})
+        return Response({'msg': 'Success', 'info': 'Policy accepted!!'})
     else:
-        return Response({'msg':'errror','info':'Session_id is required'})
+        return Response({'msg': 'errror', 'info': 'Session_id is required'})
+
 
 @api_view(["POST"])
 def register(request):
     username = request.data.get("Username")
     otp_input = request.data.get("otp")
-    sms_input=request.data.get("sms")
+    sms_input = request.data.get("sms")
     image = request.FILES.get("Profile_Image")
     password = request.data.get("Password")
     first = request.data.get("Firstname")
@@ -94,22 +96,24 @@ def register(request):
         except GuestAccount.DoesNotExist:
             emailexist = None
         if emailexist is not None:
-            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=username)
+            GuestAccount.objects.filter(email=email).update(
+                otp=otp, expiry=datetime.datetime.now(), username=username)
         else:
-            data=GuestAccount(username=username,email=email,otp=otp)
+            data = GuestAccount(username=username, email=email, otp=otp)
             data.save()
         url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
         payload = json.dumps({
-            "toEmail":email,
-            "toName":username,
-            "topic":"RegisterOtp",
-            "otp":otp
-            })
+            "toEmail": email,
+            "toName": username,
+            "topic": "RegisterOtp",
+            "otp": otp
+        })
         headers = {
             'Content-Type': 'application/json'
-            }
-        response1 = requests.request("POST", url, headers=headers, data=payload)
-        return Response({'msg':'success','info':'OTP sent successfully'})
+        }
+        response1 = requests.request(
+            "POST", url, headers=headers, data=payload)
+        return Response({'msg': 'success', 'info': 'OTP sent successfully'})
 
     elif phone and phonecode and not email and not username and not image and not password \
             and not first and not last and not user_type and not user_country and not policy_status \
@@ -136,27 +140,28 @@ def register(request):
         }
         response = requests.request("POST", url, data=payload)
         if len(response.json()) > 1:
-            return Response({'msg':'success','info':'SMS sent successfully!!'})
+            return Response({'msg': 'success', 'info': 'SMS sent successfully!!'})
         else:
-            return Response({'msg': 'error','error':'The number is not valid'})
+            return Response({'msg': 'error', 'error': 'The number is not valid'})
 
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
-        return Response({'msg':'error','info': 'Username already taken'})
+        return Response({'msg': 'error', 'info': 'Username already taken'})
 
     register_legal_policy(username)
 
     try:
         check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
-        check_sms= mobile_sms.objects.filter(sms=sms_input,phone=phonecode + phone)
+        check_sms = mobile_sms.objects.filter(
+            sms=sms_input, phone=phonecode + phone)
     except GuestAccount.DoesNotExist:
         check_otp = None
         check_sms = None
 
     if not check_otp:
-        return Response({'msg':'error','info':'Wrong Email OTP'})
+        return Response({'msg': 'error', 'info': 'Wrong Email OTP'})
     if not check_sms:
-        return Response({'msg':'error','info':'Wrong Mobile SMS'})
+        return Response({'msg': 'error', 'info': 'Wrong Mobile SMS'})
 
     name = ""
     try:
@@ -241,6 +246,7 @@ def register(request):
             'inserted_id': f"{inserted_idd}"
         })
     return Response("Internal server error")
+
 
 @api_view(["POST"])
 def MobileLogin(request):
@@ -1173,3 +1179,62 @@ def login_init_api(request):
             return res
     return Response({'msg': 'No session found'})
 
+
+@api_view(['POST'])
+def email_otp(request):
+    email = request.data.get('email', None)
+    otp_input = request.data.get('otp', None)
+
+    # Send OTP
+    if email and not otp_input:
+        otp = generateOTP()
+        message = get_html_msg('User', otp, 'recover username')
+
+        user_qs = Account.objects.filter(email=email)
+        email_qs = GuestAccount.objects.filter(email=email)
+
+        def send_otp(): return send_mail(
+            'Your otp for recovering username of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
+
+        if user_qs.exists():
+            if email_qs.exists():
+                GuestAccount.objects.filter(email=email).update(
+                    otp=otp, expiry=datetime.datetime.utcnow())
+                send_otp()
+                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
+            else:
+                return Response({'msg': 'error', 'info': 'Email not found'})
+        else:
+            return Response({'msg': 'error', 'info': 'Email not found'})
+
+@api_view(['POST'])
+def mobile_otp(request):
+        phonecode = request.data.get('phonecode')
+        phone = request.data.get('phone')
+
+        sms = generateOTP()
+        full_number = phonecode + phone
+        time = datetime.datetime.utcnow()
+        
+        try:
+            phone_exists = mobile_sms.objects.get(phone=full_number)
+        except mobile_sms.DoesNotExist:
+            phone_exists = None
+        if phone_exists is not None:
+            mobile_sms.objects.filter(
+                phone=full_number).update(sms=sms, expiry=time)
+        else:
+            mobile_sms.objects.create(
+                phone=full_number, sms=sms, expiry=time)
+        url = "https://100085.pythonanywhere.com/api/sms/"
+        payload = {
+            "sender": "DowellLogin",
+            "recipient": full_number,
+            "content": f"Enter the following OTP to create your dowell account: {sms}",
+            "created_by": "Manish"
+        }
+        response = requests.request("POST", url, data=payload)
+        if len(response.json()) > 1:
+            return Response({'msg': 'success', 'info': 'SMS sent successfully!!'})
+        else:
+            return Response({'msg': 'error', 'error': 'The number is not valid'})
