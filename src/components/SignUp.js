@@ -59,7 +59,7 @@ const schema = yup.object().shape({
   }),
   sms: yup.string().when("smsSent", {
     is: true,
-    then: yup.string().required("SMS is required"),
+    then: yup.string(),
   }),
   Profile_Image: yup
     .mixed()
@@ -148,26 +148,24 @@ const SignUp = () => {
       newsletter,
     } = data;
 
-    if (otpSent && smsSent) {
+    if (otpSent || smsSent) {
       dispatch(
         registerUser({
-          data: {
-            Firstname,
-            Lastname,
-            Username,
-            user_type,
-            Email,
-            Password,
-            confirm_Password,
-            user_country,
-            phonecode,
-            Phone,
-            otp,
-            sms,
-            Profile_Image,
-            policy_status,
-            newsletter,
-          },
+          Firstname,
+          Lastname,
+          Username,
+          user_type,
+          Email,
+          Password,
+          confirm_Password,
+          user_country,
+          phonecode,
+          Phone,
+          otp,
+          sms,
+          Profile_Image,
+          policy_status,
+          newsletter,
         })
       );
     }
@@ -273,7 +271,6 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <select
                   name="user-type"
-                  type="text"
                   placeholder="user-type"
                   required
                   className="select-btn"
@@ -295,8 +292,8 @@ const SignUp = () => {
               </label>
               <div className="mt-2.5">
                 <input
-                  type="Password"
                   name="Password"
+                  type="password"
                   id="Password"
                   autoComplete="Password"
                   className="input-field"
@@ -535,7 +532,7 @@ const SignUp = () => {
 
             <div>
               <label
-                 htmlFor="Profile_Image"
+                htmlFor="Profile_Image"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
                 Upload Photo

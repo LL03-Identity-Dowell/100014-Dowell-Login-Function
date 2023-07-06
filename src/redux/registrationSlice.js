@@ -59,26 +59,25 @@ export const registerUser = createAsyncThunk(
   }) => {
     try {
       const response = await axios.post(API_URL, {
-        data: {
-          Firstname,
-          Lastname,
-          Username,
-          user_type,
-          Email,
-          Password,
-          confirm_Password,
-          user_country,
-          phonecode,
-          Phone,
-          otp,
-          sms,
-          Profile_Image,
-          policy_status,
-          newsletter,
-        },
+        Firstname,
+        Lastname,
+        Username,
+        user_type,
+        Email,
+        Password,
+        confirm_Password,
+        user_country,
+        phonecode,
+        Phone,
+        otp,
+        sms,
+        Profile_Image,
+        policy_status,
+        newsletter,
       });
       if (response.data.msg === "success") {
-        return response?.data?.info;
+        console.log("response", response?.data?.info);
+        // return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
