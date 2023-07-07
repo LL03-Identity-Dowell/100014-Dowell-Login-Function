@@ -94,7 +94,6 @@ const schema = yup.object().shape({
 
 const SignUp = () => {
   const [attempts, setAttempts] = useState(5);
-  const [otpButtonDisabled, setOtpButtonDisabled] = useState(true);
   const [exempted, setExempted] = useState(false);
   const [showAttempts, setShowAttempts] = useState(false);
   const [countdown, setCountdown] = useState(60);
@@ -151,22 +150,22 @@ const SignUp = () => {
     if (phonecode && Phone && Phone.length > 0 && !smsSent) {
       dispatch(sendMobileOTP({ phonecode, Phone }));
       setCountdown(60); // Reset the countdown timer to 60 seconds
-      setOtpButtonDisabled(true); // Disable the "Get OTP" button
-
-      // Start the countdown timer
-      const timer = setInterval(() => {
-        setCountdown((prevCountdown) => prevCountdown - 1);
-      }, 1000); // 1 second
-
-      // Clear the countdown timer after 1 minute
-      setTimeout(() => {
-        clearInterval(timer);
-        setOtpButtonDisabled(false); // Enable the "Get OTP" button
-      }, 60000); // 60 seconds
     } else {
       setShowAttempts(true);
     }
   };
+
+  useEffect(() => {
+    if (countdown > 0) {
+      // Start the countdown timer
+      const timer = setTimeout(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000); // 1 second
+
+      // Clear the countdown timer when it reaches 0
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -523,7 +522,7 @@ const SignUp = () => {
                       onClick={handleSubmit(handleMobileOTP)}
                       disabled={
                         loading ||
-                        otpButtonDisabled ||
+                        countdown > 0 || // Disable the button while the countdown is active
                         (attempts === 0 && !exempted)
                       }
                     >
@@ -537,8 +536,8 @@ const SignUp = () => {
                           wrapperClassName="radio-wrapper"
                           color="#1ff507"
                         />
-                      ) : otpButtonDisabled ? (
-                        `Resend OTP (${countdown}s)`
+                      ) : countdown > 0 ? (
+                        `Resend OTP (${countdown}s)` // Display the countdown timer
                       ) : (
                         "Get OTP"
                       )}
