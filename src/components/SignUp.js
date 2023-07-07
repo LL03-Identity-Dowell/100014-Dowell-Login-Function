@@ -96,7 +96,7 @@ const SignUp = () => {
   const [attempts, setAttempts] = useState(5);
   const [exempted, setExempted] = useState(false);
   const [showAttempts, setShowAttempts] = useState(false);
-  const [countdown, setCountdown] = useState(60);
+  const [countdown, setCountdown] = useState(0);
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -536,14 +536,19 @@ const SignUp = () => {
                           wrapperClassName="radio-wrapper"
                           color="#1ff507"
                         />
-                      ) : countdown > 0 ? (
-                        `Resend OTP (${countdown}s)` // Display the countdown timer
                       ) : (
                         "Get OTP"
                       )}
                     </button>
                     <p className="text-green-500 font-base">{smsSent}</p>
                   </div>
+
+                  {/* Display the countdown timer only after the first SMS attempt */}
+                  {smsSent && countdown > 0 && (
+                    <div className="text-base font-normal text-green-600">
+                      Resend OTP in: {countdown}s
+                    </div>
+                  )}
 
                   {showAttempts && (
                     <div>
