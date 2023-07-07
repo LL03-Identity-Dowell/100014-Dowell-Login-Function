@@ -13,6 +13,7 @@ import {
   sendMobileOTP,
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
+import { useNavigate } from "react-router-dom";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -107,6 +108,9 @@ const SignUp = () => {
     resolver: yupResolver(schema),
   });
 
+  // a hook to redirect the user to the signin page
+  const navigate = useNavigate();
+
   // dispatch countries list
   useEffect(() => {
     dispatch(fetchCountries());
@@ -142,7 +146,6 @@ const SignUp = () => {
       phonecode,
       Phone,
       otp,
-      sms,
       Profile_Image,
       policy_status,
       newsletter,
@@ -162,10 +165,13 @@ const SignUp = () => {
           phonecode,
           Phone,
           otp,
-          sms,
           Profile_Image,
           policy_status,
           newsletter,
+        }).then(() => {
+          if (registered) {
+            navigate("/signin"); // Redirect to signin page
+          }
         })
       );
     }

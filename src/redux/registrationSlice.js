@@ -52,7 +52,6 @@ export const registerUser = createAsyncThunk(
     phonecode,
     Phone,
     otp,
-    sms,
     Profile_Image,
     policy_status,
     newsletter,
@@ -70,14 +69,13 @@ export const registerUser = createAsyncThunk(
         phonecode,
         Phone,
         otp,
-        sms,
         Profile_Image,
         policy_status,
         newsletter,
       });
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);
-        // return response?.data?.info;
+        return response?.data?.info;
       } else {
         throw new Error(response?.data?.info);
       }
@@ -93,7 +91,7 @@ const registrationSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    registered: false,
+    registered: null,
     otpSent: null,
     smsSent: null,
   },
