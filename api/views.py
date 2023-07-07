@@ -70,6 +70,37 @@ def login_legal_policy(request):
         return Response({'msg': 'errror', 'info': 'Session_id is required'})
 
 
+def register_legal_policy(user):
+    policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
+    RandomSession.objects.create(
+        sessionID=user, status="Accepted", username=user)
+    time = datetime.datetime.now()
+    data = {
+        "data": [
+            {
+                "event_id": "FB1010000000167475042357408025",
+                "session_id": user,
+                "i_agree": "true",
+                "log_datetime": time,
+                "i_agreed_datetime": time,
+                "legal_policy_type": "app-privacy-policy"
+            }
+        ],
+        "isSuccess": "true"
+    }
+    requests.post(policy_url, data=data)
+    return "success"
+
+@api_view(['POST'])
+def login_legal_policy(request):
+    session_id = request.data.get('s')
+    if session_id:
+        RandomSession.objects.create(
+            sessionID=session_id, status="Accepted", username="none")
+        return Response({'msg':'Success','info':'Policy accepted!!'})
+    else:
+        return Response({'msg':'errror','info':'Session_id is required'})
+
 @api_view(["POST"])
 def register(request):
     username = request.data.get("Username")
@@ -149,6 +180,8 @@ def register(request):
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
         return Response({'msg': 'error', 'info': 'Username already taken'})
+
+    register_legal_policy(username)
 
     register_legal_policy(username)
 
@@ -1123,7 +1156,6 @@ def login_init_api(request):
             res.data = context
             return res
     return Response({'msg': 'No session found'})
-
 
 @api_view(['POST'])
 def email_otp(request):
