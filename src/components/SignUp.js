@@ -62,6 +62,7 @@ const schema = yup.object().shape({
     is: true,
     then: yup.string(),
   }),
+
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
@@ -154,6 +155,7 @@ const SignUp = () => {
       phonecode,
       Phone,
       otp,
+      sms,
       Profile_Image,
       policy_status,
       newsletter,
@@ -172,6 +174,7 @@ const SignUp = () => {
         phonecode,
         Phone,
         otp,
+        sms,
         Profile_Image,
         policy_status,
         newsletter,
@@ -530,9 +533,9 @@ const SignUp = () => {
                   className="input-field"
                   {...register("sms")}
                 />
-                {errors.otp && (
+                {errors.sms && (
                   <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
+                    {errors.sms.message}
                   </p>
                 )}
               </div>

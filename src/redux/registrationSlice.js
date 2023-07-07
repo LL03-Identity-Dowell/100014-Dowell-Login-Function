@@ -52,6 +52,7 @@ export const registerUser = createAsyncThunk(
     phonecode,
     Phone,
     otp,
+    sms,
     Profile_Image,
     policy_status,
     newsletter,
@@ -69,17 +70,20 @@ export const registerUser = createAsyncThunk(
         phonecode,
         Phone,
         otp,
+        sms,
         Profile_Image,
         policy_status,
         newsletter,
       });
       if (response.data.msg === "success") {
         console.log("response", response?.data?.info);
-        return response?.data?.info;
+        // return response?.data?.info;
       } else {
+        console.log("response", response?.data?.info);
         throw new Error(response?.data?.info);
       }
     } catch (error) {
+      console.log("response", error?.response?.data?.info);
       throw new Error(error?.response?.data?.info);
     }
   }
