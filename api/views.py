@@ -34,6 +34,41 @@ from server.utils import qrcodegen
 from server.utils import passgen
 from api.serializers import UserSerializer
 
+def get_html_msg_new(username, otp, purpose):
+    return f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to {purpose} of dowell account <br><h2>Your OTP is <strong>{otp}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+
+def register_legal_policy(user):
+    policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
+    RandomSession.objects.create(
+        sessionID=user, status="Accepted", username=user)
+    time = datetime.datetime.now()
+    data = {
+        "data": [
+            {
+                "event_id": "FB1010000000167475042357408025",
+                "session_id": user,
+                "i_agree": "true",
+                "log_datetime": time,
+                "i_agreed_datetime": time,
+                "legal_policy_type": "app-privacy-policy"
+            }
+        ],
+        "isSuccess": "true"
+    }
+    requests.post(policy_url, data=data)
+    return "success"
+
+
+@api_view(['POST'])
+def login_legal_policy(request):
+    session_id = request.data.get('s')
+    if session_id:
+        RandomSession.objects.create(
+            sessionID=session_id, status="Accepted", username="none")
+        return Response({'msg': 'Success', 'info': 'Policy accepted!!'})
+    else:
+        return Response({'msg': 'errror', 'info': 'Session_id is required'})
+
 
 def register_legal_policy(user):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
@@ -70,7 +105,7 @@ def login_legal_policy(request):
 def register(request):
     username = request.data.get("Username")
     otp_input = request.data.get("otp")
-    sms_input=request.data.get("sms")
+    sms_input = request.data.get("sms")
     image = request.FILES.get("Profile_Image")
     password = request.data.get("Password")
     first = request.data.get("Firstname")
@@ -94,22 +129,24 @@ def register(request):
         except GuestAccount.DoesNotExist:
             emailexist = None
         if emailexist is not None:
-            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=username)
+            GuestAccount.objects.filter(email=email).update(
+                otp=otp, expiry=datetime.datetime.now(), username=username)
         else:
-            data=GuestAccount(username=username,email=email,otp=otp)
+            data = GuestAccount(username=username, email=email, otp=otp)
             data.save()
         url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
         payload = json.dumps({
-            "toEmail":email,
-            "toName":username,
-            "topic":"RegisterOtp",
-            "otp":otp
-            })
+            "toEmail": email,
+            "toName": username,
+            "topic": "RegisterOtp",
+            "otp": otp
+        })
         headers = {
             'Content-Type': 'application/json'
-            }
-        response1 = requests.request("POST", url, headers=headers, data=payload)
-        return Response({'msg':'success','info':'OTP sent successfully'})
+        }
+        response1 = requests.request(
+            "POST", url, headers=headers, data=payload)
+        return Response({'msg': 'success', 'info': 'OTP sent successfully'})
 
     elif phone and phonecode and not email and not username and not image and not password \
             and not first and not last and not user_type and not user_country and not policy_status \
@@ -136,27 +173,30 @@ def register(request):
         }
         response = requests.request("POST", url, data=payload)
         if len(response.json()) > 1:
-            return Response({'msg':'success','info':'SMS sent successfully!!'})
+            return Response({'msg': 'success', 'info': 'SMS sent successfully!!'})
         else:
-            return Response({'msg': 'error','error':'The number is not valid'})
+            return Response({'msg': 'error', 'error': 'The number is not valid'})
 
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
-        return Response({'msg':'error','info': 'Username already taken'})
+        return Response({'msg': 'error', 'info': 'Username already taken'})
+
+    register_legal_policy(username)
 
     register_legal_policy(username)
 
     try:
         check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
-        check_sms= mobile_sms.objects.filter(sms=sms_input,phone=phonecode + phone)
+        check_sms = mobile_sms.objects.filter(
+            sms=sms_input, phone=phonecode + phone)
     except GuestAccount.DoesNotExist:
         check_otp = None
         check_sms = None
 
     if not check_otp:
-        return Response({'msg':'error','info':'Wrong Email OTP'})
+        return Response({'msg': 'error', 'info': 'Wrong Email OTP'})
     if not check_sms:
-        return Response({'msg':'error','info':'Wrong Mobile SMS'})
+        return Response({'msg': 'error', 'info': 'Wrong Mobile SMS'})
 
     name = ""
     try:
@@ -241,6 +281,7 @@ def register(request):
             'inserted_id': f"{inserted_idd}"
         })
     return Response("Internal server error")
+
 
 @api_view(["POST"])
 def MobileLogin(request):
@@ -844,123 +885,66 @@ def forgot_password(request):
     otp_input = request.data.get('otp', None)
     new_password = request.data.get('new_password', None)
 
-    # Send OTP
-    if username and email and not otp_input:
-        otp = generateOTP()
-        message = get_html_msg(username, otp, 'reset password')
+    try:
+        guest = GuestAccount.objects.get(
+            otp=otp_input, email=email)
+    except GuestAccount.DoesNotExist:
+        guest = None
 
-        user_qs = Account.objects.filter(email=email, username=username)
-        email_qs = GuestAccount.objects.filter(email=email)
-
-        def send_otp(): return send_mail(
-            'Your otp for reseting password of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
-
-        if user_qs.exists():
-            if email_qs.exists():
-                GuestAccount.objects.filter(email=email).update(
-                    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
-                send_otp()
-                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
-            else:
-                guest_account = GuestAccount(
-                    username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
-                guest_account.save()
-                send_otp()
-                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
-        else:
-            return Response({'msg': 'error', 'info': 'Username, email combination is incorrect'})
-
-    # Create new password
-    elif username and email and otp_input and new_password:
-        try:
-            guest = GuestAccount.objects.get(
-                otp=otp_input, email=email)
-        except GuestAccount.DoesNotExist:
-            guest = None
-
-        if guest is not None:
-            acct = Account.objects.filter(
-                email=email, username=username).first()
-            acct.set_password(new_password)
-            acct.save()
-            fields = {'Username': username, 'Email': email}
-            user_json = dowellconnection(
-                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
-            user = json.loads(user_json)
-            if len(user['data']) >= 1:
-                update_fields = {
-                    'Password': dowell_hash.dowell_hash(new_password)}
-                dowellconnection(
-                    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
-                return Response({'msg': 'success', 'info': 'Password reset successfully'})
-        else:
-            return Response({'msg': 'error', 'info': 'Wrong OTP'})
+    if guest is not None:
+        acct = Account.objects.filter(
+            email=email, username=username).first()
+        acct.set_password(new_password)
+        acct.save()
+        fields = {'Username': username, 'Email': email}
+        user_json = dowellconnection(
+            "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
+        user = json.loads(user_json)
+        if len(user['data']) >= 1:
+            update_fields = {
+                'Password': dowell_hash.dowell_hash(new_password)}
+            print(update_fields)
+            dowellconnection(
+                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
+            return Response({'msg': 'success', 'info': 'Password reset successfully'})
     else:
-        return Response({'msg': 'error', 'info': "Request must have 'username' and 'email' for getting otp and then 'otp' and new password for changing otp. "})
-    return Response({'msg': 'Something went wrong'})
+        return Response({'msg': 'error', 'info': 'Wrong OTP'})
 
 
 @api_view(['POST'])
 def forgot_username(request):
     email = request.data.get('email', None)
     otp_input = request.data.get('otp', None)
-
-    # Send OTP
-    if email and not otp_input:
-        otp = generateOTP()
-        message = get_html_msg('User', otp, 'recover username')
-
-        user_qs = Account.objects.filter(email=email)
-        email_qs = GuestAccount.objects.filter(email=email)
-
-        def send_otp(): return send_mail(
-            'Your otp for recovering username of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
-
-        if user_qs.exists():
-            if email_qs.exists():
-                GuestAccount.objects.filter(email=email).update(
-                    otp=otp, expiry=datetime.datetime.utcnow())
-                send_otp()
-                return Response({'msg': 'success', 'info': 'OTP sent successfully'})
-            else:
-                return Response({'msg': 'error', 'info': 'Email not found'})
+    try:
+        guest = GuestAccount.objects.filter(
+            otp=otp_input, email=email)
+    except GuestAccount.DoesNotExist:
+        guest = None
+    if guest:
+        fields = {'Email': email}
+        user_json = dowellconnection(
+            "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
+        user = json.loads(user_json)
+        username_list = []
+        if len(user['data']) > 1:
+            json_data = dowellconnection(
+                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
+            data = json.loads(json_data)
+            if len(data['data']) >= 1:
+                for obj in data['data']:
+                    if obj['Username'] not in username_list:
+                        username_list.append(obj['Username'])
+                context = RequestContext(
+                    request, {'email': email, 'username_list': username_list})
+                html_msg = 'Dear user, <br> The list of username associated with your email: <strong>{{email}}</strong> as dowell account are as follows: <br><h3>{% for a in username_list %}<ul><li>{{a}}</li></ul>{%endfor%}</h3><br>You can proceed to login now!'
+                template = Template(html_msg)
+                send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
+                            email], fail_silently=False, html_message=template.render(context))
+            return Response({'msg': 'success', 'info': 'Your username/s was sent to your mail'})
         else:
             return Response({'msg': 'error', 'info': 'Email not found'})
-
-    # Create new password
-    elif email and otp_input:
-        try:
-            guest = GuestAccount.objects.filter(
-                otp=otp_input, email=email)
-        except GuestAccount.DoesNotExist:
-            guest = None
-        if guest:
-            fields = {'Email': email}
-            user_json = dowellconnection(
-                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
-            user = json.loads(user_json)
-            username_list = []
-            if len(user['data']) > 1:
-                json_data = dowellconnection(
-                    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
-                data = json.loads(json_data)
-                if len(data['data']) >= 1:
-                    for obj in data['data']:
-                        if obj['Username'] not in username_list:
-                            username_list.append(obj['Username'])
-                    context = RequestContext(
-                        request, {'email': email, 'username_list': username_list})
-                    html_msg = 'Dear user, <br> The list of username associated with your email: <strong>{{email}}</strong> as dowell account are as follows: <br><h3>{% for a in username_list %}<ul><li>{{a}}</li></ul>{%endfor%}</h3><br>You can proceed to login now!'
-                    template = Template(html_msg)
-                    send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
-                              email], fail_silently=False, html_message=template.render(context))
-                return Response({'msg': 'success', 'info': 'Your username/s was sent to your mail'})
-            else:
-                return Response({'msg': 'error', 'info': 'Email not found'})
-        else:
-            return Response({'msg': 'error', 'info': 'Wrong OTP'})
     else:
-        return Response({'msg': 'error', 'info': "Request must have field 'email' for getting otp in mail and then add field 'otp' for getting list of username in mail.."})
+        return Response({'msg': 'error', 'info': 'Wrong OTP'})
 
 
 def processApikey(api_key, api_services):
@@ -1173,3 +1157,130 @@ def login_init_api(request):
             return res
     return Response({'msg': 'No session found'})
 
+@api_view(['POST'])
+def email_otp(request):
+    email = request.data.get('email', None)
+    username= request.data.get('username','User')
+    usage = request.data.get('usage', None)
+
+    # Send OTP
+    if email and usage:
+        otp = generateOTP()
+        if usage =="forgot_username":
+            user_qs = Account.objects.filter(email=email)
+            email_qs = GuestAccount.objects.filter(email=email).first()
+            if user_qs.exists():
+                if email_qs:
+                    email_qs.otp=otp
+                    email_qs.save(update_fields=['otp'])
+                    for_html_msg="recover username"
+                    subject="Your otp for recovering username of Dowell account"
+                    msg='success'
+                    info='OTP sent Successfully'
+                else:
+                    msg='error'
+                    info='Email not found'
+            else:
+                msg='error'
+                info='Email not associated with any user'
+        elif usage == "forgot_password":
+            user_qs = Account.objects.filter(email=email, username=username)
+            email_qs = GuestAccount.objects.filter(email=email).first()
+            if user_qs.exists():
+                if email_qs:
+                    GuestAccount.objects.filter(email=email).update(
+                    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
+                else:
+                    guest_account = GuestAccount(
+                        username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
+                    guest_account.save() 
+                msg='success'
+                info='OTP sent Successfully'                   
+                for_html_msg="reset password"
+                subject="Your otp for reseting password of Dowell account"
+            else:
+                msg='error'
+                info='Username, email combination is incorrect'                  
+        elif usage == "update_email":
+            user_qs = Account.objects.filter(email=email, username=username)
+            email_qs = GuestAccount.objects.filter(email=email).first()
+            if user_qs.exists():
+                if email_qs:
+                    GuestAccount.objects.filter(email=email).update(
+                    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
+                else:
+                    guest_account=GuestAccount(username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
+                    guest_account.save()       
+                msg='success'
+                info='OTP sent Successfully'       
+                for_html_msg="use this address as email"
+                subject="Your otp for updating email of Dowell account"
+            else:
+                msg="error"
+                info="Given email is already in use with your account"
+        elif usage == "create_account":
+            for_html_msg="use this email for creation"
+            subject="Your otp for creating dowell account"
+            try:
+                emailexist = GuestAccount.objects.get(email=email)
+            except GuestAccount.DoesNotExist:
+                emailexist = None
+            if emailexist is not None:
+                GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=username)
+            else:
+                data=GuestAccount(username=username,email=email,otp=otp)
+                data.save()
+            url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+            payload = json.dumps({
+                "toEmail":email,
+                "toName":username,
+                "topic":"RegisterOtp",
+                "otp":otp
+                })
+            headers = {
+                'Content-Type': 'application/json'
+                }
+            response1 = requests.request("POST", url, headers=headers, data=payload)
+            return Response({'msg':'success','info':'OTP sent successfully'})
+        else:
+            return Response({'msg':'error','info':'Enter email and the usage you are looking for. Look into documentation for more info.'})
+        if msg =='success':
+            message = get_html_msg_new(username, otp, for_html_msg)
+            def send_otp(): return send_mail(
+                subject, otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
+            send_otp()
+        return Response({'msg':msg,'info':info})
+    else:
+        return Response({'msg':'error','info':'Enter email and the usage you are looking for. Look into documentation for more info.'})
+
+@api_view(['POST'])
+def mobile_otp(request):
+        phonecode = request.data.get('phonecode')
+        phone = request.data.get('phone')
+
+        sms = generateOTP()
+        full_number = phonecode + phone
+        time = datetime.datetime.utcnow()
+        
+        try:
+            phone_exists = mobile_sms.objects.get(phone=full_number)
+        except mobile_sms.DoesNotExist:
+            phone_exists = None
+        if phone_exists is not None:
+            mobile_sms.objects.filter(
+                phone=full_number).update(sms=sms, expiry=time)
+        else:
+            mobile_sms.objects.create(
+                phone=full_number, sms=sms, expiry=time)
+        url = "https://100085.pythonanywhere.com/api/sms/"
+        payload = {
+            "sender": "DowellLogin",
+            "recipient": full_number,
+            "content": f"Enter the following OTP to create your dowell account: {sms}",
+            "created_by": "Manish"
+        }
+        response = requests.request("POST", url, data=payload)
+        if len(response.json()) > 1:
+            return Response({'msg': 'success', 'info': 'SMS sent successfully!!'})
+        else:
+            return Response({'msg': 'error', 'error': 'The number is not valid'})

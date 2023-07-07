@@ -19,6 +19,10 @@ urlpatterns = [
     path("forgot_username/", views.forgot_username, name='api_forgot_username'),
     path('loginapi/', views.PublicApi, name="loginapi"),
     path('login_init_api/', views.login_init_api, name="login_init"),
-    path('login_legal_policy/',views.login_legal_policy,name="login_legal_policy")
+    path('login_legal_policy/', views.login_legal_policy,
+         name="login_legal_policy"),
+    path('mobile_otp/', views.mobile_otp, name='mobile_otp_api'),
+    path('email_otp/', views.email_otp, name='email_otp_api'),
+
 
 ]
