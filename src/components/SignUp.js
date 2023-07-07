@@ -104,6 +104,7 @@ const SignUp = () => {
     handleSubmit,
     register,
     formState: { errors },
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -115,6 +116,13 @@ const SignUp = () => {
   useEffect(() => {
     dispatch(fetchCountries());
   }, [dispatch]);
+
+  // Redirect when `registered` changes
+  useEffect(() => {
+    if (registered) {
+      navigate("/signin");
+    }
+  }, [registered, navigate]);
 
   // dispatch email otp
   const handleEmailOTP = (data) => {
@@ -133,7 +141,7 @@ const SignUp = () => {
   };
 
   // dispatch registered user
-  const registeredUserInfo = (data) => {
+  const registeredUserInfo = () => {
     const {
       Firstname,
       Lastname,
@@ -149,32 +157,26 @@ const SignUp = () => {
       Profile_Image,
       policy_status,
       newsletter,
-    } = data;
+    } = watch();
 
-    if (otpSent || smsSent) {
-      dispatch(
-        registerUser({
-          Firstname,
-          Lastname,
-          Username,
-          user_type,
-          Email,
-          Password,
-          confirm_Password,
-          user_country,
-          phonecode,
-          Phone,
-          otp,
-          Profile_Image,
-          policy_status,
-          newsletter,
-        }).then(() => {
-          if (registered) {
-            navigate("/signin"); // Redirect to signin page
-          }
-        })
-      );
-    }
+    dispatch(
+      registerUser({
+        Firstname,
+        Lastname,
+        Username,
+        user_type,
+        Email,
+        Password,
+        confirm_Password,
+        user_country,
+        phonecode,
+        Phone,
+        otp,
+        Profile_Image,
+        policy_status,
+        newsletter,
+      })
+    );
   };
 
   return (
@@ -641,7 +643,7 @@ const SignUp = () => {
           <div className="text-gray-500 space-x-2 py-3 px-6 text-right">
             Do have an account?
             <Link to="/signin">
-              <span className="text-green-600"> Log in</span>
+              <span className="text-green-600">Log in</span>
             </Link>
           </div>
         </form>

@@ -140,5 +140,4 @@ const registrationSlice = createSlice({
   },
 });
 
-// Export the registration slice reducer
 export default registrationSlice.reducer;
