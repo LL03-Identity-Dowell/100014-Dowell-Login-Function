@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
@@ -78,13 +78,7 @@ const schema = yup.object().shape({
       if (!value || !value[0]) return true; // Allow empty value
       return value[0].size <= 1024 * 1024;
     }),
-  newsletter: yup.boolean().when(["otpSent", "smsSent"], {
-    is: (otpSent, smsSent) => otpSent || smsSent,
-    then: yup
-      .boolean()
-      .required("Accept Newsletter Terms & Conditions")
-      .oneOf([true], "Accept Newsletter Terms & Conditions"),
-  }),
+
   policy_status: yup.boolean().when(["otpSent", "smsSent"], {
     is: (otpSent, smsSent) => otpSent || smsSent,
     then: yup
@@ -92,9 +86,18 @@ const schema = yup.object().shape({
       .required("Please accept the Terms & Conditions")
       .oneOf([true], "Please accept the Terms & Conditions"),
   }),
+  newsletter: yup.boolean().when(["otpSent", "smsSent"], {
+    is: (otpSent, smsSent) => otpSent || smsSent,
+    then: yup.boolean().oneOf([true], "Accept Newsletter Terms & Conditions"),
+  }),
 });
 
 const SignUp = () => {
+  const [attempts, setAttempts] = useState(5);
+  const [otpButtonDisabled, setOtpButtonDisabled] = useState(true);
+  const [exempted, setExempted] = useState(false);
+  const [showAttempts, setShowAttempts] = useState(false);
+
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
   const { loading, error, registered, otpSent, smsSent } = useSelector(
@@ -125,6 +128,14 @@ const SignUp = () => {
     }
   }, [registered, navigate]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setOtpButtonDisabled(false);
+    }, 60000); // 1 minute
+
+    return () => clearTimeout(timer);
+  }, [attempts]);
+
   // dispatch email otp
   const handleEmailOTP = (data) => {
     const { Email, Username } = data;
@@ -135,9 +146,18 @@ const SignUp = () => {
 
   // dispatch mobile otp
   const handleMobileOTP = (data) => {
+    if (attempts === 0 && !exempted) {
+      return; // No more attempts remaining and not exempted
+    }
+    // Decrease attempts
+    if (attempts > 0) {
+      setAttempts((prevAttempts) => prevAttempts - 1);
+    }
     const { phonecode, Phone } = data;
     if (phonecode && Phone && Phone.length > 0 && !smsSent) {
       dispatch(sendMobileOTP({ phonecode, Phone }));
+    } else {
+      setShowAttempts(true);
     }
   };
 
@@ -494,7 +514,11 @@ const SignUp = () => {
                     <button
                       className="btn-send px-2 py-1 self-start"
                       onClick={handleSubmit(handleMobileOTP)}
-                      disabled={loading}
+                      disabled={
+                        loading ||
+                        otpButtonDisabled ||
+                        (attempts === 0 && !exempted)
+                      }
                     >
                       {loading ? (
                         <Radio
@@ -512,6 +536,31 @@ const SignUp = () => {
                     </button>
                     <p className="text-green-500 font-base">{smsSent}</p>
                   </div>
+
+                  {showAttempts && (
+                    <div>
+                      <p className="text-base font-normal text-green-600">
+                        Attempts remaining: {attempts}
+                      </p>
+                      <div className="relative flex gap-x-3">
+                        <div className="flex h-6 items-center">
+                          <input
+                            id="exempt-checkbox"
+                            name="exempt-checkbox"
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                            onChange={() => setExempted(!exempted)}
+                            checked={exempted}
+                          />
+                        </div>
+                        <div className="text-sm leading-6">
+                          <p className="text-gray-600">
+                            Exempt from SMS requirement
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
