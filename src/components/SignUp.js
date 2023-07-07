@@ -97,6 +97,7 @@ const SignUp = () => {
   const [otpButtonDisabled, setOtpButtonDisabled] = useState(true);
   const [exempted, setExempted] = useState(false);
   const [showAttempts, setShowAttempts] = useState(false);
+  const [countdown, setCountdown] = useState(60);
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -128,14 +129,6 @@ const SignUp = () => {
     }
   }, [registered, navigate]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setOtpButtonDisabled(false);
-    }, 60000); // 1 minute
-
-    return () => clearTimeout(timer);
-  }, [attempts]);
-
   // dispatch email otp
   const handleEmailOTP = (data) => {
     const { Email, Username } = data;
@@ -153,9 +146,23 @@ const SignUp = () => {
     if (attempts > 0) {
       setAttempts((prevAttempts) => prevAttempts - 1);
     }
+
     const { phonecode, Phone } = data;
     if (phonecode && Phone && Phone.length > 0 && !smsSent) {
       dispatch(sendMobileOTP({ phonecode, Phone }));
+      setCountdown(60); // Reset the countdown timer to 60 seconds
+      setOtpButtonDisabled(true); // Disable the "Get OTP" button
+
+      // Start the countdown timer
+      const timer = setInterval(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000); // 1 second
+
+      // Clear the countdown timer after 1 minute
+      setTimeout(() => {
+        clearInterval(timer);
+        setOtpButtonDisabled(false); // Enable the "Get OTP" button
+      }, 60000); // 60 seconds
     } else {
       setShowAttempts(true);
     }
@@ -530,6 +537,8 @@ const SignUp = () => {
                           wrapperClassName="radio-wrapper"
                           color="#1ff507"
                         />
+                      ) : otpButtonDisabled ? (
+                        `Resend OTP (${countdown}s)`
                       ) : (
                         "Get OTP"
                       )}
