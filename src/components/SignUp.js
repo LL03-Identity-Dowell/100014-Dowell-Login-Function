@@ -124,9 +124,9 @@ const SignUp = () => {
   // Redirect when `registered` changes
   useEffect(() => {
     if (registered) {
-      navigate("/SplashPage");
+      navigate(`/splash/${watch().Username}`);
     }
-  }, [registered, navigate]);
+  }, [registered, navigate, watch]);
 
   // dispatch email otp
   const handleEmailOTP = (data) => {
