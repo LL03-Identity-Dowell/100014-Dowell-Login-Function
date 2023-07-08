@@ -8,6 +8,7 @@ import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
 import PasswordResetForm from "./components/PasswordResetForm";
 import UsernameForgot from "./components/UsernameForgot";
+import SplashPage from "./pages/SplashPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route exact path="/" element={<Home />} />
           <Route path="/signin" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/splashPage" element={<SplashPage />} />
           <Route path="/password" element={<PasswordResetForm />} />
           <Route path="/username" element={<UsernameForgot />} />
           <Route path="/chat" element={<Chat />} />

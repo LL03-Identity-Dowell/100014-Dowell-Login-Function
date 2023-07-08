@@ -124,7 +124,7 @@ const SignUp = () => {
   // Redirect when `registered` changes
   useEffect(() => {
     if (registered) {
-      navigate("/signin");
+      navigate("/SplashPage");
     }
   }, [registered, navigate]);
 

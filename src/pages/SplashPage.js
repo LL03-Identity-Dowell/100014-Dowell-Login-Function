@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useNavigation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SplashPage = () => {
-  const navigation = useNavigation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -18,29 +18,31 @@ const SplashPage = () => {
   };
 
   const handleLogin = () => {
-    navigation.navigate("/signin");
+    navigate("/signin");
   };
 
   const handleCancel = () => {
-    navigation.navigate("/signup");
+    navigate("/signup");
   };
 
   return (
     <div className="flex flex-col items-center mt-20">
       <h1 className="text-2xl mb-4">Welcome to our Splash Page!</h1>
       <p id="message" className="text-gray-600 mb-4"></p>
-      <button
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
-        onClick={handleLogin}
-      >
-        Login
-      </button>
-      <button
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        onClick={handleCancel}
-      >
-        Cancel
-      </button>
+      <div className="flex flex-row items-center mt-20">
+        <button
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
+          onClick={handleLogin}
+        >
+          Login
+        </button>
+        <button
+          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          onClick={handleCancel}
+        >
+          Cancel
+        </button>
+      </div>
     </div>
   );
 };
