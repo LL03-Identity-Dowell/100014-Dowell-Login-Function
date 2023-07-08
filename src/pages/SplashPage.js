@@ -17,15 +17,13 @@ const SplashPage = () => {
 
   return (
     <div className="antialiased bg-gray-100 flex items-center justify-center h-screen">
-      <div className="w-full flex flex-col md:flex-row space-y-6 space-x-2 md:space-x-6 p-6 items-center justify-center  text-gray-500 bg-gray-50 drop-shadow-lg max-w-3xl rounded-xl">
+      <div className="md:flex rounded-xl p-8 md:p-0 dark:bg-slate-800 space-y-6 space-x-2 md:space-x-6 text-gray-500 bg-gray-50 drop-shadow-lg ">
         <img
           src={DoWellVerticalLogo}
           alt="DoWell logo"
-          className="h-38 w-44 rounded-lg drop-shadow-sm bg-slate-100 "
-          width="60"
-          height="88"
+          className="w-24 h-24 md:w-48 md:h-auto md:rounded-none rounded-full mx-auto drop-shadow-sm"
         />
-        <div className="min-w-0 relative flex-auto space-y-8">
+        <div className="pt-6 md:p-8 text-center md:text-left space-y-4">
           <h1 className="font-bold text-xl text-slate-900 truncate text-center">
             Welcome to UXLiving Lab!
           </h1>

@@ -153,6 +153,8 @@ const SignUp = () => {
     } else {
       setShowAttempts(true);
     }
+    // Start the countdown timer
+    setCountdown(60);
   };
 
   useEffect(() => {
