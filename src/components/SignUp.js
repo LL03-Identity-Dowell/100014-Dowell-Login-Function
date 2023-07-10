@@ -212,22 +212,24 @@ const SignUp = () => {
 
   return (
     <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
-      <div className="shadow-lg bg-yellow-50 mx-auto max-w-5xl px-2 py-6 md:px-4">
-        <div className="flex items-center mx-auto max-w-2xl justify-center space-x-2 px-2 sm:px-0">
-          <img
-            src={DoWellVerticalLogo}
-            alt="DoWell logo"
-            className="h-38 w-44 rounded-full drop-shadow-sm"
-          />
-          <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-4xl">
-            Join us new member
-          </h2>
+      <div className="shadow-lg  mx-auto max-w-5xl px-2 py-6 md:px-4">
+        <div className="flex items-center justify-center">
+          <div className="mx-auto max-w-2xl items-center justify-center space-x-2 space-y-2">
+            <img
+              src={DoWellVerticalLogo}
+              alt="DoWell logo"
+              className="h-34 w-44 rounded-sm drop-shadow-sm"
+            />
+            <h2 className="text-xl font-bold tracking-tight text-green-600 md:text-2xl">
+              Join us new member
+            </h2>
+          </div>
         </div>
         <form
           className="mx-auto mt-8 max-w-xl sm:mt-12"
           onSubmit={handleSubmit(registeredUserInfo)}
         >
-          <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-y-6">
             <div>
               <label
                 htmlFor="Firstname"
@@ -240,6 +242,7 @@ const SignUp = () => {
                   type="text"
                   name="Firstname"
                   id="Firstname"
+                  placeholder="Your First Name"
                   autoComplete="Firstname"
                   className="input-field"
                   {...register("Firstname")}
@@ -264,6 +267,7 @@ const SignUp = () => {
                   type="text"
                   name="Lastname"
                   id="Lastname"
+                  placeholder="Your Last Name"
                   autoComplete="family-name"
                   className="input-field"
                   {...register("Lastname")}
@@ -288,6 +292,7 @@ const SignUp = () => {
                   type="text"
                   name="Username"
                   id="Username"
+                  placeholder="Enter Your Username"
                   autoComplete="Username"
                   className="input-field"
                   {...register("Username")}
@@ -312,7 +317,7 @@ const SignUp = () => {
                   name="user-type"
                   placeholder="user-type"
                   required
-                  className="select-btn"
+                  className="input-field"
                   defaultValue="live-user"
                   {...register("user_type")}
                 >
@@ -334,6 +339,7 @@ const SignUp = () => {
                   name="Password"
                   type="password"
                   id="Password"
+                  placeholder="Enter Your Password"
                   autoComplete="Password"
                   className="input-field"
                   {...register("Password")}
@@ -357,6 +363,7 @@ const SignUp = () => {
                 <input
                   name="confirm_Password"
                   type="password"
+                  placeholder="Confirm Your Password"
                   autoComplete="confirm_Password"
                   className="input-field"
                   {...register("confirm_Password")}
@@ -381,6 +388,7 @@ const SignUp = () => {
                   type="Email"
                   name="Email"
                   id="Email"
+                  placeholder="Enter Your Email"
                   autoComplete="Email"
                   className="input-field"
                   {...register("Email")}
@@ -432,6 +440,7 @@ const SignUp = () => {
                   type="text"
                   name="otp"
                   id="otp"
+                  placeholder="Enter OTP from Email"
                   autoComplete="otp"
                   className="input-field"
                   {...register("otp")}
@@ -456,9 +465,9 @@ const SignUp = () => {
                 <select
                   name="user_country"
                   type="text"
-                  placeholder="countries"
+                  placeholder="Select Your Country"
                   required
-                  className="select-btn"
+                  className="input-field"
                   {...register("user_country")}
                 >
                   {countries.map((country) => (
@@ -484,7 +493,7 @@ const SignUp = () => {
                   type="text"
                   placeholder="countries code"
                   required
-                  className="select-btn"
+                  className="input-field"
                   {...register("phonecode")}
                 >
                   {countries.map((country) => (
@@ -513,6 +522,7 @@ const SignUp = () => {
                   <input
                     name="Phone"
                     type="text"
+                    placeholder="Enter Your Phone Number"
                     className="input-field"
                     {...register("Phone")}
                   />
@@ -593,6 +603,7 @@ const SignUp = () => {
                   type="text"
                   name="sms"
                   id="sms"
+                  placeholder="Enter OTP from SMS"
                   autoComplete="sms"
                   className="input-field"
                   {...register("sms")}
@@ -685,7 +696,7 @@ const SignUp = () => {
           <div className="mt-8">
             <button
               type="submit"
-              className="block w-full rounded-md bg-gray-700 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+              className="block w-full rounded-md bg-green-300 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
               disabled={loading}
             >
               {loading ? (
@@ -699,7 +710,7 @@ const SignUp = () => {
                   color="#1ff507"
                 />
               ) : (
-                " Sign up"
+                "Join as a new member"
               )}
             </button>
             <p className="text-base font-normal text-green-600">{registered}</p>
