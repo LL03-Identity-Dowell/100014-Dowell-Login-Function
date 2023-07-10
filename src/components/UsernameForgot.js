@@ -56,7 +56,7 @@ const UsernameForgot = () => {
             </h3>
           </div>
 
-          <div className="overflow-hidden drop-shadow-2xl sm:rounded-2xl bg-yellow-50">
+          <div className="overflow-hidden drop-shadow-lg sm:rounded-2xl bg-gray-50">
             <div className="px-4 py-2 sm:p-6 space-y-4">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
