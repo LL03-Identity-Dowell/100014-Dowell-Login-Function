@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link } from "react-router-dom";
@@ -14,6 +14,7 @@ import {
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
+import zxcvbn from "zxcvbn";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -95,29 +96,13 @@ const schema = yup.object().shape({
   }),
 });
 
-const calculatePasswordStrength = (password) => {
-  const validationRules = [
-    /[A-Z]/, // At least 1 uppercase letter
-    /[a-z]/, // At least 1 lowercase letter
-    /\d/, // At least 1 digit
-    /[@$!%*?&]/, // At least 1 special character
-  ];
-
-  return validationRules.reduce((strength, regex) => {
-    if (regex.test(password)) {
-      return strength + 1;
-    }
-    return strength;
-  }, 0);
-};
-
 const SignUp = () => {
   const [attempts, setAttempts] = useState(5);
   const [exempted, setExempted] = useState(false);
   const [showAttempts, setShowAttempts] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [password, setPassword] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState("");
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -190,13 +175,7 @@ const SignUp = () => {
     }
   }, [countdown]);
 
-  // Update the password state on input change
-  const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    const strength = calculatePasswordStrength(newPassword);
-    setPasswordStrength(strength);
-  };
+  const passwordRef = useRef(null);
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -348,7 +327,7 @@ const SignUp = () => {
               <label htmlFor="Password" className="label">
                 Password <span className="text-red-500">*</span>
               </label>
-              <div className="mt-2.5">
+              <div className="mt-2.5 relative">
                 <input
                   name="Password"
                   type="password"
@@ -357,18 +336,48 @@ const SignUp = () => {
                   autoComplete="Password"
                   className="input-field"
                   {...register("Password")}
-                  onChange={handlePasswordChange}
+                  ref={passwordRef}
+                  onChange={() => {
+                    const newPassword = passwordRef.current.value;
+                    const { score, feedback } = zxcvbn(newPassword);
+
+                    setPasswordStrength(score);
+                    setPasswordMessage(
+                      feedback.warning || feedback.suggestions[0]
+                    );
+                  }}
                 />
                 {errors.Password && (
-                  <p className="text-red-500 text-xs mt-1">
+                  <p className="text-red-500 text-xs mt-1 absolute bottom-0 left-0">
                     {errors.Password.message}
                   </p>
                 )}
               </div>
-              <div
-                className={`progress-bar strength-${passwordStrength}`}
-                style={{ width: `${(passwordStrength / 4) * 100}%` }}
-              ></div>
+              <div className="h-2 bg-gray-300 rounded overflow-hidden w-11/12">
+                <div
+                  className={`h-full strength-${passwordStrength} ${
+                    passwordStrength === 0
+                      ? "bg-red-500"
+                      : passwordStrength === 1
+                      ? "bg-yellow-500"
+                      : passwordStrength === 2
+                      ? "bg-yellow-400"
+                      : "bg-green-500"
+                  }`}
+                  style={{ width: `${(passwordStrength / 4) * 100}%` }}
+                ></div>
+              </div>
+              {passwordMessage && (
+                <p
+                  className={`text-xs mt-1 ${
+                    passwordMessage === "Weak"
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }`}
+                >
+                  {passwordMessage}
+                </p>
+              )}
             </div>
 
             <div>
