@@ -95,11 +95,29 @@ const schema = yup.object().shape({
   }),
 });
 
+const calculatePasswordStrength = (password) => {
+  const validationRules = [
+    /[A-Z]/, // At least 1 uppercase letter
+    /[a-z]/, // At least 1 lowercase letter
+    /\d/, // At least 1 digit
+    /[@$!%*?&]/, // At least 1 special character
+  ];
+
+  return validationRules.reduce((strength, regex) => {
+    if (regex.test(password)) {
+      return strength + 1;
+    }
+    return strength;
+  }, 0);
+};
+
 const SignUp = () => {
   const [attempts, setAttempts] = useState(5);
   const [exempted, setExempted] = useState(false);
   const [showAttempts, setShowAttempts] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [password, setPassword] = useState("");
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -171,6 +189,14 @@ const SignUp = () => {
       return () => clearTimeout(timer);
     }
   }, [countdown]);
+
+  // Update the password state on input change
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    const strength = calculatePasswordStrength(newPassword);
+    setPasswordStrength(strength);
+  };
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -331,6 +357,7 @@ const SignUp = () => {
                   autoComplete="Password"
                   className="input-field"
                   {...register("Password")}
+                  onChange={handlePasswordChange}
                 />
                 {errors.Password && (
                   <p className="text-red-500 text-xs mt-1">
@@ -338,6 +365,10 @@ const SignUp = () => {
                   </p>
                 )}
               </div>
+              <div
+                className={`progress-bar strength-${passwordStrength}`}
+                style={{ width: `${(passwordStrength / 4) * 100}%` }}
+              ></div>
             </div>
 
             <div>
