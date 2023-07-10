@@ -40,8 +40,8 @@ const PasswordResetForm = () => {
         .max(99)
         .required("Password is required")
         .matches(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
-          "Password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 digit"
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+          "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
         ),
     }),
     confirm_password: yup.string().when("otpSent", {
