@@ -211,8 +211,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="isolate bg-gray-50 px-4 py-8 sm:py-12 lg:px-8">
-      <div className="shadow-lg  mx-auto max-w-5xl px-2 py-6 md:px-4">
+    <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
+      <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
           <div className="mx-auto max-w-2xl items-center justify-center space-x-2 space-y-2">
             <img
@@ -235,7 +235,7 @@ const SignUp = () => {
                 htmlFor="Firstname"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                First Name
+                First Name <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -260,7 +260,7 @@ const SignUp = () => {
                 htmlFor="Lastname"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Last Name
+                Last Name <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -285,7 +285,7 @@ const SignUp = () => {
                 htmlFor="Username"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                User Name
+                User Name <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -310,7 +310,7 @@ const SignUp = () => {
                 htmlFor="user-type"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                User Type
+                User Type <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <select
@@ -332,7 +332,7 @@ const SignUp = () => {
                 htmlFor="Password"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -357,7 +357,7 @@ const SignUp = () => {
                 htmlFor="confirm_Password"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Confirm Password
+                Confirm Password <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -381,7 +381,7 @@ const SignUp = () => {
                 htmlFor="Email"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Email
+                Email <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -432,7 +432,7 @@ const SignUp = () => {
                 htmlFor="otp-Email"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Enter OTP from Email
+                Enter OTP from Email <span className="text-red-500">*</span>
               </label>
 
               <div className="mt-2.5">
@@ -458,7 +458,7 @@ const SignUp = () => {
                 htmlFor="user_country"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Country
+                Country <span className="text-red-500">*</span>
               </label>
 
               <div className="mt-2.5">
@@ -484,7 +484,7 @@ const SignUp = () => {
                 htmlFor="county_code"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Country Code
+                Country Code <span className="text-red-500">*</span>
               </label>
 
               <div className="mt-2.5">
@@ -516,7 +516,7 @@ const SignUp = () => {
                   htmlFor="Phone"
                   className="block text-sm font-semibold leading-6 text-green-700"
                 >
-                  Phone Number
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <div className="relative mt-2.5">
                   <input
@@ -595,7 +595,7 @@ const SignUp = () => {
                 htmlFor="sms"
                 className="block text-sm font-semibold leading-6 text-green-700"
               >
-                Enter OTP from SMS
+                Enter OTP from SMS <span className="text-red-500">*</span>
               </label>
 
               <div className="mt-2.5">
@@ -696,7 +696,7 @@ const SignUp = () => {
           <div className="mt-8">
             <button
               type="submit"
-              className="block w-full rounded-md bg-green-300 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+              className="block w-full rounded-md bg-green-300 px-3.5 py-2.5 text-center font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
               disabled={loading}
             >
               {loading ? (
@@ -718,10 +718,9 @@ const SignUp = () => {
             {error && <p className="text-red-500">{error}</p>}
           </div>
 
-          <div className="text-gray-500 space-x-2 py-3 px-6 text-right">
-            Do have an account?
-            <Link to="/signin">
-              <span className="text-green-600">Log in</span>
+          <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
+            <Link to="/signin" className="text-center">
+              Do have an account? <span className="text-gray-600">Log in</span>
             </Link>
           </div>
         </form>
