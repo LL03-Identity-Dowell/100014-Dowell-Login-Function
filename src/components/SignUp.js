@@ -175,7 +175,30 @@ const SignUp = () => {
     }
   }, [countdown]);
 
+  // Add a useRef hook to get a reference to the password input field:
   const passwordRef = useRef(null);
+
+  const handlePasswordChange = (e) => {
+    const newPassword = passwordRef.current.value;
+    const { score, feedback } = zxcvbn(newPassword);
+
+    if (newPassword.length < 8) {
+      setPasswordStrength(0); // Weak password
+      setPasswordMessage("Password must be at least 8 characters");
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
+        newPassword
+      )
+    ) {
+      setPasswordStrength(0); // Weak password
+      setPasswordMessage(
+        "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
+      );
+    } else {
+      setPasswordStrength(score);
+      setPasswordMessage(feedback.warning || feedback.suggestions[0]);
+    }
+  };
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -337,15 +360,7 @@ const SignUp = () => {
                   className="input-field"
                   {...register("Password")}
                   ref={passwordRef}
-                  onChange={() => {
-                    const newPassword = passwordRef.current.value;
-                    const { score, feedback } = zxcvbn(newPassword);
-
-                    setPasswordStrength(score);
-                    setPasswordMessage(
-                      feedback.warning || feedback.suggestions[0]
-                    );
-                  }}
+                  onChange={handlePasswordChange}
                 />
                 {errors.Password && (
                   <p className="text-red-500 text-xs mt-1 absolute bottom-0 left-0">
