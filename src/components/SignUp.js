@@ -218,10 +218,10 @@ const SignUp = () => {
             <img
               src={DoWellVerticalLogo}
               alt="DoWell logo"
-              className="h-34 w-44 rounded-sm drop-shadow-sm"
+              className="h-34 w-44 rounded-sm drop-shadow-md"
             />
-            <h2 className="text-xl font-bold tracking-tight text-green-600 md:text-2xl">
-              Join us new member
+            <h2 className="text-base font-base tracking-tight text-green-400 md:text-xl">
+              Join us New Member
             </h2>
           </div>
         </div>
@@ -231,10 +231,7 @@ const SignUp = () => {
         >
           <div className="grid grid-cols-1 gap-y-6">
             <div>
-              <label
-                htmlFor="Firstname"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="Firstname" className="label">
                 First Name <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -256,10 +253,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="Lastname"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="Lastname" className="label">
                 Last Name <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -281,10 +275,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="Username"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="Username" className="label">
                 User Name <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -306,10 +297,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="user-type"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="user-type" className="label">
                 User Type <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -328,10 +316,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="Password"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="Password" className="label">
                 Password <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -353,10 +338,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="confirm_Password"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="confirm_Password" className="label">
                 Confirm Password <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -377,10 +359,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="Email"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="Email" className="label">
                 Email <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
@@ -428,10 +407,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="otp-Email"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="otp-Email" className="label">
                 Enter OTP from Email <span className="text-red-500">*</span>
               </label>
 
@@ -454,10 +430,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="user_country"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="user_country" className="label">
                 Country <span className="text-red-500">*</span>
               </label>
 
@@ -480,10 +453,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="county_code"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="county_code" className="label">
                 Country Code <span className="text-red-500">*</span>
               </label>
 
@@ -512,10 +482,7 @@ const SignUp = () => {
 
             <div>
               <div>
-                <label
-                  htmlFor="Phone"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
+                <label htmlFor="Phone" className="label">
                   Phone Number <span className="text-red-500">*</span>
                 </label>
                 <div className="relative mt-2.5">
@@ -591,10 +558,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="sms"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="sms" className="label">
                 Enter OTP from SMS <span className="text-red-500">*</span>
               </label>
 
@@ -617,10 +581,7 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label
-                htmlFor="Profile_Image"
-                className="block text-sm font-semibold leading-6 text-green-700"
-              >
+              <label htmlFor="Profile_Image" className="label">
                 Upload Photo
               </label>
               <div className="mt-2.5">
