@@ -242,7 +242,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="isolate px-2 py-4 sm:py-12 lg:px-8 bg-gray-50">
+    <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
       <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
           <div className="mx-auto max-w-2xl items-center justify-center space-x-2 space-y-2">
@@ -713,11 +713,7 @@ const SignUp = () => {
           </div>
 
           <div className="mt-8">
-            <button
-              type="submit"
-              className="block w-full rounded-md bg-green-300 px-3.5 py-2.5 text-center font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
-              disabled={loading}
-            >
+            <button type="submit" className="submit-btn" disabled={loading}>
               {loading ? (
                 <Radio
                   visible={true}
