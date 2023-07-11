@@ -110,7 +110,7 @@ const PasswordResetForm = () => {
               alt="DoWell logo"
               className="h-34 w-44 rounded-sm drop-shadow-md"
             />
-            <h2 className="text-base font-base tracking-tight text-green-400 md:text-xl">
+            <h2 className="text-xl font-semibold tracking-wide text-green-500 md:text-2xl">
               Forget Password
             </h2>
 

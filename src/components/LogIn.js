@@ -82,7 +82,7 @@ const LogIn = () => {
                   alt="DoWell logo"
                   className="h-28 w-38 rounded-full drop-shadow-sm"
                 />
-                <h2 className="text-2xl font-bold tracking-tight text-green-600 md:text-3xl">
+                <h2 className="text-xl font-semibold tracking-wide text-green-500 md:text-2xl">
                   Member Login
                 </h2>
               </div>
@@ -158,10 +158,10 @@ const LogIn = () => {
                     </div>
                   </div>
 
-                  <div className="btn-send px-1 py-1 mt-2 self-start">
+                  <div className="mt-4">
                     <button
                       type="submit"
-                      className="btn-send px-2 py-1 self-start"
+                      className="submit-btn"
                       disabled={loading}
                     >
                       {loading ? (

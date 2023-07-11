@@ -51,9 +51,9 @@ const UsernameForgot = () => {
               alt="DoWell logo"
               className="h-34 w-44 rounded-sm drop-shadow-md"
             />
-            <h3 className="text-lg uppercase md:text-xl text-center font-bold leading-6 text-green-600">
-              Username Forgot
-            </h3>
+            <h2 className="text-xl font-semibold tracking-wide text-green-500 md:text-2xl">
+              Forgot Username
+            </h2>
           </div>
         </div>
 
