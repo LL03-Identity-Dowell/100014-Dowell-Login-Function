@@ -125,11 +125,8 @@ const PasswordResetForm = () => {
           <div className="px-4 py-2 sm:p-6 space-y-4">
             <form onSubmit={handleSubmit(handleResetPassword)}>
               <div>
-                <label
-                  htmlFor="username"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  User Name
+                <label htmlFor="username" className="label">
+                  User Name <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-2.5">
                   <input
@@ -148,12 +145,9 @@ const PasswordResetForm = () => {
                 </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  Email
+              <div className="mt-2.5">
+                <label htmlFor="email" className="label">
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-2.5">
                   <input
@@ -198,12 +192,9 @@ const PasswordResetForm = () => {
                 </div>
               </div>
 
-              <div>
-                <label
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                  htmlFor="otp"
-                >
-                  Enter OTP from Email
+              <div className="mt-2.5">
+                <label className="label" htmlFor="otp">
+                  Enter OTP from Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -220,12 +211,9 @@ const PasswordResetForm = () => {
                 )}
               </div>
 
-              <div>
-                <label
-                  htmlFor="new_password"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  New Password
+              <div className="mt-2.5">
+                <label htmlFor="new_password" className="label">
+                  New Password <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-2.5">
                   <input
@@ -271,12 +259,9 @@ const PasswordResetForm = () => {
                 )}
               </div>
 
-              <div>
-                <label
-                  htmlFor="confirm_password"
-                  className="block text-sm font-semibold leading-6 text-green-700"
-                >
-                  Confirm Password
+              <div className="mt-2.5">
+                <label htmlFor="confirm_password" className="label">
+                  Confirm Password <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-2.5">
                   <input

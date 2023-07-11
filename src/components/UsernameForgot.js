@@ -60,11 +60,8 @@ const UsernameForgot = () => {
             <div className="px-4 py-2 sm:p-6 space-y-4">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                  >
-                    Email
+                  <label htmlFor="email" className="label">
+                    Email <span className="text-red-500">*</span>
                   </label>
                   <div className="mt-2.5">
                     <input
@@ -110,12 +107,9 @@ const UsernameForgot = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label
-                    className="block text-sm font-semibold leading-6 text-green-700"
-                    htmlFor="otp"
-                  >
-                    Enter OTP from Email
+                <div className="mt-2.5">
+                  <label className="label" htmlFor="otp">
+                    Enter OTP from Email <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"

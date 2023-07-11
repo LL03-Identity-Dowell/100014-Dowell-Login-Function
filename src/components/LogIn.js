@@ -111,11 +111,8 @@ const LogIn = () => {
                   onSubmit={handleSubmit(handleUserInfo)}
                 >
                   <div>
-                    <label
-                      htmlFor="username"
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                    >
-                      User Name
+                    <label htmlFor="username" className="label">
+                      User Name <span className="text-red-500">*</span>
                     </label>
                     <div className="mt-2.5">
                       <input
@@ -137,11 +134,8 @@ const LogIn = () => {
                   </div>
 
                   <div>
-                    <label
-                      htmlFor="password"
-                      className="block text-sm font-semibold leading-6 text-green-700"
-                    >
-                      Password
+                    <label htmlFor="password" className="label">
+                      Password <span className="text-red-500">*</span>
                     </label>
                     <div className="mt-2.5">
                       <input
