@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
@@ -7,51 +7,49 @@ import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { resetPassword, sendOTP } from "../redux/passwordSlice";
 import { Radio } from "react-loader-spinner";
+import zxcvbn from "zxcvbn";
+
+const schema = yup.object().shape({
+  username: yup
+    .string()
+    .required("User Name is required")
+    .max(20)
+    .notOneOf(
+      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
+      "Username not allowed"
+    ),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  otp: yup.string().when("otpSent", {
+    is: true,
+    then: yup.string().required("OTP is required"),
+  }),
+  new_password: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(99)
+      .required("Password is required")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+        "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
+      ),
+  }),
+  confirm_password: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .oneOf([yup.ref("new_password")], "Passwords must match")
+      .required("Confirm Password is required"),
+  }),
+});
 
 const PasswordResetForm = () => {
-  const schema = yup.object().shape({
-    username: yup
-      .string()
-      .required("User Name is required")
-      .max(20)
-      .notOneOf(
-        [
-          "administrator",
-          "uxlivinglab",
-          "dowellresearch",
-          "dowellteam",
-          "admin",
-        ],
-        "Username not allowed"
-      ),
-    email: yup
-      .string()
-      .email("Invalid email format")
-      .required("Email is required"),
-    otp: yup.string().when("otpSent", {
-      is: true,
-      then: yup.string().required("OTP is required"),
-    }),
-    new_password: yup.string().when("otpSent", {
-      is: true,
-      then: yup
-        .string()
-        .min(8, "Password must be at least 8 characters")
-        .max(99)
-        .required("Password is required")
-        .matches(
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-          "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
-        ),
-    }),
-    confirm_password: yup.string().when("otpSent", {
-      is: true,
-      then: yup
-        .string()
-        .oneOf([yup.ref("new_password")], "Passwords must match")
-        .required("Confirm Password is required"),
-    }),
-  });
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordMessage, setPasswordMessage] = useState("");
 
   const {
     handleSubmit,
@@ -74,6 +72,31 @@ const PasswordResetForm = () => {
       dispatch(
         resetPassword({ username, email, otp, new_password, confirm_password })
       );
+    }
+  };
+
+  // Add a useRef hook to get a reference to the password input field:
+  const passwordRef = useRef(null);
+
+  const handlePasswordChange = (e) => {
+    const newPassword = passwordRef.current.value;
+    const { score, feedback } = zxcvbn(newPassword);
+
+    if (newPassword.length < 8) {
+      setPasswordStrength(0); // Weak password
+      setPasswordMessage("Password must be at least 8 characters");
+    } else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
+        newPassword
+      )
+    ) {
+      setPasswordStrength(0); // Weak password
+      setPasswordMessage(
+        "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
+      );
+    } else {
+      setPasswordStrength(score);
+      setPasswordMessage(feedback.warning || feedback.suggestions[0]);
     }
   };
 
@@ -212,6 +235,8 @@ const PasswordResetForm = () => {
                     autoComplete="new_password"
                     className="input-field"
                     {...register("new_password", { required: otpSent })}
+                    ref={passwordRef}
+                    onChange={handlePasswordChange}
                   />
                   {errors?.new_password && (
                     <p className="text-red-500 text-xs mt-1">
@@ -219,6 +244,31 @@ const PasswordResetForm = () => {
                     </p>
                   )}
                 </div>
+                <div className="h-2 bg-gray-300 rounded overflow-hidden w-11/12">
+                  <div
+                    className={`h-full strength-${passwordStrength} ${
+                      passwordStrength === 0
+                        ? "bg-red-500"
+                        : passwordStrength === 1
+                        ? "bg-yellow-500"
+                        : passwordStrength === 2
+                        ? "bg-yellow-400"
+                        : "bg-green-500"
+                    }`}
+                    style={{ width: `${(passwordStrength / 4) * 100}%` }}
+                  ></div>
+                </div>
+                {passwordMessage && (
+                  <p
+                    className={`text-xs mt-1 ${
+                      passwordMessage === "Weak"
+                        ? "text-red-500"
+                        : "text-green-500"
+                    }`}
+                  >
+                    {passwordMessage}
+                  </p>
+                )}
               </div>
 
               <div>
