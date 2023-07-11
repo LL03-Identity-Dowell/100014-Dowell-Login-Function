@@ -120,35 +120,7 @@ def register(request):
     other_policy = request.data.get('other_policy')
     newsletter = request.data.get('newsletter')
 
-    if email and username and not image and not password and not first \
-            and not last and not phone and not phonecode and not user_type and not user_country \
-            and not policy_status and not other_policy and not newsletter:
-        otp = generateOTP()
-        try:
-            emailexist = GuestAccount.objects.get(email=email)
-        except GuestAccount.DoesNotExist:
-            emailexist = None
-        if emailexist is not None:
-            GuestAccount.objects.filter(email=email).update(
-                otp=otp, expiry=datetime.datetime.now(), username=username)
-        else:
-            data = GuestAccount(username=username, email=email, otp=otp)
-            data.save()
-        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
-        payload = json.dumps({
-            "toEmail": email,
-            "toName": username,
-            "topic": "RegisterOtp",
-            "otp": otp
-        })
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        response1 = requests.request(
-            "POST", url, headers=headers, data=payload)
-        return Response({'msg': 'success', 'info': 'OTP sent successfully'})
-
-    elif phone and phonecode and not email and not username and not image and not password \
+    if phone and phonecode and not email and not username and not image and not password \
             and not first and not last and not user_type and not user_country and not policy_status \
             and not other_policy and not newsletter:
         sms = generateOTP()
@@ -186,16 +158,15 @@ def register(request):
     register_legal_policy(username)
 
     try:
-        check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
-        check_sms = mobile_sms.objects.filter(
-            sms=sms_input, phone=phonecode + phone)
-    except GuestAccount.DoesNotExist:
-        check_otp = None
-        check_sms = None
-
-    if not check_otp:
+        if not GuestAccount.objects.filter(otp=otp_input, email=email).first():
+            return Response({'msg': 'error', 'info': 'Wrong Email OTP'})
+    except:
         return Response({'msg': 'error', 'info': 'Wrong Email OTP'})
-    if not check_sms:
+    
+    try:
+        if not mobile_sms.objects.filter(sms=sms_input, phone=phonecode + phone).first():
+            return Response({'msg': 'error', 'info': 'Wrong Mobile SMS'})
+    except:
         return Response({'msg': 'error', 'info': 'Wrong Mobile SMS'})
 
     name = ""
@@ -635,33 +606,17 @@ def profile_update(request):
         "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "fetch", field, "nil")
     data2 = json.loads(client_admin)
     resp2 = {"success_fields": [], "error_fields": []}
-    data1 = data2["data"][0]
+    try:
+        data1 = data2["data"][0]
+    except:
+        return Response({"msg":"error","info":"User doesn't exist"})
     up_field = {}
     update_fields = []
     img_exists = ""
-    if username and Email and not Profile_Image and not Phone and not Lastname and not Firstname and not vision \
-        and not language_preferences and not nationality and not native_language and not user_country and not user_location \
-            and not user_city and not zip_code and not address and not email_otp:
-        check = Account.objects.filter(username=username, email=Email)
-        check_guest = GuestAccount.objects.filter(email=Email).first()
-        if not check:
-            otp_input = generateOTP()
-            message = f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to use this email address in your existing dowell account <br><h2>Your OTP is <strong>{otp_input}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
 
-            def send_otp(): return send_mail(
-                'Your otp for changing email in your Dowell account', otp_input, settings.EMAIL_HOST_USER, [Email], fail_silently=False, html_message=message)
-
-            if check_guest:
-                check_guest.otp = otp_input
-                check_guest.save(update_fields=['otp'])
-            else:
-                guest_account = GuestAccount(
-                    username="user", email=Email, otp=otp_input, expiry=datetime.datetime.utcnow())
-                guest_account.save()
-            send_otp()
-            return Response({'msg': 'success', 'info': 'OTP sent successfully'})
-        else:
-            return Response({'msg': 'error', 'info': 'Given email is already in use with your account'})
+    user_qs=Account.objects.filter(username=username).first()
+    if not user_qs:
+        return Response({"msg":"error","info":"User doesn't exist"})
 
     if Profile_Image is not None:
         img = Image.open(io.BytesIO(
@@ -710,8 +665,6 @@ def profile_update(request):
                 otp=email_otp, email=Email)
         except GuestAccount.DoesNotExist:
             guest = None
-        print(guest)
-        print(email_otp)
         if guest is not None:
             obj.email = Email
             update_fields.append("email")
@@ -1202,9 +1155,9 @@ def email_otp(request):
                 msg='error'
                 info='Username, email combination is incorrect'                  
         elif usage == "update_email":
-            user_qs = Account.objects.filter(email=email, username=username)
+            user_qs = Account.objects.filter(email=email, username=username).first()
             email_qs = GuestAccount.objects.filter(email=email).first()
-            if user_qs.exists():
+            if not user_qs:
                 if email_qs:
                     GuestAccount.objects.filter(email=email).update(
                     otp=otp, expiry=datetime.datetime.utcnow(), username=username)
