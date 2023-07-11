@@ -133,6 +133,7 @@ const PasswordResetForm = () => {
                     type="text"
                     name="username"
                     id="username"
+                    placeholder="Enter Your Username"
                     autoComplete="username"
                     className="input-field"
                     {...register("username")}
@@ -154,6 +155,7 @@ const PasswordResetForm = () => {
                     type="email"
                     name="email"
                     id="email"
+                    placeholder="Enter Your Email"
                     autoComplete="email"
                     className="input-field"
                     {...register("email")}
@@ -200,6 +202,7 @@ const PasswordResetForm = () => {
                   type="text"
                   name="otp"
                   id="otp"
+                  placeholder="Enter OTP from Email"
                   autoComplete="otp"
                   className="input-field"
                   {...register("otp", { required: otpSent })}
@@ -220,6 +223,7 @@ const PasswordResetForm = () => {
                     type="password"
                     name="new_password"
                     id="new_password"
+                    placeholder="Enter Your Password"
                     autoComplete="new_password"
                     className="input-field"
                     {...register("new_password", { required: otpSent })}
@@ -268,6 +272,7 @@ const PasswordResetForm = () => {
                     type="password"
                     name="confirm_password"
                     id="confirm_password"
+                    placeholder="Confirm Your Password"
                     autoComplete="confirm_password"
                     className="input-field"
                     {...register("confirm_password", { required: otpSent })}

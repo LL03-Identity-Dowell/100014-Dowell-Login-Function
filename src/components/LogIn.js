@@ -119,6 +119,7 @@ const LogIn = () => {
                         type="text"
                         name="username"
                         id="username"
+                        placeholder="Enter Your Username"
                         autoComplete="username"
                         className={`input-field ${
                           errors.username ? "border-red-500" : ""
@@ -142,6 +143,7 @@ const LogIn = () => {
                         type="password"
                         name="password"
                         id="password"
+                        placeholder="Enter Your Password"
                         autoComplete="password"
                         className={`input-field ${
                           errors.password ? "border-red-500" : ""

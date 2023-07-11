@@ -68,6 +68,7 @@ const UsernameForgot = () => {
                       type="email"
                       name="email"
                       id="email"
+                      placeholder="Enter Your Email"
                       autoComplete="email"
                       className="input-field"
                       {...register("email")}
@@ -115,6 +116,7 @@ const UsernameForgot = () => {
                     type="text"
                     name="otp"
                     id="otp"
+                    placeholder="Enter OTP from Email"
                     autoComplete="otp"
                     className="input-field"
                     {...register("otp", { required: otpSent })}
