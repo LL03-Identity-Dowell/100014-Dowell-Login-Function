@@ -250,7 +250,7 @@ const PasswordResetForm = () => {
                       passwordStrength === 0
                         ? "bg-red-500"
                         : passwordStrength === 1
-                        ? "bg-yellow-500"
+                        ? "bg-orange-400"
                         : passwordStrength === 2
                         ? "bg-yellow-400"
                         : "bg-green-500"
