@@ -8,8 +8,8 @@ const FAQ = () => {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-4">
+    <div className="container mx-auto max-w-3xl px-4 py-4">
+      <h1 className="text-2xl font-semibold mb-2">
         Frequently Asked Questions
       </h1>
       <div>

@@ -47,8 +47,8 @@ const MyTabs = () => {
 
   return (
     <Tab.Group>
-      <div className="w-full max-w-7xl mx-auto px-2 py-16 sm:px-0">
-        <Tab.List className="flex space-x-1 rounded-xl bg-green-900/20 p-1">
+      <div className="w-full max-w-3xl mx-auto px-2 py-2 sm:px-0 mt-16">
+        <Tab.List className="flex space-x-1 rounded-xl bg-gray-700 p-1">
           {Object.keys(categories).map((category) => {
             const Icon = getCategoryIcon(category);
             return (
@@ -56,10 +56,10 @@ const MyTabs = () => {
                 key={category}
                 className={({ selected }) =>
                   classNames(
-                    "w-full rounded-lg py-2.5 text-sm font-medium leading-5 text-green-700",
-                    "ring-white ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2",
+                    "w-full rounded-lg py-2 text-sm font-medium leading-3 text-green-700",
+                    "ring-red-300 ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2",
                     selected
-                      ? "bg-white shadow"
+                      ? "bg-green-500 text-white shadow"
                       : "text-green-100 hover:bg-white/[0.12] hover:text-white"
                   )
                 }
@@ -72,7 +72,7 @@ const MyTabs = () => {
             );
           })}
         </Tab.List>
-        <Tab.Panels className="mt-2">
+        <Tab.Panels>
           {Object.values(categories).map((posts, idx) => (
             <Tab.Panel
               key={idx}
@@ -85,7 +85,7 @@ const MyTabs = () => {
                 {posts.map((post) => (
                   <li
                     key={post.id}
-                    className="relative rounded-md p-3 hover:bg-gray-100"
+                    className="relative rounded-md hover:bg-gray-100"
                   >
                     <h3 className="text-sm font-medium leading-5">
                       <span className="mr-1">
