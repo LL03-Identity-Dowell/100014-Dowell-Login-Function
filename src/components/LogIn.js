@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -12,6 +12,9 @@ import { Radio } from "react-loader-spinner";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import sideImage from "../assets/images/sideImage.webp";
 import { useMediaQuery } from "react-responsive";
+import ReactLanguageSelect from "react-languages-select";
+//import css module
+import "react-languages-select/css/react-languages-select.css";
 
 const schema = yup.object().shape({
   username: yup
@@ -32,6 +35,7 @@ const schema = yup.object().shape({
 });
 
 const LogIn = () => {
+  const [selectedLanguage, setSelectedLanguage] = useState(null);
   const {
     handleSubmit,
     register,
@@ -69,15 +73,19 @@ const LogIn = () => {
       device: device,
       location: location,
       timezone: userTimezone,
-      language: userLanguage,
+      language: selectedLanguage || userLanguage,
       browser: browserType,
     };
     await dispatch(loginUser(userData));
   };
 
+  const handleLanguageChange = (selectedOption) => {
+    setSelectedLanguage(selectedOption.value);
+  };
+
   return (
     <div className="flex w-full items-center justify-center">
-      <div className="flex flex-col justify-between md:flex-row md:space-x-4 space-y-2 md:space-y-0 bg-gray-50 w-full max-w-3xl p-4 md:p-6 rounded-xl shadow-lg text-gray-500 overflow-hidden">
+      <div className="flex flex-col justify-between md:flex-row md:space-x-4 space-y-2 md:space-y-0 bg-yellow-50 w-full max-w-3xl p-4 md:p-6 rounded-xl shadow-lg text-gray-500 overflow-hidden">
         {isMobile ? (
           <div className="flex justify-center">
             <img
@@ -94,8 +102,8 @@ const LogIn = () => {
           />
         )}
 
-        <div className="flex flex-col space-y-8">
-          <h2 className="text-xl font-semibold tracking-wide text-green-500 md:text-2xl">
+        <div className="flex flex-col space-y-8 bg-gradient-to-r from-yellow-50 to-gray-50">
+          <h2 className="text-2xl bg-gradient-to-r from-cyan-400 to-green-600 bg-clip-text text-transparent">
             Member Login
           </h2>
 
@@ -117,7 +125,12 @@ const LogIn = () => {
         </div>
 
         <div className="relative">
-          <div className="relative z-10 bg-gray-50 rounded-2xl drop-shadow-md p-6 text-gray-700 md:w-80">
+          <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-md p-6 text-gray-700 md:w-80">
+            <ReactLanguageSelect
+              className="select-field"
+              value={selectedLanguage}
+              onChange={handleLanguageChange}
+            />
             <form
               className="flex flex-col space-y-4"
               onSubmit={handleSubmit(handleUserInfo)}
