@@ -118,22 +118,12 @@ const PasswordResetForm = () => {
       };
     });
 
-    const passwordStrength = validationMessages?.every(
+    const isValidPassword = validationMessages.every(
       (message) => message.isValid
-    )
-      ? score
-      : 0;
-
+    );
     const passwordFeedback = feedback.warning || feedback.suggestions[0];
-    setPasswordStrength(passwordStrength);
-    if (
-      passwordFeedback &&
-      validationMessages.every((message) => message.isValid)
-    ) {
-      setPasswordMessage(passwordFeedback);
-    } else {
-      setPasswordMessage(validationMessages);
-    }
+    setPasswordStrength(isValidPassword ? score : 0);
+    setPasswordMessage(isValidPassword ? passwordFeedback : validationMessages);
   };
 
   return (
