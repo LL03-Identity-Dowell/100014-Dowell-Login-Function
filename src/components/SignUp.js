@@ -183,6 +183,7 @@ const SignUp = () => {
   // Add a useRef hook to get a reference to the password input field:
   const passwordRef = useRef(null);
 
+  // Password requirements
   const requirements = [
     {
       regex: /[a-z]/, // at least 1 lowercase letter
@@ -206,6 +207,7 @@ const SignUp = () => {
     },
   ];
 
+  // Handle password change
   const handlePasswordChange = () => {
     const newPassword = passwordRef.current.value;
     const { score, feedback } = zxcvbn(newPassword);
