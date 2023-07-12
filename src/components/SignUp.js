@@ -271,7 +271,7 @@ const SignUp = () => {
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
       <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
-          <div className="mx-auto max-w-2xl items-center justify-center space-x-2 space-y-2">
+          <div className="mx-auto max-w-2xl items-center justify-center space-y-2">
             <img
               src={DoWellVerticalLogo}
               alt="DoWell logo"

@@ -130,7 +130,7 @@ const PasswordResetForm = () => {
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
       <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
-          <div className="mx-auto max-w-2xl items-center justify-center space-x-2 space-y-2">
+          <div className="mx-auto max-w-2xl items-center justify-center space-y-2">
             <img
               src={DoWellVerticalLogo}
               alt="DoWell logo"
@@ -140,10 +140,10 @@ const PasswordResetForm = () => {
               Forget Password
             </h2>
 
-            <div className="flex text-gray-600 space-x-2 py-2 px-2 text-left">
+            <div className="flex text-gray-600 py-2 text-left">
               <p>Do you forget username?</p>
               <Link to="/username">
-                <span className="text-green-600">Click here</span>
+                <span className="text-green-600"> Click here</span>
               </Link>
             </div>
           </div>
