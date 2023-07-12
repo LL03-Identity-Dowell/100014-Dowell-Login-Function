@@ -34,7 +34,12 @@ const schema = yup.object().shape({
     .min(8, "Password must be at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-      "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
+      [
+        "Password must include at least 1 lowercase letter",
+        "Password must include at least 1 uppercase letter",
+        "Password must include at least 1 digit",
+        "Password must include at least 1 special character",
+      ]
     ),
   confirm_Password: yup
     .string()
@@ -178,26 +183,47 @@ const SignUp = () => {
   // Add a useRef hook to get a reference to the password input field:
   const passwordRef = useRef(null);
 
-  const handlePasswordChange = (e) => {
+  const requirements = [
+    {
+      regex: /[a-z]/, // at least 1 lowercase letter
+      message: "Password must contain at least 1 lowercase letter",
+    },
+    {
+      regex: /[A-Z]/, // at least 1 uppercase letter
+      message: "Password must contain at least 1 uppercase letter",
+    },
+    {
+      regex: /\d/, // at least 1 digit
+      message: "Password must contain at least 1 digit",
+    },
+    {
+      regex: /[@$!%*?&]/, // at least 1 special character
+      message: "Password must contain at least 1 special character",
+    },
+    {
+      regex: /.{8}/, // at least 8 characters
+      message: "Password must be at least 8 characters",
+    },
+  ];
+
+  const handlePasswordChange = () => {
     const newPassword = passwordRef.current.value;
     const { score, feedback } = zxcvbn(newPassword);
 
-    if (newPassword.length < 8) {
-      setPasswordStrength(0); // Weak password
-      setPasswordMessage("Password must be at least 8 characters");
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(
-        newPassword
-      )
-    ) {
-      setPasswordStrength(0); // Weak password
-      setPasswordMessage(
-        "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
-      );
-    } else {
-      setPasswordStrength(score);
-      setPasswordMessage(feedback.warning || feedback.suggestions[0]);
-    }
+    const validationMessages = requirements?.map((requirement) => {
+      const isValid = requirement.regex.test(newPassword);
+      return {
+        message: requirement.message,
+        isValid,
+      };
+    });
+
+    const isValidPassword = validationMessages.every(
+      (message) => message.isValid
+    );
+    const passwordFeedback = feedback.warning || feedback.suggestions[0];
+    setPasswordStrength(isValidPassword ? score : 0);
+    setPasswordMessage(isValidPassword ? passwordFeedback : validationMessages);
   };
 
   // dispatch registered user
@@ -382,12 +408,23 @@ const SignUp = () => {
                   style={{ width: `${(passwordStrength / 4) * 100}%` }}
                 ></div>
               </div>
-              {passwordMessage && (
+              {Array.isArray(passwordMessage) ? (
+                <div>
+                  {passwordMessage.map((message, index) => (
+                    <p
+                      key={index}
+                      className={`text-xs mt-1 ${
+                        message.isValid ? "text-green-500" : "text-red-500"
+                      }`}
+                    >
+                      {message.message}
+                    </p>
+                  ))}
+                </div>
+              ) : (
                 <p
                   className={`text-xs mt-1 ${
-                    passwordMessage === "Weak"
-                      ? "text-red-500"
-                      : "text-green-500"
+                    passwordMessage ? "text-green-500" : "text-red-500"
                   }`}
                 >
                   {passwordMessage}
