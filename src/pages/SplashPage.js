@@ -6,7 +6,7 @@ const SplashPage = () => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    navigate("/signin");
+    navigate("/");
   };
 
   const handleCancel = () => {
