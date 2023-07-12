@@ -126,11 +126,15 @@ const LogIn = () => {
 
         <div className="relative">
           <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-md p-6 text-gray-700 md:w-80">
-            <ReactLanguageSelect
-              className="select-field"
-              value={selectedLanguage}
-              onChange={handleLanguageChange}
-            />
+            <div className="flex">
+              <p>Select your language</p>
+              <ReactLanguageSelect
+                className="select-field"
+                defaultLanguage="en"
+                value={selectedLanguage}
+                onChange={handleLanguageChange}
+              />
+            </div>
             <form
               className="flex flex-col space-y-4"
               onSubmit={handleSubmit(handleUserInfo)}
