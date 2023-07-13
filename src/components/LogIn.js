@@ -10,6 +10,7 @@ import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
+import { useCookies } from "react-cookie";
 
 const schema = yup.object().shape({
   username: yup
@@ -30,6 +31,7 @@ const schema = yup.object().shape({
 });
 
 const LogIn = () => {
+  const [cookies, setCookie] = useCookies(["sessionID"]); // Initialize the sessionID cookie
   const {
     handleSubmit,
     register,
@@ -67,7 +69,22 @@ const LogIn = () => {
       language: userLanguage,
       browser: browserType,
     };
-    await dispatch(loginUser(userData));
+
+    try {
+      const response = await dispatch(loginUser(userData));
+      const sessionID = response.payload.sessionID; // Assuming your response contains the session ID
+
+      // Set the sessionID cookie
+      setCookie("sessionID", sessionID, {
+        path: "/",
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Expires after 30 days
+      });
+
+      // Redirect to the desired page
+      window.location.href = "https://100093.pythonanywhere.com/#";
+    } catch (error) {
+      throw new Error(error.response.data);
+    }
   };
 
   const handleLanguageChange = (language) => {
