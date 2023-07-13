@@ -9,9 +9,6 @@ import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import { Radio } from "react-loader-spinner";
-import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import sideImage from "../assets/images/sideImage.webp";
-import { useMediaQuery } from "react-responsive";
 import ReactLanguageSelect from "react-languages-select";
 //import css module
 import "react-languages-select/css/react-languages-select.css";
@@ -60,9 +57,6 @@ const LogIn = () => {
   // Use the detectBrowser
   const browserType = detectBrowser();
 
-  // Use media queries to determine the screen size
-  const isMobile = useMediaQuery({ maxWidth: 767 });
-
   const handleUserInfo = async ({ username, password }) => {
     const userData = {
       username,
@@ -86,24 +80,8 @@ const LogIn = () => {
   return (
     <div className="flex w-full items-center justify-center">
       <div className="flex flex-col justify-between md:flex-row md:space-x-4 space-y-2 md:space-y-0 bg-yellow-50 w-full max-w-3xl p-4 md:p-6 rounded-xl shadow-lg text-gray-500 overflow-hidden">
-        {isMobile ? (
-          <div className="flex justify-center">
-            <img
-              src={DoWellVerticalLogo}
-              alt="DoWell logo"
-              className="h-28 w-28 rounded-full drop-shadow-md"
-            />
-          </div>
-        ) : (
-          <img
-            src={sideImage}
-            alt="DoWell logo"
-            className="h-72 w-28 drop-shadow-md"
-          />
-        )}
-
         <div className="flex flex-col space-y-8 bg-gradient-to-r from-yellow-50 to-gray-50">
-          <h2 className="text-2xl bg-gradient-to-r from-cyan-400 to-green-600 bg-clip-text text-transparent">
+          <h2 className="text-2xl bg-green-600 bg-clip-text text-transparent">
             Member Login
           </h2>
 

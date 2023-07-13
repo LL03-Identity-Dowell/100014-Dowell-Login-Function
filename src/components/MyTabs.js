@@ -47,7 +47,7 @@ const MyTabs = () => {
 
   return (
     <Tab.Group>
-      <div className="w-full max-w-3xl mx-auto px-2 py-2 sm:px-0 mt-16">
+      <div className="w-full max-w-3xl mx-auto px-2 py-2 sm:px-0">
         <Tab.List className="flex space-x-1 rounded-xl bg-gray-700 p-1">
           {Object.keys(categories).map((category) => {
             const Icon = getCategoryIcon(category);
