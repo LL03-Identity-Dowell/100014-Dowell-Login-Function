@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
 import Samanta from "../assets/images/samanta.webp";
@@ -27,7 +27,7 @@ const SignOutPage = () => {
           <img
             src={DoWellVerticalLogo}
             alt="DoWell logo"
-            className="h-28 w-28 md:h-34 md:w-44 rounded-sm drop-shadow-md"
+            className="h-28 w-28 md:h-36 md:w-36 rounded-sm drop-shadow-md"
           />
         </div>
         <div className="pt-6 md:p-8 text-center md:text-left space-y-8">
@@ -42,14 +42,14 @@ const SignOutPage = () => {
                 <img
                   src={QR_Code}
                   alt="QR_Code"
-                  className="w-24 h-24 md:w-36 md:h-52 md:rounded-none rounded-md drop-shadow-sm"
+                  className="h-28 w-28 md:h-36 md:w-36 md:rounded-none rounded-md drop-shadow-sm"
                   loading="lazy"
                 />
                 <div>
                   <img
                     src={Samanta}
                     alt="Samanta"
-                    className="w-24 h-24 md:w-32 md:h-48 md:rounded-none rounded-md drop-shadow-sm"
+                    className="h-24 w-24 md:h-32 md:w-32 md:rounded-none rounded-md drop-shadow-sm"
                     loading="lazy"
                   />
                   <p className="font-base text-lg text-slate-900 text-center">

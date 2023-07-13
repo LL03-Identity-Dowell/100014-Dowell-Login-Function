@@ -9,17 +9,17 @@ import FAQ from "./pages/FAQ";
 import PasswordResetForm from "./components/PasswordResetForm";
 import UsernameForgot from "./components/UsernameForgot";
 import SplashPage from "./pages/SplashPage";
-import SignOutPage from "./pages/SignOutPage";
+import SignOutPage from "./pages/SignoutPage";
 
 function App() {
   return (
     <>
       <Router>
         <Routes>
-          <Route exact path="/" element={<SignOutPage />} />
-          {/* <Route exact path="/" element={<Home />} /> */}
+          <Route exact path="/" element={<Home />} />
           <Route path="/signin" element={<LogIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route exact path="/logout" element={<SignOutPage />} />
           <Route path="/splash/:Username" element={<SplashPage />} />
           <Route path="/password" element={<PasswordResetForm />} />
           <Route path="/username" element={<UsernameForgot />} />
