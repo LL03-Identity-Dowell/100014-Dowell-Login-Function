@@ -96,38 +96,41 @@ const SignOutPage = () => {
               Do you wish to recommend this application to your friend?
             </p>
             <div className="flex flex-row items-center justify-center space-x-2">
-              <button
-                value="Yes"
-                type="button"
-                onClick={handleClick}
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Yes
-              </button>
-              <button
-                value="Maybe"
-                type="button"
-                onClick={handleClick}
-                className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
-              >
-                Maybe
-              </button>
+              {clicked ? (
+                <p className="text-center bg-green">
+                  Thank you for your response!
+                </p>
+              ) : (
+                <>
+                  <button
+                    value="Yes"
+                    type="button"
+                    onClick={handleClick}
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Yes
+                  </button>
 
-              <button
-                value="No"
-                type="button"
-                onClick={handleClick}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              >
-                No
-              </button>
+                  <button
+                    value="Maybe"
+                    type="button"
+                    onClick={handleClick}
+                    className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    Maybe
+                  </button>
+
+                  <button
+                    value="No"
+                    type="button"
+                    onClick={handleClick}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  >
+                    No
+                  </button>
+                </>
+              )}
             </div>
-
-            {clicked && (
-              <p className="text-center bg-green">
-                Thank you for your response!
-              </p>
-            )}
           </div>
         </div>
       </div>
