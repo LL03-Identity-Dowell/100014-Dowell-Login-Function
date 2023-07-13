@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from . models import Account,GuestAccount,CustomSession,QR_Creation,RandomSession
+from . models import Account,GuestAccount,CustomSession,QR_Creation,RandomSession,Linkbased_RandomSession
 
 
 @admin.register(Account)
@@ -12,3 +12,4 @@ admin.site.register(GuestAccount)
 admin.site.register(CustomSession)
 admin.site.register(QR_Creation)
 admin.site.register(RandomSession)
+admin.site.register(Linkbased_RandomSession)

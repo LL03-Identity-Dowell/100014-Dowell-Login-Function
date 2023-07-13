@@ -25,7 +25,7 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation, RandomSession
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation, RandomSession, Linkbased_RandomSession
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -1237,3 +1237,15 @@ def mobile_otp(request):
             return Response({'msg': 'success', 'info': 'SMS sent successfully!!'})
         else:
             return Response({'msg': 'error', 'error': 'The number is not valid'})
+
+@api_view(['GET', 'POST'])
+def linklogin_info(request):
+    if request.method == 'POST':
+        session=request.data["session_id"]
+        mydata=Linkbased_RandomSession.objects.filter(sessionID=session).first()
+        if not mydata:
+            return Response({"message":"SessionID not found in database, Please check and try again!!"})
+        var1=mydata.info
+        var2=json.loads(var1)
+        return Response({'userinfo':var2})
+    return Response({'msg':'Success','info':'API is working, POST session_id for userinfo'})

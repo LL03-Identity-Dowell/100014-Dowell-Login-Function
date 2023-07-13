@@ -36,7 +36,8 @@ from loginapp.models import (
     RandomSession,
     LiveStatus,
     Live_Public_Status,
-    Live_QR_Status
+    Live_QR_Status,
+    Linkbased_RandomSession
 )
 
 # server utility functions
@@ -86,11 +87,15 @@ def linked_based(request):
         mobconn = request.POST["conn"]
         if user is None:
             user = passgen.generate_random_password1(8)
-        field = {"Username": user, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
+        random_session=passgen.generate_random_password1(32)
+        field = {"Username": user,"random_session":random_session, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
             ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
         resp = dowellconnection("login", "bangalore", "login", "login",
                                 "login", "6752828281", "ABCDE", "insert", field, "nil")
         respj = json.loads(resp)
+        field1=json.dumps(field)
+        field2=str(field1)
+        Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
         qrcodegen.qrgen1(
             user, respj["inserted_id"], f"media/userqrcodes/{respj['inserted_id']}.png")
         if murl is not None:
@@ -98,7 +103,7 @@ def linked_based(request):
             return HttpResponse(f'<script>url={mobileurl};window.location.replace(url);</script>')
 
         if url is not None:
-            return redirect(f'{url}?qrid={respj["inserted_id"]}')
+            return redirect(f'{url}?qrid={respj["inserted_id"]}?session_id={random_session}')
         return HttpResponse("pl provide redirect url")
     return render(request, "link_based.html", context)
 
