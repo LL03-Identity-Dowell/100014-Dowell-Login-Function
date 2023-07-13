@@ -12,7 +12,9 @@ const Home = () => {
     <>
       <div className="isolate px-2 py-4 sm:py-8 lg:px-8">
         <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
-          <div className={isMobile ? "flex flex-col items-center" : "flex"}>
+          <div
+            className={isMobile ? "flex flex-col items-center" : "flex px-2"}
+          >
             {isMobile ? (
               <img
                 src={DoWellVerticalLogo}
