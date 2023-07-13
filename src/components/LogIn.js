@@ -9,9 +9,7 @@ import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import { Radio } from "react-loader-spinner";
-import ReactLanguageSelect from "react-languages-select";
-//import css module
-import "react-languages-select/css/react-languages-select.css";
+import LanguageDropdown from "./LanguageDropdown";
 
 const schema = yup.object().shape({
   username: yup
@@ -32,7 +30,6 @@ const schema = yup.object().shape({
 });
 
 const LogIn = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState(null);
   const {
     handleSubmit,
     register,
@@ -53,7 +50,7 @@ const LogIn = () => {
   // Retrieves the user's timezone
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   // Retrieves the user's preferred language
-  const userLanguage = navigator.language;
+  const [userLanguage, setUserLanguage] = useState(navigator.language);
   // Use the detectBrowser
   const browserType = detectBrowser();
 
@@ -67,14 +64,14 @@ const LogIn = () => {
       device: device,
       location: location,
       timezone: userTimezone,
-      language: selectedLanguage || userLanguage,
+      language: userLanguage,
       browser: browserType,
     };
     await dispatch(loginUser(userData));
   };
 
-  const handleLanguageChange = (selectedOption) => {
-    setSelectedLanguage(selectedOption.value);
+  const handleLanguageChange = (language) => {
+    setUserLanguage(language);
   };
 
   return (
@@ -103,14 +100,12 @@ const LogIn = () => {
         </div>
 
         <div className="relative">
-          <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-md p-6 text-gray-700 md:w-80">
-            <div className="flex">
+          <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-md p-6 text-gray-700 w-full">
+            <div className="flex space-x-2">
               <p>Select your language</p>
-              <ReactLanguageSelect
-                className="select-field"
-                defaultLanguage="en"
-                value={selectedLanguage}
-                onChange={handleLanguageChange}
+              <LanguageDropdown
+                selectedLanguage={userLanguage}
+                onLanguageChange={handleLanguageChange}
               />
             </div>
             <form
