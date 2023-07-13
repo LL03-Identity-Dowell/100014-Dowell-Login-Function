@@ -1,23 +1,23 @@
 import React, { useCallback, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
 import Samanta from "../assets/images/samanta.webp";
 
 const SignOutPage = () => {
-  const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
+  const [loggedOut, setLoggedOut] = useState(false);
 
   const handleClick = useCallback((e) => {
     setClicked(e.target.value);
   }, []);
 
-  const handleSignOut = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
+  const handleSignOut = () => {
+    setLoggedOut(true);
+  };
 
   const handleCancel = useCallback(() => {
-    // navigate(`https://100093.pythonanywhere.com/home?session_id=${session_id}`);
+    window.location.href = "https://100093.pythonanywhere.com/#";
   }, []);
 
   return (
@@ -65,18 +65,29 @@ const SignOutPage = () => {
               Thank you, Do you want to exit?
             </p>
             <div className="flex flex-row items-center justify-center">
-              <button
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
-                onClick={handleSignOut}
-              >
-                Yes
-              </button>
-              <button
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleCancel}
-              >
-                No
-              </button>
+              {loggedOut ? (
+                <div className="text-center">
+                  <p className="text-green-500">Logged Out Successfully!</p>
+                  <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
+                    <Link to="/">Do have an account? Log in</Link>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
+                    onClick={handleSignOut}
+                  >
+                    Yes
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                    onClick={handleCancel}
+                  >
+                    No
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
