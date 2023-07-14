@@ -20,7 +20,7 @@ const SignOutPage = () => {
 
   // Handle cancel
   const handleCancel = () => {
-    window.location.href = "https://100093.pythonanywhere.com/#";
+    window.location.href = "/#";
   };
 
   return (

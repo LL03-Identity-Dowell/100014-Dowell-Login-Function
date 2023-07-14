@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -10,7 +10,6 @@ import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
-import { useCookies } from "react-cookie";
 
 const schema = yup.object().shape({
   username: yup
@@ -31,13 +30,17 @@ const schema = yup.object().shape({
 });
 
 const LogIn = () => {
-  const [cookies, setCookie] = useCookies(["sessionID"]); // Initialize the sessionID cookie
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  // React Hook Form for form validation
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm({ resolver: yupResolver(schema) });
 
+  // Redux dispatch hook to dispatch actions to the store and trigger state changes
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.login) || {};
 
@@ -73,16 +76,11 @@ const LogIn = () => {
 
     try {
       const response = await dispatch(loginUser(userData));
-      const sessionID = response.payload.sessionID; // Assuming your response contains the session ID
-
-      // Set the sessionID cookie
-      setCookie("sessionID", sessionID, {
-        path: "/",
-        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Expires after 30 days
-      });
+      const sessionID = response.payload.session_id;
+      setIsLoggedIn(true);
 
       // Redirect to the desired page
-      window.location.href = "https://100093.pythonanywhere.com/#";
+      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
     } catch (error) {
       throw new Error(error.response.data);
     }
