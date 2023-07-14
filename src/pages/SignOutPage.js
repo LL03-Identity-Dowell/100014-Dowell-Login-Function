@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
 import Samanta from "../assets/images/samanta.webp";
@@ -9,26 +9,20 @@ import { Radio } from "react-loader-spinner";
 
 const SignOutPage = () => {
   const [clicked, setClicked] = useState(false);
-  const [isLoggedOut, setIsLoggedOut] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { loading, error, loggedOut } =
     useSelector((state) => state.logout) || {};
 
-  // Handle button click
-  const handleClick = (e) => {
-    setClicked(e.target.value);
-  };
-
   // Handle sign out
   const handleSignOut = () => {
-    dispatch(logoutUser("s20vytmoshxrt6ma0m5rzc59vp35ikv0"));
-    setIsLoggedOut(true);
+    dispatch(logoutUser({ session_id: "s20vytmoshxrt6ma0m5rzc59vp35ikv0" }));
   };
 
   // Handle cancel
   const handleCancel = () => {
-    window.location.href = "/#";
+    navigate("/#");
   };
 
   return (
@@ -76,7 +70,7 @@ const SignOutPage = () => {
               Thank you, Do you want to exit?
             </p>
             <div className="flex flex-row items-center justify-center">
-              {isLoggedOut ? (
+              {loggedOut ? (
                 <div className="text-center">
                   <p className="text-green-500">{loggedOut}</p>
                   <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
@@ -120,16 +114,15 @@ const SignOutPage = () => {
               Do you wish to recommend this application to your friend?
             </p>
             <div className="flex flex-row items-center justify-center space-x-2">
-              {clicked ? (
-                <p className="text-center bg-green">
-                  Thank you for your response!
-                </p>
-              ) : (
+              <p className={clicked ? "text-center bg-green" : ""}>
+                {clicked ? "Thank you for your response!" : ""}
+              </p>
+              {!clicked && (
                 <>
                   <button
                     value="Yes"
                     type="button"
-                    onClick={handleClick}
+                    onClick={() => setClicked(true)}
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
                   >
                     Yes
@@ -138,7 +131,7 @@ const SignOutPage = () => {
                   <button
                     value="Maybe"
                     type="button"
-                    onClick={handleClick}
+                    onClick={() => setClicked(true)}
                     className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
                   >
                     Maybe
@@ -147,7 +140,7 @@ const SignOutPage = () => {
                   <button
                     value="No"
                     type="button"
-                    onClick={handleClick}
+                    onClick={() => setClicked(true)}
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                   >
                     No
