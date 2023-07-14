@@ -22,7 +22,7 @@ const SignOutPage = () => {
 
   // Handle cancel
   const handleCancel = () => {
-    navigate("/#");
+    navigate(-1); // Go back to the previous page
   };
 
   return (
