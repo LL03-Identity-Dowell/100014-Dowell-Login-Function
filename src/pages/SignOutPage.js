@@ -5,6 +5,7 @@ import QR_Code from "../assets/images/QR-Code.png";
 import Samanta from "../assets/images/samanta.webp";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/logoutSlice";
+import { Radio } from "react-loader-spinner";
 
 const SignOutPage = () => {
   const [clicked, setClicked] = useState(false);
@@ -88,7 +89,19 @@ const SignOutPage = () => {
                     className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
                     onClick={handleSignOut}
                   >
-                    Yes
+                    {loading ? (
+                      <Radio
+                        visible={true}
+                        height={30}
+                        width={30}
+                        ariaLabel="radio-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName="radio-wrapper"
+                        color="#1ff507"
+                      />
+                    ) : (
+                      "Yes"
+                    )}
                   </button>
                   <button
                     className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -98,6 +111,7 @@ const SignOutPage = () => {
                   </button>
                 </>
               )}
+              {error && <p>{error}</p>}
             </div>
           </div>
 
