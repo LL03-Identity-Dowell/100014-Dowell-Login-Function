@@ -87,15 +87,11 @@ def linked_based(request):
         mobconn = request.POST["conn"]
         if user is None:
             user = passgen.generate_random_password1(8)
-        random_session=passgen.generate_random_password1(32)
-        field = {"Username": user,"random_session":random_session, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
+        field = {"Username": user, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
             ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
         resp = dowellconnection("login", "bangalore", "login", "login",
                                 "login", "6752828281", "ABCDE", "insert", field, "nil")
         respj = json.loads(resp)
-        field1=json.dumps(field)
-        field2=str(field1)
-        Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
         qrcodegen.qrgen1(
             user, respj["inserted_id"], f"media/userqrcodes/{respj['inserted_id']}.png")
         if murl is not None:
@@ -103,10 +99,39 @@ def linked_based(request):
             return HttpResponse(f'<script>url={mobileurl};window.location.replace(url);</script>')
 
         if url is not None:
-            return redirect(f'{url}?qrid={respj["inserted_id"]}?session_id={random_session}')
+            return redirect(f'{url}?qrid={respj["inserted_id"]}')
         return HttpResponse("pl provide redirect url")
     return render(request, "link_based.html", context)
 
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def LinkLogin(request):
+    url=request.GET.get("redirect_url",None)
+    user=request.GET.get("user",None)
+    context={}
+    if request.method == 'POST':
+        loc=request.POST["loc"]
+        device=request.POST["dev"]
+        osver=request.POST["os"]
+        brow=request.POST["brow"]
+        ltime=request.POST["time"]
+        ipuser=request.POST["ip"]
+        mobconn=request.POST["conn"]
+        if user is None:
+            user=passgen.generate_random_password1(8)
+        random_session=passgen.generate_random_password1(32)
+        field={"Username":user,"random_session":random_session,"OS":osver,"Device":device,"Browser":brow,"Location":loc,"Time":str(ltime),"SessionID":"linkbased","Connection":mobconn,"qrcode_id":"user6","IP":ipuser}
+        resp=dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field,"nil")
+        respj=json.loads(resp)
+        field1=json.dumps(field)
+        field2=str(field1)
+        Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
+        qrcodegen.qrgen1(user,respj["inserted_id"],f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
+
+        if url is not None:
+            return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
+        return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}')
+    return render(request,"link_based.html",context)
 
 def register_legal_policy(request):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
