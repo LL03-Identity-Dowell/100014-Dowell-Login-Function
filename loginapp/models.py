@@ -97,3 +97,8 @@ class Live_Public_Status(models.Model):
     status = models.CharField(max_length=50, null=True, blank=True)
     updated = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(null=True, blank=True)
+
+class Linkbased_RandomSession(models.Model):
+    sessionID=models.CharField(max_length=1000)
+    info=models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
