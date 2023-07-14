@@ -1,7 +1,17 @@
 # Dowell Login API Documentation
 
 `POST /api/loginapi/`
-This is the publicapi for user authentication. All fields are required
+This is the publicapi for user authentication.
+
+Required fields
+
+- username
+- password
+- time
+- ip
+- os
+- location
+- timezone
 
 #### Request body
 
