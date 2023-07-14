@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
@@ -8,17 +8,17 @@ const SignOutPage = () => {
   const [clicked, setClicked] = useState(false);
   const [loggedOut, setLoggedOut] = useState(false);
 
-  const handleClick = useCallback((e) => {
+  const handleClick = (e) => {
     setClicked(e.target.value);
-  }, []);
+  };
 
   const handleSignOut = () => {
     setLoggedOut(true);
   };
 
-  const handleCancel = useCallback(() => {
+  const handleCancel = () => {
     window.location.href = "https://100093.pythonanywhere.com/#";
-  }, []);
+  };
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8 flex  justify-center">
