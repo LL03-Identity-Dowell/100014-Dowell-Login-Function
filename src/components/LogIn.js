@@ -56,6 +56,7 @@ const LogIn = () => {
   // Use the detectBrowser
   const browserType = detectBrowser();
 
+  // Handle user information
   const handleUserInfo = async ({ username, password }) => {
     const userData = {
       username,
@@ -87,6 +88,7 @@ const LogIn = () => {
     }
   };
 
+  // Handle language change
   const handleLanguageChange = (language) => {
     setUserLanguage(language);
   };

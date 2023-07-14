@@ -8,14 +8,17 @@ const SignOutPage = () => {
   const [clicked, setClicked] = useState(false);
   const [loggedOut, setLoggedOut] = useState(false);
 
+  // Handle button click
   const handleClick = (e) => {
     setClicked(e.target.value);
   };
 
+  // Handle sign out
   const handleSignOut = () => {
     setLoggedOut(true);
   };
 
+  // Handle cancel
   const handleCancel = () => {
     window.location.href = "https://100093.pythonanywhere.com/#";
   };
