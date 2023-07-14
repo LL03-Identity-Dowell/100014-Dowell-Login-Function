@@ -9,7 +9,7 @@ import FAQ from "./pages/FAQ";
 import PasswordResetForm from "./components/PasswordResetForm";
 import UsernameForgot from "./components/UsernameForgot";
 import SplashPage from "./pages/SplashPage";
-import SignOutPage from "./pages/SignoutPage";
+import SignOutPage from "./pages/SignOutPage";
 
 function App() {
   return (
