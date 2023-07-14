@@ -86,6 +86,14 @@ const LogIn = () => {
     }
   };
 
+  // Check login status when the component mounts
+  useEffect(() => {
+    if (isLoggedIn) {
+      // Redirect to the desired page
+      window.location.href = `https://100093.pythonanywhere.com/home`;
+    }
+  }, [isLoggedIn, navigate]);
+
   // Handle language change
   const handleLanguageChange = (language) => {
     setUserLanguage(language);

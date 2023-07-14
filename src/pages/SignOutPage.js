@@ -3,10 +3,16 @@ import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
 import Samanta from "../assets/images/samanta.webp";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../redux/logoutSlice";
 
 const SignOutPage = () => {
   const [clicked, setClicked] = useState(false);
-  const [loggedOut, setLoggedOut] = useState(false);
+  const [isLoggedOut, setIsLoggedOut] = useState(false);
+  const dispatch = useDispatch();
+
+  const { loading, error, loggedOut } =
+    useSelector((state) => state.logout) || {};
 
   // Handle button click
   const handleClick = (e) => {
@@ -15,7 +21,8 @@ const SignOutPage = () => {
 
   // Handle sign out
   const handleSignOut = () => {
-    setLoggedOut(true);
+    dispatch(logoutUser("s20vytmoshxrt6ma0m5rzc59vp35ikv0"));
+    setIsLoggedOut(true);
   };
 
   // Handle cancel
@@ -68,9 +75,9 @@ const SignOutPage = () => {
               Thank you, Do you want to exit?
             </p>
             <div className="flex flex-row items-center justify-center">
-              {loggedOut ? (
+              {isLoggedOut ? (
                 <div className="text-center">
-                  <p className="text-green-500">Logged Out Successfully!</p>
+                  <p className="text-green-500">{loggedOut}</p>
                   <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
                     <Link to="/">Do have an account? Log in</Link>
                   </div>
