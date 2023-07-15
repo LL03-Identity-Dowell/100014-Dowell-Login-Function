@@ -9,14 +9,14 @@ export const logoutUser = createAsyncThunk(
   "logout/logoutUser",
   async ({ session_id }) => {
     try {
-      const response = await axios.post(logoutAPI, { session_id: session_id });
-      if (response.data.msg === "success") {
-        return response.data.info;
+      const response = await axios.post(logoutAPI, { session_id });
+      if (response.data.msg === "Logged out Successfully..") {
+        return response.data.msg;
       } else {
-        throw new Error(response.data.info);
+        throw new Error(response.data.msg);
       }
     } catch (error) {
-      throw new Error(error?.response?.data?.info);
+      throw new Error(error?.response?.data?.msg);
     }
   }
 );
@@ -27,7 +27,7 @@ const logoutSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    loggedOut: null,
+    loggedOut: false,
   },
   reducers: {},
   extraReducers: (builder) => {
