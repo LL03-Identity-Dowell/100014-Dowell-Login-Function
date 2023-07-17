@@ -9,11 +9,8 @@ import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 
 const LogIn = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // Redux dispatch hook to dispatch actions to the store and trigger state changes
-  const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.login) || {};
+  const dispatch = useDispatch();
 
   const currentTime = new Date().toLocaleTimeString();
   const operatingSystem = getOperatingSystem();
@@ -24,10 +21,14 @@ const LogIn = () => {
   const browserType = detectBrowser();
 
   // Handle user information
-  const handleUserInfo = async ({ username, password }) => {
+  const handleUserInfo = async (e) => {
+    e.preventDefault();
+
+    const { username, password } = e.target.elements;
+
     const userData = {
-      username,
-      password,
+      username: username.value,
+      password: password.value,
       time: currentTime,
       ip: "",
       os: operatingSystem,
@@ -41,7 +42,6 @@ const LogIn = () => {
     try {
       const response = await dispatch(loginUser(userData));
       const sessionID = response.payload.session_id;
-      setIsLoggedIn(true);
 
       // Redirect to the desired page
       window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
