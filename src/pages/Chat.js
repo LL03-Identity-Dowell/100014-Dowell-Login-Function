@@ -12,7 +12,7 @@ const Chat = () => {
         width="100%"
         height="350px"
         id="chatAppFrame"
-        className="py-1 px-2"
+        className="py-4 px-6"
         display="initial"
         position="relative"
       />
