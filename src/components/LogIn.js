@@ -9,7 +9,8 @@ import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 
 const LogIn = () => {
-  const { loading, error } = useSelector((state) => state.login) || {};
+  const { userInfo, loading, error } =
+    useSelector((state) => state.login) || {};
   const dispatch = useDispatch();
 
   const currentTime = new Date().toLocaleTimeString();
@@ -138,6 +139,7 @@ const LogIn = () => {
                     "Login"
                   )}
                 </button>
+                <p className="text-green-500 font-base">{userInfo}</p>
                 {error && <p>{error}</p>}
               </div>
             </form>

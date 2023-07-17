@@ -30,7 +30,6 @@ export const loginUser = createAsyncThunk(
         language,
         browser,
       });
-      // console.log("response", response?.data);
       return response?.data;
     } catch (error) {
       throw new Error(error.response.data);
