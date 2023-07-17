@@ -8,8 +8,8 @@ const Help = () => {
   return (
     <div className="relative">
       <div className="w-full flex justify-center items-center">
-        <div className="max-w-2xl space-y-2 flex flex-col items-center">
-          <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-2 rounded-3xl">
+        <div className="max-w-3xl space-y-2 flex flex-col items-center">
+          <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-1 rounded-3xl">
             {videoTitle}
           </h2>
           <YouTube videoId={videoId} />

@@ -10,7 +10,7 @@ const Home = () => {
 
   return (
     <>
-      <div className="isolate px-2 py-4 sm:py-8 lg:px-8">
+      <div className="isolate px-2 py-4 lg:px-8">
         <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
           <div
             className={isMobile ? "flex flex-col items-center" : "flex px-2"}
@@ -25,7 +25,7 @@ const Home = () => {
               <img
                 src={sideImage}
                 alt="DoWell logo"
-                className="h-full w-32 drop-shadow-lg"
+                className="mt-4 h-full w-32 drop-shadow-lg"
               />
             )}
             <MyTabs />
