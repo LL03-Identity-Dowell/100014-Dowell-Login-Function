@@ -1063,19 +1063,12 @@ def login_init_api(request):
     urls = request.GET.get('next', None)
     context["url"] = request.GET.get('redirect_url', None)
     redirect_url = request.GET.get('redirect_url', None)
-    country = ""
-    city = ""
-    saved_browser_session = request.session.session_key
-    # if saved_browser_session:
-    #   return Response({"session_id": saved_browser_session, "redirect_url": redirect_url})
-    # else:
-    # return Response({'msg': 'No session found'});
-    #  if orgs:
-    #     return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
-    # elif redirect_url:
-    #    return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={saved_browser_session}');</script>")
-    # else:
-    #   return redirect(f'https://100093.pythonanywhere.com/home?session_id={saved_browser_session}')
+    past_login=request.COOKIES.get('DOWELL_LOGIN')
+    if past_login:
+        test_session=CustomSession.objects.filter(sessionID=past_login).first()
+        if test_session:
+            if test_session.status == "login":
+                return Response({'msg':'error','info':'logged_in_user'})
     random_text = passgen.generate_random_password1(24)
     context["random_session"] = random_text
     if request.COOKIES.get('qrid_login'):
@@ -1086,6 +1079,9 @@ def login_init_api(request):
             context["qrid_login_type"] = "new"
         else:
             context["qrid_login_type"] = "old"
+        res = Response()
+        res.data = context
+        return res
     else:
         qrid_obj = QR_Creation.objects.filter(status="new").first()
         if qrid_obj is None:
@@ -1317,7 +1313,7 @@ def main_login(request):
                 if obj.first().status == 'login':
                     data = {'session_id': session}
                     response = Response()
-                    response.set_cookie('dowell_login', session)
+                    response.set_cookie('DOWELL_LOGIN', session)
                     return response
             try:
                 res = create_event()
@@ -1371,7 +1367,7 @@ def main_login(request):
             data = {'session_id': session}
 
             response = Response()
-            response.set_cookie('dowell_login', session)
+            response.set_cookie('DOWELL_LOGIN', session)
             response.data = data
             return response
         else:
@@ -1385,7 +1381,7 @@ def main_login(request):
 
 @api_view(['POST'])
 def main_logout(request):
-    session = request.COOKIES.get('dowell_login')
+    session = request.COOKIES.get('DOWELL_LOGIN')
 
     mydata = CustomSession.objects.filter(sessionID=session).first()
     if mydata is not None:
@@ -1405,5 +1401,5 @@ def main_logout(request):
     logout(request)
     response = Response()
     response.data = {'msg': 'Logged out Successfully..'}
-    response.delete_cookie('dowell_login')
+    response.delete_cookie('DOWELL_LOGIN')
     return response
