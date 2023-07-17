@@ -104,12 +104,13 @@ const schema = yup.object().shape({
 });
 
 const SignUp = () => {
-  const [attempts, setAttempts] = useState(5);
-  const [exempted, setExempted] = useState(false);
-  const [showAttempts, setShowAttempts] = useState(false);
-  const [countdown, setCountdown] = useState(0);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordMessage, setPasswordMessage] = useState("");
+  const [attempts, setAttempts] = useState(5);
+  const [showAttempts, setShowAttempts] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [exempted, setExempted] = useState(false);
+  const [showExemptionCheckbox, setShowExemptionCheckbox] = useState(false);
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -153,6 +154,7 @@ const SignUp = () => {
   // dispatch mobile otp
   const handleMobileOTP = (data) => {
     if (attempts === 0 && !exempted) {
+      setShowExemptionCheckbox(true);
       return; // No more attempts remaining and not exempted
     }
     // Decrease attempts
@@ -397,7 +399,7 @@ const SignUp = () => {
                   onChange={handlePasswordChange}
                 />
                 {errors.Password && (
-                  <p className="text-red-500 text-xs mt-1 absolute bottom-0 left-0">
+                  <p className="text-red-500 text-xs mt-1">
                     {errors.Password.message}
                   </p>
                 )}
@@ -637,23 +639,25 @@ const SignUp = () => {
                       <p className="text-base font-normal text-green-600">
                         Attempts remaining: {attempts}
                       </p>
-                      <div className="relative flex gap-x-3">
-                        <div className="flex h-6 items-center">
-                          <input
-                            id="exempt-checkbox"
-                            name="exempt-checkbox"
-                            type="checkbox"
-                            className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                            onChange={() => setExempted(!exempted)}
-                            checked={exempted}
-                          />
+                      {showExemptionCheckbox && (
+                        <div className="relative flex gap-x-3">
+                          <div className="flex h-6 items-center">
+                            <input
+                              id="exempt-checkbox"
+                              name="exempt-checkbox"
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                              onChange={() => setExempted(!exempted)}
+                              checked={exempted}
+                            />
+                          </div>
+                          <div className="text-sm leading-6">
+                            <p className="text-gray-600">
+                              Exempt from SMS requirement
+                            </p>
+                          </div>
                         </div>
-                        <div className="text-sm leading-6">
-                          <p className="text-gray-600">
-                            Exempt from SMS requirement
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   )}
                 </div>
