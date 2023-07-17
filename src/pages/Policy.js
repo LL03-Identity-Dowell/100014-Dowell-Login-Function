@@ -2,7 +2,7 @@ import Iframe from "react-iframe";
 
 const Policy = () => {
   return (
-    <div className="max-w-4xl space-y-2 flex flex-col items-center">
+    <div className="max-w-3xl space-y-2 flex flex-col items-center">
       <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-1 rounded-3xl">
         Legal, Privacy, Safety, Security Policies
       </h2>
@@ -11,7 +11,7 @@ const Policy = () => {
         width="100%"
         height="350px"
         id="myFrame"
-        className="my-frame-classname"
+        className="py-1"
         display="initial"
         position="relative"
       />
