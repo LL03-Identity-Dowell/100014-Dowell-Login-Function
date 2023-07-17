@@ -60,14 +60,17 @@ const schema = yup.object().shape({
   }),
   phonecode: yup.string().when("otpSent", {
     is: true,
-    then: yup.string().required("Country Code is required"),
+    then: yup
+      .string()
+      .required("Country Code is required")
+      .matches(/^\d{1,3}$/, "Country Code must be 1 to 3 digits"),
   }),
   Phone: yup.string().when("otpSent", {
     is: true,
     then: yup
       .string()
       .required("Phone number is required")
-      .matches(/^\d+$/, "Phone number must be numeric"),
+      .matches(/^\d{9,}$/, "Phone number must have at least 9 digits"),
   }),
   sms: yup.string().when("smsSent", {
     is: true,
