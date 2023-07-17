@@ -23,7 +23,10 @@ urlpatterns = [
          name="login_legal_policy"),
     path('mobile_otp/', views.mobile_otp, name='mobile_otp_api'),
     path('email_otp/', views.email_otp, name='email_otp_api'),
-    path('linklogin_info/',views.linklogin_info,name="linklogin_info")
+    path('linklogin_info/',views.linklogin_info,name="linklogin_info"),
+
+    path('main_login/', views.main_login, name='main_login'),
+    path('main_logout/', views.main_logout, name='main_logout')
 
 
 ]

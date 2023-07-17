@@ -25,6 +25,7 @@ urlpatterns = [
     path("live_public_status/", views.live_public_status,
          name="live_public_status"),
     path("user_details/", views.user_info, name="userdetails"),
+    path('linklogin',views.LinkLogin,name="linklogin"),
 
     path("user_chart/", TemplateView.as_view(template_name="chart.html"))
 ]

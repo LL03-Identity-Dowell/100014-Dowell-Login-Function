@@ -1,7 +1,16 @@
 # Dowell Login API Documentation
 
-`POST /api/loginapi/`
-This is the publicapi for user authentication. All fields are required
+**POST** `/api/loginapi/`
+
+Required fields
+
+- username
+- password
+- time
+- ip
+- os
+- location
+- timezone
 
 #### Request body
 
@@ -33,7 +42,13 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/password_change/`
+**POST** `/api/password_change/`
+
+Required fields
+
+- username
+- old_password
+- new_password
 
 #### Request body
 
@@ -55,8 +70,13 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/userinfo/`
-`GET /api/userinfo/`
+**POST** `/api/userinfo/`
+**GET** `/api/userinfo/`
+
+Required fields
+
+- session_id
+- product
 
 #### Request body
 
@@ -82,7 +102,17 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/mobilelogin/`
+**POST** ` /api/mobilelogin/`
+
+Required fields
+
+- username
+- password
+- time
+- ip
+- os
+- location
+- timezone
 
 #### Request body
 
@@ -111,7 +141,11 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/mobilelogout/`
+**POST** `/api/mobilelogout/`
+
+Required fields
+
+- session_id
 
 #### Request body
 
@@ -131,7 +165,13 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/emailotp/`
+**POST** `/api/emailotp/`
+
+Required fields
+
+- email
+- username
+- usage
 
 #### Request body
 
@@ -154,9 +194,16 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/forgot_password/`
+**POST** ` /api/forgot_password/`
 
 > You must get the otp from the `/api/emailotp` endpoint
+
+Required fields
+
+- username
+- email
+- otp
+- new_password
 
 #### Request body
 
@@ -180,9 +227,14 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/forgot_username/`
+**POST** `/api/forgot_username/`
 
 > You must get the otp from the `/api/emailotp` endpoint
+
+Required fields:
+
+- email
+- otp
 
 #### Request body
 
@@ -204,7 +256,11 @@ This is the publicapi for user authentication. All fields are required
 
 ---
 
-`POST /api/password_update/`
+**POST** ` /api/profile_update/`
+Required fields:
+
+- email_otp
+- username
 
 #### Request body
 
