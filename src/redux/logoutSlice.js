@@ -2,7 +2,7 @@ import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 // Define the logout API endpoint
-const logoutAPI = "https://100014.pythonanywhere.com/api/mobilelogout/";
+const logoutAPI = "https://100014.pythonanywhere.com/api/main_logout/";
 
 // Create an async thunk for the logout API call
 export const logoutUser = createAsyncThunk(

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const api_url = "https://100014.pythonanywhere.com/api/mobilelogin/";
+const api_url = "https://100014.pythonanywhere.com/api/main_login/";
 
 export const loginUser = createAsyncThunk(
   "login/loginUser",
