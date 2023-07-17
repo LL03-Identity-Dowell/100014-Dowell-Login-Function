@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
@@ -11,51 +8,19 @@ import { detectBrowser } from "../utils/browserUtils";
 import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 
-const schema = yup.object().shape({
-  username: yup
-    .string()
-    .required("User Name is required")
-    .max(20)
-    .notOneOf(
-      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
-      "Username not allowed"
-    ),
-  password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-      "Password must include at least 1 uppercase letter, 1 lowercase letter, 1 special character, and 1 digit"
-    ),
-});
-
 const LogIn = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // React Hook Form for form validation
-  const {
-    handleSubmit,
-    register,
-    formState: { errors },
-  } = useForm({ resolver: yupResolver(schema) });
 
   // Redux dispatch hook to dispatch actions to the store and trigger state changes
   const dispatch = useDispatch();
   const { loading, error } = useSelector((state) => state.login) || {};
 
-  // Retrieves the current local time in the user's browser
   const currentTime = new Date().toLocaleTimeString();
-  // Operating System
   const operatingSystem = getOperatingSystem();
-  // Device Type
   const device = getDeviceType();
-  // Retrieves the user's location in latitude and longitude format
   const location = Coordinate();
-  // Retrieves the user's timezone
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  // Retrieves the user's preferred language
   const [userLanguage, setUserLanguage] = useState(navigator.language);
-  // Use the detectBrowser
   const browserType = detectBrowser();
 
   // Handle user information
@@ -124,10 +89,7 @@ const LogIn = () => {
                 onLanguageChange={handleLanguageChange}
               />
             </div>
-            <form
-              className="flex flex-col space-y-4"
-              onSubmit={handleSubmit(handleUserInfo)}
-            >
+            <form className="flex flex-col space-y-4" onSubmit={handleUserInfo}>
               <div>
                 <label htmlFor="username" className="label">
                   User Name <span className="text-red-500">*</span>
@@ -139,16 +101,8 @@ const LogIn = () => {
                     id="username"
                     placeholder="Enter Your Username"
                     autoComplete="username"
-                    className={`input-field ${
-                      errors.username ? "border-red-500" : ""
-                    }`}
-                    {...register("username")}
+                    className="input-field"
                   />
-                  {errors.username && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.username.message}
-                    </p>
-                  )}
                 </div>
               </div>
 
@@ -163,16 +117,8 @@ const LogIn = () => {
                     id="password"
                     placeholder="Enter Your Password"
                     autoComplete="password"
-                    className={`input-field ${
-                      errors.password ? "border-red-500" : ""
-                    }`}
-                    {...register("password")}
+                    className="input-field"
                   />
-                  {errors.password && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.password.message}
-                    </p>
-                  )}
                 </div>
               </div>
 
