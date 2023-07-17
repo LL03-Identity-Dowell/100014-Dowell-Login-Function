@@ -120,6 +120,7 @@ const SignUp = () => {
     register,
     formState: { errors },
     watch,
+    setValue,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -224,6 +225,9 @@ const SignUp = () => {
       (message) => message.isValid
     );
     const passwordFeedback = feedback.warning || feedback.suggestions[0];
+
+    setValue("Password", newPassword); // Update the form value
+
     setPasswordStrength(isValidPassword ? score : 0);
     setPasswordMessage(isValidPassword ? passwordFeedback : validationMessages);
   };
