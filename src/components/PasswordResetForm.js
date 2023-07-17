@@ -60,6 +60,7 @@ const PasswordResetForm = () => {
     handleSubmit,
     register,
     formState: { errors },
+    setValue,
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
@@ -124,6 +125,9 @@ const PasswordResetForm = () => {
       (message) => message.isValid
     );
     const passwordFeedback = feedback.warning || feedback.suggestions[0];
+
+    setValue("new_password", newPassword); // Update the form value
+
     setPasswordStrength(isValidPassword ? score : 0);
     setPasswordMessage(isValidPassword ? passwordFeedback : validationMessages);
   };
