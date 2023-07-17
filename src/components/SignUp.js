@@ -32,6 +32,7 @@ const schema = yup.object().shape({
   Password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
+    .required("Password is required")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
       [
@@ -43,7 +44,8 @@ const schema = yup.object().shape({
     ),
   confirm_Password: yup
     .string()
-    .oneOf([yup.ref("Password"), null], "Passwords must match"),
+    .oneOf([yup.ref("Password"), null], "Passwords must match")
+    .required("Confirm Password is required"),
   Email: yup
     .string()
     .email("Invalid Email format")
