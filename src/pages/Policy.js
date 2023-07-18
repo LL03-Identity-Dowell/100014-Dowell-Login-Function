@@ -4,6 +4,7 @@ import Iframe from "react-iframe";
 
 const Policy = () => {
   const [sessionID, setSessionID] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     generateRandomSessionID();
@@ -14,8 +15,9 @@ const Policy = () => {
       const response = await axios.get(
         "https://100014.pythonanywhere.com/api/login_init_api/"
       );
-      const randomSessionID = response.data.session_id;
+      const randomSessionID = response.data.random_session;
       setSessionID(randomSessionID);
+      setIsLoading(false);
     } catch (error) {
       console.error("Error generating session ID:", error);
     }
@@ -33,15 +35,20 @@ const Policy = () => {
       <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-1 rounded-3xl">
         Legal, Privacy, Safety, Security Policies
       </h2>
-      <Iframe
-        url={getIframeURL()}
-        width="100%"
-        height="350px"
-        id="myFrame"
-        className="py-1"
-        display="initial"
-        position="relative"
-      />
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <Iframe
+          url={getIframeURL()}
+          width="100%"
+          height="330px"
+          id="myFrame"
+          className="py-1"
+          display="initial"
+          position="relative"
+          scrolling="yes"
+        />
+      )}
     </div>
   );
 };
