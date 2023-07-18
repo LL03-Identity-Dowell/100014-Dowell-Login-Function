@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Iframe from "react-iframe";
+import { Radio } from "react-loader-spinner";
 
 const Policy = () => {
   const [sessionID, setSessionID] = useState("");
@@ -36,7 +37,15 @@ const Policy = () => {
         Legal, Privacy, Safety, Security Policies
       </h2>
       {isLoading ? (
-        <div>Loading...</div>
+        <Radio
+          visible={true}
+          height={30}
+          width={30}
+          ariaLabel="radio-loading"
+          wrapperStyle={{}}
+          wrapperClassName="radio-wrapper"
+          color="#1ff507"
+        />
       ) : (
         <Iframe
           url={getIframeURL()}

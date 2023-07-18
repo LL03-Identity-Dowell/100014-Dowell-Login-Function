@@ -9,6 +9,8 @@ import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 
 const LogIn = () => {
+  const [userLanguage, setUserLanguage] = useState("en");
+
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
   const dispatch = useDispatch();
@@ -18,7 +20,6 @@ const LogIn = () => {
   const device = getDeviceType();
   const location = Coordinate();
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [userLanguage, setUserLanguage] = useState(navigator.language);
   const browserType = detectBrowser();
 
   // Handle user information
@@ -38,11 +39,15 @@ const LogIn = () => {
       timezone: userTimezone,
       language: userLanguage,
       browser: browserType,
+      sessionID: "", // Initialize sessionID
     };
 
     try {
       const response = await dispatch(loginUser(userData));
       const sessionID = response.payload.session_id;
+
+      // Update the sessionID in the userData object
+      userData.sessionID = sessionID;
 
       // Redirect to the desired page
       window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
@@ -82,9 +87,9 @@ const LogIn = () => {
         </div>
 
         <div className="relative">
-          <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-md p-6 text-gray-700 w-full">
-            <div className="flex space-x-2">
-              <p>Select your language</p>
+          <div className="relative z-10 bg-yellow-50 rounded-2xl drop-shadow-md p-6 text-gray-700 w-80 space-y-2">
+            <div className="flex flex-col items-center justify-center space-y-2">
+              <p className="label">Select your language</p>
               <LanguageDropdown
                 selectedLanguage={userLanguage}
                 onLanguageChange={handleLanguageChange}
@@ -139,7 +144,9 @@ const LogIn = () => {
                     "Login"
                   )}
                 </button>
-                <p className="text-green-500 font-base">{userInfo}</p>
+                {userInfo && (
+                  <p className="text-green-500 font-base">{userInfo}</p>
+                )}
                 {error && <p>{error}</p>}
               </div>
             </form>

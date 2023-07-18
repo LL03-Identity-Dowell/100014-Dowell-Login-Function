@@ -16,6 +16,7 @@ export const loginUser = createAsyncThunk(
     timezone,
     language,
     browser,
+    sessionID,
   }) => {
     try {
       const response = await axios.post(api_url, {
@@ -29,6 +30,7 @@ export const loginUser = createAsyncThunk(
         timezone,
         language,
         browser,
+        sessionID,
       });
       return response?.data;
     } catch (error) {
