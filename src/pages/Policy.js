@@ -7,7 +7,7 @@ const Policy = () => {
 
   useEffect(() => {
     generateRandomSessionID();
-  });
+  }, []);
 
   const generateRandomSessionID = async () => {
     try {
