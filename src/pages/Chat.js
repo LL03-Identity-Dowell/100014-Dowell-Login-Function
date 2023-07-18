@@ -8,7 +8,7 @@ const Chat = () => {
         Chat with UX Living Lab
       </h2>
       <Iframe
-        url="https://100096.pythonanywhere.com/chat/login/?session_id=test"
+        url="https://100096.pythonanywhere.com/chat/login/?session_id=Ie0dpYWagGaTXYW8xodF3gud"
         width="100%"
         height="350px"
         id="chatAppFrame"
