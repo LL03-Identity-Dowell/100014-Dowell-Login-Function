@@ -1,26 +1,19 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import Iframe from "react-iframe";
+import { useDispatch, useSelector } from "react-redux";
+import { generateSessionID } from "../redux/chatSlice";
+import { Radio } from "react-loader-spinner";
 
 const Chat = () => {
-  const [sessionID, setSessionID] = useState("");
+  const dispatch = useDispatch();
+  const sessionID = useSelector((state) => state.chat.sessionID);
+  const status = useSelector((state) => state.chat.status);
 
   useEffect(() => {
-    generateSessionID();
-  }, []);
-
-  const generateSessionID = async () => {
-    try {
-      const response = await axios.get(
-        "https://100014.pythonanywhere.com/api/login_init_api/"
-      );
-      console.log("response", response);
-      const qridLogin = response.data.qrid_login;
-      setSessionID(qridLogin);
-    } catch (error) {
-      console.error("Error generating session ID:", error);
+    if (status === "idle") {
+      dispatch(generateSessionID());
     }
-  };
+  }, [status, dispatch]);
 
   const getChatAppURL = () => {
     const baseURL = "https://100096.pythonanywhere.com/chat/login/";
@@ -33,15 +26,27 @@ const Chat = () => {
       <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-1 rounded-3xl">
         Chat with UX Living Lab
       </h2>
-      <Iframe
-        url={getChatAppURL()}
-        width="100%"
-        height="350px"
-        id="chatAppFrame"
-        className="py-4 px-6"
-        display="initial"
-        position="relative"
-      />
+      {status === "loading" ? (
+        <Radio
+          visible={true}
+          height={30}
+          width={30}
+          ariaLabel="radio-loading"
+          wrapperStyle={{}}
+          wrapperClassName="radio-wrapper"
+          color="#1ff507"
+        />
+      ) : (
+        <Iframe
+          url={getChatAppURL()}
+          width="100%"
+          height="350px"
+          id="chatAppFrame"
+          className="py-4 px-6"
+          display="initial"
+          position="relative"
+        />
+      )}
     </div>
   );
 };
