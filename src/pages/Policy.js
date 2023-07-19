@@ -27,7 +27,8 @@ const Policy = () => {
   const getIframeURL = () => {
     const baseURL =
       "https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/";
-    const redirectURL = `https://100014.pythonanywhere.com/legalpolicy1?s=${sessionID}&session_id=${sessionID}`;
+    const redirectURL =
+      "https://100014.pythonanywhere.com/legalpolicy1?s=test&session_id=test";
     return `${baseURL}?redirect_url=${encodeURIComponent(redirectURL)}`;
   };
 

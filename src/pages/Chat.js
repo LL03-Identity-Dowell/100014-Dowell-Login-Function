@@ -14,6 +14,7 @@ const Chat = () => {
       const response = await axios.get(
         "https://100014.pythonanywhere.com/api/login_init_api/"
       );
+      console.log("response", response);
       const qridLogin = response.data.qrid_login;
       setSessionID(qridLogin);
     } catch (error) {

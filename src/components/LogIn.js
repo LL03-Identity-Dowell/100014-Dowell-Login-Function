@@ -39,7 +39,7 @@ const LogIn = () => {
       timezone: userTimezone,
       language: userLanguage,
       browser: browserType,
-      sessionID: "", // Initialize sessionID
+      random_session: "",
     };
 
     try {
@@ -47,7 +47,7 @@ const LogIn = () => {
       const sessionID = response.payload.session_id;
 
       // Update the sessionID in the userData object
-      userData.sessionID = sessionID;
+      userData.random_session = sessionID;
 
       // Redirect to the desired page
       window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
