@@ -26,7 +26,7 @@ const SignOutPage = () => {
   };
 
   return (
-    <div className="isolate px-2 py-4 sm:py-12 lg:px-8 flex  justify-center">
+    <div className="isolate px-2 py-4 sm:py-12 lg:px-8 flex justify-center">
       <div className="shadow-sm mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
           <img
@@ -42,7 +42,6 @@ const SignOutPage = () => {
                 Scan QR Code to contribute your comments and suggestions about
                 this application in 2 minutes and get rewarded!
               </h3>
-
               <div className="flex space-x-4 mx-auto">
                 <img
                   src={QR_Code}
