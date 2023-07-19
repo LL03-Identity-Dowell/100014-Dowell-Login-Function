@@ -447,6 +447,8 @@ def login(request):
         detail = request.GET.get('detail', None)
     except:
         pass
+    hr_invitation=request.GET.get('hr_invitation',None)
+    context["hr_invitation"]=hr_invitation
     context["org"] = orgs
     context["type"] = type1
     urls = request.GET.get('next', None)

@@ -283,19 +283,25 @@ def MobileLogin(request):
         return Response(resp)
     browser = mdata("browser")
     language = mdata("language", "English")
-    company = None
-    org = None
-    dept = None
-    member = None
-    project = None
-    subproject = None
-    role_res = None
-    user_id = None
-    first_name = None
-    last_name = None
-    email = None
-    phone = None
-    User_type = None
+    company=None
+    org=None
+    dept=None
+    member=None
+    project=None
+    subproject=None
+    role_res=None
+    first_name=None
+    last_name=None
+    email=None
+    phone=None
+    User_type=None
+    payment_status=None
+    newsletter=None
+    user_country=None
+    privacy_policy=None
+    other_policy=None
+    userID=None
+    client_admin_id=None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
@@ -310,8 +316,8 @@ def MobileLogin(request):
             obj = CustomSession.objects.filter(sessionID=session)
             if obj:
                 if obj.first().status == 'login':
-                    resp = {'session_id': session}
-                    return Response(resp)
+                    data = {'session_id': session}
+                    return Response(data)
             try:
                 res = create_event()
                 event_id = res['event_id']
@@ -323,20 +329,25 @@ def MobileLogin(request):
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
+                userID=response["data"]['_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type = response["data"]['User_type']
-                client_admin_id = response["data"]['client_admin_id']
-                user_id = response["data"]['_id']
-                role_res = response["data"]['Role']
-                company = response["data"]['company_id']
-                member = response["data"]['Memberof']
-                dept = response["data"]['dept_id']
-                org = response["data"]['org_id']
-                project = response["data"]['project_id']
-                subproject = response["data"]['subproject_id']
+                User_type=response["data"]['User_type']
+                client_admin_id=response["data"]['client_admin_id']
+                payment_status=response["data"]['payment_status']
+                newsletter=response["data"]['newsletter_subscription']
+                user_country=response["data"]['user_country']
+                privacy_policy=response["data"]['Policy_status']
+                other_policy=response["data"]['safety_security_policy']
+                role_res=response["data"]['Role']
+                company=response["data"]['company_id']
+                member=response["data"]['Memberof']
+                dept=response["data"]['dept_id']
+                org=response["data"]['org_id']
+                project=response["data"]['project_id']
+                subproject=response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -349,20 +360,22 @@ def MobileLogin(request):
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
             field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': user_id, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info = {"role": role_res, "username": username, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
-                    "regional_time": final_ltime, "server_time": serverclock, "userIP": ipuser, "browser": browser, "userOS": osver, "userDevice": device, "userBrowser": "", "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id}
-            info1 = json.dumps(info)
-            infoo = str(info1)
-            custom_session = CustomSession.objects.create(
-                sessionID=session, info=infoo, document="", status="login")
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            info1=json.dumps(info)
+            infoo=str(info1)
+            custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
+
+            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
 
             # resp={'userinfo':info}
-            resp = {'session_id': session}
-            return Response(resp)
+            data = {'session_id': session}
+
+            return Response(data)
         else:
             resp = {"data": "Username not found in database"}
             return Response(resp)
@@ -1278,25 +1291,44 @@ def main_login(request):
     ltime = mdata("time")
     ipuser = mdata("ip")
     zone = mdata("timezone")
+    random_session=mdata("randomsession")
     if None in [username, password, loc, device, osver, ltime, ipuser]:
         resp = {"data": "Provide all credentials",
                 "Credentials": "username, password, location, device, os, time, ip"}
         return Response(resp)
     browser = mdata("browser")
     language = mdata("language", "English")
-    company = None
-    org = None
-    dept = None
-    member = None
-    project = None
-    subproject = None
-    role_res = None
-    user_id = None
-    first_name = None
-    last_name = None
-    email = None
-    phone = None
-    User_type = None
+    obj=Account.objects.filter(username=username).first()    
+    try:
+        obj.current_task="Logging In"
+        obj.save(update_fields=['current_task'])
+    except:
+        pass    
+    random_session_obj1=RandomSession.objects.filter(username=username).first()
+    if random_session_obj1 is None:
+        random_session_obj=RandomSession.objects.filter(sessionID=random_session).first()
+        if random_session_obj is None:
+            return Response({'msg':'error','info':'Please accept the terms in policy page!'})
+        random_session_obj.username=username
+        random_session_obj.save(update_fields=['username'])
+    company=None
+    org=None
+    dept=None
+    member=None
+    project=None
+    subproject=None
+    role_res=None
+    first_name=None
+    last_name=None
+    email=None
+    phone=None
+    User_type=None
+    payment_status=None
+    newsletter=None
+    user_country=None
+    privacy_policy=None
+    other_policy=None
+    userID=None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
@@ -1305,6 +1337,12 @@ def main_login(request):
                               "registration", "10004545", "ABCDE", "find", field, "nil")
         response = json.loads(id)
         if response["data"] != None:
+            try:
+                obj.current_task="Verifying User"
+                #obj.current_task="Logging In"
+                obj.save(update_fields=['current_task'])
+            except:
+                pass
             form = login(request, user)
             request.session.save()
             session = request.session.session_key
@@ -1326,20 +1364,25 @@ def main_login(request):
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
+                userID=response["data"]['_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type = response["data"]['User_type']
-                client_admin_id = response["data"]['client_admin_id']
-                user_id = response["data"]['_id']
-                role_res = response["data"]['Role']
-                company = response["data"]['company_id']
-                member = response["data"]['Memberof']
-                dept = response["data"]['dept_id']
-                org = response["data"]['org_id']
-                project = response["data"]['project_id']
-                subproject = response["data"]['subproject_id']
+                User_type=response["data"]['User_type']
+                client_admin_id=response["data"]['client_admin_id']
+                payment_status=response["data"]['payment_status']
+                newsletter=response["data"]['newsletter_subscription']
+                user_country=response["data"]['user_country']
+                privacy_policy=response["data"]['Policy_status']
+                other_policy=response["data"]['safety_security_policy']
+                role_res=response["data"]['Role']
+                company=response["data"]['company_id']
+                member=response["data"]['Memberof']
+                dept=response["data"]['dept_id']
+                org=response["data"]['org_id']
+                project=response["data"]['project_id']
+                subproject=response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -1352,16 +1395,23 @@ def main_login(request):
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
             field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': user_id, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info = {"role": role_res, "username": username, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
-                    "regional_time": final_ltime, "server_time": serverclock, "userIP": ipuser, "browser": browser, "userOS": osver, "userDevice": device, "userBrowser": "", "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id}
-            info1 = json.dumps(info)
-            infoo = str(info1)
-            custom_session = CustomSession.objects.create(
-                sessionID=session, info=infoo, document="", status="login")
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            info1=json.dumps(info)
+            infoo=str(info1)
+            custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
+
+            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+
+            try:
+                obj.current_task="Connecting to UX Living Lab"
+                obj.save(update_fields=['current_task'])
+            except:
+                pass
 
             # resp={'userinfo':info}
             data = {'session_id': session}
