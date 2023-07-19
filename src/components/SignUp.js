@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
@@ -114,6 +114,8 @@ const SignUp = () => {
   const [countdown, setCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
   const [showExemptionCheckbox, setShowExemptionCheckbox] = useState(false);
+  // Get the mainParams from the URL
+  const { mainParams } = useParams();
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -146,6 +148,14 @@ const SignUp = () => {
     }
   }, [registered, navigate, watch]);
 
+  // Set the form values from the URL
+  useEffect(() => {
+    const queryParams = new URLSearchParams(mainParams);
+    for (let pair of queryParams.entries()) {
+      setValue(pair[0], pair[1]);
+    }
+  }, [mainParams, setValue]);
+
   // dispatch email otp
   const handleEmailOTP = (data) => {
     const { Email, Username } = data;
@@ -176,6 +186,7 @@ const SignUp = () => {
     setCountdown(60);
   };
 
+  // Countdown timer
   useEffect(() => {
     if (countdown > 0) {
       // Start the countdown timer
@@ -259,6 +270,32 @@ const SignUp = () => {
       newsletter,
     } = watch();
 
+    // Get the mainParams from the form values and URL encode it
+    const queryString = new URLSearchParams(mainParams);
+    for (const field of [
+      "Firstname",
+      "Lastname",
+      "Username",
+      "user_type",
+      "Email",
+      "Password",
+      "confirm_Password",
+      "user_country",
+      "phonecode",
+      "Phone",
+      "otp",
+      "sms",
+      "Profile_Image",
+      "policy_status",
+      "newsletter",
+    ]) {
+      queryString.set(field, watch()[field]);
+    }
+
+    // Set the value of the hidden input element to be used in the redirect URL
+    document.getElementById("mainParams").value = queryString.toString();
+
+    // Dispatch the registerUser action with the form data
     dispatch(
       registerUser({
         Firstname,
@@ -300,6 +337,8 @@ const SignUp = () => {
           onSubmit={handleSubmit(registeredUserInfo)}
         >
           <div className="grid grid-cols-1 gap-y-6">
+            <input type="hidden" id="mainParams" name="mainParams" />
+
             <div>
               <label htmlFor="Firstname" className="label">
                 First Name <span className="text-red-500">*</span>
