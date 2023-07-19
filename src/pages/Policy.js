@@ -1,35 +1,24 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect } from "react";
 import Iframe from "react-iframe";
 import { Radio } from "react-loader-spinner";
+import { useDispatch, useSelector } from "react-redux";
+import { generateRandomSessionID } from "../redux/policySlice";
 
 const Policy = () => {
-  const [sessionID, setSessionID] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { randomSession, isLoading } = useSelector((state) => state.policy);
 
   useEffect(() => {
-    generateRandomSessionID();
-  }, []);
-
-  const generateRandomSessionID = async () => {
-    try {
-      const response = await axios.get(
-        "https://100014.pythonanywhere.com/api/login_init_api/"
-      );
-      const randomSessionID = response.data.random_session;
-      setSessionID(randomSessionID);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error generating session ID:", error);
+    if (!randomSession) {
+      dispatch(generateRandomSessionID());
     }
-  };
+  }, []);
 
   const getIframeURL = () => {
     const baseURL =
       "https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/";
-    const redirectURL =
-      "https://100014.pythonanywhere.com/legalpolicy1?s=test&session_id=test";
-    return `${baseURL}?redirect_url=${encodeURIComponent(redirectURL)}`;
+    const redirectURL = `https://100014.pythonanywhere.com/legalpolicy1?s=${randomSession}&session_id=${randomSession}`;
+    return `${baseURL}?redirect_url=${redirectURL}`;
   };
 
   return (

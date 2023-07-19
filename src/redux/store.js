@@ -5,6 +5,8 @@ import usernameReducer from "./usernameSlice";
 import loginReducer from "./loginSlice";
 import registrationReducer from "./registrationSlice";
 import logoutReducer from "./logoutSlice";
+import chatReducer from "./chatSlice";
+import policyReducer from "./policySlice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ const store = configureStore({
     login: loginReducer,
     registration: registrationReducer,
     logout: logoutReducer,
+    chat: chatReducer,
+    policy: policyReducer,
   },
 });
 

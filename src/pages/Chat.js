@@ -6,18 +6,18 @@ import { Radio } from "react-loader-spinner";
 
 const Chat = () => {
   const dispatch = useDispatch();
-  const sessionID = useSelector((state) => state.chat.sessionID);
+  const chatSessionID = useSelector((state) => state.chat.sessionID);
   const status = useSelector((state) => state.chat.status);
 
   useEffect(() => {
     if (status === "idle") {
       dispatch(generateSessionID());
     }
-  }, [status, dispatch]);
+  }, []);
 
   const getChatAppURL = () => {
     const baseURL = "https://100096.pythonanywhere.com/chat/login/";
-    const chatAppURL = `${baseURL}?session_id=${sessionID}`;
+    const chatAppURL = `${baseURL}?session_id=${chatSessionID}`;
     return chatAppURL;
   };
 
