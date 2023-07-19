@@ -10,6 +10,7 @@ import PasswordResetForm from "./components/PasswordResetForm";
 import UsernameForgot from "./components/UsernameForgot";
 import SplashPage from "./pages/SplashPage";
 import SignOutPage from "./pages/SignOutPage";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/policy" element={<Policy />} />
           <Route path="/help" element={<Help />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="*" component={NotFound} />
         </Routes>
       </Router>
     </>
