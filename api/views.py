@@ -1351,7 +1351,7 @@ def main_login(request):
                 if obj.first().status == 'login':
                     data = {'session_id': session}
                     response = Response()
-                    response.set_cookie('DOWELL_LOGIN', session)
+                    response.set_cookie('DOWELL_LOGIN', session, domain='pythonanywher.com')
                     return response
             try:
                 res = create_event()
@@ -1417,7 +1417,7 @@ def main_login(request):
             data = {'session_id': session}
 
             response = Response()
-            response.set_cookie('DOWELL_LOGIN', session)
+            response.set_cookie('DOWELL_LOGIN', session, domain='pythonanywhere.com')
             response.data = data
             return response
         else:
