@@ -8,8 +8,7 @@ export const generateRandomSessionID = createAsyncThunk(
       const response = await axios.get(
         "https://100014.pythonanywhere.com/api/login_init_api/"
       );
-      console.log("response", response);
-      // return response.data.random_session;
+      return response.data.random_session;
     } catch (error) {
       throw new Error("Error generating session ID:", error);
     }

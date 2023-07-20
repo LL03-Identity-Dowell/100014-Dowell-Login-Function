@@ -1,48 +1,39 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
-import Coordinate from "../utils/Coordinate";
 import { detectBrowser } from "../utils/browserUtils";
 import { Radio } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
-import { useParams } from "react-router-dom";
+import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
   // Get the mainParams directly using useParams
-  const { mainParams } = useParams();
-  const navigate = useNavigate();
-
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
   const dispatch = useDispatch();
 
-  const Time = new Date();
-  const formatTime = Time.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  });
-
-  const currentTime = formatTime;
-
-  const operatingSystem = getOperatingSystem();
+  const time = new Date().toLocaleTimeString();
+  const os = getOperatingSystem();
   const device = getDeviceType();
-  const userTimezone = Intl.DateTimeFormat()
-    .resolvedOptions()
-    .timeZone.replace(/\//g, "");
-  const browserType = detectBrowser();
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const browser = detectBrowser();
+  const location = Coordinate();
 
-  // Append query parameters to the URL
-  const appendQueryParameters = (baseUrl, queryParams) => {
-    const url = new URL(baseUrl);
-    const urlParams = new URLSearchParams(queryParams);
-    url.search = urlParams.toString();
-    return url.toString();
-  };
+  // Get the query parameters
+  const urlString = window.location.href;
+  const paramString = urlString.split("?")[1];
+  const queryString = new URLSearchParams(paramString);
+  const query = queryString.toString();
+
+  // Check if there are query parameters before proceeding
+  const mainParams = query
+    ? Array.from(queryString.entries())
+        .map(([key, value]) => `${key}=${value}`)
+        .join("&")
+    : "";
 
   // Handle user information
   const handleUserInfo = async (e) => {
@@ -50,72 +41,32 @@ const LogIn = () => {
 
     const { username, password } = e.target.elements;
 
-    const locationValue = await Coordinate().catch((error) => {
-      console.log(error.message);
-      return "";
-    });
-
     const userData = {
       username: username.value,
       password: password.value,
-      time: currentTime,
+      time,
       ip: "",
-      os: operatingSystem,
+      os,
       device,
-      timezone: userTimezone,
+      timezone,
       language: userLanguage,
-      browser: browserType,
-      location: locationValue,
-      random_session: mainParams || "",
+      browser,
+      location,
+      random_session: "",
+      mainParams,
     };
 
     try {
       const response = await dispatch(loginUser(userData));
-      const session_id = response?.payload?.session_id;
+      const sessionID = response?.payload?.session_id;
 
       // Update the sessionID in the userData object
-      userData.random_session = session_id;
+      userData.random_session = sessionID;
 
-      if (session_id) {
-        // Set the base URL for redirection
-        const baseUrl = "https://100093.pythonanywhere.com/home";
-
-        // Destructure the userData object to get individual properties
-        const {
-          username,
-          time,
-          ip,
-          os,
-          device,
-          timezone,
-          language,
-          browser,
-          location,
-          random_session,
-        } = userData;
-
-        // Redirect to the desired page with query parameters
-        const queryParams = {
-          username,
-          time,
-          ip,
-          os,
-          device,
-          timezone,
-          language,
-          browser,
-          location,
-          random_session,
-        };
-
-        // redirect to the desired URL
-        const redirectURL = appendQueryParameters(baseUrl, queryParams);
-        navigate(redirectURL);
-      } else {
-        throw new Error("Invalid username or password");
-      }
+      // Redirect to the desired page
+      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}&${mainParams}`;
     } catch (error) {
-      console.log("Error while logging in:", error.message);
+      throw new Error(error.response.data);
     }
   };
 
