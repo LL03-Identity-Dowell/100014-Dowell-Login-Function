@@ -1,22 +1,20 @@
 import React, { useEffect } from "react";
 import Iframe from "react-iframe";
 import { useDispatch, useSelector } from "react-redux";
-import { generateSessionID } from "../redux/chatSlice";
 import { Radio } from "react-loader-spinner";
+import { generateSessionID } from "../redux/sessionSlice";
 
 const Chat = () => {
   const dispatch = useDispatch();
-  const { sessionID, status } = useSelector((state) => state.chat);
+  const { chatSessionID, status } = useSelector((state) => state.session);
 
   useEffect(() => {
-    if (status === "idle") {
-      dispatch(generateSessionID());
-    }
+    dispatch(generateSessionID());
   }, []);
 
   const getChatAppURL = () => {
     const baseURL = "https://100096.pythonanywhere.com/chat/login/";
-    const chatAppURL = `${baseURL}?session_id=${sessionID}`;
+    const chatAppURL = `${baseURL}?session_id=${chatSessionID}`;
     return chatAppURL;
   };
 

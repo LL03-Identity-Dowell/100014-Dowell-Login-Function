@@ -2,17 +2,17 @@ import React, { useEffect } from "react";
 import Iframe from "react-iframe";
 import { Radio } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
-import { generateRandomSessionID } from "../redux/policySlice";
+import { generateRandomSessionID } from "../redux/sessionSlice";
 
 const Policy = () => {
   const dispatch = useDispatch();
-  const { randomSession, isLoading } = useSelector((state) => state.policy);
+  const { randomSession, isLoading } = useSelector((state) => state.session);
 
   useEffect(() => {
     if (!randomSession) {
       dispatch(generateRandomSessionID());
     }
-  }, []);
+  }, [randomSession, dispatch]);
 
   const getIframeURL = () => {
     const baseURL =
