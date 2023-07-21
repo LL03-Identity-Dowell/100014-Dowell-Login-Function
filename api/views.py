@@ -283,25 +283,25 @@ def MobileLogin(request):
         return Response(resp)
     browser = mdata("browser")
     language = mdata("language", "English")
-    company=None
-    org=None
-    dept=None
-    member=None
-    project=None
-    subproject=None
-    role_res=None
-    first_name=None
-    last_name=None
-    email=None
-    phone=None
-    User_type=None
-    payment_status=None
-    newsletter=None
-    user_country=None
-    privacy_policy=None
-    other_policy=None
-    userID=None
-    client_admin_id=None
+    company = None
+    org = None
+    dept = None
+    member = None
+    project = None
+    subproject = None
+    role_res = None
+    first_name = None
+    last_name = None
+    email = None
+    phone = None
+    User_type = None
+    payment_status = None
+    newsletter = None
+    user_country = None
+    privacy_policy = None
+    other_policy = None
+    userID = None
+    client_admin_id = None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
@@ -329,25 +329,25 @@ def MobileLogin(request):
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
-                userID=response["data"]['_id']
+                userID = response["data"]['_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type=response["data"]['User_type']
-                client_admin_id=response["data"]['client_admin_id']
-                payment_status=response["data"]['payment_status']
-                newsletter=response["data"]['newsletter_subscription']
-                user_country=response["data"]['user_country']
-                privacy_policy=response["data"]['Policy_status']
-                other_policy=response["data"]['safety_security_policy']
-                role_res=response["data"]['Role']
-                company=response["data"]['company_id']
-                member=response["data"]['Memberof']
-                dept=response["data"]['dept_id']
-                org=response["data"]['org_id']
-                project=response["data"]['project_id']
-                subproject=response["data"]['subproject_id']
+                User_type = response["data"]['User_type']
+                client_admin_id = response["data"]['client_admin_id']
+                payment_status = response["data"]['payment_status']
+                newsletter = response["data"]['newsletter_subscription']
+                user_country = response["data"]['user_country']
+                privacy_policy = response["data"]['Policy_status']
+                other_policy = response["data"]['safety_security_policy']
+                role_res = response["data"]['Role']
+                company = response["data"]['company_id']
+                member = response["data"]['Memberof']
+                dept = response["data"]['dept_id']
+                org = response["data"]['org_id']
+                project = response["data"]['project_id']
+                subproject = response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -364,13 +364,16 @@ def MobileLogin(request):
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
-            info1=json.dumps(info)
-            infoo=str(info1)
-            custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
+            info = {"role": role_res, "username": username, "first_name": first_name, "last_name": last_name, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone, "regional_time": final_ltime, "server_time": serverclock,
+                    "userIP": ipuser, "userOS": osver, "userDevice": device, "language": language, "userID": userID, "login_eventID": event_id, "client_admin_id": client_admin_id, "payment_status": payment_status, "user_country": user_country, "newsletter_subscription": newsletter, "Privacy_policy": privacy_policy, "Safety,Security_policy": other_policy}
+            info1 = json.dumps(info)
+            infoo = str(info1)
+            custom_session = CustomSession.objects.create(
+                sessionID=session, info=infoo, document="", status="login")
 
-            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+            serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session, username=username, product="",
+                                      status="login", created=serverclock1, updated=serverclock1)
 
             # resp={'userinfo':info}
             data = {'session_id': session}
@@ -453,6 +456,7 @@ def new_userinfo(request):
                 del var2[key]
             except:
                 pass
+        user_data = Account.objects.filter(username=var2["username"]).first()
         field = {"document_name": var2["username"]}
         details = dowellconnection("login", "bangalore", "login", "client_admin",
                                    "client_admin", "1159", "ABCDE", "fetch", field, "nil")
@@ -487,6 +491,8 @@ def new_userinfo(request):
             except:
                 pass
         try:
+            var2["first_login"] = user_data.date_joined
+            var2["last_login"] = user_data.last_login
             var2["client_admin_id"] = details_res["data"][0]["_id"]
             for r in var3:
                 r["org_id"] = details_res["data"][0]["_id"]
@@ -504,6 +510,47 @@ def new_userinfo(request):
                     'members': main_member, "own_organisations": [{"org_name": organisations}], "other_org": otherorg}
         return Response(userinfo)
     return Response({"message": "its working"})
+
+
+@api_view(['GET', 'POST'])
+def all_users(request):
+    if request.method == 'POST':
+        username = request.data["username"]
+        password1 = request.data["password"]
+        # password=base64.b64decode(password1.encode('utf-8')).decode()
+        user = authenticate(request, username=username, password=password1)
+        if user is not None:
+            userfield = {}
+            main = dowellconnection("login", "bangalore", "login", "registration",
+                                    "registration", "10004545", "ABCDE", "fetch", userfield, "nil")
+            main_res = json.loads(main)
+            final = main_res["data"]
+            final2 = []
+            for a in final:
+                try:
+                    if not a["User_status"] == "deleted" and not a["User_status"] == "inactive":
+                        try:
+                            username = a['Username']
+                            payment_status = a['payment_status']
+                            user_id = a['_id']
+                            user_type = a['User_type']
+                            final2.append({"username": username, "org_name": username,
+                                          "payment_status": payment_status, "user_id": user_id, "user_type": user_type})
+                        except:
+                            pass
+                    else:
+                        pass
+                except:
+                    try:
+                        username = a['Username']
+                        payment_status = a['payment_status']
+                        user_id = a['_id']
+                        user_type = a['User_type']
+                        final2.append({"username": username, "org_name": username,
+                                      "payment_status": payment_status, "user_id": user_id, "user_type": user_type})
+                    except:
+                        pass
+            return Response({"data": final2})
 
 
 @api_view(['GET', 'POST'])
@@ -750,9 +797,17 @@ def profile_view(request):
                                 "registration", "10004545", "ABCDE", "find", {"Username": username}, "nil")
         resp1 = json.loads(resp)
         if resp1["data"] != None:
-            return Response(resp1["data"])
+            try:
+                if resp1["data"]["User_status"] == "deleted":
+                    return Response({'msg': 'error', 'info': 'User not found with given credentials..'})
+                elif resp1["data"]["User_status"] == "inactive":
+                    return Response({'msg': 'error', 'info': 'Account disabled, please contact admin'})
+                else:
+                    return Response(resp1["data"])
+            except:
+                return Response(resp1["data"])
         else:
-            return Response({"Error": "Credentials wrong1"})
+            return Response({'msg': 'error', 'info': 'User not found with given credentials..'})
     else:
         return Response({"Error": "Credentials wrong"})
 
@@ -1076,12 +1131,13 @@ def login_init_api(request):
     urls = request.GET.get('next', None)
     context["url"] = request.GET.get('redirect_url', None)
     redirect_url = request.GET.get('redirect_url', None)
-    past_login=request.COOKIES.get('DOWELL_LOGIN')
+    past_login = request.COOKIES.get('DOWELL_LOGIN')
     if past_login:
-        test_session=CustomSession.objects.filter(sessionID=past_login).first()
+        test_session = CustomSession.objects.filter(
+            sessionID=past_login).first()
         if test_session:
             if test_session.status == "login":
-                return Response({'msg':'error','info':'logged_in_user'})
+                return Response({'msg': 'error', 'info': 'logged_in_user'})
     random_text = passgen.generate_random_password1(24)
     context["random_session"] = random_text
     if request.COOKIES.get('qrid_login'):
@@ -1291,44 +1347,46 @@ def main_login(request):
     ltime = mdata("time")
     ipuser = mdata("ip")
     zone = mdata("timezone")
-    random_session=mdata("randomsession")
+    random_session = mdata("randomsession")
     if None in [username, password, loc, device, osver, ltime, ipuser]:
         resp = {"data": "Provide all credentials",
                 "Credentials": "username, password, location, device, os, time, ip"}
         return Response(resp)
     browser = mdata("browser")
     language = mdata("language", "English")
-    obj=Account.objects.filter(username=username).first()    
+    obj = Account.objects.filter(username=username).first()
     try:
-        obj.current_task="Logging In"
+        obj.current_task = "Logging In"
         obj.save(update_fields=['current_task'])
     except:
-        pass    
-    random_session_obj1=RandomSession.objects.filter(username=username).first()
+        pass
+    random_session_obj1 = RandomSession.objects.filter(
+        username=username).first()
     if random_session_obj1 is None:
-        random_session_obj=RandomSession.objects.filter(sessionID=random_session).first()
+        random_session_obj = RandomSession.objects.filter(
+            sessionID=random_session).first()
         if random_session_obj is None:
-            return Response({'msg':'error','info':'Please accept the terms in policy page!'})
-        random_session_obj.username=username
+            return Response({'msg': 'error', 'info': 'Please accept the terms in policy page!'})
+        random_session_obj.username = username
         random_session_obj.save(update_fields=['username'])
-    company=None
-    org=None
-    dept=None
-    member=None
-    project=None
-    subproject=None
-    role_res=None
-    first_name=None
-    last_name=None
-    email=None
-    phone=None
-    User_type=None
-    payment_status=None
-    newsletter=None
-    user_country=None
-    privacy_policy=None
-    other_policy=None
-    userID=None
+    company = None
+    org = None
+    dept = None
+    member = None
+    project = None
+    subproject = None
+    role_res = None
+    first_name = None
+    last_name = None
+    email = None
+    phone = None
+    User_type = None
+    payment_status = None
+    newsletter = None
+    user_country = None
+    privacy_policy = None
+    other_policy = None
+    userID = None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
@@ -1338,8 +1396,8 @@ def main_login(request):
         response = json.loads(id)
         if response["data"] != None:
             try:
-                obj.current_task="Verifying User"
-                #obj.current_task="Logging In"
+                obj.current_task = "Verifying User"
+                # obj.current_task="Logging In"
                 obj.save(update_fields=['current_task'])
             except:
                 pass
@@ -1351,7 +1409,8 @@ def main_login(request):
                 if obj.first().status == 'login':
                     data = {'session_id': session}
                     response = Response()
-                    response.set_cookie('DOWELL_LOGIN', session, domain='pythonanywhere.com')
+                    response.set_cookie(
+                        'DOWELL_LOGIN', session, domain='pythonanywhere.com')
                     return response
             try:
                 res = create_event()
@@ -1364,25 +1423,25 @@ def main_login(request):
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
-                userID=response["data"]['_id']
+                userID = response["data"]['_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type=response["data"]['User_type']
-                client_admin_id=response["data"]['client_admin_id']
-                payment_status=response["data"]['payment_status']
-                newsletter=response["data"]['newsletter_subscription']
-                user_country=response["data"]['user_country']
-                privacy_policy=response["data"]['Policy_status']
-                other_policy=response["data"]['safety_security_policy']
-                role_res=response["data"]['Role']
-                company=response["data"]['company_id']
-                member=response["data"]['Memberof']
-                dept=response["data"]['dept_id']
-                org=response["data"]['org_id']
-                project=response["data"]['project_id']
-                subproject=response["data"]['subproject_id']
+                User_type = response["data"]['User_type']
+                client_admin_id = response["data"]['client_admin_id']
+                payment_status = response["data"]['payment_status']
+                newsletter = response["data"]['newsletter_subscription']
+                user_country = response["data"]['user_country']
+                privacy_policy = response["data"]['Policy_status']
+                other_policy = response["data"]['safety_security_policy']
+                role_res = response["data"]['Role']
+                company = response["data"]['company_id']
+                member = response["data"]['Memberof']
+                dept = response["data"]['dept_id']
+                org = response["data"]['org_id']
+                project = response["data"]['project_id']
+                subproject = response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -1399,16 +1458,19 @@ def main_login(request):
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
-            info1=json.dumps(info)
-            infoo=str(info1)
-            custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
+            info = {"role": role_res, "username": username, "first_name": first_name, "last_name": last_name, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone, "regional_time": final_ltime, "server_time": serverclock,
+                    "userIP": ipuser, "userOS": osver, "userDevice": device, "language": language, "userID": userID, "login_eventID": event_id, "client_admin_id": client_admin_id, "payment_status": payment_status, "user_country": user_country, "newsletter_subscription": newsletter, "Privacy_policy": privacy_policy, "Safety,Security_policy": other_policy}
+            info1 = json.dumps(info)
+            infoo = str(info1)
+            custom_session = CustomSession.objects.create(
+                sessionID=session, info=infoo, document="", status="login")
 
-            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+            serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session, username=username, product="",
+                                      status="login", created=serverclock1, updated=serverclock1)
 
             try:
-                obj.current_task="Connecting to UX Living Lab"
+                obj.current_task = "Connecting to UX Living Lab"
                 obj.save(update_fields=['current_task'])
             except:
                 pass
@@ -1417,7 +1479,8 @@ def main_login(request):
             data = {'session_id': session}
 
             response = Response()
-            response.set_cookie('DOWELL_LOGIN', session, domain='pythonanywhere.com')
+            response.set_cookie('DOWELL_LOGIN', session,
+                                domain='pythonanywhere.com')
             response.data = data
             return response
         else:
@@ -1453,3 +1516,23 @@ def main_logout(request):
     response.data = {'msg': 'Logged out Successfully..'}
     response.delete_cookie('DOWELL_LOGIN')
     return response
+
+
+@api_view(['POST'])
+def user_status(request):
+    username = request.data.get("username", None)
+    status = request.data.get("status", None)
+    field = {"Username": username}
+    id = dowellconnection("login", "bangalore", "login", "registration",
+                          "registration", "10004545", "ABCDE", "find", field, "nil")
+    response = json.loads(id)
+    if response["data"] != None:
+        if status is not None:
+            up_field = {"User_status": status}
+            dowellconnection("login", "bangalore", "login", "registration",
+                             "registration", "10004545", "ABCDE", "update", field, up_field)
+            return Response({'msg': 'success', 'info': f"{username}'s status changed to {status}"})
+        else:
+            return Response({'msg': 'error', 'info': "Please Enter valid status"})
+    else:
+        return Response({'msg': 'error', 'info': "Username not found"})
