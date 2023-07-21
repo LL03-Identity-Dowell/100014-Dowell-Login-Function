@@ -16,7 +16,6 @@ export const loginUser = createAsyncThunk(
     timezone,
     language,
     browser,
-    random_session,
   }) => {
     try {
       const response = await axios.post(api_url, {
@@ -30,7 +29,6 @@ export const loginUser = createAsyncThunk(
         timezone,
         language,
         browser,
-        random_session,
       });
       return response?.data;
     } catch (error) {

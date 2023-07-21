@@ -1,19 +1,24 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const SplashPage = () => {
   const navigate = useNavigate();
+  const { Username } = useParams();
+
+  const location = useLocation();
+  const urlString = location.search;
+  const paramString = urlString.split("?")[1];
+  const queryString = new URLSearchParams(paramString);
+  const mainParams = queryString.toString();
 
   const handleLogin = () => {
-    navigate("/");
+    navigate(`/?${mainParams}`);
   };
 
   const handleCancel = () => {
     navigate("/signup");
   };
-
-  const { Username } = useParams();
 
   return (
     <div className="antialiased bg-gray-100 flex items-center justify-center h-screen">
@@ -30,6 +35,7 @@ const SplashPage = () => {
           <p className="text-gray-600 mb-4 text-center">
             User{" "}
             <strong className="underline text-green-500">{Username}</strong>
+            {""}
             successfully registered!
           </p>
           <div className="flex flex-row items-center justify-center mt-20">

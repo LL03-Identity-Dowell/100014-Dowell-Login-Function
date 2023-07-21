@@ -10,9 +10,13 @@ import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
-
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
+
+  // Get the random session ID from the Redux store
+  const { randomSession } = useSelector((state) => state.session);
+
+  // Access the dispatch function
   const dispatch = useDispatch();
 
   const time = new Date().toLocaleTimeString();
@@ -52,16 +56,13 @@ const LogIn = () => {
       language: userLanguage,
       browser,
       location,
-      random_session: "",
+      randomSession,
       mainParams,
     };
 
     try {
       const response = await dispatch(loginUser(userData));
       const sessionID = response?.payload?.session_id;
-
-      // Update the sessionID in the userData object
-      userData.random_session = sessionID;
 
       // Redirect to the desired page
       window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
@@ -94,7 +95,7 @@ const LogIn = () => {
 
           <div className="text-gray-500 text-base">
             <p>Don't have an account?</p>
-            <Link to="/signup">
+            <Link to={`/signup?${mainParams}`}>
               <span className="text-green-500 text-base">Sign up</span>
             </Link>
           </div>
