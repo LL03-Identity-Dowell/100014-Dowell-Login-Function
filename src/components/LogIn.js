@@ -10,7 +10,7 @@ import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
-  // Get the mainParams directly using useParams
+
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
   const dispatch = useDispatch();
@@ -64,7 +64,7 @@ const LogIn = () => {
       userData.random_session = sessionID;
 
       // Redirect to the desired page
-      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}&${mainParams}`;
+      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
     } catch (error) {
       throw new Error(error.response.data);
     }

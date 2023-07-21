@@ -302,8 +302,6 @@ const SignUp = () => {
           onSubmit={handleSubmit(registeredUserInfo)}
         >
           <div className="grid grid-cols-1 gap-y-6">
-            <input type="hidden" id="mainParams" name="mainParams" />
-
             <div>
               <label htmlFor="Firstname" className="label">
                 First Name <span className="text-red-500">*</span>

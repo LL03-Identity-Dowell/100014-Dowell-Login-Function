@@ -9,7 +9,9 @@ const Chat = () => {
   const { chatSessionID, status } = useSelector((state) => state.session);
 
   useEffect(() => {
-    dispatch(generateSessionID());
+    if (!chatSessionID) {
+      dispatch(generateSessionID());
+    }
   }, []);
 
   const getChatAppURL = () => {
