@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
