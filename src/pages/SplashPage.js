@@ -1,24 +1,14 @@
 import React from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const SplashPage = () => {
   const navigate = useNavigate();
   const { Username } = useParams();
 
+  // Use the useLocation hook to access the URL parameters passed from the login page
   const location = useLocation();
-  const urlString = location.search;
-  const paramString = urlString.split("?")[1];
-  const queryString = new URLSearchParams(paramString);
-  const mainParams = queryString.toString();
-
-  const handleLogin = () => {
-    navigate(`/?${mainParams}`);
-  };
-
-  const handleCancel = () => {
-    navigate("/signup");
-  };
+  const mainParams = location.search.substring(1); // Remove the leading '?' character
 
   return (
     <div className="antialiased bg-gray-100 flex items-center justify-center h-screen">
@@ -41,13 +31,13 @@ const SplashPage = () => {
           <div className="flex flex-row items-center justify-center mt-20">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
-              onClick={handleLogin}
+              onClick={() => navigate(`/?${mainParams}`)}
             >
               Login
             </button>
             <button
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={handleCancel}
+              onClick={() => navigate("/signup")}
             >
               Cancel
             </button>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
@@ -134,6 +134,10 @@ const SignUp = () => {
   // a hook to redirect the user to the signin page
   const navigate = useNavigate();
 
+  // Use the useLocation hook to access the URL parameters passed from the login page
+  const location = useLocation();
+  const mainParams = location.search.substring(1); // Remove the leading '?' character
+
   // dispatch countries list
   useEffect(() => {
     dispatch(fetchCountries());
@@ -142,9 +146,9 @@ const SignUp = () => {
   // Redirect when `registered` changes
   useEffect(() => {
     if (registered) {
-      navigate(`/splash/${watch().Username}`);
+      navigate(`/splash/${watch().Username}/${mainParams}`);
     }
-  }, [registered, navigate, watch]);
+  }, [registered, navigate, watch, mainParams]);
 
   // dispatch email otp
   const handleEmailOTP = (data) => {
