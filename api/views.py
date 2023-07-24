@@ -926,6 +926,12 @@ def forgot_password(request):
             "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
         user = json.loads(user_json)
         if len(user['data']) >= 1:
+            try:
+                data = user['data']
+                if data["User_status"] == "deleted" and data["User_status"] == "inactive":
+                    return Response({'msg': 'Sorry account inactive or deleted'})
+            except:
+                pass
             update_fields = {
                 'Password': dowell_hash.dowell_hash(new_password)}
             print(update_fields)
@@ -952,6 +958,12 @@ def forgot_username(request):
         user = json.loads(user_json)
         username_list = []
         if len(user['data']) > 1:
+            try:
+                data = user['data']
+                if data["User_status"] == "deleted" and data["User_status"] == "inactive":
+                    return Response({'msg': 'Sorry account inactive or deleted'})
+            except:
+                pass
             json_data = dowellconnection(
                 "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
             data = json.loads(json_data)
