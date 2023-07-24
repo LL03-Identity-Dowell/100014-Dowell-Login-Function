@@ -72,11 +72,10 @@ const schema = yup.object().shape({
       .required("Phone number is required")
       .matches(/^\d{9,}$/, "Phone number must have at least 9 digits"),
   }),
-  sms: yup.string().when("smsSent", {
-    is: true,
-    then: yup.string(),
+  sms: yup.string().when(["smsSent", "exempted"], {
+    is: (smsSent, exempted) => smsSent && !exempted,
+    then: yup.string().required("OTP is required"),
   }),
-
   Profile_Image: yup
     .mixed()
     .required("Upload profile photo")
@@ -92,7 +91,6 @@ const schema = yup.object().shape({
       if (!value || !value[0]) return true; // Allow empty value
       return value[0].size <= 1024 * 1024;
     }),
-
   policy_status: yup.boolean().when(["otpSent", "smsSent"], {
     is: (otpSent, smsSent) => otpSent || smsSent,
     then: yup
@@ -113,7 +111,6 @@ const SignUp = () => {
   const [showAttempts, setShowAttempts] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
-  const [showExemptionCheckbox, setShowExemptionCheckbox] = useState(false);
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -161,14 +158,12 @@ const SignUp = () => {
   // dispatch mobile otp
   const handleMobileOTP = (data) => {
     if (attempts === 0 && !exempted) {
-      setShowExemptionCheckbox(true);
-      return; // No more attempts remaining and not exempted
+      setExempted(true); // Set user as exempted when attempts are exhausted
     }
     // Decrease attempts
-    if (attempts > 0) {
+    if (attempts > 0 && !exempted) {
       setAttempts((prevAttempts) => prevAttempts - 1);
     }
-
     const { phonecode, Phone } = data;
     if (phonecode && Phone && Phone.length > 0 && !smsSent) {
       dispatch(sendMobileOTP({ phonecode, Phone }));
@@ -616,7 +611,7 @@ const SignUp = () => {
                       disabled={
                         loading ||
                         countdown > 0 || // Disable the button while the countdown is active
-                        (attempts === 0 && !exempted)
+                        (attempts === 0 && !exempted) // Disable the button if attempts are exhausted and not exempted
                       }
                     >
                       {loading ? (
@@ -643,58 +638,62 @@ const SignUp = () => {
                     </div>
                   )}
 
-                  {showAttempts && (
+                  {showAttempts && !exempted && (
                     <div>
                       <p className="text-base font-normal text-green-600">
                         Attempts remaining: {attempts}
                       </p>
-                      {showExemptionCheckbox && (
-                        <div className="relative flex gap-x-3">
-                          <div className="flex h-6 items-center">
-                            <input
-                              id="exempt-checkbox"
-                              name="exempt-checkbox"
-                              type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                              onChange={() => setExempted(!exempted)}
-                              checked={exempted}
-                            />
-                          </div>
-                          <div className="text-sm leading-6">
-                            <p className="text-gray-600">
-                              Exempt from SMS requirement
-                            </p>
-                          </div>
-                        </div>
-                      )}
+                    </div>
+                  )}
+
+                  {attempts === 0 && countdown === 0 && (
+                    <div className="relative flex gap-x-3">
+                      <div className="flex h-6 items-center">
+                        <input
+                          id="exempt-checkbox"
+                          name="exempt-checkbox"
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                          onChange={() => setExempted(!exempted)}
+                          checked={exempted}
+                        />
+                      </div>
+                      <div className="text-sm leading-6">
+                        <p className="text-gray-600">
+                          Exempt from SMS requirement
+                        </p>
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
             </div>
 
-            <div>
-              <label htmlFor="sms" className="label">
-                Enter OTP from SMS <span className="text-red-500">*</span>
-              </label>
+            {smsSent && !exempted && (
+              <div>
+                <label htmlFor="sms" className="label">
+                  Enter OTP from SMS <span className="text-red-500">*</span>
+                </label>
 
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="sms"
-                  id="sms"
-                  placeholder="Enter OTP from SMS"
-                  autoComplete="sms"
-                  className="input-field"
-                  {...register("sms")}
-                />
-                {errors.sms && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.sms.message}
-                  </p>
-                )}
+                <div className="mt-2.5">
+                  <input
+                    type="text"
+                    name="sms"
+                    id="sms"
+                    placeholder="Enter OTP from SMS"
+                    autoComplete="sms"
+                    className="input-field"
+                    {...register("sms", { required: exempted })}
+                    disabled={exempted}
+                  />
+                  {errors.sms && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.sms.message}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             <div>
               <label htmlFor="Profile_Image" className="label">
