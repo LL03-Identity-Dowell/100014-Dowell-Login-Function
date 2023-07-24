@@ -1410,7 +1410,7 @@ def main_login(request):
                     data = {'session_id': session}
                     response = Response()
                     response.set_cookie(
-                        'DOWELL_LOGIN', session, domain='pythonanywhere.com')
+                        'DOWELL_LOGIN', session, domain='pythonanywhere.com', httponly=True)
                     return response
             try:
                 res = create_event()
@@ -1480,7 +1480,7 @@ def main_login(request):
 
             response = Response()
             response.set_cookie('DOWELL_LOGIN', session,
-                                domain='pythonanywhere.com')
+                                domain='pythonanywhere.com', httponly=True)
             response.data = data
             return response
         else:
