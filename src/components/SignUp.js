@@ -15,6 +15,7 @@ import {
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import zxcvbn from "zxcvbn";
+import useTimedMessage from "./useTimedMessage";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -107,10 +108,17 @@ const schema = yup.object().shape({
 const SignUp = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordMessage, setPasswordMessage] = useState("");
-  const [attempts, setAttempts] = useState(5);
-  const [showAttempts, setShowAttempts] = useState(false);
-  const [countdown, setCountdown] = useState(0);
+  const [attemptsOtp, setAttemptsOtp] = useState(5);
+  const [attemptsSms, setAttemptsSms] = useState(5);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
+  const [smsOtpSent, setSmsOtpSent] = useState(false);
+
+  // Use the custom hook to handle the email and SMS sent messages
+  const [emailMessages, setEmailMessage] = useTimedMessage();
+  const [smsMessages, setSmsMessage] = useTimedMessage();
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -149,44 +157,51 @@ const SignUp = () => {
 
   // dispatch email otp
   const handleEmailOTP = (data) => {
-    const { Email, Username } = data;
-    if (Email && Username) {
-      dispatch(sendEmailOTP({ Email, Username }));
+    if (attemptsOtp > 0 && !exempted && otpCountdown === 0) {
+      setAttemptsOtp((prevAttempts) => prevAttempts - 1);
+      const { Email, Username } = data;
+      if (Email && Username) {
+        dispatch(sendEmailOTP({ Email, Username }));
+        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
+        setEmailOtpSent(true);
+        setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+      }
     }
   };
 
-  // dispatch mobile otp
+  // Dispatch mobile sms
   const handleMobileOTP = (data) => {
-    if (attempts === 0 && !exempted) {
-      setExempted(true); // Set user as exempted when attempts are exhausted
+    if (attemptsSms > 0 && !exempted && smsCountdown === 0) {
+      setAttemptsSms((prevAttempts) => prevAttempts - 1);
+      const { phonecode, Phone } = data;
+      if (phonecode && Phone && Phone.length > 0) {
+        dispatch(sendMobileOTP({ phonecode, Phone }));
+        setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
+        setSmsOtpSent(true);
+        setSmsMessage(smsSent || smsOtpSent, 10000); // Show the SMS message for 10 seconds
+      }
     }
-    // Decrease attempts
-    if (attempts > 0 && !exempted) {
-      setAttempts((prevAttempts) => prevAttempts - 1);
-    }
-    const { phonecode, Phone } = data;
-    if (phonecode && Phone && Phone.length > 0 && !smsSent) {
-      dispatch(sendMobileOTP({ phonecode, Phone }));
-      setCountdown(60); // Reset the countdown timer to 60 seconds
-    } else {
-      setShowAttempts(true);
-    }
-    // Start the countdown timer
-    setCountdown(60);
   };
 
-  // Countdown timer
+  // Countdown timer for OTP
   useEffect(() => {
-    if (countdown > 0) {
-      // Start the countdown timer
-      const timer = setTimeout(() => {
-        setCountdown((prevCountdown) => prevCountdown - 1);
+    if (otpCountdown > 0) {
+      const otpTimer = setTimeout(() => {
+        setOtpCountdown((prevCountdown) => prevCountdown - 1);
       }, 1000); // 1 second
-
-      // Clear the countdown timer when it reaches 0
-      return () => clearTimeout(timer);
+      return () => clearTimeout(otpTimer);
     }
-  }, [countdown]);
+  }, [otpCountdown]);
+
+  // Countdown timer for SMS
+  useEffect(() => {
+    if (smsCountdown > 0) {
+      const smsTimer = setTimeout(() => {
+        setSmsCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000); // 1 second
+      return () => clearTimeout(smsTimer);
+    }
+  }, [smsCountdown]);
 
   // Add a useRef hook to get a reference to the password input field:
   const passwordRef = useRef(null);
@@ -487,12 +502,17 @@ const SignUp = () => {
                   </p>
                 )}
               </div>
+
               <div className="mt-2.5">
                 <div className="flex flex-row space-x-3 items-center">
                   <button
                     className="btn-send px-2 py-1 self-start"
-                    onClick={handleSubmit(handleEmailOTP)}
-                    disabled={loading}
+                    onClick={() => handleEmailOTP(watch())}
+                    disabled={
+                      loading ||
+                      (emailOtpSent && otpCountdown > 0) ||
+                      attemptsOtp === 0
+                    }
                   >
                     {loading ? (
                       <Radio
@@ -508,35 +528,79 @@ const SignUp = () => {
                       "Get OTP"
                     )}
                   </button>
-                  <p className="text-base font-normal text-green-600">
-                    {otpSent}
-                  </p>
+                  {emailMessages.map((message) => (
+                    <p
+                      key={message.id}
+                      className="text-base font-normal text-green-600"
+                    >
+                      {message.message}
+                    </p>
+                  ))}
                 </div>
-              </div>
-            </div>
 
-            <div>
-              <label htmlFor="otp-Email" className="label">
-                Enter OTP from Email <span className="text-red-500">*</span>
-              </label>
+                {/* Display the countdown timer only after the first OTP attempt */}
+                {emailOtpSent && otpCountdown > 0 && (
+                  <div className="text-base font-normal text-green-600">
+                    Resend OTP in: {otpCountdown}s
+                  </div>
+                )}
 
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="otp"
-                  id="otp"
-                  placeholder="Enter OTP from Email"
-                  autoComplete="otp"
-                  className="input-field"
-                  {...register("otp")}
-                />
-                {errors.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
+                {/* Display the email OTP attempts remaining */}
+                {attemptsOtp > 0 && emailOtpSent && (
+                  <div>
+                    <p className="text-base font-normal text-green-600">
+                      Attempts remaining: {attemptsOtp}
+                    </p>
+                  </div>
+                )}
+
+                {/* Display checkbox to exempt from email OTP */}
+                {attemptsOtp === 0 && otpCountdown === 0 && (
+                  <div className="relative flex gap-x-3">
+                    <div className="flex h-6 items-center">
+                      <input
+                        id="exempt-checkbox"
+                        name="exempt-checkbox"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                        onChange={() => setExempted(!exempted)}
+                        checked={exempted}
+                      />
+                    </div>
+                    <div className="text-sm leading-6">
+                      <p className="text-gray-600">
+                        Exempt from OTP requirement
+                      </p>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
+
+            {emailOtpSent && !exempted && (
+              <div>
+                <label htmlFor="otp-Email" className="label">
+                  Enter OTP from Email <span className="text-red-500">*</span>
+                </label>
+
+                <div className="mt-2.5">
+                  <input
+                    type="text"
+                    name="otp"
+                    id="otp"
+                    placeholder="Enter OTP from Email"
+                    autoComplete="otp"
+                    className="input-field"
+                    {...register("otp")}
+                  />
+                  {errors.otp && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.otp.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div>
               <label htmlFor="user_country" className="label">
@@ -590,82 +654,87 @@ const SignUp = () => {
             </div>
 
             <div>
-              <div>
-                <label htmlFor="Phone" className="label">
-                  Phone Number <span className="text-red-500">*</span>
-                </label>
-                <div className="relative mt-2.5">
-                  <input
-                    name="Phone"
-                    type="text"
-                    placeholder="Enter Your Phone Number"
-                    className="input-field"
-                    {...register("Phone")}
-                  />
-                </div>
-                <div className="mt-2.5">
-                  <div className="flex flex-row space-x-3 items-center">
-                    <button
-                      className="btn-send px-2 py-1 self-start"
-                      onClick={handleSubmit(handleMobileOTP)}
-                      disabled={
-                        loading ||
-                        countdown > 0 || // Disable the button while the countdown is active
-                        (attempts === 0 && !exempted) // Disable the button if attempts are exhausted and not exempted
-                      }
+              <label htmlFor="Phone" className="label">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <div className="relative mt-2.5">
+                <input
+                  name="Phone"
+                  type="text"
+                  placeholder="Enter Your Phone Number"
+                  className="input-field"
+                  {...register("Phone")}
+                />
+              </div>
+              <div className="mt-2.5">
+                <div className="flex flex-row space-x-3 items-center">
+                  <button
+                    className="btn-send px-2 py-1 self-start"
+                    onClick={() => handleMobileOTP(watch())}
+                    disabled={
+                      loading ||
+                      (smsOtpSent && smsCountdown > 0) ||
+                      (attemptsSms === 0 && !exempted)
+                    }
+                  >
+                    {loading ? (
+                      <Radio
+                        visible={true}
+                        height={30}
+                        width={30}
+                        ariaLabel="radio-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName="radio-wrapper"
+                        color="#1ff507"
+                      />
+                    ) : (
+                      "Get SMS"
+                    )}
+                  </button>
+                  {smsMessages.map((message) => (
+                    <p
+                      key={message.id}
+                      className="text-base font-normal text-green-600"
                     >
-                      {loading ? (
-                        <Radio
-                          visible={true}
-                          height={30}
-                          width={30}
-                          ariaLabel="radio-loading"
-                          wrapperStyle={{}}
-                          wrapperClassName="radio-wrapper"
-                          color="#1ff507"
-                        />
-                      ) : (
-                        "Get OTP"
-                      )}
-                    </button>
-                    <p className="text-green-500 font-base">{smsSent}</p>
+                      {message.message}
+                    </p>
+                  ))}
+                </div>
+
+                {/* Display the countdown timer only after the first SMS attempt */}
+                {smsOtpSent && smsCountdown > 0 && (
+                  <div className="text-base font-normal text-green-600">
+                    Resend SMS in: {smsCountdown}s
                   </div>
+                )}
 
-                  {/* Display the countdown timer only after the first SMS attempt */}
-                  {smsSent && countdown > 0 && (
-                    <div className="text-base font-normal text-green-600">
-                      Resend OTP in: {countdown}s
+                {attemptsSms > 0 && smsOtpSent && (
+                  <div>
+                    <p className="text-base font-normal text-green-600">
+                      Attempts remaining: {attemptsSms}
+                    </p>
+                  </div>
+                )}
+
+                {attemptsSms === 0 && smsCountdown === 0 && (
+                  <div className="relative flex gap-x-3">
+                    <div className="flex h-6 items-center">
+                      <input
+                        id="exempt-checkbox"
+                        name="exempt-checkbox"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                        onChange={() => setExempted(!exempted)}
+                        checked={exempted}
+                      />
                     </div>
-                  )}
-
-                  {showAttempts && !exempted && (
-                    <div>
-                      <p className="text-base font-normal text-green-600">
-                        Attempts remaining: {attempts}
+                    <div className="text-sm leading-6">
+                      <p className="text-gray-600">
+                        Exempt from SMS requirement
                       </p>
                     </div>
-                  )}
-
-                  {attempts === 0 && countdown === 0 && (
-                    <div className="relative flex gap-x-3">
-                      <div className="flex h-6 items-center">
-                        <input
-                          id="exempt-checkbox"
-                          name="exempt-checkbox"
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                          onChange={() => setExempted(!exempted)}
-                          checked={exempted}
-                        />
-                      </div>
-                      <div className="text-sm leading-6">
-                        <p className="text-gray-600">
-                          Exempt from SMS requirement
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </div>
 
