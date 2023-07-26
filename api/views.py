@@ -309,6 +309,14 @@ def MobileLogin(request):
         id = dowellconnection("login", "bangalore", "login", "registration",
                               "registration", "10004545", "ABCDE", "find", field, "nil")
         response = json.loads(id)
+        # Check if the user has been deleted or is inactive
+        if len(response['data']) > 1:
+            data = response['data']
+            try:
+                if data["User_status"] == "deleted" and data["User_status"] == "inactive":
+                    return Response({'msg': 'Sorry account inactive or deleted'})
+            except:
+                pass
         if response["data"] != None:
             form = login(request, user)
             request.session.save()
@@ -461,6 +469,13 @@ def new_userinfo(request):
         details = dowellconnection("login", "bangalore", "login", "client_admin",
                                    "client_admin", "1159", "ABCDE", "fetch", field, "nil")
         details_res = json.loads(details)
+        if len(details_res['data']) > 1:
+            data = details_res['data']
+            try:
+                if data["User_status"] == "deleted" and data["User_status"] == "inactive":
+                    return Response({'msg': 'Sorry account inactive or deleted'})
+            except:
+                pass
         var3 = []
         productport = []
         portfolio = details_res["data"][0]["portpolio"]
@@ -565,6 +580,12 @@ def all_users(request):
                                     "registration", "10004545", "ABCDE", "fetch", userfield, "nil")
             main_res = json.loads(main)
             final = main_res["data"]
+            if len(final) > 1:
+                try:
+                    if final["User_status"] == "deleted" and final["User_status"] == "inactive":
+                        return Response({'msg': 'Sorry account inactive or deleted'})
+                except:
+                    pass
             final2 = []
             for a in final:
                 try:
