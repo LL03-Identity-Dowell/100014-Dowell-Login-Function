@@ -3,47 +3,76 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/dist/output.css" rel="stylesheet" />
     <title>LogIn</title>
   </head>
   <body>
-    <div>
-      <header className="font-bold">Is this you?</header>
-      <h2>There's been some activity from a new login on your account</h2>
-    </div>
+    <div class="mx-auto max-w-3xl p-4 space-y-2 mt-8">
+      <div class="flex flex-col items-center justify-center space-y-2">
+        <h2 class="text-2xl font-bold tracking-tight text-gray-900 lg:text-3xl">
+          Is this you?
+        </h2>
+        <h2 class="text-2xl font-bold leading-7 text-gray-900">
+          There's been some activity from a new login on your account
+        </h2>
+      </div>
 
-    <div>
-      <p>
-        This is a security notification from ZeroBounce. A new login was
-        recognized from the following login IP:
-        <span className="font-bold">117.193.91.36 (Kamataka, india).</span>
-      </p>
+      <div class="max-w-3xl text-base leading-7 text-gray-700 space-y-3">
+        <p>
+          This is a security notification from ZeroBounce. A new login was
+          recognized from the following login IP:
+          <span class="font-bold">117.193.91.36 (Kamataka, india).</span>
+        </p>
 
-      <p>
-        If the activity is you or your team, then you can safely ignore this
-        email.
-      </p>
-      <p>If this seems odd, we recommend that you:</p>
-      <ul>
-        <li>
-          <p>
-            Login and change your password immediately at
-            <a href="www.zerobounce.net"></a>
-          </p>
-        </li>
-        <li><p>Check your computer for viruses or malware.</p></li>
-        <li>
-          <p>
-            Contact zerobounce support by email at support@zerobounce.com or
-            visit <a href=" www.zerobounce.net"></a> and use the live chat to
-            talk to a real person 24/7.
-          </p>
-        </li>
-      </ul>
-      <p>
-        Here are some steps you can take if your account is compromised:
-        <span className="">Securing Your Account</span>
-      </p>
+        <p>
+          If the activity is you or your team, then you can safely ignore this
+          email.
+        </p>
+
+        <p>If this seems odd, we recommend that you:</p>
+        <ul role="list" class="mt-4 space-y-4 list-disc pl-9">
+          <li>
+            <span>
+              Login and change your password immediately at
+              <a class="text-blue-400" href="https://www.zerobounce.net"
+                >www.zerobounce.net</a
+              >
+            </span>
+          </li>
+          <li><span>Check your computer for viruses or malware.</span></li>
+          <li>
+            <span>
+              Contact zerobounce support by email at
+              <a class="text-blue-400" href="https://support@zerobounce.com"
+                >support@zerobounce.com</a
+              >
+              or visit
+              <a class="text-blue-400" href="https://www.zerobounce.net"
+                >www.zerobounce.net</a
+              >
+              and use the live chat to talk to a real person 24/7.
+            </span>
+          </li>
+        </ul>
+        <p>
+          Here are some steps you can take if your account is compromised:
+          <span class="">
+            <a class="text-blue-400" href="https://www.zerobounce.net"
+              >Securing Your Account</a
+            ></span
+          >
+        </p>
+      </div>
+
+      <div class="flex flex-col items-center justify-center">
+        <a href="/" class="text-center">
+          <button
+            class="border border-transparent rounded bg-gray-600 px-6 py-1.5 md:py-2 md:px-8 text-base font-bold text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:ring-offset-2"
+          >
+            Log in
+          </button>
+        </a>
+      </div>
     </div>
-    <div><button className="submit-btn">Login</button></div>
   </body>
 </html>
