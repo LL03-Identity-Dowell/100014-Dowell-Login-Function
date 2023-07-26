@@ -25,7 +25,10 @@ const schema = yup.object().shape({
     .required("Email is required"),
   otp: yup.string().when("otpSent", {
     is: true,
-    then: yup.string().required("OTP is required"),
+    then: yup
+      .string()
+      .required("OTP is required")
+      .matches(/^[0-9]+$/, "OTP must contain only numbers"),
   }),
   new_password: yup.string().when("otpSent", {
     is: true,
@@ -58,7 +61,6 @@ const PasswordResetForm = () => {
   const [passwordMessage, setPasswordMessage] = useState("");
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [exempted, setExempted] = useState(false);
   const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [emailMessages, setEmailMessage] = useTimedMessage();
 
@@ -75,16 +77,14 @@ const PasswordResetForm = () => {
   );
 
   const handleSendOTP = ({ username, email }) => {
-    if (attemptsOtp > 0 && !exempted && otpCountdown === 0) {
+    if (attemptsOtp > 0 && otpCountdown === 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       if (username && email) {
         dispatch(sendOTP({ username, email }));
-        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
         setEmailOtpSent(true);
+        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
         setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
       }
-    } else {
-      setExempted(true);
     }
   };
 
@@ -281,26 +281,16 @@ const PasswordResetForm = () => {
 
               {/* Display checkbox to exempt from email OTP */}
               {attemptsOtp === 0 && otpCountdown === 0 && (
-                <div className="relative flex gap-x-3">
-                  <div className="flex h-6 items-center">
-                    <input
-                      id="exempt-checkbox"
-                      name="exempt-checkbox"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                      onChange={() => setExempted(!exempted)}
-                      checked={exempted}
-                    />
-                  </div>
-                  <div className="text-sm leading-6">
-                    <p className="text-gray-600">Exempt from OTP requirement</p>
-                  </div>
+                <div className="text-sm leading-6">
+                  <p className="text-red-600">
+                    You have to reload the page and try again!!
+                  </p>
                 </div>
               )}
             </div>
           </div>
 
-          {emailOtpSent && !exempted && (
+          {emailOtpSent && (
             <div className="mt-2.5">
               <label className="label" htmlFor="otp">
                 Enter OTP from Email <span className="text-red-500">*</span>

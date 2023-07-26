@@ -23,12 +23,14 @@ const schema = yup.object().shape({
     .string()
     .required("First Name is required")
     .max(20)
-    .matches(/^[A-Za-z]+$/, "First Name must not include numbers"),
+    .matches(/^[A-Za-z]+$/, {
+      message: "Last Name must not include numbers",
+    }),
   Lastname: yup
     .string()
     .required("Last Name is required")
     .max(20)
-    .matches(/^[A-Za-z]+$/, "Last Name must not include numbers"),
+    .matches(/^[A-Za-z]+$/, { message: "Last Name must not include numbers" }),
   Username: yup
     .string()
     .required("User Name is required")
@@ -171,13 +173,13 @@ const SignUp = () => {
 
   // dispatch email otp
   const handleEmailOTP = (data) => {
-    if (attemptsOtp > 0 && !exempted && otpCountdown === 0) {
+    if (attemptsOtp > 0 && otpCountdown === 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       const { Email, Username } = data;
       if (Email && Username) {
         dispatch(sendEmailOTP({ Email, Username }));
-        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
         setEmailOtpSent(true);
+        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
         setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
       }
     }
@@ -190,8 +192,8 @@ const SignUp = () => {
       const { phonecode, Phone } = data;
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
-        setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
         setSmsOtpSent(true);
+        setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
         setSmsMessage(smsSent || smsOtpSent, 10000); // Show the SMS message for 10 seconds
       }
     } else {
@@ -581,7 +583,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            {emailOtpSent && !exempted && (
+            {emailOtpSent && (
               <div>
                 <label htmlFor="otp-Email" className="label">
                   Enter OTP from Email <span className="text-red-500">*</span>

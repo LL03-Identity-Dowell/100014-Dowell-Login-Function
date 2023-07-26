@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
@@ -7,6 +7,7 @@ import * as yup from "yup";
 import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { Radio } from "react-loader-spinner";
 import { useDispatch, useSelector } from "react-redux";
+import useTimedMessage from "./useTimedMessage";
 
 const schema = yup.object().shape({
   email: yup
@@ -15,11 +16,19 @@ const schema = yup.object().shape({
     .required("Email is required"),
   otp: yup.string().when("otpSent", {
     is: true,
-    then: yup.string().required("OTP is required"),
+    then: yup
+      .string()
+      .required("OTP is required")
+      .matches(/^[0-9]+$/, "OTP must contain only numbers"),
   }),
 });
 
 const UsernameForgot = () => {
+  const [attemptsOtp, setAttemptsOtp] = useState(5);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
+  const [emailMessages, setEmailMessage] = useTimedMessage();
+
   const {
     handleSubmit,
     register,
@@ -31,15 +40,30 @@ const UsernameForgot = () => {
     (state) => state?.username
   );
 
-  const onSubmit = ({ email, otp }) => {
-    if (otpSent === false) {
-      // Send OTP
-      dispatch(userSendOTP({ email }));
-    } else {
-      // Verify OTP
-      dispatch(verifyOTP({ email, otp }));
+  const onSubmit = (data) => {
+    if (attemptsOtp > 0 && otpCountdown === 0) {
+      setAttemptsOtp((prevAttempts) => prevAttempts - 1);
+      const { email, otp } = data;
+      if (otpSent === false) {
+        dispatch(userSendOTP({ email }));
+        setEmailOtpSent(true);
+        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
+        setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+      } else {
+        dispatch(verifyOTP({ email, otp }));
+      }
     }
   };
+
+  // Countdown timer for OTP
+  useEffect(() => {
+    if (otpCountdown > 0) {
+      const otpTimer = setTimeout(() => {
+        setOtpCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000); // 1 second
+      return () => clearTimeout(otpTimer);
+    }
+  }, [otpCountdown]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -87,7 +111,11 @@ const UsernameForgot = () => {
                 <button
                   type="submit"
                   className="btn-send px-2 py-1 self-start"
-                  disabled={loading}
+                  disabled={
+                    loading ||
+                    (emailOtpSent && otpCountdown > 0) ||
+                    attemptsOtp === 0
+                  }
                 >
                   {loading ? (
                     <Radio
@@ -104,34 +132,65 @@ const UsernameForgot = () => {
                   )}
                 </button>
 
-                <p className="text-base font-normal text-green-600">
-                  {otpSent}
-                </p>
+                {emailMessages.map((message) => (
+                  <p
+                    key={message.id}
+                    className="text-base font-normal text-green-600"
+                  >
+                    {message.message}
+                  </p>
+                ))}
               </div>
-            </div>
-          </div>
+              {/* Display the countdown timer only after the first OTP attempt */}
+              {emailOtpSent && otpCountdown > 0 && (
+                <div className="text-base font-normal text-green-600">
+                  Resend OTP in: {otpCountdown}s
+                </div>
+              )}
 
-          <div className="mt-2.5">
-            <label className="label" htmlFor="otp">
-              Enter OTP from Email <span className="text-red-500">*</span>
-            </label>
-            <div className="mt-2.5">
-              <input
-                type="text"
-                name="otp"
-                id="otp"
-                placeholder="Enter OTP from Email"
-                autoComplete="otp"
-                className="input-field"
-                {...register("otp", { required: otpSent })}
-              />
-              {errors?.otp && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.otp.message}
-                </p>
+              {/* Display the email OTP attempts remaining */}
+              {attemptsOtp > 0 && emailOtpSent && (
+                <div>
+                  <p className="text-base font-normal text-green-600">
+                    Attempts remaining: {attemptsOtp}
+                  </p>
+                </div>
+              )}
+
+              {/* Display checkbox to exempt from email OTP */}
+              {attemptsOtp === 0 && otpCountdown === 0 && (
+                <div className="text-sm leading-6">
+                  <p className="text-red-600">
+                    You have to reload the page and try again!!
+                  </p>
+                </div>
               )}
             </div>
           </div>
+
+          {emailOtpSent && (
+            <div className="mt-2.5">
+              <label className="label" htmlFor="otp">
+                Enter OTP from Email <span className="text-red-500">*</span>
+              </label>
+              <div className="mt-2.5">
+                <input
+                  type="text"
+                  name="otp"
+                  id="otp"
+                  placeholder="Enter OTP from Email"
+                  autoComplete="otp"
+                  className="input-field"
+                  {...register("otp", { required: otpSent })}
+                />
+                {errors?.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="mt-4">
             <button type="submit" className="submit-btn" disabled={loading}>
