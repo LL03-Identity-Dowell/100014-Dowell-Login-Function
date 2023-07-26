@@ -12,7 +12,7 @@ const Policy = () => {
     if (!randomSession) {
       dispatch(generateRandomSessionID());
     }
-  }, []);
+  }, [randomSession, dispatch]);
 
   const getIframeURL = () => {
     const baseURL =

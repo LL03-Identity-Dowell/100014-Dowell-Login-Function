@@ -28,7 +28,7 @@ const schema = yup.object().shape({
     .string()
     .required("Last Name is required")
     .max(20)
-    .matches(/^[A-Za-z]+$/, "First Name must not include numbers"),
+    .matches(/^[A-Za-z]+$/, "Last Name must not include numbers"),
   Username: yup
     .string()
     .required("User Name is required")
