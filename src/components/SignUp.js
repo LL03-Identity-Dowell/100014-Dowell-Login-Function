@@ -19,12 +19,21 @@ import useTimedMessage from "./useTimedMessage";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
-  Firstname: yup.string().required("First Name is required").max(20),
-  Lastname: yup.string().required("Last Name is required").max(20),
+  Firstname: yup
+    .string()
+    .required("First Name is required")
+    .max(20)
+    .matches(/^[A-Za-z]+$/, "First Name must not include numbers"),
+  Lastname: yup
+    .string()
+    .required("Last Name is required")
+    .max(20)
+    .matches(/^[A-Za-z]+$/, "First Name must not include numbers"),
   Username: yup
     .string()
     .required("User Name is required")
     .max(20)
+    .matches(/^[A-Za-z0-9]+$/, "Username must not include special characters")
     .notOneOf(
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
       "Username not allowed"
@@ -53,7 +62,10 @@ const schema = yup.object().shape({
     .required("Email is required"),
   otp: yup.string().when("otpSent", {
     is: true,
-    then: yup.string().required("OTP is required"),
+    then: yup
+      .string()
+      .required("OTP is required")
+      .matches(/^[0-9]+$/, "OTP must contain only numbers"),
   }),
   user_country: yup.string().when("otpSent", {
     is: true,
@@ -75,11 +87,13 @@ const schema = yup.object().shape({
   }),
   sms: yup.string().when(["smsSent", "exempted"], {
     is: (smsSent, exempted) => smsSent && !exempted,
-    then: yup.string().required("OTP is required"),
+    then: yup
+      .string()
+      .required("OTP is required")
+      .matches(/^[0-9]+$/, "SMS must contain only numbers"),
   }),
   Profile_Image: yup
     .mixed()
-    .required("Upload profile photo")
     .test("fileFormat", "Unsupported file format", (value) => {
       if (!value || !value[0]) return true; // Allow empty value
       return (
@@ -180,6 +194,8 @@ const SignUp = () => {
         setSmsOtpSent(true);
         setSmsMessage(smsSent || smsOtpSent, 10000); // Show the SMS message for 10 seconds
       }
+    } else {
+      setExempted(true);
     }
   };
 
@@ -556,22 +572,10 @@ const SignUp = () => {
 
                 {/* Display checkbox to exempt from email OTP */}
                 {attemptsOtp === 0 && otpCountdown === 0 && (
-                  <div className="relative flex gap-x-3">
-                    <div className="flex h-6 items-center">
-                      <input
-                        id="exempt-checkbox"
-                        name="exempt-checkbox"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                        onChange={() => setExempted(!exempted)}
-                        checked={exempted}
-                      />
-                    </div>
-                    <div className="text-sm leading-6">
-                      <p className="text-gray-600">
-                        Exempt from OTP requirement
-                      </p>
-                    </div>
+                  <div className="text-sm leading-6">
+                    <p className="text-red-600">
+                      You have to reload the page and try again!!
+                    </p>
                   </div>
                 )}
               </div>
