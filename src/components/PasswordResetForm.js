@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetPassword, sendOTP } from "../redux/passwordSlice";
 import { Radio } from "react-loader-spinner";
 import zxcvbn from "zxcvbn";
+import useTimedMessage from "./useTimedMessage";
 
 const schema = yup.object().shape({
   username: yup
@@ -55,6 +56,11 @@ const schema = yup.object().shape({
 const PasswordResetForm = () => {
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordMessage, setPasswordMessage] = useState("");
+  const [attemptsOtp, setAttemptsOtp] = useState(5);
+  const [otpCountdown, setOtpCountdown] = useState(0);
+  const [exempted, setExempted] = useState(false);
+  const [emailOtpSent, setEmailOtpSent] = useState(false);
+  const [emailMessages, setEmailMessage] = useTimedMessage();
 
   const {
     handleSubmit,
@@ -69,9 +75,30 @@ const PasswordResetForm = () => {
   );
 
   const handleSendOTP = ({ username, email }) => {
-    dispatch(sendOTP({ username, email }));
+    if (attemptsOtp > 0 && !exempted && otpCountdown === 0) {
+      setAttemptsOtp((prevAttempts) => prevAttempts - 1);
+      if (username && email) {
+        dispatch(sendOTP({ username, email }));
+        setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
+        setEmailOtpSent(true);
+        setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+      }
+    } else {
+      setExempted(true);
+    }
   };
 
+  // Countdown timer for OTP
+  useEffect(() => {
+    if (otpCountdown > 0) {
+      const otpTimer = setTimeout(() => {
+        setOtpCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000); // 1 second
+      return () => clearTimeout(otpTimer);
+    }
+  }, [otpCountdown]);
+
+  // password reset handler
   const handleResetPassword = (data) => {
     const { username, email, otp, new_password, confirm_password } = data;
     if (otp && new_password && confirm_password) {
@@ -206,7 +233,11 @@ const PasswordResetForm = () => {
                 <button
                   className="btn-send px-2 py-1 self-start"
                   onClick={handleSubmit(handleSendOTP)}
-                  disabled={loading}
+                  disabled={
+                    loading ||
+                    (emailOtpSent && otpCountdown > 0) ||
+                    attemptsOtp === 0
+                  }
                 >
                   {loading ? (
                     <Radio
@@ -222,30 +253,74 @@ const PasswordResetForm = () => {
                     "Get OTP"
                   )}
                 </button>
-                <p className="text-base font-normal text-green-600">
-                  {otpSent}
-                </p>
+                {emailMessages.map((message) => (
+                  <p
+                    key={message.id}
+                    className="text-base font-normal text-green-600"
+                  >
+                    {message.message}
+                  </p>
+                ))}
               </div>
+
+              {/* Display the countdown timer only after the first OTP attempt */}
+              {emailOtpSent && otpCountdown > 0 && (
+                <div className="text-base font-normal text-green-600">
+                  Resend OTP in: {otpCountdown}s
+                </div>
+              )}
+
+              {/* Display the email OTP attempts remaining */}
+              {attemptsOtp > 0 && emailOtpSent && (
+                <div>
+                  <p className="text-base font-normal text-green-600">
+                    Attempts remaining: {attemptsOtp}
+                  </p>
+                </div>
+              )}
+
+              {/* Display checkbox to exempt from email OTP */}
+              {attemptsOtp === 0 && otpCountdown === 0 && (
+                <div className="relative flex gap-x-3">
+                  <div className="flex h-6 items-center">
+                    <input
+                      id="exempt-checkbox"
+                      name="exempt-checkbox"
+                      type="checkbox"
+                      className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                      onChange={() => setExempted(!exempted)}
+                      checked={exempted}
+                    />
+                  </div>
+                  <div className="text-sm leading-6">
+                    <p className="text-gray-600">Exempt from OTP requirement</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="mt-2.5">
-            <label className="label" htmlFor="otp">
-              Enter OTP from Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="otp"
-              id="otp"
-              placeholder="Enter OTP from Email"
-              autoComplete="otp"
-              className="input-field"
-              {...register("otp", { required: otpSent })}
-            />
-            {errors?.otp && (
-              <p className="text-red-500 text-xs mt-1">{errors.otp.message}</p>
-            )}
-          </div>
+          {emailOtpSent && !exempted && (
+            <div className="mt-2.5">
+              <label className="label" htmlFor="otp">
+                Enter OTP from Email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                name="otp"
+                id="otp"
+                placeholder="Enter OTP from Email"
+                autoComplete="otp"
+                className="input-field"
+                {...register("otp", { required: otpSent })}
+              />
+              {errors?.otp && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.otp.message}
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="mt-2.5">
             <label htmlFor="new_password" className="label">

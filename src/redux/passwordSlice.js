@@ -34,7 +34,6 @@ export const resetPassword = createAsyncThunk(
         confirm_password,
       });
       if (response.data.msg === "success") {
-        // console.log("response", response.data.info);
         return response?.data.info;
       } else {
         throw new Error(response?.data?.info);
