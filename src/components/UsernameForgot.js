@@ -16,10 +16,7 @@ const schema = yup.object().shape({
     .required("Email is required"),
   otp: yup.string().when("otpSent", {
     is: true,
-    then: yup
-      .string()
-      .required("OTP is required")
-      .matches(/^[0-9]+$/, "OTP must contain only numbers"),
+    then: yup.string().required("OTP is required"),
   }),
 });
 
@@ -37,14 +34,14 @@ const UsernameForgot = () => {
 
   const dispatch = useDispatch();
   const { loading, error, usernameList, otpSent } = useSelector(
-    (state) => state?.username
+    (state) => state.username
   );
 
-  const onSubmit = (data) => {
-    if (attemptsOtp > 0 && otpCountdown === 0) {
+  const handleVerification = (data) => {
+    if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       const { email, otp } = data;
-      if (otpSent === false) {
+      if (email) {
         dispatch(userSendOTP({ email }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
@@ -83,7 +80,7 @@ const UsernameForgot = () => {
 
         <form
           className="mx-auto mt-8 max-w-xl sm:mt-12"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleVerification)}
         >
           <div>
             <label htmlFor="email" className="label">
@@ -131,7 +128,6 @@ const UsernameForgot = () => {
                     "Get OTP"
                   )}
                 </button>
-
                 {emailMessages.map((message) => (
                   <p
                     key={message.id}
@@ -141,6 +137,7 @@ const UsernameForgot = () => {
                   </p>
                 ))}
               </div>
+
               {/* Display the countdown timer only after the first OTP attempt */}
               {emailOtpSent && otpCountdown > 0 && (
                 <div className="text-base font-normal text-green-600">
@@ -208,12 +205,11 @@ const UsernameForgot = () => {
                 "Verify"
               )}
             </button>
+            <p className="text-base font-normal text-green-600">
+              {usernameList}
+            </p>
           </div>
-
-          <p className="text-base font-normal text-green-600">{usernameList}</p>
-
           {error && <p>{error}</p>}
-
           <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
             <Link to="/" className="text-center">
               Do have an account? Log in

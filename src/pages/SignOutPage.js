@@ -73,7 +73,7 @@ const SignOutPage = () => {
                 <div className="text-center">
                   <p className="text-green-500">{loggedOut}</p>
                   <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
-                    <Link to="/">Do have an account? Log in</Link>
+                    <Link to="/">Log in</Link>
                   </div>
                 </div>
               ) : (
