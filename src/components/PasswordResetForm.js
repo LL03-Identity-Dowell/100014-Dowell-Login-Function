@@ -77,7 +77,7 @@ const PasswordResetForm = () => {
   );
 
   const handleSendOTP = ({ username, email }) => {
-    if (attemptsOtp > 0 && otpCountdown === 0) {
+    if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       if (username && email) {
         dispatch(sendOTP({ username, email }));
