@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
 import Samanta from "../assets/images/samanta.webp";
@@ -20,9 +20,20 @@ const SignOutPage = () => {
     dispatch(logoutUser({ session_id: "s20vytmoshxrt6ma0m5rzc59vp35ikv0" }));
   };
 
+  // Use the useLocation hook to access the URL parameters
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
+  // Extract the redirect_url parameter from the query parameters
+  const redirectUrl = queryParams.get("redirect_url");
+
   // Handle cancel
   const handleCancel = () => {
-    navigate(-1); // Go back to the previous page
+    if (redirectUrl) {
+      window.location.href = redirectUrl; // Redirect the user to the specified URL
+    } else {
+      navigate(-1); // Go back to the previous page
+    }
   };
 
   return (
