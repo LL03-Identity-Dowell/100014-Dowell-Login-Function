@@ -41,16 +41,22 @@ const UsernameForgot = () => {
     if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       const { email, otp } = data;
-      if (email) {
+      if (email && !emailOtpSent) {
         dispatch(userSendOTP({ email }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
-        setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
       } else {
         dispatch(verifyOTP({ email, otp }));
       }
     }
   };
+
+  // Use useEffect to show the email message when otpSent becomes true
+  useEffect(() => {
+    if (otpSent || emailOtpSent) {
+      setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+    }
+  }, [otpSent, emailOtpSent]);
 
   // Countdown timer for OTP
   useEffect(() => {

@@ -180,10 +180,16 @@ const SignUp = () => {
         dispatch(sendEmailOTP({ Email, Username }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
-        setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
       }
     }
   };
+
+  // Use useEffect to show the email message when otpSent becomes true
+  useEffect(() => {
+    if (otpSent || emailOtpSent) {
+      setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+    }
+  }, [otpSent, emailOtpSent]);
 
   // Dispatch mobile sms
   const handleMobileOTP = (data) => {
@@ -194,12 +200,18 @@ const SignUp = () => {
         dispatch(sendMobileOTP({ phonecode, Phone }));
         setSmsOtpSent(true);
         setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
-        setSmsMessage(smsSent || smsOtpSent, 10000); // Show the SMS message for 10 seconds
       }
     } else {
       setExempted(true);
     }
   };
+
+  // Use useEffect to show the email message when otpSent becomes true
+  useEffect(() => {
+    if (smsSent || smsOtpSent) {
+      setSmsMessage(smsSent || smsOtpSent, 10000); // Show the SMS message for 10 seconds
+    }
+  }, [smsSent, smsOtpSent]);
 
   // Countdown timer for OTP
   useEffect(() => {

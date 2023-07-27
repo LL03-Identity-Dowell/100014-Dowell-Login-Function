@@ -88,6 +88,13 @@ const PasswordResetForm = () => {
     }
   };
 
+  // Use useEffect to show the email message when otpSent becomes true
+  useEffect(() => {
+    if (otpSent || emailOtpSent) {
+      setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+    }
+  }, [otpSent, emailOtpSent]);
+
   // Countdown timer for OTP
   useEffect(() => {
     if (otpCountdown > 0) {
