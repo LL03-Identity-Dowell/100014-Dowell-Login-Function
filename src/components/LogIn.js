@@ -10,8 +10,9 @@ import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
-  const { userInfo, loading, error } =
-    useSelector((state) => state.login) || {};
+  const [error, setError] = useState(""); // Added error state
+
+  const { userInfo, loading } = useSelector((state) => state.login) || {};
 
   // Get the random session ID from the Redux store
   const { randomSession } = useSelector((state) => state.session);
@@ -64,10 +65,19 @@ const LogIn = () => {
       const response = await dispatch(loginUser(userData));
       const sessionID = response?.payload?.session_id;
 
-      // Redirect to the desired page
-      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
+      if (sessionID) {
+        // Redirect to the desired page
+        window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
+      } else {
+        setError("Invalid username or password");
+      }
     } catch (error) {
-      throw new Error(error.response.data);
+      // Handle other errors and set the error message
+      if (error?.response?.data) {
+        setError(error.response.data);
+      } else {
+        setError("An unknown error occurred.");
+      }
     }
   };
 
@@ -161,11 +171,11 @@ const LogIn = () => {
                 </button>
                 {userInfo && (
                   <p className="text-green-500 font-base">
-                    {userInfo?.username}
+                    {userInfo.username}
                   </p>
                 )}
 
-                {error && <p>{error}</p>}
+                {error && <p className="text-red-500">{error}</p>}
               </div>
             </form>
           </div>

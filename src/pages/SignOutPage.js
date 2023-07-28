@@ -15,7 +15,6 @@ const SignOutPage = () => {
   const { loading, error, loggedOut } =
     useSelector((state) => state.logout) || {};
 
-  // Handle sign out
   const handleSignOut = () => {
     dispatch(logoutUser({ session_id: "s20vytmoshxrt6ma0m5rzc59vp35ikv0" }));
   };
@@ -25,14 +24,17 @@ const SignOutPage = () => {
   const queryParams = new URLSearchParams(location.search);
 
   // Extract the redirect_url parameter from the query parameters
-  const redirectUrl = queryParams.get("redirect_url");
+  const redirectUrl = queryParams.get("returnurl");
+
+  // Extract the returnurl parameter from the query parameters
+  const returnUrl = queryParams.get("returnurl");
 
   // Handle cancel
   const handleCancel = () => {
-    if (redirectUrl) {
-      window.location.href = redirectUrl; // Redirect the user to the specified URL
+    if (returnUrl) {
+      window.location.href = returnUrl;
     } else {
-      navigate(-1); // Go back to the previous page
+      navigate(-1);
     }
   };
 
@@ -84,7 +86,7 @@ const SignOutPage = () => {
                 <div className="text-center">
                   <p className="text-green-500">{loggedOut}</p>
                   <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
-                    <Link to="/">Log in</Link>
+                    <Link to={`/?redirect_url=${redirectUrl}`}>Log in</Link>
                   </div>
                 </div>
               ) : (
