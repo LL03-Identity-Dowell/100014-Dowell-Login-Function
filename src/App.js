@@ -11,6 +11,7 @@ import UsernameForgot from "./components/UsernameForgot";
 import SplashPage from "./pages/SplashPage";
 import SignOutPage from "./pages/SignOutPage";
 import NotFound from "./pages/NotFound";
+import ChangePassword from "./components/changePassword";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route exact path="/logout" element={<SignOutPage />} />
           <Route path="/splash/:Username" element={<SplashPage />} />
           <Route path="/password" element={<PasswordResetForm />} />
+          <Route path="/changePassword" element={<ChangePassword />} />
           <Route path="/username" element={<UsernameForgot />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/policy" element={<Policy />} />
