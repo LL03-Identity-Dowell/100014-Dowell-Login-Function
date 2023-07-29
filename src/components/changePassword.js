@@ -9,6 +9,14 @@ import PasswordInput from "./passwordInput";
 
 // Validation schema
 const schema = yup.object().shape({
+  username: yup
+    .string()
+    .required("User Name is required")
+    .max(20)
+    .notOneOf(
+      ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
+      "Username not allowed"
+    ),
   old_password: yup.string().required("Old Password is required"),
   new_password: yup
     .string()
@@ -69,6 +77,28 @@ const ChangePassword = () => {
           className="mx-auto mt-8 max-w-xl sm:mt-12"
           onSubmit={handleSubmit(onSubmit)}
         >
+          <div>
+            <label htmlFor="username" className="label">
+              Username <span className="text-red-500">*</span>
+            </label>
+            <div className="mt-2.5">
+              <input
+                type="text"
+                name="username"
+                id="username"
+                placeholder="Enter Your Username"
+                autoComplete="username"
+                className="input-field"
+                {...register("username")}
+              />
+              {errors?.username && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors?.username?.message}
+                </p>
+              )}
+            </div>
+          </div>
+
           <div className="mt-2.5">
             <label htmlFor="old_password" className="label">
               Old Password <span className="text-red-500">*</span>
