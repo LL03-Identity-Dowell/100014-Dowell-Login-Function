@@ -64,10 +64,10 @@ const ChangePassword = () => {
               Change Password
             </h2>
 
-            <div className="flex text-gray-600 py-2 text-left">
-              <p>Do you forget username?</p>
-              <Link to="/username">
-                <span className="text-green-600"> Click here</span>
+            <div className="flex text-gray-600 py-2 text-left space-x-2">
+              <p>Do you forget password?</p>
+              <Link to="/password">
+                <span className="text-green-600">Click here</span>
               </Link>
             </div>
           </div>
@@ -140,7 +140,7 @@ const ChangePassword = () => {
                 type="password"
                 name="confirm_password"
                 id="confirm_password"
-                placeholder="Confirm Your Password"
+                placeholder="Confirm new Password"
                 autoComplete="confirm_password"
                 className="input-field"
                 {...register("confirm_password")}

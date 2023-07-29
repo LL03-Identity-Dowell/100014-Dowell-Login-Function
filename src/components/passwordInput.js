@@ -64,7 +64,7 @@ const PasswordInput = ({ name, value, errors, onChange }) => {
           name={name}
           type="password"
           id={name}
-          placeholder="Enter Your Password"
+          placeholder="Enter new Password"
           autoComplete="Password"
           className="input-field"
           value={value}

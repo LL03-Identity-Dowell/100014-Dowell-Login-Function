@@ -180,7 +180,7 @@ const PasswordResetForm = () => {
               Forget Password
             </h2>
 
-            <div className="flex text-gray-600 py-2 text-left">
+            <div className="flex text-gray-600 py-2 text-left space-x-2">
               <p>Do you forget username?</p>
               <Link to="/username">
                 <span className="text-green-600"> Click here</span>
@@ -328,7 +328,7 @@ const PasswordResetForm = () => {
                 type="password"
                 name="new_password"
                 id="new_password"
-                placeholder="Enter Your Password"
+                placeholder="Enter new Password"
                 autoComplete="new_password"
                 className="input-field"
                 {...register("new_password", { required: otpSent })}
@@ -388,7 +388,7 @@ const PasswordResetForm = () => {
                 type="password"
                 name="confirm_password"
                 id="confirm_password"
-                placeholder="Confirm Your Password"
+                placeholder="Confirm new Password"
                 autoComplete="confirm_password"
                 className="input-field"
                 {...register("confirm_password", { required: otpSent })}
