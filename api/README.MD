@@ -4,6 +4,8 @@
 
 Required fields
 
+- api_service_id (The service_id you see in Dowell API services)
+- api_key (The key you get from Dowell API services)
 - username
 - password
 - time
@@ -11,6 +13,12 @@ Required fields
 - os
 - location
 - timezone
+
+Optional fields
+- language (If not provided English is submitted to db)
+- browser (If not provided empty string is provoded to db)
+- device (If not provided, string 'api' is sent to db)
+
 
 #### Request body
 
@@ -35,11 +43,14 @@ Required fields
 
 ```json
 {
+  "msg":"string",
+  "info":"string",
   "session_id": "string",
   "remaining_times": "integer"
 }
 ```
-
+- Now this session_id can be used in /userinfo api to get login details.
+  
 ---
 
 **POST** `/api/password_change/`
@@ -64,7 +75,8 @@ Required fields
 
 ```json
 {
-  "data": "Password Changed successfully.."
+  "msg":"string",
+  "info": "string"
 }
 ```
 
@@ -114,6 +126,11 @@ Required fields
 - location
 - timezone
 
+Optional fields
+- language (If not provided English is submitted to db)
+- browser (If not provided empty string is provoded to db)
+- device (If not provided, string 'api' is sent to db)
+
 #### Request body
 
 ```json
@@ -135,10 +152,12 @@ Required fields
 
 ```json
 {
+  "msg":"string",
+  "info":"string",
   "session_id": "string"
 }
 ```
-
+- Now this session_id can be used in /userinfo api to get login details.
 ---
 
 **POST** `/api/mobilelogout/`
@@ -159,7 +178,8 @@ Required fields
 
 ```json
 {
-  "msg": "string"
+  "msg": "string",
+  "info":"string"
 }
 ```
 
@@ -172,6 +192,10 @@ Required fields
 - email
 - username
 - usage
+  - "create_account" if you're using this api for register page.
+  - "update_email" if you're using this pai for profile_update.
+  - "forgot_password" for respective page
+  - "forgot_username" for respective page.
 
 #### Request body
 
@@ -196,7 +220,7 @@ Required fields
 
 **POST** ` /api/forgot_password/`
 
-> You must get the otp from the `/api/emailotp` endpoint
+> You must get the otp from the `/api/emailotp` endpoint with the exact "usage" given in the api documentation.
 
 Required fields
 
@@ -229,7 +253,7 @@ Required fields
 
 **POST** `/api/forgot_username/`
 
-> You must get the otp from the `/api/emailotp` endpoint
+> You must get the otp from the `/api/emailotp` endpoint with the exact "usage" given in the api documentation.
 
 Required fields:
 
@@ -259,8 +283,10 @@ Required fields:
 **POST** ` /api/profile_update/`
 Required fields:
 
-- email_otp
 - username
+
+If you're trying to update email, firstly user must be sent the otp in their email. So, for that:
+> You must get the otp from the `/api/emailotp` endpoint with the exact "usage" given in the api documentation.
 
 #### Request body
 

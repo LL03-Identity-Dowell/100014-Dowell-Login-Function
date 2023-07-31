@@ -647,7 +647,7 @@ def password_change(request):
     new_password = request.data.get("new_password")
     obj = authenticate(request, username=username, password=old_password)
     if None in [username, old_password, new_password]:
-        response = {'data': 'Please provide all fields'}
+        response = {'msg':'error','info':'Please provide all fields'}
         return Response(response)
     if obj is not None:
         print("ok")
@@ -658,13 +658,13 @@ def password_change(request):
             up_field = {'Password': dowell_hash.dowell_hash(new_password)}
             dowellconnection("login", "bangalore", "login", "registration",
                              "registration", "10004545", "ABCDE", "update", field, up_field)
-            response = {'data': 'Password Changed successfully..'}
+            response = {'msg':'success','info':'Password Changed successfully..'}
             return Response(response)
         except Exception as e:
-            response = {'data': 'Error', 'error': e}
+            response = {'msg':'success','info':'Error','error':e}
             return Response(response)
     else:
-        response = {'data': 'Username, Password combination incorrect'}
+        response = {'msg':'success','info':'Username, Password combination incorrect'}
         return Response(response)
 
 
@@ -1051,7 +1051,7 @@ def PublicApi(request):
     ipuser = mdata("ip")
     zone = mdata("timezone")
     if None in [username, password, loc, device, osver, ltime, ipuser]:
-        resp = {"data": "Provide all credentials",
+        resp = {"msg":"error","info": "Provide all credentials",
                 "Credentials": "username, password, location, device, os, time, ip"}
         return Response(resp)
     browser = mdata("browser")
@@ -1083,7 +1083,13 @@ def PublicApi(request):
             obj = CustomSession.objects.filter(sessionID=session)
             if obj:
                 if obj.first().status == 'login':
-                    resp = {'session_id': session}
+                    info=json.loads(obj.first().info)
+                    user_obj=Account.objects.filter(username=info["username"]).first()
+                    try:
+                        resp={'msg':'success','info':'Logged In Successfully','session_id':session,'remaining_times':api_resp1["count"]/10,'first_name':user_obj.first_name,'last_name':user_obj.last_name,'last_login':user_obj.last_login,'first_login':user_obj.date_joined}
+                    except Exception as e:
+                        resp={'msg':'success','info':'Logged In Successfully','session_id':session,'remaining_times':api_resp1["count"]/10}
+                        print(e)
                     return Response(resp)
             try:
                 res = create_event()
@@ -1134,15 +1140,14 @@ def PublicApi(request):
                 sessionID=session, info=infoo, document="", status="login")
 
             # resp={'userinfo':info}
-            resp = {'session_id': session,
-                    'remaining_times': api_resp1["count"]}
+            resp = {'msg':'success','info':'Logged In Successfully','session_id': session,'remaining_times':api_resp1["count"]/10,'first_name':first_name,'last_name':last_name,'last_login':user_obj.last_login,'first_login':user_obj.date_joined}
             return Response(resp)
         else:
-            resp = {"data": "Username not found in database"}
+            resp = {'msg':'error','info':"Username not found in database"}
             return Response(resp)
         # raise AuthenticationFailed("Username not Found or password not found")
     else:
-        resp = {"data": "Username, Password combination incorrect.."}
+        resp = {'msg':'error',"info": "Username, Password combination incorrect.."}
         return Response(resp)
 
 
