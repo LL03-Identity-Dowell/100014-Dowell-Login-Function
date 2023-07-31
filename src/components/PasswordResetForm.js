@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPassword, sendOTP } from "../redux/passwordSlice";
+import { resetPassword, sendOTP } from "../redux/resetPasswordSlice";
 import { Radio } from "react-loader-spinner";
 import zxcvbn from "zxcvbn";
 import useTimedMessage from "./useTimedMessage";

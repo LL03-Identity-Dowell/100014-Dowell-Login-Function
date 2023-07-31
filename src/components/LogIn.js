@@ -10,9 +10,9 @@ import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
-  const [error, setError] = useState(""); // Added error state
 
-  const { userInfo, loading } = useSelector((state) => state.login) || {};
+  const { userInfo, loading, error } =
+    useSelector((state) => state.login) || {};
 
   // Get the random session ID from the Redux store
   const { randomSession } = useSelector((state) => state.session);
@@ -69,15 +69,14 @@ const LogIn = () => {
         // Redirect to the desired page
         window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
       } else {
-        setError("Invalid username or password");
+        throw new Error(
+          "Login failed. Please check your username and password."
+        );
       }
     } catch (error) {
-      // Handle other errors and set the error message
-      if (error?.response?.data) {
-        setError(error.response.data);
-      } else {
-        setError("An unknown error occurred.");
-      }
+      throw new Error(
+        "An error occurred during login. Please try again later."
+      );
     }
   };
 
@@ -170,11 +169,8 @@ const LogIn = () => {
                   )}
                 </button>
                 {userInfo && (
-                  <p className="text-green-500 font-base">
-                    {userInfo.username}
-                  </p>
+                  <p className="text-green-500 font-base">{userInfo}</p>
                 )}
-
                 {error && <p className="text-red-500">{error}</p>}
               </div>
             </form>

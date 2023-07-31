@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link } from "react-router-dom";
@@ -6,6 +6,8 @@ import { useForm, FormProvider } from "react-hook-form";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Radio } from "react-loader-spinner";
 import PasswordInput from "./passwordInput";
+import { useDispatch, useSelector } from "react-redux";
+import { changePasswordAsync } from "../redux/changePasswordSlice";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -34,7 +36,11 @@ const schema = yup.object().shape({
 });
 
 const ChangePassword = () => {
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const { loading, error, changePassword } =
+    useSelector((state) => state.password) || {};
 
   const {
     handleSubmit,
@@ -42,15 +48,13 @@ const ChangePassword = () => {
     formState: { errors },
     setValue,
     getValues,
-    reset,
   } = useForm({ resolver: yupResolver(schema) });
 
-  const onSubmit = async (data) => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Submitting form with data:", data);
-    setLoading(false);
-    reset();
+  const handleChangePassword = (data) => {
+    const { username, new_password, old_password, confirm_password } = data;
+    if (username && new_password && old_password && confirm_password) {
+      dispatch(changePasswordAsync(data));
+    }
   };
 
   return (
@@ -79,7 +83,7 @@ const ChangePassword = () => {
         <FormProvider {...register}>
           <form
             className="mx-auto mt-8 max-w-xl sm:mt-12"
-            onSubmit={handleSubmit(onSubmit)}
+            onSubmit={handleSubmit(handleChangePassword)}
           >
             <div>
               <label htmlFor="username" className="label">
@@ -163,6 +167,10 @@ const ChangePassword = () => {
                   "Change Password"
                 )}
               </button>
+              {changePassword && (
+                <p className="text-green-500 font-base">{changePassword}</p>
+              )}
+              {error && <p className="text-red-500">{error}</p>}
             </div>
 
             <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
