@@ -24,7 +24,7 @@ const SignOutPage = () => {
   const queryParams = new URLSearchParams(location.search);
 
   // Extract the redirect_url parameter from the query parameters
-  const redirectUrl = queryParams.get("returnurl");
+  const redirectUrl = queryParams.get("redirect_url");
 
   // Extract the returnurl parameter from the query parameters
   const returnUrl = queryParams.get("returnurl");
@@ -115,7 +115,19 @@ const SignOutPage = () => {
                     onClick={handleCancel}
                     disabled={loading}
                   >
-                    No
+                    {loading ? (
+                      <Radio
+                        visible={true}
+                        height={30}
+                        width={30}
+                        ariaLabel="radio-loading"
+                        wrapperStyle={{}}
+                        wrapperClassName="radio-wrapper"
+                        color="#1ff507"
+                      />
+                    ) : (
+                      "No"
+                    )}
                   </button>
                 </>
               )}

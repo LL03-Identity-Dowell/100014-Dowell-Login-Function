@@ -10,13 +10,13 @@ export const logoutUser = createAsyncThunk(
   async ({ session_id }) => {
     try {
       const response = await axios.post(logoutAPI, { session_id });
-      if (response.data.msg === "Logged out Successfully..") {
-        return response.data.msg;
+      if (response.data.msg === "error") {
+        return response.data.info;
       } else {
-        throw new Error(response.data.msg);
+        throw new Error(response.data.info);
       }
     } catch (error) {
-      throw new Error(error?.response?.data?.msg);
+      throw new Error(error?.response?.data?.info);
     }
   }
 );
