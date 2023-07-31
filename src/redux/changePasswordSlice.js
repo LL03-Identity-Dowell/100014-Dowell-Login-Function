@@ -5,17 +5,13 @@ import { postData } from "./instance";
 export const changePasswordAsync = createAsyncThunk(
   "password/changePassword",
   async ({ username, old_password, new_password }) => {
-    try {
-      const response = await postData("/api/password_change/", {
-        username,
-        old_password,
-        new_password,
-      });
+    const response = await postData("/api/password_change/", {
+      username,
+      old_password,
+      new_password,
+    });
 
-      return response;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    return response;
   }
 );
 
