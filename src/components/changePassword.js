@@ -41,6 +41,7 @@ const ChangePassword = () => {
   const dispatch = useDispatch();
   const { loading, error, changePassword } =
     useSelector((state) => state.password) || {};
+  console.log("ChangePassword", changePassword);
 
   const {
     handleSubmit,

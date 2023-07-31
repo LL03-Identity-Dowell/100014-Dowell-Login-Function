@@ -1,27 +1,20 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { instance } from "../lib/instance";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { postData } from "./instance";
 
 // Async thunk to change the password
 export const changePasswordAsync = createAsyncThunk(
   "password/changePassword",
   async ({ username, old_password, new_password }) => {
     try {
-      const response = await instance.post("/api/password_change/", {
+      const response = await postData("/api/password_change/", {
         username,
         old_password,
         new_password,
       });
 
-      if (response.data.msg === "success") {
-        console.log("success", response?.data.info);
-        // return response?.data.info;
-      } else {
-        console.log("error", response?.data.info);
-        // throw new Error(response?.data.info);
-      }
+      return response;
     } catch (error) {
-      console.log("error", error.response?.data.info);
-      // throw new Error(error.response?.data.info);
+      throw new Error(error.message);
     }
   }
 );
@@ -31,7 +24,7 @@ const passwordSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    changePassword: false,
+    changePassword: null,
   },
   reducers: {},
   extraReducers: (builder) => {
