@@ -15,6 +15,7 @@ from django.template import RequestContext, Template
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.http.response import JsonResponse
+from django.utils import timezone
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -1422,6 +1423,7 @@ def main_login(request):
     userID = None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
+    expires = timezone.now() + datetime.timedelta(days=14)
     if user is not None:
         field = {"Username": username}
         id = dowellconnection("login", "bangalore", "login", "registration",
@@ -1443,7 +1445,7 @@ def main_login(request):
                     data = {'session_id': session}
                     response = Response()
                     response.set_cookie(
-                        'DOWELL_LOGIN', session, domain='pythonanywhere.com', httponly=True)
+                        key='DOWELL_LOGIN', value=session, expires=expires, httponly=True, samesite='Lax')
                     return response
             try:
                 res = create_event()
@@ -1512,8 +1514,8 @@ def main_login(request):
             data = {'session_id': session}
 
             response = Response()
-            response.set_cookie('DOWELL_LOGIN', session,
-                                domain='pythonanywhere.com', httponly=True)
+            response.set_cookie(key='DOWELL_LOGIN', value=session,
+                                expires=expires, httponly=True, samesite='Lax')
             response.data = data
             return response
         else:

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 import environ
 from pathlib import Path
+from corsheaders.defaults import default_headers
 
 env = environ.Env()
 environ.Env.read_env()
@@ -146,6 +147,14 @@ LOCALE_PATHS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'X-Amz-Date',
+    'Access-Control-Request-Headers',
+    'Access-Control-Allow-Headers',
+    'Access-Control-Allow-Origin',
+    'XMLHttpRequest',
+]
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
