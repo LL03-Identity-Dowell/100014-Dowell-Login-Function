@@ -1,8 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { postData } from "./instance";
-
-const API_URL = "https://100014.pythonanywhere.com/api/register/";
 
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
@@ -22,7 +19,8 @@ export const sendEmailOTP = createAsyncThunk(
 export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
   async ({ phonecode, Phone }) => {
-    const response = await postData(API_URL, { phonecode, Phone });
+    const response = await postData("/api/register/", { phonecode, Phone });
+    console.log("Phone response", response);
     return response;
   }
 );
@@ -47,32 +45,25 @@ export const registerUser = createAsyncThunk(
     policy_status,
     newsletter,
   }) => {
-    try {
-      const response = await axios.post(API_URL, {
-        Firstname,
-        Lastname,
-        Username,
-        user_type,
-        Email,
-        Password,
-        confirm_Password,
-        user_country,
-        phonecode,
-        Phone,
-        otp,
-        sms,
-        Profile_Image,
-        policy_status,
-        newsletter,
-      });
-      if (response.data.msg === "success") {
-        return response?.data?.info;
-      } else {
-        throw new Error(response?.data?.info);
-      }
-    } catch (error) {
-      throw new Error(error?.response?.data?.info);
-    }
+    const response = await postData("/api/register/", {
+      Firstname,
+      Lastname,
+      Username,
+      user_type,
+      Email,
+      Password,
+      confirm_Password,
+      user_country,
+      phonecode,
+      Phone,
+      otp,
+      sms,
+      Profile_Image,
+      policy_status,
+      newsletter,
+    });
+    console.log("Registration response", response);
+    return response;
   }
 );
 

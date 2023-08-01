@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import { postData } from "./instance";
 
 // Async thunk for sending the POST request and getting OTP
@@ -11,8 +10,7 @@ export const sendOTP = createAsyncThunk(
       email,
       usage,
     });
-    console.log("send otp", response);
-    // return response;
+    return response;
   }
 );
 
@@ -46,7 +44,6 @@ const resetPasswordSlice = createSlice({
       .addCase(sendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.otpSent = false;
       })
       .addCase(sendOTP.fulfilled, (state, action) => {
         state.loading = false;
@@ -59,7 +56,6 @@ const resetPasswordSlice = createSlice({
       .addCase(resetPassword.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.passwordReset = false;
       })
       .addCase(resetPassword.fulfilled, (state, action) => {
         state.loading = false;
