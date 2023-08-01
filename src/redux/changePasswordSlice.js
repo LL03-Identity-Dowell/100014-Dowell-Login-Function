@@ -10,7 +10,7 @@ export const changePasswordAsync = createAsyncThunk(
       old_password,
       new_password,
     });
-    // console.log("changePassword response", response);
+
     return response;
   }
 );

@@ -7,8 +7,13 @@ const API_URL = "https://100014.pythonanywhere.com/api/register/";
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
-  async ({ Username, Email }) => {
-    const response = await postData("/api/emailotp/", { Username, Email });
+  async ({ Username, Email, usage }) => {
+    const response = await postData("/api/emailotp/", {
+      Username,
+      Email,
+      usage: "create_account",
+    });
+    console.log("OTP response", response);
     return response;
   }
 );

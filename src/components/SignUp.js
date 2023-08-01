@@ -175,9 +175,9 @@ const SignUp = () => {
   const handleEmailOTP = (data) => {
     if (attemptsOtp > 0 && otpCountdown === 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
-      const { Email, Username } = data;
+      const { Email, Username } = watch();
       if (Email && Username) {
-        dispatch(sendEmailOTP({ Email, Username }));
+        dispatch(sendEmailOTP({ ...watch() }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
       }

@@ -31,13 +31,10 @@ export const loginUser = createAsyncThunk(
         browser,
       });
 
-      console.log("response", response.data);
-
-      if (response.data.msg === "success") {
-        // console.log("success", response?.data.info);
-        return response?.data.info;
+      if (response?.data.msg === "success") {
+        console.log("success", response?.data.info);
+        return response?.data;
       } else {
-        // console.log("error", response?.data.info);
         throw new Error(response?.data.info);
       }
     } catch (error) {

@@ -65,18 +65,10 @@ const LogIn = () => {
       const response = await dispatch(loginUser(userData));
       const sessionID = response?.payload?.session_id;
 
-      if (sessionID) {
-        // Redirect to the desired page
-        window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
-      } else {
-        throw new Error(
-          "Login failed. Please check your username and password."
-        );
-      }
+      // Redirect to the desired page
+      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
     } catch (error) {
-      throw new Error(
-        "An error occurred during login. Please try again later."
-      );
+      throw new Error(error);
     }
   };
 
