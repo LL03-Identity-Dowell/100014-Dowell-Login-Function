@@ -166,9 +166,9 @@ const SignUp = () => {
   const handleEmailOTP = (data) => {
     if (attemptsOtp > 0 && otpCountdown === 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
-      const { Email, Username } = watch();
+      const { Email, Username } = data;
       if (Email && Username) {
-        dispatch(sendEmailOTP({ ...watch() }));
+        dispatch(sendEmailOTP({ Email, Username, usage: "create_account" }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
       }

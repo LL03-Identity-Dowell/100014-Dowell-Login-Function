@@ -1,40 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-
-const apiBaseUrl = "https://100014.pythonanywhere.com/api/forgot_username/";
+import { postData } from "./instance";
 
 export const userSendOTP = createAsyncThunk(
   "username/userSendOTP",
-  async ({ email }) => {
-    try {
-      const response = await axios.post(apiBaseUrl, { email });
-      if (response.data.msg === "success") {
-        return response?.data?.info;
-      } else {
-        throw new Error(response?.data?.info);
-      }
-    } catch (error) {
-      throw new Error(error?.response?.data?.info);
-    }
+  async ({ email, usage }) => {
+    const response = await postData("/api/emailotp/", { email, usage });
+    return response;
   }
 );
 
 export const verifyOTP = createAsyncThunk(
   "username/verifyOTP",
   async ({ email, otp }) => {
-    try {
-      const response = await axios.post(apiBaseUrl, {
-        email,
-        otp,
-      });
-      if (response.data.msg === "success") {
-        return response?.data?.info;
-      } else {
-        throw new Error(response?.data?.info);
-      }
-    } catch (error) {
-      throw new Error(error?.response?.data?.info);
-    }
+    const response = await postData("/api/forgot_username/", {
+      email,
+      otp,
+    });
+    return response;
   }
 );
 

@@ -11,7 +11,7 @@ export const sendEmailOTP = createAsyncThunk(
     const response = await postData("/api/emailotp/", {
       Username,
       Email,
-      usage: "create_account",
+      usage,
     });
     console.log("OTP response", response);
     return response;

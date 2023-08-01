@@ -30,15 +30,21 @@ const schema = yup.object().shape({
       .required("OTP is required")
       .matches(/^[0-9]+$/, "OTP must contain only numbers"),
   }),
-  new_password: yup
-    .string()
-    .min(8, "Password must be at least 8 characters")
-    .max(99)
-    .required("Password is required"),
-  confirm_password: yup
-    .string()
-    .oneOf([yup.ref("new_password")], "Passwords must match")
-    .required("Confirm Password is required"),
+  new_password: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(99)
+      .required("Password is required"),
+  }),
+  confirm_password: yup.string().when("otpSent", {
+    is: true,
+    then: yup
+      .string()
+      .oneOf([yup.ref("new_password")], "Passwords must match")
+      .required("Confirm Password is required"),
+  }),
 });
 
 const PasswordResetForm = () => {
@@ -64,7 +70,7 @@ const PasswordResetForm = () => {
     if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       if (username && email) {
-        dispatch(sendOTP({ username, email }));
+        dispatch(sendOTP({ username, email, usage: "forgot_password" }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
         setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds

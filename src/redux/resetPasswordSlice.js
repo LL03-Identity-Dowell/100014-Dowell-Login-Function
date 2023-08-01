@@ -1,23 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-
-// Define the API endpoint URL
-const API_URL = "https://100014.pythonanywhere.com/api/forgot_password/";
+import { postData } from "./instance";
 
 // Async thunk for sending the POST request and getting OTP
 export const sendOTP = createAsyncThunk(
   "password/sendOTP",
-  async ({ username, email }) => {
-    try {
-      const response = await axios.post(API_URL, { username, email });
-      if (response.data.msg === "success") {
-        return response?.data?.info;
-      } else {
-        throw new Error(response?.data?.info);
-      }
-    } catch (error) {
-      throw new Error(error?.response?.data?.info);
-    }
+  async ({ username, email, usage }) => {
+    const response = await postData("/api/emailotp/", {
+      username,
+      email,
+      usage,
+    });
+    console.log("send otp", response);
+    // return response;
   }
 );
 
@@ -25,22 +20,15 @@ export const sendOTP = createAsyncThunk(
 export const resetPassword = createAsyncThunk(
   "password/resetPassword",
   async ({ username, email, otp, new_password, confirm_password }) => {
-    try {
-      const response = await axios.post(API_URL, {
-        username,
-        email,
-        otp,
-        new_password,
-        confirm_password,
-      });
-      if (response.data.msg === "success") {
-        return response?.data.info;
-      } else {
-        throw new Error(response?.data?.info);
-      }
-    } catch (error) {
-      throw new Error(error?.response?.data?.info);
-    }
+    const response = await postData("/api/forgot_password/", {
+      username,
+      email,
+      otp,
+      new_password,
+      confirm_password,
+    });
+
+    return response;
   }
 );
 

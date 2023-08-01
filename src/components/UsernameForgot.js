@@ -42,7 +42,7 @@ const UsernameForgot = () => {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       const { email, otp } = data;
       if (email && !emailOtpSent) {
-        dispatch(userSendOTP({ email }));
+        dispatch(userSendOTP({ email, usage: "forgot_username" }));
         setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
       } else {
