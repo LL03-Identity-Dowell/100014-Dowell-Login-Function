@@ -98,7 +98,14 @@ class Live_Public_Status(models.Model):
     updated = models.DateTimeField(null=True, blank=True)
     created = models.DateTimeField(null=True, blank=True)
 
+
 class Linkbased_RandomSession(models.Model):
-    sessionID=models.CharField(max_length=1000)
-    info=models.TextField()
+    sessionID = models.CharField(max_length=1000)
+    info = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+
+
+class Location_check(models.Model):
+    username = models.CharField(max_length=1000, unique=True)
+    usual = models.TextField()
+    unusual = models.TextField(null=True, blank=True)

@@ -647,7 +647,7 @@ def password_change(request):
     new_password = request.data.get("new_password")
     obj = authenticate(request, username=username, password=old_password)
     if None in [username, old_password, new_password]:
-        response = {'msg':'error','info':'Please provide all fields'}
+        response = {'msg': 'error', 'info': 'Please provide all fields'}
         return Response(response)
     if obj is not None:
         print("ok")
@@ -658,13 +658,15 @@ def password_change(request):
             up_field = {'Password': dowell_hash.dowell_hash(new_password)}
             dowellconnection("login", "bangalore", "login", "registration",
                              "registration", "10004545", "ABCDE", "update", field, up_field)
-            response = {'msg':'success','info':'Password Changed successfully..'}
+            response = {'msg': 'success',
+                        'info': 'Password Changed successfully..'}
             return Response(response)
         except Exception as e:
-            response = {'msg':'success','info':'Error','error':e}
+            response = {'msg': 'success', 'info': 'Error', 'error': e}
             return Response(response)
     else:
-        response = {'msg':'success','info':'Username, Password combination incorrect'}
+        response = {'msg': 'success',
+                    'info': 'Username, Password combination incorrect'}
         return Response(response)
 
 
@@ -1051,7 +1053,7 @@ def PublicApi(request):
     ipuser = mdata("ip")
     zone = mdata("timezone")
     if None in [username, password, loc, device, osver, ltime, ipuser]:
-        resp = {"msg":"error","info": "Provide all credentials",
+        resp = {"msg": "error", "info": "Provide all credentials",
                 "Credentials": "username, password, location, device, os, time, ip"}
         return Response(resp)
     browser = mdata("browser")
@@ -1083,12 +1085,15 @@ def PublicApi(request):
             obj = CustomSession.objects.filter(sessionID=session)
             if obj:
                 if obj.first().status == 'login':
-                    info=json.loads(obj.first().info)
-                    user_obj=Account.objects.filter(username=info["username"]).first()
+                    info = json.loads(obj.first().info)
+                    user_obj = Account.objects.filter(
+                        username=info["username"]).first()
                     try:
-                        resp={'msg':'success','info':'Logged In Successfully','session_id':session,'remaining_times':api_resp1["count"]/10,'first_name':user_obj.first_name,'last_name':user_obj.last_name,'last_login':user_obj.last_login,'first_login':user_obj.date_joined}
+                        resp = {'msg': 'success', 'info': 'Logged In Successfully', 'session_id': session, 'remaining_times':
+                                api_resp1["count"]/10, 'first_name': user_obj.first_name, 'last_name': user_obj.last_name, 'last_login': user_obj.last_login, 'first_login': user_obj.date_joined}
                     except Exception as e:
-                        resp={'msg':'success','info':'Logged In Successfully','session_id':session,'remaining_times':api_resp1["count"]/10}
+                        resp = {'msg': 'success', 'info': 'Logged In Successfully',
+                                'session_id': session, 'remaining_times': api_resp1["count"]/10}
                         print(e)
                     return Response(resp)
             try:
@@ -1127,8 +1132,41 @@ def PublicApi(request):
                 dowell_time = ''
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
-            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': user_id, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
+            field_session = {
+                'first_name': first_name,
+                'last_name': last_name,
+                'lat'
+                'sessionID': session,
+                'role': role_res,
+                'username': username,
+                'Email': email,
+                "profile_img": profile_image,
+                'Phone': phone,
+                "User_type": User_type,
+                'language': language,
+                'city': city,
+                'country': country,
+                'org': org,
+                'company_id': company,
+                'project': project,
+                'subproject': subproject,
+                'dept': dept,
+                'Memberof': member,
+                'status': 'login',
+                'dowell_time': dowell_time,
+                'timezone': zone,
+                'regional_time': final_ltime,
+                'server_time': serverclock,
+                'userIP': ipuser,
+                'userOS': osver,
+                'browser': browser,
+                'userdevice': device,
+                'userbrowser': "",
+                'UserID': user_id,
+                'login_eventID': event_id,
+                "redirect_url": "",
+                "client_admin_id": client_admin_id
+            }
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
@@ -1140,14 +1178,24 @@ def PublicApi(request):
                 sessionID=session, info=infoo, document="", status="login")
 
             # resp={'userinfo':info}
-            resp = {'msg':'success','info':'Logged In Successfully','session_id': session,'remaining_times':api_resp1["count"]/10,'first_name':first_name,'last_name':last_name,'last_login':user_obj.last_login,'first_login':user_obj.date_joined}
+            resp = {
+                'msg': 'success',
+                'info': 'Logged In Successfully',
+                'session_id': session,
+                'remaining_times': api_resp1["count"]/10,
+                'first_name': first_name,
+                'last_name': last_name,
+                'last_login': user_obj.last_login,
+                'first_login': user_obj.date_joined
+            }
             return Response(resp)
         else:
-            resp = {'msg':'error','info':"Username not found in database"}
+            resp = {'msg': 'error', 'info': "Username not found in database"}
             return Response(resp)
         # raise AuthenticationFailed("Username not Found or password not found")
     else:
-        resp = {'msg':'error',"info": "Username, Password combination incorrect.."}
+        resp = {'msg': 'error',
+                "info": "Username, Password combination incorrect.."}
         return Response(resp)
 
 
@@ -1379,10 +1427,8 @@ def main_login(request):
     except:
         city = ""
         country = ""
-    # return Response({"city":city,"country":country,"zone":timezone_str})
     device = mdata("device")
     osver = mdata("os")
-    # brow=mdata["browser"]
     ltime = mdata("time")
     ipuser = mdata("ip")
     zone = mdata("timezone")
@@ -1515,8 +1561,8 @@ def main_login(request):
             except:
                 pass
 
-            # resp={'userinfo':info}
-            data = {'session_id': session}
+            data = {"msg": "success", "info": "Logged in successfull",
+                    'session_id': session}
 
             response = Response()
             response.set_cookie(key='DOWELL_LOGIN', value=session,
@@ -1524,11 +1570,12 @@ def main_login(request):
             response.data = data
             return response
         else:
-            resp = {"data": "Username not found in database"}
+            resp = {"msg": "error", "info": "Username not found in database"}
             return Response(resp)
         # raise AuthenticationFailed("Username not Found or password not found")
     else:
-        resp = {"data": "Username, Password combination incorrect.."}
+        resp = {"msg": "error",
+                "info": "Username, Password combination incorrect.."}
         return Response(resp)
 
 
