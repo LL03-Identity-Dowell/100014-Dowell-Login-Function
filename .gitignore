@@ -132,3 +132,4 @@ dmypy.json
 
 # Local django settings
 local.py
+node_modules
