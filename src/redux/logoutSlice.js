@@ -1,23 +1,12 @@
-import axios from "axios";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-// Define the logout API endpoint
-const logoutAPI = "https://100014.pythonanywhere.com/api/main_logout/";
+import { postData } from "./instance";
 
 // Create an async thunk for the logout API call
 export const logoutUser = createAsyncThunk(
   "logout/logoutUser",
   async ({ session_id }) => {
-    try {
-      const response = await axios.post(logoutAPI, { session_id });
-      if (response.data.msg === "success") {
-        return response.data.info;
-      } else {
-        throw new Error(response.data.info);
-      }
-    } catch (error) {
-      throw new Error(error?.response?.data?.info);
-    }
+    const response = await postData("/api/main_logout/", { session_id });
+    return response;
   }
 );
 

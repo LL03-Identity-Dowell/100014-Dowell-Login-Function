@@ -36,12 +36,9 @@ const schema = yup.object().shape({
 });
 
 const ChangePassword = () => {
-  // const [loading, setLoading] = useState(false);
-
   const dispatch = useDispatch();
   const { loading, error, changePassword } =
     useSelector((state) => state.password) || {};
-  console.log("ChangePassword", changePassword);
 
   const {
     handleSubmit,
