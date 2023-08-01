@@ -132,8 +132,15 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+BUILD_DIR=BASE_DIR /"build"
+
 STATIC_ROOT = BASE_DIR / 'build/static'
-STATIC_URL = '/static/'
+# STATIC_URL = '/static/'
+
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [
+    BUILD_DIR / "static",
+]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -158,6 +165,5 @@ CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
-
 
 BASE_URL = "/"

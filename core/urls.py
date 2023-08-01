@@ -27,12 +27,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path("", TemplateView.as_view(template_name="index.html"))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += i18n_patterns(
     path('server/', include("server.urls")),
-    path('', include("loginapp.urls")),
+    path('main/', include("loginapp.urls")),
     prefix_default_language=True,
 )
 
