@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link, useLocation } from "react-router-dom";
@@ -14,8 +14,8 @@ import {
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
-import zxcvbn from "zxcvbn";
 import useTimedMessage from "./useTimedMessage";
+import PasswordInput from "./passwordInput";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -44,19 +44,11 @@ const schema = yup.object().shape({
   Password: yup
     .string()
     .min(8, "Password must be at least 8 characters")
-    .required("Password is required")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-      [
-        "Password must include at least 1 lowercase letter",
-        "Password must include at least 1 uppercase letter",
-        "Password must include at least 1 digit",
-        "Password must include at least 1 special character",
-      ]
-    ),
-  confirm_Password: yup
+    .max(99)
+    .required("Password is required"),
+  confirm_password: yup
     .string()
-    .oneOf([yup.ref("Password"), null], "Passwords must match")
+    .oneOf([yup.ref("Password")], "Passwords must match")
     .required("Confirm Password is required"),
   Email: yup
     .string()
@@ -122,8 +114,6 @@ const schema = yup.object().shape({
 });
 
 const SignUp = () => {
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [passwordMessage, setPasswordMessage] = useState("");
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [attemptsSms, setAttemptsSms] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
@@ -148,6 +138,7 @@ const SignUp = () => {
     formState: { errors },
     watch,
     setValue,
+    getValues,
   } = useForm({
     resolver: yupResolver(schema),
   });
@@ -232,57 +223,6 @@ const SignUp = () => {
       return () => clearTimeout(smsTimer);
     }
   }, [smsCountdown]);
-
-  // Add a useRef hook to get a reference to the password input field:
-  const passwordRef = useRef(null);
-
-  // Password requirements
-  const requirements = [
-    {
-      regex: /[a-z]/, // at least 1 lowercase letter
-      message: "Password must contain at least 1 lowercase letter",
-    },
-    {
-      regex: /[A-Z]/, // at least 1 uppercase letter
-      message: "Password must contain at least 1 uppercase letter",
-    },
-    {
-      regex: /\d/, // at least 1 digit
-      message: "Password must contain at least 1 digit",
-    },
-    {
-      regex: /[@$!%*?&]/, // at least 1 special character
-      message: "Password must contain at least 1 special character",
-    },
-    {
-      regex: /.{8}/, // at least 8 characters
-      message: "Password must be at least 8 characters",
-    },
-  ];
-
-  // Handle password change
-  const handlePasswordChange = () => {
-    const newPassword = passwordRef.current.value;
-    const { score, feedback } = zxcvbn(newPassword);
-
-    const validationMessages = requirements?.map((requirement) => {
-      const isValid = requirement.regex.test(newPassword);
-      return {
-        message: requirement.message,
-        isValid,
-      };
-    });
-
-    const isValidPassword = validationMessages.every(
-      (message) => message.isValid
-    );
-    const passwordFeedback = feedback.warning || feedback.suggestions[0];
-
-    setValue("Password", newPassword); // Update the form value
-
-    setPasswordStrength(isValidPassword ? score : 0);
-    setPasswordMessage(isValidPassword ? passwordFeedback : validationMessages);
-  };
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -432,84 +372,25 @@ const SignUp = () => {
             </div>
 
             <div>
-              <label htmlFor="Password" className="label">
-                Password <span className="text-red-500">*</span>
-              </label>
-              <div className="mt-2.5 relative">
-                <input
-                  name="Password"
-                  type="password"
-                  id="Password"
-                  placeholder="Enter Your Password"
-                  autoComplete="Password"
-                  className="input-field"
-                  {...register("Password")}
-                  ref={passwordRef}
-                  onChange={handlePasswordChange}
-                />
-                {errors.Password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.Password.message}
-                  </p>
-                )}
-              </div>
-              <div className="h-2 bg-gray-300 rounded overflow-hidden w-11/12">
-                <div
-                  className={`h-full strength-${passwordStrength} ${
-                    passwordStrength === 0
-                      ? "bg-red-500"
-                      : passwordStrength === 1
-                      ? "bg-orange-400"
-                      : passwordStrength === 2
-                      ? "bg-yellow-400"
-                      : "bg-green-500"
-                  }`}
-                  style={{ width: `${(passwordStrength / 4) * 100}%` }}
-                ></div>
-              </div>
-              {Array.isArray(passwordMessage) ? (
-                <div>
-                  {passwordMessage.map((message, index) => (
-                    <p
-                      key={index}
-                      className={`text-xs mt-1 ${
-                        message.isValid ? "text-green-500" : "text-red-500"
-                      }`}
-                    >
-                      {message.message}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <p
-                  className={`text-xs mt-1 ${
-                    passwordMessage ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {passwordMessage}
-                </p>
-              )}
+              <PasswordInput
+                name="new_password"
+                register={register}
+                value={getValues("new_password")}
+                errors={errors}
+                isConfirm={false}
+                onChange={setValue}
+              />
             </div>
 
             <div>
-              <label htmlFor="confirm_Password" className="label">
-                Confirm Password <span className="text-red-500">*</span>
-              </label>
-              <div className="mt-2.5">
-                <input
-                  name="confirm_Password"
-                  type="password"
-                  placeholder="Confirm Your Password"
-                  autoComplete="confirm_Password"
-                  className="input-field"
-                  {...register("confirm_Password")}
-                />
-                {errors.confirm_Password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.confirm_Password.message}
-                  </p>
-                )}
-              </div>
+              <PasswordInput
+                name="confirm_password"
+                register={register}
+                value={getValues("confirm_password")}
+                errors={errors}
+                isConfirm={true}
+                onChange={setValue}
+              />
             </div>
 
             <div>

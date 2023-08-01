@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
@@ -7,8 +7,8 @@ import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { resetPassword, sendOTP } from "../redux/resetPasswordSlice";
 import { Radio } from "react-loader-spinner";
-import zxcvbn from "zxcvbn";
 import useTimedMessage from "./useTimedMessage";
+import PasswordInput from "./passwordInput";
 
 const schema = yup.object().shape({
   username: yup
@@ -30,35 +30,18 @@ const schema = yup.object().shape({
       .required("OTP is required")
       .matches(/^[0-9]+$/, "OTP must contain only numbers"),
   }),
-  new_password: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(99)
-      .required("Password is required")
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
-        [
-          "Password must include at least 1 lowercase letter",
-          "Password must include at least 1 uppercase letter",
-          "Password must include at least 1 digit",
-          "Password must include at least 1 special character",
-        ]
-      ),
-  }),
-  confirm_password: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .oneOf([yup.ref("new_password")], "Passwords must match")
-      .required("Confirm Password is required"),
-  }),
+  new_password: yup
+    .string()
+    .min(8, "Password must be at least 8 characters")
+    .max(99)
+    .required("Password is required"),
+  confirm_password: yup
+    .string()
+    .oneOf([yup.ref("new_password")], "Passwords must match")
+    .required("Confirm Password is required"),
 });
 
 const PasswordResetForm = () => {
-  const [passwordStrength, setPasswordStrength] = useState(0);
-  const [passwordMessage, setPasswordMessage] = useState("");
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [emailOtpSent, setEmailOtpSent] = useState(false);
@@ -69,11 +52,12 @@ const PasswordResetForm = () => {
     register,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
   const { passwordReset, loading, error, otpSent } = useSelector(
-    (state) => state.password
+    (state) => state.password || {}
   );
 
   const handleSendOTP = ({ username, email }) => {
@@ -113,57 +97,6 @@ const PasswordResetForm = () => {
         resetPassword({ username, email, otp, new_password, confirm_password })
       );
     }
-  };
-
-  // Add a useRef hook to get a reference to the password input field:
-  const passwordRef = useRef(null);
-
-  // Password requirements
-  const requirements = [
-    {
-      regex: /[a-z]/, // at least 1 lowercase letter
-      message: "Password must contain at least 1 lowercase letter",
-    },
-    {
-      regex: /[A-Z]/, // at least 1 uppercase letter
-      message: "Password must contain at least 1 uppercase letter",
-    },
-    {
-      regex: /\d/, // at least 1 digit
-      message: "Password must contain at least 1 digit",
-    },
-    {
-      regex: /[@$!%*?&]/, // at least 1 special character
-      message: "Password must contain at least 1 special character",
-    },
-    {
-      regex: /.{8}/, // at least 8 characters
-      message: "Password must be at least 8 characters",
-    },
-  ];
-
-  // Handle password change
-  const handlePasswordChange = () => {
-    const newPassword = passwordRef.current.value;
-    const { score, feedback } = zxcvbn(newPassword);
-
-    const validationMessages = requirements?.map((requirement) => {
-      const isValid = requirement.regex.test(newPassword);
-      return {
-        message: requirement.message,
-        isValid,
-      };
-    });
-
-    const isValidPassword = validationMessages.every(
-      (message) => message.isValid
-    );
-    const passwordFeedback = feedback.warning || feedback.suggestions[0];
-
-    setValue("new_password", newPassword); // Update the form value
-
-    setPasswordStrength(isValidPassword ? score : 0);
-    setPasswordMessage(isValidPassword ? passwordFeedback : validationMessages);
   };
 
   return (
@@ -319,86 +252,26 @@ const PasswordResetForm = () => {
             </div>
           )}
 
-          <div className="mt-2.5">
-            <label htmlFor="new_password" className="label">
-              New Password <span className="text-red-500">*</span>
-            </label>
-            <div className="mt-2.5">
-              <input
-                type="password"
-                name="new_password"
-                id="new_password"
-                placeholder="Enter new Password"
-                autoComplete="new_password"
-                className="input-field"
-                {...register("new_password", { required: otpSent })}
-                ref={passwordRef}
-                onChange={handlePasswordChange}
-              />
-              {errors?.new_password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.new_password.message}
-                </p>
-              )}
-            </div>
-            <div className="h-2 bg-gray-300 rounded overflow-hidden w-11/12">
-              <div
-                className={`h-full strength-${passwordStrength} ${
-                  passwordStrength === 0
-                    ? "bg-red-500"
-                    : passwordStrength === 1
-                    ? "bg-orange-400"
-                    : passwordStrength === 2
-                    ? "bg-yellow-400"
-                    : "bg-green-500"
-                }`}
-                style={{ width: `${(passwordStrength / 4) * 100}%` }}
-              ></div>
-            </div>
-            {Array.isArray(passwordMessage) ? (
-              <div>
-                {passwordMessage.map((message, index) => (
-                  <p
-                    key={index}
-                    className={`text-xs mt-1 ${
-                      message.isValid ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {message.message}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p
-                className={`text-xs mt-1 ${
-                  passwordMessage ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {passwordMessage}
-              </p>
-            )}
+          <div className="mt-2">
+            <PasswordInput
+              name="new_password"
+              register={register}
+              value={getValues("new_password")}
+              errors={errors}
+              isConfirm={false}
+              onChange={setValue}
+            />
           </div>
 
-          <div className="mt-2.5">
-            <label htmlFor="confirm_password" className="label">
-              Confirm Password <span className="text-red-500">*</span>
-            </label>
-            <div className="mt-2.5">
-              <input
-                type="password"
-                name="confirm_password"
-                id="confirm_password"
-                placeholder="Confirm new Password"
-                autoComplete="confirm_password"
-                className="input-field"
-                {...register("confirm_password", { required: otpSent })}
-              />
-              {errors.confirm_password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.confirm_password.message}
-                </p>
-              )}
-            </div>
+          <div className="mt-2">
+            <PasswordInput
+              name="confirm_password"
+              register={register}
+              value={getValues("confirm_password")}
+              errors={errors}
+              isConfirm={true}
+              onChange={setValue}
+            />
           </div>
 
           <div className="mt-4">

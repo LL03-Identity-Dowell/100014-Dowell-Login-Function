@@ -23,7 +23,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route exact path="/logout" element={<SignOutPage />} />
           <Route path="/splash/:Username" element={<SplashPage />} />
-          <Route path="/password" element={<PasswordResetForm />} />
+          <Route path="/resetPassword" element={<PasswordResetForm />} />
           <Route path="/changePassword" element={<ChangePassword />} />
           <Route path="/username" element={<UsernameForgot />} />
           <Route path="/chat" element={<Chat />} />
