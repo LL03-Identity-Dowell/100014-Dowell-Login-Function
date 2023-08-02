@@ -65,8 +65,12 @@ const LogIn = () => {
       const response = await dispatch(loginUser(userData));
       const sessionID = response?.payload?.session_id;
 
-      // Redirect to the desired page
-      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
+      if (sessionID) {
+        // Redirect to the desired page
+        window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
+      } else {
+        throw new Error("Invalid password or username");
+      }
     } catch (error) {
       throw new Error(error);
     }

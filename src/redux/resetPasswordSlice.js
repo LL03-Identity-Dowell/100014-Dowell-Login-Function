@@ -10,6 +10,7 @@ export const sendOTP = createAsyncThunk(
       email,
       usage,
     });
+    // console.log("emailOTP", response);
     return response;
   }
 );
