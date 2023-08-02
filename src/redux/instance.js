@@ -11,12 +11,12 @@ export const instance = axios.create({
 export const postData = async (endpoint, data) => {
   try {
     const response = await instance.post(endpoint, data);
-    if (response?.data.msg === "success") {
-      return response?.data.info;
+    if (response?.data?.msg === "success") {
+      return response?.data?.info;
     } else {
-      throw new Error(response?.data.info);
+      throw new Error(response?.data?.info);
     }
   } catch (error) {
-    throw new Error(error.response?.data.info);
+    throw new Error(error?.response?.data?.info);
   }
 };

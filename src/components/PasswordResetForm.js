@@ -108,20 +108,19 @@ const PasswordResetForm = () => {
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
       <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
-          <div className="mx-auto max-w-2xl items-center justify-center space-y-2">
+          <div className="text-center space-y-2">
             <img
               src={DoWellVerticalLogo}
               alt="DoWell logo"
-              className="h-34 w-44 rounded-sm drop-shadow-md"
+              className="h-34 w-44 rounded-sm drop-shadow-md mx-auto"
             />
             <h2 className="text-xl font-semibold tracking-wide text-green-500 md:text-2xl">
-              Forget Password
+              Forgot Password
             </h2>
-
             <div className="flex text-gray-600 py-2 text-left space-x-2">
-              <p>Do you forget username?</p>
+              <p>Do you forgot your username?</p>
               <Link to="/username">
-                <span className="text-green-600"> Click here</span>
+                <span className="text-green-600">Click here</span>
               </Link>
             </div>
           </div>
@@ -292,7 +291,7 @@ const PasswordResetForm = () => {
                   color="#1ff507"
                 />
               ) : (
-                "Reset Password"
+                "Change Password"
               )}
             </button>
             <p className="text-base font-normal text-green-600">
