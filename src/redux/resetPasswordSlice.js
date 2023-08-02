@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { postData } from "./instance";
 
-// Async thunk for sending the POST request and getting OTP
+// Async thunk for sending the POST request and getting emailOTP
 export const sendOTP = createAsyncThunk(
   "password/sendOTP",
   async ({ username, email, usage }) => {
@@ -10,7 +10,6 @@ export const sendOTP = createAsyncThunk(
       email,
       usage,
     });
-    // console.log("emailOTP", response);
     return response;
   }
 );
@@ -26,7 +25,6 @@ export const resetPassword = createAsyncThunk(
       new_password,
       confirm_password,
     });
-
     return response;
   }
 );

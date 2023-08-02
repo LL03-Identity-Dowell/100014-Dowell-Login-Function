@@ -32,7 +32,6 @@ export const loginUser = createAsyncThunk(
       });
 
       if (response?.data.msg === "success") {
-        console.log("success", response?.data.info);
         return response?.data;
       } else {
         throw new Error(response?.data.info);

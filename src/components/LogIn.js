@@ -10,9 +10,9 @@ import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
+  const [error, setError] = useState(null);
 
-  const { userInfo, loading, error } =
-    useSelector((state) => state.login) || {};
+  const { userInfo, loading } = useSelector((state) => state.login) || {};
 
   // Get the random session ID from the Redux store
   const { randomSession } = useSelector((state) => state.session);
@@ -61,18 +61,14 @@ const LogIn = () => {
       mainParams,
     };
 
-    try {
-      const response = await dispatch(loginUser(userData));
-      const sessionID = response?.payload?.session_id;
+    const response = await dispatch(loginUser(userData));
+    const sessionID = response?.payload?.session_id;
 
-      if (sessionID) {
-        // Redirect to the desired page
-        window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
-      } else {
-        throw new Error("Invalid password or username");
-      }
-    } catch (error) {
-      throw new Error(error);
+    if (sessionID) {
+      // Redirect to the desired page
+      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
+    } else {
+      setError("Invalid username or password");
     }
   };
 
