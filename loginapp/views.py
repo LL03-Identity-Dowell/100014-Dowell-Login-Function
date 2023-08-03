@@ -5,9 +5,12 @@ import json
 import requests
 import datetime
 import time
+import jwt
 
 from dateutil import parser
 from geopy.geocoders import Nominatim
+
+from . models import Location_check
 
 # django
 from django.shortcuts import render, redirect
@@ -103,35 +106,41 @@ def linked_based(request):
         return HttpResponse("pl provide redirect url")
     return render(request, "link_based.html", context)
 
+
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 def LinkLogin(request):
-    url=request.GET.get("redirect_url",None)
-    user=request.GET.get("user",None)
-    context={}
+    url = request.GET.get("redirect_url", None)
+    user = request.GET.get("user", None)
+    context = {}
     if request.method == 'POST':
-        loc=request.POST["loc"]
-        device=request.POST["dev"]
-        osver=request.POST["os"]
-        brow=request.POST["brow"]
-        ltime=request.POST["time"]
-        ipuser=request.POST["ip"]
-        mobconn=request.POST["conn"]
+        loc = request.POST["loc"]
+        device = request.POST["dev"]
+        osver = request.POST["os"]
+        brow = request.POST["brow"]
+        ltime = request.POST["time"]
+        ipuser = request.POST["ip"]
+        mobconn = request.POST["conn"]
         if user is None:
-            user=passgen.generate_random_password1(8)
-        random_session=passgen.generate_random_password1(32)
-        field={"Username":user,"random_session":random_session,"OS":osver,"Device":device,"Browser":brow,"Location":loc,"Time":str(ltime),"SessionID":"linkbased","Connection":mobconn,"qrcode_id":"user6","IP":ipuser}
-        resp=dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field,"nil")
-        respj=json.loads(resp)
-        field1=json.dumps(field)
-        field2=str(field1)
-        Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
-        qrcodegen.qrgen1(user,respj["inserted_id"],f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
+            user = passgen.generate_random_password1(8)
+        random_session = passgen.generate_random_password1(32)
+        field = {"Username": user, "random_session": random_session, "OS": osver, "Device": device, "Browser": brow,
+                 "Location": loc, "Time": str(ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
+        resp = dowellconnection("login", "bangalore", "login", "login",
+                                "login", "6752828281", "ABCDE", "insert", field, "nil")
+        respj = json.loads(resp)
+        field1 = json.dumps(field)
+        field2 = str(field1)
+        Linkbased_RandomSession.objects.create(
+            sessionID=random_session, info=field2)
+        qrcodegen.qrgen1(
+            user, respj["inserted_id"], f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
 
         if url is not None:
             return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
         return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}')
-    return render(request,"link_based.html",context)
+    return render(request, "link_based.html", context)
+
 
 def register_legal_policy(request):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
@@ -296,7 +305,7 @@ def register(request):
         main_params = request.POST.get('mainparams', None)
         _type = request.POST.get('type', None)
         otp = request.POST.get('otp')
-        sms=request.POST.get('sms')
+        sms = request.POST.get('sms')
         org = request.POST.get('org', None)
         policy_status = request.POST.get('policy_status')
         other_policy = request.POST.get('other_policy')
@@ -390,12 +399,12 @@ def register(request):
 
             field = {"Profile_Image": f"https://100014.pythonanywhere.com/media/{profile_image}", "Username": user, "Password": dowell_hash(password1), "Firstname": first, "Lastname": last, "Email": email, "phonecode": phonecode, "Phone": phone, "profile_id": profile_id, "client_admin_id": client_admin_res[
                 "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter}
-            if sms == "" or sms==None:
-                sms_verified="unverified"
-                field["verified"]="False"
+            if sms == "" or sms == None:
+                sms_verified = "unverified"
+                field["verified"] = "False"
             else:
-                sms_verified="verified"
-                field["verified"]="True"
+                sms_verified = "verified"
+                field["verified"] = "True"
             # Insert user registration
             id = dowellconnection("login", "bangalore", "login", "registration",
                                   "registration", "10004545", "ABCDE", "insert", field, "nil")
@@ -412,7 +421,7 @@ def register(request):
                 "phoneNumber": phone,
                 "usertype": user_type,
                 "country": user_country,
-                "verified_phone":sms_verified,
+                "verified_phone": sms_verified,
                 "verified_email": "verified"
             })
             headers = {
@@ -436,6 +445,14 @@ def register(request):
 @csrf_exempt
 def login(request):
     context = {}
+    orgs = None
+    type1 = None
+    email1 = None
+    name1 = None
+    u_code = None
+    spec = None
+    code = None
+    detail = None
     try:
         orgs = request.GET.get('org', None)
         type1 = request.GET.get('type', None)
@@ -447,8 +464,8 @@ def login(request):
         detail = request.GET.get('detail', None)
     except:
         pass
-    hr_invitation=request.GET.get('hr_invitation',None)
-    context["hr_invitation"]=hr_invitation
+    hr_invitation = request.GET.get('hr_invitation', None)
+    context["hr_invitation"] = hr_invitation
     context["org"] = orgs
     context["type"] = type1
     urls = request.GET.get('next', None)
@@ -458,15 +475,36 @@ def login(request):
     city = ""
     saved_browser_session = request.session.session_key
     if saved_browser_session:
-        return HttpResponse(f"Logged in successfully, SessionID is = {saved_browser_session}")
         if orgs:
             return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
         elif redirect_url:
-            return HttpResponse(f"<script>window.location.replace('{redirect_url}?session_id={saved_browser_session}');</script>")
+            logindetail = CustomSession.objects.filter(
+                sessionID=saved_browser_session).first()
+            info = json.loads(logindetail.info)
+            if "ll04-finance-dowell.github.io" in url:
+                if info["User_type"] == "betatester":
+                    return redirect(f'https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing?session_id={session}')
+                else:
+                    return redirect(f'https://ll04-finance-dowell.github.io/workflowai.online?session_id={session}')
+            elif "ll07-team-dowell.github.io" in url:
+                if info["User_type"] == "betatester":
+                    return redirect(f'https://ll07-team-dowell.github.io/100098-DowellJobPortal?session_id={session}')
+                else:
+                    return redirect(f'https://ll07-team-dowell.github.io/Jobportal?session_id={session}')
+            else:
+                return HttpResponse(f"<script>window.location.replace('{url}?session_id={session}');</script>")
+                return redirect(f'{url}?session_id={session}')
+        elif hr_invitation:
+            hr_invitation = jwt.decode(
+                jwt=hr_invitation, key='secret', algorithms=["HS256"])
+            logindetail = CustomSession.objects.filter(
+                sessionID=saved_browser_session).first()
+            info = json.loads(logindetail.info)
+            return redirect(f'https://100093.pythonanywhere.com/invitelink1?session_id={saved_browser_session}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={info["username"]}')
         else:
             return redirect(f'https://100093.pythonanywhere.com/home?session_id={saved_browser_session}')
-    random_text = passgen.generate_random_password1(24)
-    context["random_session"] = random_text
+    var1 = passgen.generate_random_password1(24)
+    context["random_session"] = var1
     if request.COOKIES.get('qrid_login'):
         context["qrid_login"] = request.COOKIES.get('qrid_login')
         qrid_obj_1 = QR_Creation.objects.filter(
@@ -643,8 +681,9 @@ def login(request):
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
 
-            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+            serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session, username=username, product="",
+                                      status="login", created=serverclock1, updated=serverclock1)
 
             if "org" in main_params:
                 return HttpResponse(f"Logged in successfully, SessionID is = {session}")
@@ -1041,3 +1080,62 @@ def user_info(request):
     response["weekly"] = weekly
     resp = response
     return render(request, 'user_detail.html', {"resp": resp})
+
+
+def change_password(request):
+    context = {}
+    username = request.GET.get("username", "")
+    context["username"] = username
+    if is_ajax(request=request):
+        if request.method == "POST":
+            username = request.POST.get("username", None)
+            new_password = request.POST.get("new_password", None)
+            old_password = request.POST.get("old_password", None)
+
+            user = authenticate(request, username=username,
+                                password=old_password)
+
+            if user is not None:
+                obj = Account.objects.filter(username=username).first()
+                obj.set_password(new_password)
+                obj.save()
+
+                field = {"Username": username}
+                update_field = {"Password": dowell_hash(new_password)}
+                dowellconnection("login", "bangalore", "login", "registration",
+                                 "registration", "10004545", "ABCDE", "update", field, update_field)
+                return JsonResponse({"msg": "success", "info": "Password Changed Successfully!!"})
+            else:
+                return JsonResponse({"msg": "error", "info": "Username, Password combination is incorrect"})
+        else:
+            return JsonResponse({"msg": "success", "info": "Running correctly"})
+    return render(request, 'login/change_password.html', context)
+
+
+def allow_location(request):
+    username = request.GET.get("username")
+    location = request.GET.get("location")
+    location_check = Location_check.objects.filter(username=username).first()
+    if location is not None:
+        if location_check:
+            try:
+                usual = json.loads(location_check.usual)
+            except:
+                usual = location_check.usual
+            try:
+                unusual = json.loads(location_check.unusual)
+            except:
+                unusual = location_check.unusual
+            for a in unusual:
+                if location == list(a.keys())[0]:
+                    unusual.remove(a)
+                    if location not in usual:
+                        usual.append(location)
+            location_check.usual = str(json.dumps(usual))
+            location_check.unusual = str(json.dumps(unusual))
+            location_check.save(update_fields=["usual", "unusual"])
+            return HttpResponse("Location info is updated, You can proceed to login!!")
+        else:
+            return HttpResponse("User not found")
+    else:
+        return HttpResponse("Not location given to update..")

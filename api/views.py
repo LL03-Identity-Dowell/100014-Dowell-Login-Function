@@ -6,6 +6,7 @@ import base64
 import os
 import csv
 import requests
+import re
 
 from django.shortcuts import render
 from django.core.files.base import ContentFile
@@ -1199,36 +1200,62 @@ def PublicApi(request):
         return Response(resp)
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def login_init_api(request):
-    context = {}
-    try:
-        orgs = request.GET.get('org', None)
-        type1 = request.GET.get('type', None)
-        email1 = request.GET.get('email', None)
-        name1 = request.GET.get('name', None)
-        code = request.GET.get('code', None)
-        spec = request.GET.get('spec', None)
-        u_code = request.GET.get('u_code', None)
-        detail = request.GET.get('detail', None)
-    except:
-        pass
-    context["org"] = orgs
-    context["type"] = type1
-    urls = request.GET.get('next', None)
-    context["url"] = request.GET.get('redirect_url', None)
-    redirect_url = request.GET.get('redirect_url', None)
-    past_login = request.COOKIES.get('DOWELL_LOGIN')
-    if past_login:
-        test_session = CustomSession.objects.filter(
-            sessionID=past_login).first()
-        if test_session:
-            if test_session.status == "login":
-                return Response({'msg': 'error', 'info': 'logged_in_user'})
-    random_text = passgen.generate_random_password1(24)
-    context["random_session"] = random_text
-    if request.COOKIES.get('qrid_login'):
-        context["qrid_login"] = request.COOKIES.get('qrid_login')
+    if request.method == "POST":
+        mainparams = request.data.get('mainparams', None)
+        context = {}
+        past_login = request.COOKIES.get('DOWELL_LOGIN')
+        if past_login:
+            test_session = CustomSession.objects.filter(
+                sessionID=past_login).first()
+            if test_session:
+                if test_session.status == "login":
+                    logindetail = CustomSession.objects.filter(
+                        sessionID=past_login).first()
+                    info = json.loads(logindetail.info)
+                    response = {'msg': 'error', 'info': 'logged_in_user'}
+                    if "org" in mainparams:
+                        response[
+                            "url"] = f'https://100093.pythonanywhere.com/invitelink?session_id={past_login}&{mainparams}'
+                    elif "redirect_url" in mainparams:
+                        try:
+                            result = re.search(
+                                'redirect_url=(.*)&', mainparams)
+                            rr = result.group(1)
+                        except:
+                            rr = mainparams[mainparams.find(
+                                'redirect_url=')+13:]
+                        if "ll04-finance-dowell.github.io" in rr:
+                            if info["User_type"] == "betatester":
+                                rr = "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing"
+                            else:
+                                rr = "https://ll04-finance-dowell.github.io/workflowai.online"
+                        elif "ll07-team-dowell.github.io" in rr:
+                            if info["User_type"] == "betatester":
+                                rr = 'https://ll07-team-dowell.github.io/100098-DowellJobPortal'
+                            else:
+                                rr = 'https://ll07-team-dowell.github.io/Jobportal'
+                        response["url"] = f'{rr}?session_id={past_login}'
+                    elif "hr_invitation" in mainparams:
+                        try:
+                            result = re.search(
+                                'hr_invitation=(.*)&', mainparams)
+                            hr_invitation = result.group(1)
+                        except:
+                            hr_invitation = mainparams[mainparams.find(
+                                'hr_invitation=')+14:]
+                        hr_invitation = jwt.decode(
+                            jwt=hr_invitation, key='secret', algorithms=["HS256"])
+                        response["url"] = f'https://100093.pythonanywhere.com/invitelink1?session_id={past_login}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={info["username"]}'
+                    else:
+                        response[
+                            "url"] = f'https://100093.pythonanywhere.com/home?session_id={past_login}'
+                    return Response(response)
+        random_text = passgen.generate_random_password1(24)
+        context["random_session"] = random_text
+        if request.COOKIES.get('qrid_login'):
+            context["qrid_login"] = request.COOKIES.get('qrid_login')
         qrid_obj_1 = QR_Creation.objects.filter(
             qrid=context["qrid_login"]).first()
         if qrid_obj_1.info == "":
