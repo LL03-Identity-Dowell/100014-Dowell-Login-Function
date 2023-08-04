@@ -1448,6 +1448,7 @@ def main_login(request):
     username = mdata('username')
     password = mdata('password')
     loc = mdata("location")
+    mainparams = mdata("mainparams")
     try:
         lo = loc.split(" ")
         country, city = country_city_name(lo[0], lo[1])
@@ -1594,6 +1595,38 @@ def main_login(request):
             response = Response()
             response.set_cookie(key='DOWELL_LOGIN', value=session,
                                 expires=expires, httponly=True, samesite='Lax')
+
+            if "org" in mainparams:
+                data["url"] = f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{mainparams}'
+            elif "redirect_url" in mainparams:
+                try:
+                    result = re.search('redirect_url=(.*)&', mainparams)
+                    rr = result.group(1)
+                except:
+                    rr = mainparams[mainparams.find('redirect_url=')+13:]
+                if "ll04-finance-dowell.github.io" in rr:
+                    if info["User_type"] == "betatester":
+                        rr = 'https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing'
+                    else:
+                        rr = 'https://ll04-finance-dowell.github.io/workflowai.online'
+                elif "ll07-team-dowell.github.io" in rr:
+                    if info["User_type"] == "betatester":
+                        rr = 'https://ll07-team-dowell.github.io/100098-DowellJobPortal'
+                    else:
+                        rr = 'https://ll07-team-dowell.github.io/Jobportal'
+                data["url"] = f'{rr}?session_id={session}'
+            elif "hr_invitation" in mainparams:
+                try:
+                    result = re.search('hr_invitation=(.*)&', mainparams)
+                    hr_invitation = result.group(1)
+                except:
+                    hr_invitation = mainparams[mainparams.find(
+                        'hr_invitation=')+14:]
+                hr_invitation = jwt.decode(
+                    jwt=hr_invitation, key='secret', algorithms=["HS256"])
+                data["url"] = f'https://100093.pythonanywhere.com/invitelink1?session_id={session}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={username}'
+            else:
+                data["url"] = f'https://100093.pythonanywhere.com/home?session_id={session}'
             response.data = data
             return response
         else:
