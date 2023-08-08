@@ -6,6 +6,7 @@ import requests
 import datetime
 import time
 import jwt
+import os
 
 from dateutil import parser
 from geopy.geocoders import Nominatim
@@ -17,6 +18,7 @@ from django.shortcuts import render, redirect
 from django.http.response import HttpResponse, JsonResponse
 from django.conf import settings
 from django.template import RequestContext, Template
+from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
@@ -573,6 +575,15 @@ def login(request):
         brow = request.POST.get("brow", "")
         ltime = request.POST["time"]
         ipuser = request.POST.get("ip", "")
+        try:
+            if ipuser != "":
+                response = requests.get(
+                    f'https://ipapi.co/{ipuser}/json/').json()
+                ip_city = response.get("city")
+            else:
+                ip_city = None
+        except Exception as e:
+            ip_city = None
         mobconn = request.POST["conn"]
 
         user = authenticate(request, username=username, password=password)
@@ -684,6 +695,62 @@ def login(request):
             serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             LiveStatus.objects.create(sessionID=session, username=username, product="",
                                       status="login", created=serverclock1, updated=serverclock1)
+
+            # Location check
+            if ip_city is not None:
+                location_check = Location_check.objects.filter(
+                    username=username).first()
+                if not location_check:
+                    usual = [f'{ip_city}']
+                    Location_check.objects.create(
+                        username=username, usual=str(json.dumps(usual)))
+                else:
+                    match = "Checking"
+                    try:
+                        usual = json.loads(location_check.usual)
+                    except:
+                        usual = location_check.usual
+                    if ip_city not in usual:
+                        try:
+                            unusual = json.loads(location_check.unusual)
+                        except:
+                            unusual = location_check.unusual
+                            pass
+                        print(unusual)
+                        if unusual is not None:
+                            for a in unusual:
+                                if ip_city == list(a.keys())[0]:
+                                    a[f"{ip_city}"] += 1
+                                    match = "True"
+                                    if a[f"{ip_city}"] % 3 == 0:
+                                        send = True
+                                    break
+                                else:
+                                    match = "False"
+                        if match != "True" and match != "False":
+                            unusual = [{f'{ip_city}': 1}]
+                            send = True
+                        elif match == "False":
+                            unusual.append({f'{ip_city}': 1})
+                            send = True
+                        location_check.unusual = str(json.dumps(unusual))
+                        location_check.save(update_fields=["unusual"])
+                        try:
+                            if send == True:
+                                values = {"username": username,
+                                          "ip": ipuser, "location": ip_city}
+                                url_email = "https://100085.pythonanywhere.com/api/email/"
+                                payload = {
+                                    "toname": username,
+                                    "toemail": email,
+                                    "subject": "Login detected from another location",
+                                    "email_content": render_to_string(os.path.join(settings.BASE_DIR, 'templates/login/location_info.html'), values)
+                                }
+                                response = requests.post(
+                                    url_email, json=payload)
+                                print(response)
+                        except:
+                            pass
 
             if "org" in main_params:
                 return HttpResponse(f"Logged in successfully, SessionID is = {session}")
