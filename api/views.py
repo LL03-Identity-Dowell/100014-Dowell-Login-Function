@@ -1675,7 +1675,7 @@ def user_status(request):
                           "registration", "10004545", "ABCDE", "find", field, "nil")
     response = json.loads(id)
     if response["data"] != None:
-        if status is not None:
+        if status is not None and status in ['active', 'inactive', 'deleted']:
             up_field = {"User_status": status}
             dowellconnection("login", "bangalore", "login", "registration",
                              "registration", "10004545", "ABCDE", "update", field, up_field)
