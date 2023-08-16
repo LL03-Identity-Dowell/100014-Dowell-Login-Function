@@ -15,10 +15,10 @@ Required fields
 - timezone
 
 Optional fields
+
 - language (If not provided English is submitted to db)
 - browser (If not provided empty string is provoded to db)
 - device (If not provided, string 'api' is sent to db)
-
 
 #### Request body
 
@@ -43,14 +43,15 @@ Optional fields
 
 ```json
 {
-  "msg":"string",
-  "info":"string",
+  "msg": "string",
+  "info": "string",
   "session_id": "string",
   "remaining_times": "integer"
 }
 ```
+
 - Now this session_id can be used in /userinfo api to get login details.
-  
+
 ---
 
 **POST** `/api/password_change/`
@@ -75,7 +76,7 @@ Required fields
 
 ```json
 {
-  "msg":"string",
+  "msg": "string",
   "info": "string"
 }
 ```
@@ -127,6 +128,7 @@ Required fields
 - timezone
 
 Optional fields
+
 - language (If not provided English is submitted to db)
 - browser (If not provided empty string is provoded to db)
 - device (If not provided, string 'api' is sent to db)
@@ -152,12 +154,14 @@ Optional fields
 
 ```json
 {
-  "msg":"string",
-  "info":"string",
+  "msg": "string",
+  "info": "string",
   "session_id": "string"
 }
 ```
+
 - Now this session_id can be used in /userinfo api to get login details.
+
 ---
 
 **POST** `/api/mobilelogout/`
@@ -179,7 +183,7 @@ Required fields
 ```json
 {
   "msg": "string",
-  "info":"string"
+  "info": "string"
 }
 ```
 
@@ -286,6 +290,7 @@ Required fields:
 - username
 
 If you're trying to update email, firstly user must be sent the otp in their email. So, for that:
+
 > You must get the otp from the `/api/emailotp` endpoint with the exact "usage" given in the api documentation.
 
 #### Request body
@@ -308,6 +313,32 @@ If you're trying to update email, firstly user must be sent the otp in their ema
   "email": "string",
   "phone": "string",
   "image": "string"
+}
+```
+
+#### Example response
+
+```json
+{
+  "msg": "string",
+  "info": "string"
+}
+```
+
+---
+
+**POST** ` /api/user_status/`
+Required fields:
+
+- username
+- status
+
+#### Request body
+
+```json
+{
+  "username": "string",
+  "status": "string"
 }
 ```
 
