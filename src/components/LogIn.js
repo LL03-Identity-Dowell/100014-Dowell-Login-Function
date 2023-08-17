@@ -64,15 +64,14 @@ const LogIn = () => {
     try {
       const response = await dispatch(loginUser(userData));
       const sessionID = response?.payload?.session_id;
+      const URL = response?.payload?.url;
 
       if (sessionID) {
-        // Redirect to the desired page
-        window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
-      } else if (response.error) {
-        throw new Error(response?.data.info);
+        // Redirect to specific url
+        window.location.href = `${URL}`;
       }
     } catch (error) {
-      throw new Error(error.response?.data.info);
+      console.error("Error during login:", error);
     }
   };
 
@@ -165,7 +164,7 @@ const LogIn = () => {
                   )}
                 </button>
                 {userInfo && (
-                  <p className="text-green-500 font-base">{userInfo}</p>
+                  <p className="text-green-500 font-base">{userInfo.info}</p>
                 )}
                 {error && <p className="text-red-500">{error}</p>}
               </div>
