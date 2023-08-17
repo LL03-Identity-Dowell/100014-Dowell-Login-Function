@@ -631,9 +631,18 @@ def login(request):
             response = json.loads(id)
             if response["data"] != None:
                 try:
-                    obj.current_task = "Verifying User"
-                    # obj.current_task="Logging In"
-                    obj.save(update_fields=['current_task'])
+                  if response["data"]["User_status"] == "deleted":
+                        context["error"]="Username, Password combination is incorrect!"
+                        logout(request)
+                        return render(request,'login/new_login.html',context)
+                  elif response["data"]["User_status"] == "inactive":
+                      context["error"]="Account disabled, please contact admin"
+                      logout(request)
+                      return render(request,'login/new_login.html',context)
+                    
+                  obj.current_task = "Verifying User"
+                  # obj.current_task="Logging In"
+                  obj.save(update_fields=['current_task'])
                 except:
                     pass
                 first_name = response["data"]['Firstname']
