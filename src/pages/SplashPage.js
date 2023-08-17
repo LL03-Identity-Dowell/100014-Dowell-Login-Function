@@ -8,7 +8,7 @@ const SplashPage = () => {
 
   // Use the useLocation hook to access the URL parameters passed from the login page
   const location = useLocation();
-  const mainParams = location.search.substring(1); // Remove the leading '?' character
+  const mainparams = location.search.substring(1); // Remove the leading '?' character
 
   return (
     <div className="antialiased bg-gray-100 flex items-center justify-center h-screen">
@@ -31,7 +31,7 @@ const SplashPage = () => {
           <div className="flex flex-row items-center justify-center mt-20">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
-              onClick={() => navigate(`/?${mainParams}`)}
+              onClick={() => navigate(`/?${mainparams}`)}
             >
               Login
             </button>

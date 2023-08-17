@@ -16,6 +16,7 @@ export const loginUser = createAsyncThunk(
     timezone,
     language,
     browser,
+    mainparams,
   }) => {
     try {
       const response = await axios.post(api_url, {
@@ -29,6 +30,7 @@ export const loginUser = createAsyncThunk(
         timezone,
         language,
         browser,
+        mainparams,
       });
 
       if (response?.data.msg === "success") {
@@ -48,14 +50,14 @@ const loginSlice = createSlice({
   initialState: {
     userInfo: null,
     loading: false,
-    error: null,
+    error: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.error = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;

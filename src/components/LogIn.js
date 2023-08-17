@@ -10,9 +10,9 @@ import Coordinate from "../utils/Coordinate";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
-  const [error, setError] = useState(null);
 
-  const { userInfo, loading } = useSelector((state) => state.login) || {};
+  const { userInfo, loading, error } =
+    useSelector((state) => state.login) || {};
 
   // Get the random session ID from the Redux store
   const { randomSession } = useSelector((state) => state.session);
@@ -34,7 +34,7 @@ const LogIn = () => {
   const query = queryString.toString();
 
   // Check if there are query parameters before proceeding
-  const mainParams = query
+  const mainparams = query
     ? Array.from(queryString.entries())
         .map(([key, value]) => `${key}=${value}`)
         .join("&")
@@ -58,17 +58,21 @@ const LogIn = () => {
       browser,
       location,
       randomSession,
-      mainParams,
+      mainparams,
     };
 
-    const response = await dispatch(loginUser(userData));
-    const sessionID = response?.payload?.session_id;
+    try {
+      const response = await dispatch(loginUser(userData));
+      const sessionID = response?.payload?.session_id;
 
-    if (sessionID) {
-      // Redirect to the desired page
-      window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
-    } else {
-      setError("Invalid username or password");
+      if (sessionID) {
+        // Redirect to the desired page
+        window.location.href = `https://100093.pythonanywhere.com/home?session_id=${sessionID}`;
+      } else if (response.error) {
+        throw new Error(response?.data.info);
+      }
+    } catch (error) {
+      throw new Error(error.response?.data.info);
     }
   };
 
@@ -96,7 +100,7 @@ const LogIn = () => {
 
           <div className="text-gray-500 text-base">
             <p>Don't have an account?</p>
-            <Link to={`/signup?${mainParams}`}>
+            <Link to={`/signup?${mainparams}`}>
               <span className="text-green-500 text-base">Sign up</span>
             </Link>
           </div>
@@ -130,7 +134,7 @@ const LogIn = () => {
 
               <div>
                 <label htmlFor="password" className="label">
-                  Password <span className="text-red-500">*</span>
+                  Password<span className="text-red-500">*</span>
                 </label>
                 <div className="mt-2.5">
                   <input
