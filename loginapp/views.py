@@ -203,6 +203,13 @@ def register(request):
     }
     _type = None
     orgs = request.GET.get("org", None)
+    # For countrycode
+    URL='https://100074.pythonanywhere.com/countries/johnDoe123/haikalsb1234/100074/'
+    res = requests.get(url=URL)
+    final_list=[]
+    for data in res.json():
+        my_list=["+" + data["country_code"], data["name"] + "(+"+ data["country_code"]+")"]
+        final_list.append(my_list)
 
     if is_ajax(request=request):
         if request.POST.get('form') == 'verify_otp':
@@ -359,7 +366,7 @@ def register(request):
             profile_image = account.profile_image
 
             # Mongodb document structure
-            json_data = open('loginapp/static/clientadmin.json')
+            json_data = open('loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
 

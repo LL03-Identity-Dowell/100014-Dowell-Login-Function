@@ -109,3 +109,9 @@ class Location_check(models.Model):
     username = models.CharField(max_length=1000, unique=True)
     usual = models.TextField()
     unusual = models.TextField(null=True, blank=True)
+
+class products(models.Model):
+    product=models.CharField(max_length=1000,unique=True)
+    url=models.CharField(max_length=1000,blank=True)
+    ip=models.CharField(max_length=1000,blank=True)
+    status=models.CharField(max_length=100,default="active")
