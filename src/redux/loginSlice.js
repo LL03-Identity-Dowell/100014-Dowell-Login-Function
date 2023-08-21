@@ -36,7 +36,7 @@ export const loginUser = createAsyncThunk(
       if (response?.data.msg === "success") {
         return response?.data;
       } else {
-        throw new Error(response?.data.info);
+        return response.data;
       }
     } catch (error) {
       throw new Error(error.response?.data.info);
@@ -50,14 +50,14 @@ const loginSlice = createSlice({
   initialState: {
     userInfo: null,
     loading: false,
-    error: false,
+    error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = false;
+        state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;

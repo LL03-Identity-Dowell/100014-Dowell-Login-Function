@@ -71,7 +71,8 @@ const LogIn = () => {
         window.location.href = `${URL}`;
       }
     } catch (error) {
-      console.error("Error during login:", error);
+      // throw new Error(error.response?.data.info);
+      return { error: error.response?.data.info };
     }
   };
 
@@ -163,10 +164,12 @@ const LogIn = () => {
                     "Login"
                   )}
                 </button>
+
                 {userInfo && (
-                  <p className="text-green-500 font-base">{userInfo.info}</p>
+                  <p className="text-red-500 font-base">{userInfo.info}</p>
                 )}
-                {error && <p className="text-red-500">{error}</p>}
+
+                {/* {error && <p className="text-red-500">{error.info}</p>} */}
               </div>
             </form>
           </div>

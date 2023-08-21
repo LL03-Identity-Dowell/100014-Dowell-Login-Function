@@ -10,7 +10,7 @@ export const sendEmailOTP = createAsyncThunk(
       Email,
       usage,
     });
-    console.log("OTP response", response);
+    // console.log("OTP response", response);
     return response;
   }
 );
@@ -20,7 +20,7 @@ export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
   async ({ phonecode, Phone }) => {
     const response = await postData("/api/register/", { phonecode, Phone });
-    console.log("Phone response", response);
+    // console.log("Phone response", response);
     return response;
   }
 );
@@ -62,7 +62,7 @@ export const registerUser = createAsyncThunk(
       policy_status,
       newsletter,
     });
-    console.log("Registration response", response);
+    // console.log("Registration response", response);
     return response;
   }
 );

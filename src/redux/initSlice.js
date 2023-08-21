@@ -9,7 +9,6 @@ export const initSessionID = createAsyncThunk(
   async ({ mainparams }) => {
     try {
       const response = await axios.post(api_url, { mainparams });
-      console.log("Init", response?.data);
       return response?.data;
     } catch (error) {
       throw new Error("Error generating init session ID:", error);
