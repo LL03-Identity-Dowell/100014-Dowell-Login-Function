@@ -369,6 +369,14 @@ def register(request):
             json_data = open('loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
+            main = {"username": [],"member_type": "owner","product": "Living Lab Admin","data_type": "Real_Data","operations_right": "Add/Edit","role": "default","portfolio_name": "default","portfolio_code": "01","portfolio_specification": "default","portfolio_uni_code": "default","portfolio_details": "default","status": "enable"}
+            product_list = ["Workflow AI", "Digital Queue", "Wifi QR Code", "Living Lab Chat","User Experience Live","Social Media Automation","Living Lab Scales","Logo Scan","Legalzard","Living Lab Maps","Customer Experience","Living Lab Admin","Team Management","Living Lab Monitoring","Live Stream Dashboard","Sales Agent","Permutation Calculator","Dowell Customer Support Centre","Secure Repositories","Secure Data"]
+            for i in range(len(product_list)):
+                main["username"]=[user]
+                main["product"]=product_list[i]
+                main["portfolio_code"]=i+1
+                # print(main)
+                data["portfolio"].append(main.copy())
 
             # Change document name and username
             data["document_name"] = user

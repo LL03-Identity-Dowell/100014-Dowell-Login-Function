@@ -195,20 +195,29 @@ def register(request):
                 password), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
 
         profile_image = new_user.profile_image
-        json_data = open('dowell_login/static/newnaga2.json')
-        data1 = json.load(json_data)
+
+        json_data = open('loginapp/static/client.json')
+        data = json.load(json_data)
         json_data.close()
-        data1["document_name"] = username
-        data1["Username"] = username
+        main = {"username": [],"member_type": "owner","product": "Living Lab Admin","data_type": "Real_Data","operations_right": "Add/Edit","role": "default","portfolio_name": "default","portfolio_code": "01","portfolio_specification": "default","portfolio_uni_code": "default","portfolio_details": "default","status": "enable"}
+        product_list = ["Workflow AI", "Digital Queue", "Wifi QR Code", "Living Lab Chat","User Experience Live","Social Media Automation","Living Lab Scales","Logo Scan","Legalzard","Living Lab Maps","Customer Experience","Living Lab Admin","Team Management","Living Lab Monitoring","Live Stream Dashboard","Sales Agent","Permutation Calculator","Dowell Customer Support Centre","Secure Repositories","Secure Data"]
+        for i in range(len(product_list)):
+          main["username"]=[username]
+          main["product"]=product_list[i]
+          main["portfolio_code"]=i+1
+          data["portfolio"].append(main.copy())
+
+        data["document_name"] = username
+        data["Username"] = username
         update_data1 = {"first_name": first, "last_name": last, "profile_img": f'https://100014.pythonanywhere.com/media/{profile_image}',
                         "email": email, "phonecode": phonecode, "phone": phone}
-        data1["profile_info"].update(update_data1)
-        data1["organisations"][0]["org_name"] = username
+        data["profile_info"].update(update_data1)
+        data["organisations"][0]["org_name"] = username
         update_data2 = {"first_name": first, "last_name": last, "email": email}
-        data1["members"]["team_members"]["accept_members"][0].update(
+        data["members"]["team_members"]["accept_members"][0].update(
             update_data2)
         client_admin = dowellconnection(
-            "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "insert", data1, "nil")
+            "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "insert", data, "nil")
         client_admin_res = json.loads(client_admin)
         org_id = client_admin_res["inserted_id"]
 
