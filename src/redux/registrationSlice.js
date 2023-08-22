@@ -4,13 +4,12 @@ import { postData } from "./instance";
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
-  async ({ Username, Email, usage }) => {
+  async ({ username, email, usage }) => {
     const response = await postData("/api/emailotp/", {
-      Username,
-      Email,
+      username,
+      email,
       usage,
     });
-    // console.log("OTP response", response);
     return response;
   }
 );
@@ -20,7 +19,6 @@ export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
   async ({ phonecode, Phone }) => {
     const response = await postData("/api/register/", { phonecode, Phone });
-    // console.log("Phone response", response);
     return response;
   }
 );
@@ -62,7 +60,6 @@ export const registerUser = createAsyncThunk(
       policy_status,
       newsletter,
     });
-    // console.log("Registration response", response);
     return response;
   }
 );
