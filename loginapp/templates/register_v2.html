@@ -1685,6 +1685,7 @@ else
                                                                         required="required" aria-required="true"
                                                                         pattern="[a-zA-Z]*"
                                                                         title="Only alphabets are allowed">
+                                                                        <span id="first_error" style="color:red"></span>
                                                                 </div>
                                                                 <div
                                                                     class="elementor-field-type-text elementor-field-group elementor-column elementor-field-group-field_76d99f3 elementor-col-100 elementor-field-required elementor-mark-required">
@@ -1697,6 +1698,7 @@ else
                                                                         placeholder="Your last name" pattern="[a-zA-Z]*"
                                                                         required="required" aria-required="true"
                                                                         title="Only alphabets are allowed">
+                                                                        <span id="last_error" style="color:red"></span>
                                                                 </div>
                                                                 <div
                                                                     class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
@@ -2346,6 +2348,7 @@ else
                                                                         $('#mess').html('Not Matching').css('color', 'red');
                                                                 });</script>
                                                             <script>
+                                                               let no_unames=["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin","uxlive","livinglab","ux","dowell"]
                                                                 $('#username').on('change', function () {
                                                                     if (["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"].includes($('#username').val())) {
                                                                         $('#user_error').html("This username is not allowed..");
@@ -2353,6 +2356,30 @@ else
                                                                     } else {
                                                                         $('#user_error').html("");
                                                                     }
+                                                                }),
+                                                                $('#first_name').on('change', function () {
+                                                                    for(i=0;i<no_unames.length;i++){
+                                                                        if ($(this).val().includes(no_unames[i])){
+                                                                            $('#first_error').html("This name is not allowed..");
+                                                                            $('#first_name').val("");
+                                                                            break;
+                                                                        } else {
+                                                                            $('#first_error').html("");
+                                                                        }
+                                                                    }
+
+                                                                })
+                                                                $('#last_name').on('change', function () {
+                                                                    for(i=0;i<no_unames.length;i++){
+                                                                        if ($(this).val().includes(no_unames[i])){
+                                                                            $('#last_error').html("This name is not allowed..");
+                                                                            $('#first_name').val("");
+                                                                            break;
+                                                                        } else {
+                                                                            $('#last_error').html("");
+                                                                        }
+                                                                    }
+
                                                                 })
                                                                 function ShowFunction() {
                                                                     var x = document.getElementById("id_password1");
