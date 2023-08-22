@@ -14,9 +14,11 @@ export const postData = async (endpoint, data) => {
     if (response?.data?.msg === "success") {
       return response?.data?.info;
     } else {
+      console.log("Error", response.data.info);
       return response.data.info;
     }
   } catch (error) {
-    return { error: error.response.data.info };
+    console.log("Error-Catch", error.response.data.info);
+    return error.response.data.info;
   }
 };

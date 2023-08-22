@@ -54,7 +54,7 @@ const UsernameForgot = () => {
   // Use useEffect to show the email message when otpSent becomes true
   useEffect(() => {
     if (otpSent || emailOtpSent) {
-      setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+      setEmailMessage(otpSent || emailOtpSent, 10000);
     }
   }, [otpSent, emailOtpSent]);
 

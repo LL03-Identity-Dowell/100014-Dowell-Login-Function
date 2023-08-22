@@ -34,7 +34,7 @@ const resetPasswordSlice = createSlice({
   initialState: {
     loading: false,
     error: null,
-    otpSent: false,
+    otpSent: null,
     passwordReset: false,
   },
   reducers: {},
