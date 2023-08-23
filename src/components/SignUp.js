@@ -439,12 +439,12 @@ const SignUp = () => {
                       "Get OTP"
                     )}
                   </button>
-                  {emailMessages.map((message) => (
+                  {emailMessages.map((msg) => (
                     <p
-                      key={message.id}
+                      key={msg.id}
                       className="text-base font-normal text-green-600"
                     >
-                      {message.message}
+                      {msg.message}
                     </p>
                   ))}
                 </div>
@@ -590,12 +590,12 @@ const SignUp = () => {
                       "Get SMS"
                     )}
                   </button>
-                  {smsMessages.map((message) => (
+                  {smsMessages.map((msg) => (
                     <p
-                      key={message.id}
+                      key={msg.id}
                       className="text-base font-normal text-green-600"
                     >
-                      {message.message}
+                      {msg.message}
                     </p>
                   ))}
                 </div>

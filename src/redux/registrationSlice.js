@@ -69,10 +69,10 @@ const registrationSlice = createSlice({
   name: "registration",
   initialState: {
     loading: false,
+    registered: false,
+    otpSent: false,
+    smsSent: false,
     error: null,
-    registered: null,
-    otpSent: null,
-    smsSent: null,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -80,7 +80,6 @@ const registrationSlice = createSlice({
       .addCase(sendEmailOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.otpSent = false;
       })
       .addCase(sendEmailOTP.fulfilled, (state, action) => {
         state.loading = false;
@@ -93,7 +92,6 @@ const registrationSlice = createSlice({
       .addCase(sendMobileOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.smsSent = false;
       })
       .addCase(sendMobileOTP.fulfilled, (state, action) => {
         state.loading = false;
@@ -106,7 +104,6 @@ const registrationSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.registered = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
