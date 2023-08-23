@@ -4,7 +4,11 @@ import { postData } from "./instance";
 export const userSendOTP = createAsyncThunk(
   "username/userSendOTP",
   async ({ email, usage }) => {
-    const response = await postData("/api/emailotp/", { email, usage });
+    const response = await postData("/api/emailotp/", {
+      email,
+      usage,
+    });
+
     return response;
   }
 );
@@ -34,7 +38,6 @@ const usernameSlice = createSlice({
       .addCase(userSendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.otpSent = false;
       })
       .addCase(userSendOTP.fulfilled, (state, action) => {
         state.loading = false;

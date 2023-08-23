@@ -165,10 +165,10 @@ const LogIn = () => {
                 </button>
 
                 {userInfo && (
-                  <p className="text-red-500 font-base">{userInfo.info}</p>
+                  <p className="text-green-500 font-base">{userInfo.info}</p>
                 )}
 
-                {error && <p className="text-red-500">{error.info}</p>}
+                {error && <p className="text-red-500">{error}</p>}
               </div>
             </form>
           </div>

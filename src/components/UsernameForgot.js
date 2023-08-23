@@ -33,9 +33,8 @@ const UsernameForgot = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { loading, error, usernameList, otpSent } = useSelector(
-    (state) => state.username
-  );
+  const { loading, usernameList, otpSent, error } =
+    useSelector((state) => state.username) || {};
 
   const handleVerification = (data) => {
     if (attemptsOtp > 0) {
@@ -134,12 +133,12 @@ const UsernameForgot = () => {
                     "Get OTP"
                   )}
                 </button>
-                {emailMessages.map((message) => (
+                {emailMessages.map((msg) => (
                   <p
-                    key={message.id}
+                    key={msg.id}
                     className="text-base font-normal text-green-600"
                   >
-                    {message.message}
+                    {msg.message}
                   </p>
                 ))}
               </div>
