@@ -62,18 +62,28 @@ const PasswordResetForm = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { passwordReset, loading, error, otpSent } = useSelector(
-    (state) => state.password || {}
-  );
+  const { loading, passwordReset, otpSent, error } =
+    useSelector((state) => state.password) || {};
 
-  const handleSendOTP = ({ username, email }) => {
+  const handleSendOTP = (data) => {
     if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
+      const { username, email } = data;
       if (username && email) {
         dispatch(sendOTP({ username, email, usage: "forgot_password" }));
         setEmailOtpSent(true);
         setOtpCountdown(60);
       }
+    }
+  };
+
+  // password reset handler
+  const handleResetPassword = (data) => {
+    const { username, email, otp, new_password, confirm_password } = data;
+    if (otp && new_password && confirm_password) {
+      dispatch(
+        resetPassword({ username, email, otp, new_password, confirm_password })
+      );
     }
   };
 
@@ -93,16 +103,6 @@ const PasswordResetForm = () => {
       return () => clearTimeout(otpTimer);
     }
   }, [otpCountdown]);
-
-  // password reset handler
-  const handleResetPassword = (data) => {
-    const { username, email, otp, new_password, confirm_password } = data;
-    if (otp && new_password && confirm_password) {
-      dispatch(
-        resetPassword({ username, email, otp, new_password, confirm_password })
-      );
-    }
-  };
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -294,9 +294,11 @@ const PasswordResetForm = () => {
                 "Change Password"
               )}
             </button>
-            <p className="text-base font-normal text-green-600">
-              {passwordReset}
-            </p>
+            {passwordReset && (
+              <p className="text-base font-normal text-green-600">
+                {passwordReset}
+              </p>
+            )}
 
             {error && <p className="text-red-500">{error}</p>}
           </div>

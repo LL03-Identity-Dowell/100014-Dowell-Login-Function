@@ -50,7 +50,6 @@ const usernameSlice = createSlice({
       .addCase(verifyOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.usernameList = "";
       })
       .addCase(verifyOTP.fulfilled, (state, action) => {
         state.loading = false;
