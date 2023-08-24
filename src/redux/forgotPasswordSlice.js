@@ -1,35 +1,23 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { postData } from "./instance";
 import axios from "axios";
-// import axios from "axios";
 
-// export const sendOTP = createAsyncThunk(
-//   "password/sendOTP",
-//   async ({ username, email, usage }) => {
-//     const response = await postData("/api/emailotp/", {
-//       username,
-//       email,
-//       usage,
-//     });
-//     return response;
-//   }
-// );
-
-const api_url = "https://100014.pythonanywhere.com";
+const base_url = "https://100014.pythonanywhere.com";
 
 export const sendOTP = createAsyncThunk(
   "password/sendOTP",
   async ({ username, email, usage }) => {
     try {
-      const response = await axios.post(`${api_url}/api/emailotp/`, {
+      const response = await axios.post(`${base_url}/api/emailotp/`, {
         username,
         email,
         usage,
       });
-      if (response?.data.msg === "success") {
+      if (response.data.msg === "success") {
+        console.log("pass-suc", response.data.info);
         return response.data.info;
       }
     } catch (error) {
+      console.log("pass-err", error.response.data.info);
       throw new Error(error.response.data.info);
     }
   }
@@ -39,15 +27,20 @@ export const sendOTP = createAsyncThunk(
 export const resetPassword = createAsyncThunk(
   "password/resetPassword",
   async ({ username, email, otp, new_password, confirm_password }) => {
-    const response = await postData("/api/forgot_password/", {
-      username,
-      email,
-      otp,
-      new_password,
-      confirm_password,
-    });
-
-    return response;
+    try {
+      const response = await axios.post(`${base_url}/api/forgot_password/`, {
+        username,
+        email,
+        otp,
+        new_password,
+        confirm_password,
+      });
+      if (response?.data.msg === "success") {
+        return response.data.info;
+      }
+    } catch (error) {
+      throw new Error(error.response.data.info);
+    }
   }
 );
 

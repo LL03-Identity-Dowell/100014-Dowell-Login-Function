@@ -128,9 +128,8 @@ const SignUp = () => {
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { loading, error, registered, otpSent, smsSent } = useSelector(
-    (state) => state.registration
-  );
+  const { loading, error, registered, otpSent, smsSent } =
+    useSelector((state) => state.registration) || {};
 
   const {
     handleSubmit,
@@ -450,14 +449,14 @@ const SignUp = () => {
                 </div>
 
                 {/* Display the countdown timer only after the first OTP attempt */}
-                {emailOtpSent && otpCountdown > 0 && (
+                {emailOtpSent && otpCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
                     Resend OTP in: {otpCountdown}s
                   </div>
                 )}
 
                 {/* Display the email OTP attempts remaining */}
-                {attemptsOtp > 0 && emailOtpSent && (
+                {attemptsOtp > 0 && emailOtpSent && !error && (
                   <div>
                     <p className="text-base font-normal text-green-600">
                       Attempts remaining: {attemptsOtp}
@@ -601,13 +600,13 @@ const SignUp = () => {
                 </div>
 
                 {/* Display the countdown timer only after the first SMS attempt */}
-                {smsOtpSent && smsCountdown > 0 && (
+                {smsOtpSent && smsCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
                     Resend SMS in: {smsCountdown}s
                   </div>
                 )}
 
-                {attemptsSms > 0 && smsOtpSent && (
+                {attemptsSms > 0 && smsOtpSent && !error && (
                   <div>
                     <p className="text-base font-normal text-green-600">
                       Attempts remaining: {attemptsSms}

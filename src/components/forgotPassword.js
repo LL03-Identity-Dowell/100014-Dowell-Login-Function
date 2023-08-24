@@ -62,7 +62,7 @@ const ForgotPassword = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { loading, passwordReset, otpSent, error } =
+  const { loading, otpSent, passwordReset, error } =
     useSelector((state) => state.password) || {};
 
   const handleSendOTP = (data) => {
@@ -205,6 +205,8 @@ const ForgotPassword = () => {
                     {msg.message}
                   </p>
                 ))}
+
+                {error && <p className="text-red-500">{error}</p>}
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
