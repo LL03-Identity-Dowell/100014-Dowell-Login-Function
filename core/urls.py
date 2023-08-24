@@ -20,17 +20,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
 from server.views import error_404, error_500
+from django.views.generic import TemplateView
 
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls'))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api/', include('api.urls')),
+    path("", TemplateView.as_view(template_name="index.html"))
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += i18n_patterns(
     path('server/', include("server.urls")),
-    path('', include("loginapp.urls")),
+    path('main/', include("loginapp.urls")),
     prefix_default_language=True,
 )
 
