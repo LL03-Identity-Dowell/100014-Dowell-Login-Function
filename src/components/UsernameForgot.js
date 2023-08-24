@@ -144,14 +144,14 @@ const UsernameForgot = () => {
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
-              {emailOtpSent && otpCountdown > 0 && (
+              {emailOtpSent && otpCountdown > 0 && !error && (
                 <div className="text-base font-normal text-green-600">
                   Resend OTP in: {otpCountdown}s
                 </div>
               )}
 
               {/* Display the email OTP attempts remaining */}
-              {attemptsOtp > 0 && emailOtpSent && (
+              {attemptsOtp > 0 && emailOtpSent && !error && (
                 <div>
                   <p className="text-base font-normal text-green-600">
                     Attempts remaining: {attemptsOtp}

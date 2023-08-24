@@ -205,6 +205,13 @@ const PasswordResetForm = () => {
                     {msg.message}
                   </p>
                 ))}
+
+                {/* {otpSent && (
+                  <p className="text-base font-normal text-green-600">
+                    {otpSent}
+                  </p>
+                )} */}
+                {error && <p className="text-red-500">{error}</p>}
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}

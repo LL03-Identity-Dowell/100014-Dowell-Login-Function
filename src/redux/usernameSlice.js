@@ -8,7 +8,6 @@ export const userSendOTP = createAsyncThunk(
       email,
       usage,
     });
-
     return response;
   }
 );
