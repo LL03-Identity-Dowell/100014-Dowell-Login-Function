@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPassword, sendOTP } from "../redux/resetPasswordSlice";
+import { resetPassword, sendOTP } from "../redux/forgotPasswordSlice";
 import { Radio } from "react-loader-spinner";
 import useTimedMessage from "./useTimedMessage";
 import PasswordInput from "./passwordInput";
@@ -47,7 +47,7 @@ const schema = yup.object().shape({
   }),
 });
 
-const PasswordResetForm = () => {
+const ForgotPassword = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [emailOtpSent, setEmailOtpSent] = useState(false);
@@ -205,24 +205,17 @@ const PasswordResetForm = () => {
                     {msg.message}
                   </p>
                 ))}
-
-                {/* {otpSent && (
-                  <p className="text-base font-normal text-green-600">
-                    {otpSent}
-                  </p>
-                )} */}
-                {error && <p className="text-red-500">{error}</p>}
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
-              {emailOtpSent && otpCountdown > 0 && (
+              {emailOtpSent && otpCountdown > 0 && !error && (
                 <div className="text-base font-normal text-green-600">
                   Resend OTP in: {otpCountdown}s
                 </div>
               )}
 
               {/* Display the email OTP attempts remaining */}
-              {attemptsOtp > 0 && emailOtpSent && (
+              {attemptsOtp > 0 && emailOtpSent && !error && (
                 <div>
                   <p className="text-base font-normal text-green-600">
                     Attempts remaining: {attemptsOtp}
@@ -320,4 +313,4 @@ const PasswordResetForm = () => {
   );
 };
 
-export default PasswordResetForm;
+export default ForgotPassword;

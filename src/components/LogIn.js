@@ -92,7 +92,7 @@ const LogIn = () => {
             <p className=" text-gray-500 text-base">
               Don't remember username and password?
             </p>
-            <Link to="/resetPassword">
+            <Link to="/forgotPassword">
               <span className="text-green-500 text-base">Click here</span>
             </Link>
           </div>

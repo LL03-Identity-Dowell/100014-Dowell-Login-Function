@@ -5,14 +5,14 @@ import loginReducer from "./loginSlice";
 import registrationReducer from "./registrationSlice";
 import logoutReducer from "./logoutSlice";
 import sessionReducer from "./sessionSlice";
-import resetPasswordReducer from "./resetPasswordSlice";
 import changePasswordReducer from "./changePasswordSlice";
 import initSliceReducer from "./initSlice";
+import forgotPasswordReducer from "./forgotPasswordSlice";
 
 const store = configureStore({
   reducer: {
     countries: countriesReducer,
-    resetPassword: resetPasswordReducer,
+    forgotPassword: forgotPasswordReducer,
     username: usernameReducer,
     login: loginReducer,
     registration: registrationReducer,

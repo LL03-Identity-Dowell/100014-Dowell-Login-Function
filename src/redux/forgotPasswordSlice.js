@@ -51,7 +51,7 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-const resetPasswordSlice = createSlice({
+const forgotPasswordSlice = createSlice({
   name: "password",
   initialState: {
     loading: false,
@@ -89,4 +89,4 @@ const resetPasswordSlice = createSlice({
   },
 });
 
-export default resetPasswordSlice.reducer;
+export default forgotPasswordSlice.reducer;

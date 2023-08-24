@@ -6,12 +6,12 @@ import Policy from "./pages/Policy";
 import Chat from "./pages/Chat";
 import Help from "./pages/Help";
 import FAQ from "./pages/FAQ";
-import PasswordResetForm from "./components/PasswordResetForm";
 import UsernameForgot from "./components/UsernameForgot";
 import SplashPage from "./pages/SplashPage";
 import SignOutPage from "./pages/SignOutPage";
 import NotFound from "./pages/NotFound";
 import ChangePassword from "./components/changePassword";
+import ForgotPassword from "./components/forgotPassword";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route exact path="/logout" element={<SignOutPage />} />
           <Route path="/splash/:Username" element={<SplashPage />} />
-          <Route path="/resetPassword" element={<PasswordResetForm />} />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/changePassword" element={<ChangePassword />} />
           <Route path="/username" element={<UsernameForgot />} />
           <Route path="/chat" element={<Chat />} />
