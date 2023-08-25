@@ -135,6 +135,9 @@ USE_TZ = True
 STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = '/static/'
 
+BUILD_ROOT = BASE_DIR / 'build'
+BUILD_URL = '/build/'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
