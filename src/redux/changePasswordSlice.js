@@ -1,26 +1,25 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { postData } from "./instance";
+import axios from "axios";
+
+const base_url = "https://100014.pythonanywhere.com";
 
 // Async thunk to change the password
 export const changePasswordAsync = createAsyncThunk(
   "password/changePassword",
   async ({ username, old_password, new_password }) => {
     try {
-      const response = await postData("/api/password_change/", {
+      const response = await axios.post(`${base_url}/api/password_change/`, {
         username,
         old_password,
         new_password,
       });
-      if (response?.data.msg === "success") {
-        console.log("chaP-succ", response?.data.info);
-        return response?.data.info;
-      } else {
-        console.log("chaP-Error", response?.data.info);
-        throw new Error(response?.data.info);
+      if (response.data.msg === "success") {
+        console.log("chaP-succ", response.data.info);
+        return response.data.info;
       }
     } catch (error) {
-      console.log("chaP-Error", error.response?.data.info);
-      throw new Error(error.response?.data.info);
+      console.log("chaP-Error", error.response.data.info);
+      throw new Error(error.response.data.info);
     }
   }
 );
@@ -29,8 +28,8 @@ const passwordSlice = createSlice({
   name: "password",
   initialState: {
     loading: false,
+    changePassword: false,
     error: null,
-    changePassword: null,
   },
   reducers: {},
   extraReducers: (builder) => {

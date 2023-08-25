@@ -37,7 +37,7 @@ const schema = yup.object().shape({
 
 const ChangePassword = () => {
   const dispatch = useDispatch();
-  const { loading, error, changePassword } =
+  const { loading, changePassword, error } =
     useSelector((state) => state.password) || {};
 
   const {
@@ -168,6 +168,7 @@ const ChangePassword = () => {
               {changePassword && (
                 <p className="text-green-500 font-base">{changePassword}</p>
               )}
+
               {error && <p className="text-red-500">{error}</p>}
             </div>
 

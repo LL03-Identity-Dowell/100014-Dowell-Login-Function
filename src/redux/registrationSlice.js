@@ -15,8 +15,6 @@ export const sendEmailOTP = createAsyncThunk(
       });
       if (response.data.msg === "success") {
         return response.data.info;
-      } else {
-        throw new Error(response.data.info);
       }
     } catch (error) {
       throw new Error(error.response.data.info);
