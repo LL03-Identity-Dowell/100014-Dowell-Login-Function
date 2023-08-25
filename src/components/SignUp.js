@@ -372,9 +372,9 @@ const SignUp = () => {
 
             <div>
               <PasswordInput
-                name="new_password"
+                name="Password"
                 register={register}
-                value={getValues("new_password")}
+                value={getValues("Password")}
                 errors={errors}
                 isConfirm={false}
                 onChange={setValue}

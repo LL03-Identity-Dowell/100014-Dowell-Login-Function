@@ -1,29 +1,44 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { postData } from "./instance";
+import axios from "axios";
 
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
   async ({ username, email, usage }) => {
-    try {
-      const response = await postData("/api/emailotp/", {
-        username,
-        email,
-        usage,
-      });
-      if (response.data.msg === "success") {
-        // console.log("signup-succ", response?.data.info);
-        return response.data.info;
-      } else {
-        // console.log("signup-Error", response?.data.info);
-        throw new Error(response.data.info);
-      }
-    } catch (error) {
-      // console.log("signup-Error", error.response?.data.info);
-      throw new Error(error.response.data.info);
-    }
+    const response = await postData("/api/emailotp/", {
+      username,
+      email,
+      usage,
+    });
+    return response;
   }
 );
+
+// const base_url = "https://100014.pythonanywhere.com";
+
+// export const sendEmailOTP = createAsyncThunk(
+//   "registration/sendEmailOTP",
+//   async ({ username, email, usage }) => {
+//     try {
+//       const response = await axios.post(`${base_url}/api/emailotp/`, {
+//         username,
+//         email,
+//         usage,
+//       });
+//       if (response.data.msg === "success") {
+//         console.log("signup-succ", response?.data.info);
+//         return response.data.info;
+//       } else {
+//         console.log("signup-Error", response?.data.info);
+//         throw new Error(response.data.info);
+//       }
+//     } catch (error) {
+//       console.log("signup-Error", error.response?.data.info);
+//       throw new Error(error.response.data.info);
+//     }
+//   }
+// );
 
 // Async thunk function to handle the mobile OTP request
 export const sendMobileOTP = createAsyncThunk(

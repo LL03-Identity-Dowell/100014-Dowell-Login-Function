@@ -100,14 +100,14 @@ const PasswordInput = ({ name, value, isConfirm, errors, onChange }) => {
             </div>
             {Array.isArray(passwordMessage) ? (
               <div>
-                {passwordMessage.map((message, index) => (
+                {passwordMessage.map((msg, index) => (
                   <p
                     key={index}
                     className={`text-xs mt-1 ${
-                      message.isValid ? "text-green-500" : "text-red-500"
+                      msg.isValid ? "text-green-500" : "text-red-500"
                     }`}
                   >
-                    {message.message}
+                    {msg.message}
                   </p>
                 ))}
               </div>
