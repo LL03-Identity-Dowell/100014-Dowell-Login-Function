@@ -5,12 +5,23 @@ import { postData } from "./instance";
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
   async ({ username, email, usage }) => {
-    const response = await postData("/api/emailotp/", {
-      username,
-      email,
-      usage,
-    });
-    return response;
+    try {
+      const response = await postData("/api/emailotp/", {
+        username,
+        email,
+        usage,
+      });
+      if (response.data.msg === "success") {
+        // console.log("signup-succ", response?.data.info);
+        return response.data.info;
+      } else {
+        // console.log("signup-Error", response?.data.info);
+        throw new Error(response.data.info);
+      }
+    } catch (error) {
+      // console.log("signup-Error", error.response?.data.info);
+      throw new Error(error.response.data.info);
+    }
   }
 );
 
@@ -18,8 +29,16 @@ export const sendEmailOTP = createAsyncThunk(
 export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
   async ({ phonecode, Phone }) => {
-    const response = await postData("/api/register/", { phonecode, Phone });
-    return response;
+    try {
+      const response = await postData("/api/register/", { phonecode, Phone });
+      if (response.data.msg === "success") {
+        // console.log("mob-succ", response?.data.info);
+        return response.data.info;
+      }
+    } catch (error) {
+      // console.log("mobi-Error", error.response?.data.info);
+      throw new Error(error.response.data.info);
+    }
   }
 );
 
@@ -43,24 +62,32 @@ export const registerUser = createAsyncThunk(
     policy_status,
     newsletter,
   }) => {
-    const response = await postData("/api/register/", {
-      Firstname,
-      Lastname,
-      Username,
-      user_type,
-      Email,
-      Password,
-      confirm_Password,
-      user_country,
-      phonecode,
-      Phone,
-      otp,
-      sms,
-      Profile_Image,
-      policy_status,
-      newsletter,
-    });
-    return response;
+    try {
+      const response = await postData("/api/register/", {
+        Firstname,
+        Lastname,
+        Username,
+        user_type,
+        Email,
+        Password,
+        confirm_Password,
+        user_country,
+        phonecode,
+        Phone,
+        otp,
+        sms,
+        Profile_Image,
+        policy_status,
+        newsletter,
+      });
+      if (response?.data.msg === "success") {
+        // console.log("regi-succ", response?.data.info);
+        return response?.data.info;
+      }
+    } catch (error) {
+      // console.log("Regi-Error", error.response?.data.info);
+      throw new Error(error.response?.data.info);
+    }
   }
 );
 

@@ -5,12 +5,23 @@ import { postData } from "./instance";
 export const changePasswordAsync = createAsyncThunk(
   "password/changePassword",
   async ({ username, old_password, new_password }) => {
-    const response = await postData("/api/password_change/", {
-      username,
-      old_password,
-      new_password,
-    });
-    return response;
+    try {
+      const response = await postData("/api/password_change/", {
+        username,
+        old_password,
+        new_password,
+      });
+      if (response?.data.msg === "success") {
+        console.log("chaP-succ", response?.data.info);
+        return response?.data.info;
+      } else {
+        console.log("chaP-Error", response?.data.info);
+        throw new Error(response?.data.info);
+      }
+    } catch (error) {
+      console.log("chaP-Error", error.response?.data.info);
+      throw new Error(error.response?.data.info);
+    }
   }
 );
 
