@@ -1,57 +1,42 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { postData } from "./instance";
 import axios from "axios";
+
+const base_url = "https://100014.pythonanywhere.com";
 
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
   async ({ username, email, usage }) => {
-    const response = await postData("/api/emailotp/", {
-      username,
-      email,
-      usage,
-    });
-    return response;
+    try {
+      const response = await axios.post(`${base_url}/api/emailotp/`, {
+        username,
+        email,
+        usage,
+      });
+      if (response.data.msg === "success") {
+        return response.data.info;
+      } else {
+        throw new Error(response.data.info);
+      }
+    } catch (error) {
+      throw new Error(error.response.data.info);
+    }
   }
 );
-
-// const base_url = "https://100014.pythonanywhere.com";
-
-// export const sendEmailOTP = createAsyncThunk(
-//   "registration/sendEmailOTP",
-//   async ({ username, email, usage }) => {
-//     try {
-//       const response = await axios.post(`${base_url}/api/emailotp/`, {
-//         username,
-//         email,
-//         usage,
-//       });
-//       if (response.data.msg === "success") {
-//         console.log("signup-succ", response?.data.info);
-//         return response.data.info;
-//       } else {
-//         console.log("signup-Error", response?.data.info);
-//         throw new Error(response.data.info);
-//       }
-//     } catch (error) {
-//       console.log("signup-Error", error.response?.data.info);
-//       throw new Error(error.response.data.info);
-//     }
-//   }
-// );
 
 // Async thunk function to handle the mobile OTP request
 export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
   async ({ phonecode, Phone }) => {
     try {
-      const response = await postData("/api/register/", { phonecode, Phone });
+      const response = await axios.post(`${base_url}/api/register/`, {
+        phonecode,
+        Phone,
+      });
       if (response.data.msg === "success") {
-        // console.log("mob-succ", response?.data.info);
         return response.data.info;
       }
     } catch (error) {
-      // console.log("mobi-Error", error.response?.data.info);
       throw new Error(error.response.data.info);
     }
   }
@@ -78,7 +63,7 @@ export const registerUser = createAsyncThunk(
     newsletter,
   }) => {
     try {
-      const response = await postData("/api/register/", {
+      const response = await axios.post(`${base_url}/api/register/`, {
         Firstname,
         Lastname,
         Username,
@@ -96,11 +81,9 @@ export const registerUser = createAsyncThunk(
         newsletter,
       });
       if (response?.data.msg === "success") {
-        // console.log("regi-succ", response?.data.info);
         return response?.data.info;
       }
     } catch (error) {
-      // console.log("Regi-Error", error.response?.data.info);
       throw new Error(error.response?.data.info);
     }
   }
