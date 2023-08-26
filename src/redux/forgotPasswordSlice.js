@@ -24,7 +24,7 @@ export const sendOTP = createAsyncThunk(
 );
 
 // Async thunk for submitting OTP and new password
-export const resetPassword = createAsyncThunk(
+export const forgotPassword = createAsyncThunk(
   "password/resetPassword",
   async ({ username, email, otp, new_password, confirm_password }) => {
     try {
@@ -67,15 +67,15 @@ const forgotPasswordSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(resetPassword.pending, (state) => {
+      .addCase(forgotPassword.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(resetPassword.fulfilled, (state, action) => {
+      .addCase(forgotPassword.fulfilled, (state, action) => {
         state.loading = false;
         state.passwordReset = action.payload;
       })
-      .addCase(resetPassword.rejected, (state, action) => {
+      .addCase(forgotPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });

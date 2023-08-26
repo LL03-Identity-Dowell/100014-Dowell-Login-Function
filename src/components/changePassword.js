@@ -38,7 +38,7 @@ const schema = yup.object().shape({
 const ChangePassword = () => {
   const dispatch = useDispatch();
   const { loading, changePassword, error } =
-    useSelector((state) => state.password) || {};
+    useSelector((state) => state.changePassword) || {};
 
   const {
     handleSubmit,

@@ -5,7 +5,7 @@ const base_url = "https://100014.pythonanywhere.com";
 
 // Async thunk to change the password
 export const changePasswordAsync = createAsyncThunk(
-  "password/changePassword",
+  "changePassword/changePasswordAsync",
   async ({ username, old_password, new_password }) => {
     try {
       const response = await axios.post(`${base_url}/api/password_change/`, {
@@ -14,18 +14,16 @@ export const changePasswordAsync = createAsyncThunk(
         new_password,
       });
       if (response.data.msg === "success") {
-        console.log("chaP-succ", response.data.info);
         return response.data.info;
       }
     } catch (error) {
-      console.log("chaP-Error", error.response.data.info);
       throw new Error(error.response.data.info);
     }
   }
 );
 
 const passwordSlice = createSlice({
-  name: "password",
+  name: "changePassword",
   initialState: {
     loading: false,
     changePassword: false,

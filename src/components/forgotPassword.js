@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { resetPassword, sendOTP } from "../redux/forgotPasswordSlice";
+import { forgotPassword, sendOTP } from "../redux/forgotPasswordSlice";
 import { Radio } from "react-loader-spinner";
 import useTimedMessage from "./useTimedMessage";
 import PasswordInput from "./passwordInput";
@@ -78,11 +78,11 @@ const ForgotPassword = () => {
   };
 
   // password reset handler
-  const handleResetPassword = (data) => {
+  const handleForgotPassword = (data) => {
     const { username, email, otp, new_password, confirm_password } = data;
     if (otp && new_password && confirm_password) {
       dispatch(
-        resetPassword({ username, email, otp, new_password, confirm_password })
+        forgotPassword({ username, email, otp, new_password, confirm_password })
       );
     }
   };
@@ -128,7 +128,7 @@ const ForgotPassword = () => {
 
         <form
           className="mx-auto mt-8 max-w-xl sm:mt-12"
-          onSubmit={handleSubmit(handleResetPassword)}
+          onSubmit={handleSubmit(handleForgotPassword)}
         >
           <div>
             <label htmlFor="username" className="label">
@@ -301,7 +301,6 @@ const ForgotPassword = () => {
                 {passwordReset}
               </p>
             )}
-
             {error && <p className="text-red-500">{error}</p>}
           </div>
           <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
