@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPassword, sendOTP } from "../redux/forgotPasswordSlice";
+import { forgotPasswordAsync, sendOTP } from "../redux/forgotPasswordSlice";
 import { Radio } from "react-loader-spinner";
 import useTimedMessage from "./useTimedMessage";
 import PasswordInput from "./passwordInput";
@@ -63,7 +63,7 @@ const ForgotPassword = () => {
 
   const dispatch = useDispatch();
   const { loading, otpSent, passwordReset, error } =
-    useSelector((state) => state.password) || {};
+    useSelector((state) => state.forgotPassword) || {};
 
   const handleSendOTP = (data) => {
     if (attemptsOtp > 0) {
@@ -82,7 +82,13 @@ const ForgotPassword = () => {
     const { username, email, otp, new_password, confirm_password } = data;
     if (otp && new_password && confirm_password) {
       dispatch(
-        forgotPassword({ username, email, otp, new_password, confirm_password })
+        forgotPasswordAsync({
+          username,
+          email,
+          otp,
+          new_password,
+          confirm_password,
+        })
       );
     }
   };

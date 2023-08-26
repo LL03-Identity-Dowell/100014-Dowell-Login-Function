@@ -4,7 +4,7 @@ import axios from "axios";
 const base_url = "https://100014.pythonanywhere.com";
 
 export const sendOTP = createAsyncThunk(
-  "password/sendOTP",
+  "forgotPassword/sendOTP",
   async ({ username, email, usage }) => {
     try {
       const response = await axios.post(`${base_url}/api/emailotp/`, {
@@ -24,8 +24,8 @@ export const sendOTP = createAsyncThunk(
 );
 
 // Async thunk for submitting OTP and new password
-export const forgotPassword = createAsyncThunk(
-  "password/resetPassword",
+export const forgotPasswordAsync = createAsyncThunk(
+  "forgotPassword/forgotPassword",
   async ({ username, email, otp, new_password, confirm_password }) => {
     try {
       const response = await axios.post(`${base_url}/api/forgot_password/`, {
@@ -45,7 +45,7 @@ export const forgotPassword = createAsyncThunk(
 );
 
 const forgotPasswordSlice = createSlice({
-  name: "password",
+  name: "forgotPassword",
   initialState: {
     loading: false,
     otpSent: false,
@@ -67,15 +67,15 @@ const forgotPasswordSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(forgotPassword.pending, (state) => {
+      .addCase(forgotPasswordAsync.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(forgotPassword.fulfilled, (state, action) => {
+      .addCase(forgotPasswordAsync.fulfilled, (state, action) => {
         state.loading = false;
         state.passwordReset = action.payload;
       })
-      .addCase(forgotPassword.rejected, (state, action) => {
+      .addCase(forgotPasswordAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });
