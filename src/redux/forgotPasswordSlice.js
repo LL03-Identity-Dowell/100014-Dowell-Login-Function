@@ -13,11 +13,9 @@ export const sendOTP = createAsyncThunk(
         usage,
       });
       if (response.data.msg === "success") {
-        console.log("pass-suc", response.data.info);
         return response.data.info;
       }
     } catch (error) {
-      console.log("pass-err", error.response.data.info);
       throw new Error(error.response.data.info);
     }
   }

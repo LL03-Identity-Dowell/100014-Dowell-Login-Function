@@ -12,11 +12,9 @@ export const postData = async (endpoint, data) => {
   try {
     const response = await instance.post(endpoint, data);
     if (response?.data.msg === "success") {
-      console.log("Password-succ", response?.data.info);
       return response?.data.info;
     }
   } catch (error) {
-    console.log("Password-Error", error.response?.data.info);
     throw new Error(error.response?.data.info);
   }
 };
