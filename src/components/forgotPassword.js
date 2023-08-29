@@ -211,8 +211,6 @@ const ForgotPassword = () => {
                     {msg.message}
                   </p>
                 ))}
-
-                {error && <p className="text-red-500">{error}</p>}
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
