@@ -71,7 +71,7 @@ const ChangePassword = () => {
 
             <div className="flex text-gray-600 py-2 text-left space-x-2">
               <p>Do you forget password?</p>
-              <Link to="/password">
+              <Link to="/beta/forgotPassword">
                 <span className="text-green-600">Click here</span>
               </Link>
             </div>
@@ -173,7 +173,7 @@ const ChangePassword = () => {
             </div>
 
             <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
-              <Link to="/" className="text-center">
+              <Link to="/beta" className="text-center">
                 Do have an account? Log in
               </Link>
             </div>

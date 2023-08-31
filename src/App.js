@@ -18,18 +18,18 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route exact path="/" element={<Home />} />
-          <Route path="/signin" element={<LogIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route exact path="/logout" element={<SignOutPage />} />
-          <Route path="/splash/:Username" element={<SplashPage />} />
-          <Route path="/forgotPassword" element={<ForgotPassword />} />
-          <Route path="/changePassword" element={<ChangePassword />} />
-          <Route path="/username" element={<UsernameForgot />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/faq" element={<FAQ />} />
+          <Route exact path="/beta" element={<Home />} />
+          <Route path="/beta/signin" element={<LogIn />} />
+          <Route path="/beta/signup" element={<SignUp />} />
+          <Route exact path="/beta/logout" element={<SignOutPage />} />
+          <Route path="/beta/splash/:Username" element={<SplashPage />} />
+          <Route path="/beta/forgotPassword" element={<ForgotPassword />} />
+          <Route path="/beta/changePassword" element={<ChangePassword />} />
+          <Route path="/beta/username" element={<UsernameForgot />} />
+          <Route path="/beta/chat" element={<Chat />} />
+          <Route path="/beta/policy" element={<Policy />} />
+          <Route path="/beta/help" element={<Help />} />
+          <Route path="/beta/faq" element={<FAQ />} />
           <Route path="*" component={NotFound} />
         </Routes>
       </Router>

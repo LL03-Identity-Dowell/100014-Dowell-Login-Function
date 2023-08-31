@@ -119,8 +119,6 @@ const SignUp = () => {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
-  const [emailOtpSent, setEmailOtpSent] = useState(false);
-  const [smsOtpSent, setSmsOtpSent] = useState(false);
 
   // Use the custom hook to handle the email and SMS sent messages
   const [emailMessages, setEmailMessage] = useTimedMessage();
@@ -163,12 +161,11 @@ const SignUp = () => {
 
   // dispatch email otp
   const handleEmailOTP = (data) => {
-    if (attemptsOtp > 0 && otpCountdown === 0) {
+    if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       const { email, username } = data;
       if (email && username) {
         dispatch(sendEmailOTP({ email, username, usage: "create_account" }));
-        setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
       }
     }
@@ -176,10 +173,10 @@ const SignUp = () => {
 
   // Use useEffect to show the email message when otpSent becomes true
   useEffect(() => {
-    if (otpSent || emailOtpSent) {
-      setEmailMessage(otpSent || emailOtpSent, 10000); // Show the email message for 10 seconds
+    if (otpSent) {
+      setEmailMessage(otpSent, 10000); // Show the email message for 10 seconds
     }
-  }, [otpSent, emailOtpSent]);
+  }, [otpSent]);
 
   // Dispatch mobile sms
   const handleMobileOTP = (data) => {
@@ -188,7 +185,6 @@ const SignUp = () => {
       const { phonecode, Phone } = data;
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
-        setSmsOtpSent(true);
         setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
       }
     } else {
@@ -198,10 +194,10 @@ const SignUp = () => {
 
   // Use useEffect to show the email message when otpSent becomes true
   useEffect(() => {
-    if (smsSent || smsOtpSent) {
-      setSmsMessage(smsSent || smsOtpSent, 10000); // Show the SMS message for 10 seconds
+    if (smsSent) {
+      setSmsMessage(smsSent, 10000); // Show the SMS message for 10 seconds
     }
-  }, [smsSent, smsOtpSent]);
+  }, [smsSent]);
 
   // Countdown timer for OTP
   useEffect(() => {
@@ -420,7 +416,7 @@ const SignUp = () => {
                     onClick={() => handleEmailOTP(watch())}
                     disabled={
                       loading ||
-                      (emailOtpSent && otpCountdown > 0) ||
+                      (otpSent && otpCountdown > 0) ||
                       attemptsOtp === 0
                     }
                   >
@@ -449,14 +445,14 @@ const SignUp = () => {
                 </div>
 
                 {/* Display the countdown timer only after the first OTP attempt */}
-                {emailOtpSent && otpCountdown > 0 && !error && (
+                {otpSent && otpCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
                     Resend OTP in: {otpCountdown}s
                   </div>
                 )}
 
                 {/* Display the email OTP attempts remaining */}
-                {attemptsOtp > 0 && emailOtpSent && !error && (
+                {attemptsOtp > 0 && otpSent && !error && (
                   <div>
                     <p className="text-base font-normal text-green-600">
                       Attempts remaining: {attemptsOtp}
@@ -475,7 +471,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            {emailOtpSent && (
+            {otpSent && (
               <div>
                 <label htmlFor="otp-Email" className="label">
                   Enter OTP from Email <span className="text-red-500">*</span>
@@ -571,7 +567,7 @@ const SignUp = () => {
                     onClick={() => handleMobileOTP(watch())}
                     disabled={
                       loading ||
-                      (smsOtpSent && smsCountdown > 0) ||
+                      (smsSent && smsCountdown > 0) ||
                       (attemptsSms === 0 && !exempted)
                     }
                   >
@@ -600,13 +596,13 @@ const SignUp = () => {
                 </div>
 
                 {/* Display the countdown timer only after the first SMS attempt */}
-                {smsOtpSent && smsCountdown > 0 && !error && (
+                {smsSent && smsCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
                     Resend SMS in: {smsCountdown}s
                   </div>
                 )}
 
-                {attemptsSms > 0 && smsOtpSent && !error && (
+                {attemptsSms > 0 && smsSent && !error && (
                   <div>
                     <p className="text-base font-normal text-green-600">
                       Attempts remaining: {attemptsSms}
