@@ -19,12 +19,14 @@ from django.conf.urls import handler404, handler500
 from django.conf import settings
 from django.conf.urls.static import static
 from django.conf.urls.i18n import i18n_patterns
+from django.views.generic.base import TemplateView
 from server.views import error_404, error_500
 
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls'))
+    path('api/', include('api.urls')),
+    path('testapp/', TemplateView.as_view(template_name='index.html'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -35,6 +37,8 @@ urlpatterns += i18n_patterns(
 )
 
 if settings.DEBUG:
+    import mimetypes
+    mimetypes.add_type("application/javascript", ".js", True)
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.BUILD_URL, document_root=settings.BUILD_ROOT)
