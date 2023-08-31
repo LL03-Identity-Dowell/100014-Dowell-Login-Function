@@ -92,14 +92,14 @@ const LogIn = () => {
             <p className=" text-gray-500 text-base">
               Don't remember username and password?
             </p>
-            <Link to="/forgotPassword">
+            <Link to="/beta/forgotPassword">
               <span className="text-green-500 text-base">Click here</span>
             </Link>
           </div>
 
           <div className="text-gray-500 text-base">
             <p>Don't have an account?</p>
-            <Link to={`/signup?${mainparams}`}>
+            <Link to={`/beta/signup?${mainparams}`}>
               <span className="text-green-500 text-base">Sign up</span>
             </Link>
           </div>
