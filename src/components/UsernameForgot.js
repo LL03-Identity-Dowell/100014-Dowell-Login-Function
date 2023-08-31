@@ -23,7 +23,6 @@ const schema = yup.object().shape({
 const UsernameForgot = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [emailOtpSent, setEmailOtpSent] = useState(false);
   const [emailMessages, setEmailMessage] = useTimedMessage();
 
   const {
@@ -40,9 +39,8 @@ const UsernameForgot = () => {
     if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
       const { email, otp } = data;
-      if (email && !emailOtpSent) {
+      if (email && !otpSent) {
         dispatch(userSendOTP({ email, usage: "forgot_username" }));
-        setEmailOtpSent(true);
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
       } else {
         dispatch(verifyOTP({ email, otp }));
@@ -52,10 +50,10 @@ const UsernameForgot = () => {
 
   // Use useEffect to show the email message when otpSent becomes true
   useEffect(() => {
-    if (otpSent || emailOtpSent) {
-      setEmailMessage(otpSent || emailOtpSent, 10000);
+    if (otpSent) {
+      setEmailMessage(otpSent, 10000);
     }
-  }, [otpSent, emailOtpSent]);
+  }, [otpSent]);
 
   // Countdown timer for OTP
   useEffect(() => {
@@ -115,7 +113,7 @@ const UsernameForgot = () => {
                   className="btn-send px-2 py-1 self-start"
                   disabled={
                     loading ||
-                    (emailOtpSent && otpCountdown > 0) ||
+                    (otpSent && otpCountdown > 0) ||
                     attemptsOtp === 0
                   }
                 >
@@ -144,14 +142,14 @@ const UsernameForgot = () => {
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
-              {emailOtpSent && otpCountdown > 0 && !error && (
+              {otpSent && otpCountdown > 0 && !error && (
                 <div className="text-base font-normal text-green-600">
                   Resend OTP in: {otpCountdown}s
                 </div>
               )}
 
               {/* Display the email OTP attempts remaining */}
-              {attemptsOtp > 0 && emailOtpSent && !error && (
+              {attemptsOtp > 0 && otpSent && !error && (
                 <div>
                   <p className="text-base font-normal text-green-600">
                     Attempts remaining: {attemptsOtp}
@@ -170,7 +168,7 @@ const UsernameForgot = () => {
             </div>
           </div>
 
-          {emailOtpSent && (
+          {otpSent && (
             <div className="mt-2.5">
               <label className="label" htmlFor="otp">
                 Enter OTP from Email <span className="text-red-500">*</span>
