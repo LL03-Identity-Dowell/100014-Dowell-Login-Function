@@ -31,13 +31,13 @@ const SplashPage = () => {
           <div className="flex flex-row items-center justify-center mt-20">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
-              onClick={() => navigate(`/?${mainparams}`)}
+              onClick={() => navigate(`/beta/?${mainparams}`)}
             >
               Login
             </button>
             <button
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-              onClick={() => navigate("/signup")}
+              onClick={() => navigate("/beta/signup")}
             >
               Cancel
             </button>
