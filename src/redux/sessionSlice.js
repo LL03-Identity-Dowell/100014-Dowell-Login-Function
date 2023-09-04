@@ -9,6 +9,7 @@ export const generateRandomSessionID = createAsyncThunk(
   async () => {
     try {
       const response = await axios.post(api_url);
+      console.log("Policy", response.data.random_session);
       return response.data.random_session;
     } catch (error) {
       throw new Error("Error generating random session ID:", error);
@@ -21,6 +22,7 @@ export const generateSessionID = createAsyncThunk(
   async () => {
     try {
       const response = await axios.post(api_url);
+      console.log("Chat", response.data.qrid_login);
       return response.data.qrid_login;
     } catch (error) {
       throw new Error("Error generating chat session ID:", error);

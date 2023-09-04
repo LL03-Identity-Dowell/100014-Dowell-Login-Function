@@ -82,7 +82,7 @@ const LogIn = () => {
     setUserLanguage(language);
   };
 
-  // use setTimeout to hide the timer after 5 seconds
+  // use setTimeout to hide the timer after 10 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowTimer(true);
@@ -96,9 +96,9 @@ const LogIn = () => {
     <>
       {loading ? (
         <div className="flex flex-col justify-center items-center h-screen">
-          <div className="flex relative w-60 h-60">
+          <div className="flex relative w-48 h-48">
             {/* Spinner */}
-            <div className="absolute top-0 left-0 w-full h-full justify-center items-center z-20">
+            <div className="block absolute top-0 left-0 w-full h-full justify-center items-center z-20">
               <RotatingLines
                 visible={true}
                 height={96}
@@ -112,7 +112,7 @@ const LogIn = () => {
 
             {/* Timer (background) */}
             {showTimer && (
-              <div className="bg-no-repeat w-14 h-14 absolute top-0 left-0 z-10 opacity-50">
+              <div className="block bg-no-repeat w-8 h-8 absolute top-10 left-8 z-10 opacity-60">
                 <img src={Timer} alt="Loading timer" />
               </div>
             )}
