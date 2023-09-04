@@ -12,7 +12,7 @@ const Chat = () => {
     if (!chatSessionID) {
       dispatch(generateSessionID());
     }
-  }, [chatSessionID, dispatch]);
+  }, [chatSessionID]);
 
   const getChatAppURL = () => {
     const baseURL = "https://100096.pythonanywhere.com/chat/login/";

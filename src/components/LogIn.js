@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
@@ -7,9 +7,11 @@ import { detectBrowser } from "../utils/browserUtils";
 import { Radio, RotatingLines } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
+import Timer from "../assets/images/count_down.gif";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
+  const [showTimer, setShowTimer] = useState(false);
 
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
@@ -80,21 +82,43 @@ const LogIn = () => {
     setUserLanguage(language);
   };
 
+  // use setTimeout to hide the timer after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowTimer(true);
+    }, 10000);
+
+    // Cleanup the timer when component unmounts or loading is complete
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <>
       {loading ? (
         <div className="flex flex-col justify-center items-center h-screen">
-          <Radio
-            visible={true}
-            height={96}
-            width={96}
-            ariaLabel="radio-loading"
-            wrapperStyle={{}}
-            wrapperClassName="radio-wrapper"
-            color="#1ff507"
-            strokeWidth="5"
-            animationDuration="0.75"
-          />
+          <div className="flex relative w-60 h-60">
+            {/* Spinner */}
+            <div className="absolute top-0 left-0 w-full h-full justify-center items-center z-20">
+              <RotatingLines
+                visible={true}
+                height={96}
+                width={96}
+                ariaLabel="radio-loading"
+                wrapperStyle={{}}
+                color="#1ff507"
+                strokeWidth="5"
+              />
+            </div>
+
+            {/* Timer (background) */}
+            {showTimer && (
+              <div className="bg-no-repeat w-14 h-14 absolute top-0 left-0 z-10 opacity-50">
+                <img src={Timer} alt="Loading timer" />
+              </div>
+            )}
+          </div>
+
+          <span>username...loading</span>
         </div>
       ) : (
         <div className="flex w-full items-center justify-center">
