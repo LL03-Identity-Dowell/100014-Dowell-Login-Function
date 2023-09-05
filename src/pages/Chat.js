@@ -1,18 +1,10 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Iframe from "react-iframe";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Radio } from "react-loader-spinner";
-import { generateSessionID } from "../redux/sessionSlice";
 
 const Chat = () => {
-  const dispatch = useDispatch();
   const { chatSessionID, status } = useSelector((state) => state.session);
-
-  useEffect(() => {
-    if (!chatSessionID) {
-      dispatch(generateSessionID());
-    }
-  }, [chatSessionID]);
 
   const getChatAppURL = () => {
     const baseURL = "https://100096.pythonanywhere.com/chat/login/";
