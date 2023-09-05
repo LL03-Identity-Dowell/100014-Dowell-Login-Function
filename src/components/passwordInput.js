@@ -63,7 +63,7 @@ const PasswordInput = ({ name, value, isConfirm, errors, onChange }) => {
   return (
     <>
       <div>
-        <label htmlFor="Password" className="label">
+        <label htmlFor={name} className="label">
           {isConfirm ? "Confirm Password" : "New Password"}
           <span className="text-red-500">*</span>
         </label>
@@ -77,6 +77,7 @@ const PasswordInput = ({ name, value, isConfirm, errors, onChange }) => {
             className="input-field"
             value={password}
             onChange={handlePasswordChange}
+            aria-label={`Password ${isConfirm ? "confirm" : "input"} `}
           />
           {errors[name] && (
             <p className="text-red-500 text-xs mt-1">{errors[name].message}</p>

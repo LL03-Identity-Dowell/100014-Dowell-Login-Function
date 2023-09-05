@@ -248,7 +248,7 @@ const ForgotPassword = () => {
                 placeholder="Enter OTP from Email"
                 autoComplete="otp"
                 className="input-field"
-                {...register("otp", { required: otpSent })}
+                {...register("otp")}
               />
               {errors?.otp && (
                 <p className="text-red-500 text-xs mt-1">
