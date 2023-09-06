@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
@@ -8,10 +8,14 @@ import { Radio, RotatingLines } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
+import Iframe from "react-iframe";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
+
+  // Define a ref for username
+  const usernameRef = useRef("");
 
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
@@ -72,6 +76,9 @@ const LogIn = () => {
         // Redirect to specific url
         window.location.href = `${URL}`;
       }
+
+      // Update the username ref
+      usernameRef.current = username.value;
     } catch (error) {
       throw new Error(error.response?.data.info);
     }
@@ -86,11 +93,32 @@ const LogIn = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowTimer(true);
-    }, 10000);
+    }, 1000);
 
     // Cleanup the timer when component unmounts or loading is complete
     return () => clearTimeout(timer);
   }, []);
+
+  // Iframe URL
+  const iframeURL = () => {
+    const url = `https://100014.pythonanywhere.com/check_status?username=${usernameRef.current}`;
+    console.log("Iframe URL:", url);
+    return url;
+  };
+
+  // Create a variable for the content to be displayed in the iframe
+  const iframeContent = `
+  <html>
+    <head>
+      <!-- Any necessary CSS or head content can be placed here -->
+    </head>
+    <body>
+    <p>Logging In</p>
+    <p>Connecting to UX Living Lab</p>
+    <p>Verifying User</p>
+    </body>
+  </html>
+`;
 
   return (
     <>
@@ -117,8 +145,15 @@ const LogIn = () => {
               </div>
             )}
           </div>
-
-          <span>username...loading</span>
+          <Iframe
+            url={iframeURL()}
+            width="100%"
+            height="330px"
+            id="myiFrame"
+            className="py-4 px-6"
+            display="initial"
+            srcDoc={iframeContent} // Use srcDoc to set the HTML content of the iframe
+          />
         </div>
       ) : (
         <div className="flex w-full items-center justify-center">
