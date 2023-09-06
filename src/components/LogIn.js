@@ -7,7 +7,7 @@ import { detectBrowser } from "../utils/browserUtils";
 import { Radio, RotatingLines } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
-import Timer from "../assets/images/count_down.gif";
+import Timer from "../assets/images/count_up.gif";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
@@ -112,7 +112,7 @@ const LogIn = () => {
 
             {/* Timer (background) */}
             {showTimer && (
-              <div className="block bg-no-repeat w-8 h-8 absolute top-10 left-8 z-10 opacity-60">
+              <div className="block bg-no-repeat w-10 h-12 absolute top-10 left-8 z-10 opacity-60">
                 <img src={Timer} alt="Loading timer" />
               </div>
             )}
