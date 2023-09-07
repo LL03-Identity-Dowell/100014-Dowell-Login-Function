@@ -21,7 +21,9 @@ const LogIn = () => {
     useSelector((state) => state.login) || {};
 
   // Get the random session ID from the Redux store
-  const { randomSession } = useSelector((state) => state.session);
+  const { initSession } = useSelector((state) => state.init);
+
+  const randomSession = initSession.random_session;
 
   // Access the dispatch function
   const dispatch = useDispatch();

@@ -4,9 +4,11 @@ import { Radio } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 
 const Policy = () => {
-  const { randomSession, isLoading } = useSelector((state) => state.session);
+  // const { randomSession, isLoading } = useSelector((state) => state.session);
+  const { initSession, isLoading } = useSelector((state) => state.init);
 
   const getIframeURL = () => {
+    const randomSession = initSession.random_session;
     const baseURL =
       "https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/";
     const redirectURL = `https://100014.pythonanywhere.com/legalpolicy1?s=${randomSession}&session_id=${randomSession}`;

@@ -4,9 +4,11 @@ import { useSelector } from "react-redux";
 import { Radio } from "react-loader-spinner";
 
 const Chat = () => {
-  const { chatSessionID, status } = useSelector((state) => state.session);
+  // const { chatSessionID, status } = useSelector((state) => state.session);
+  const { initSession, isLoading } = useSelector((state) => state.init);
 
   const getChatAppURL = () => {
+    const chatSessionID = initSession.qrid_login;
     const baseURL = "https://100096.pythonanywhere.com/chat/login/";
     const chatAppURL = `${baseURL}?session_id=${chatSessionID}`;
     return chatAppURL;
@@ -17,7 +19,7 @@ const Chat = () => {
       <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-1 rounded-3xl">
         Chat with UX Living Lab
       </h2>
-      {status === "loading" ? (
+      {isLoading ? (
         <Radio
           visible={true}
           height={30}
