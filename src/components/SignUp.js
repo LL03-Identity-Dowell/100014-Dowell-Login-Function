@@ -160,10 +160,11 @@ const SignUp = () => {
   }, [registered, navigate, watch, mainParams]);
 
   // dispatch email otp
-  const handleEmailOTP = (data) => {
+  const handleEmailOTP = () => {
     if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
-      const { email, username } = data;
+      const email = watch("Email");
+      const username = watch("Username");
       if (email && username) {
         dispatch(sendEmailOTP({ email, username, usage: "create_account" }));
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
@@ -332,7 +333,7 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="Username"
+                  name="username"
                   id="Username"
                   placeholder="Enter Your Username"
                   autoComplete="Username"
@@ -395,7 +396,7 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="Email"
-                  name="Email"
+                  name="email"
                   id="Email"
                   placeholder="Enter Your Email"
                   autoComplete="Email"
@@ -414,6 +415,7 @@ const SignUp = () => {
                   <button
                     className="btn-send px-2 py-1 self-start"
                     onClick={() => handleEmailOTP(watch())}
+                    // onClick={handleSubmit(handleEmailOTP)}
                     disabled={
                       loading ||
                       (otpSent && otpCountdown > 0) ||
