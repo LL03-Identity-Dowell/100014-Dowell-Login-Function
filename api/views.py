@@ -1513,6 +1513,11 @@ def main_login(request):
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     expires = timezone.now() + datetime.timedelta(days=14)
+    main_params = request.get_full_path()
+    main_params = main_params[main_params.find('?')+1:]
+    if "code=masterlink1" in main_params:
+        link_url = f"linklogin?{main_params}"
+        return Response({'link_url': link_url})
     if user is not None:
         field = {"Username": username}
         id = dowellconnection("login", "bangalore", "login", "registration",
