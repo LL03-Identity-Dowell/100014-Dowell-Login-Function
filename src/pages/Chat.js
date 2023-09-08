@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { Radio } from "react-loader-spinner";
 
 const Chat = () => {
-  // const { chatSessionID, status } = useSelector((state) => state.session);
   const { initSession, isLoading } = useSelector((state) => state.init);
 
   const getChatAppURL = () => {

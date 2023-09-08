@@ -4,7 +4,6 @@ import { Radio } from "react-loader-spinner";
 import { useSelector } from "react-redux";
 
 const Policy = () => {
-  // const { randomSession, isLoading } = useSelector((state) => state.session);
   const { initSession, isLoading } = useSelector((state) => state.init);
 
   const getIframeURL = () => {
