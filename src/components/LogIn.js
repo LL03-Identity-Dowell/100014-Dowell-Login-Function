@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import { detectBrowser } from "../utils/browserUtils";
-import { Radio, RotatingLines } from "react-loader-spinner";
+import { RotatingLines } from "react-loader-spinner";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
@@ -15,7 +15,7 @@ const LogIn = () => {
   const [showTimer, setShowTimer] = useState(false);
 
   // Define a ref for username
-  const usernameRef = useRef("");
+  const usernameRef = useRef(null);
 
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
@@ -101,7 +101,7 @@ const LogIn = () => {
 
   // Iframe URL
   const iframeURL = () => {
-    const url = `https://100014.pythonanywhere.com/check_status?username=${usernameRef.current}`;
+    const url = `https://100014.pythonanywhere.com/check_status?username=${usernameRef.current.value}`;
     return url;
   };
 
@@ -112,7 +112,7 @@ const LogIn = () => {
           <div className="flex relative w-48 h-48">
             {/* Spinner */}
             <div className="block absolute top-0 left-0 w-full h-full justify-center items-center z-20">
-              <Radio
+              <RotatingLines
                 visible={true}
                 height={96}
                 width={96}
@@ -188,6 +188,7 @@ const LogIn = () => {
                         placeholder="Enter Your Username"
                         autoComplete="username"
                         className="input-field"
+                        ref={usernameRef}
                       />
                     </div>
                   </div>
