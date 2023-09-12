@@ -112,6 +112,8 @@ def linked_based(request):
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 def LinkLogin(request):
+    main_params = request.get_full_path()
+    main_params = main_params[main_params.find('?')+1:]
     url = request.GET.get("redirect_url", None)
     user = request.GET.get("user", None)
     context = {}
@@ -137,7 +139,8 @@ def LinkLogin(request):
             sessionID=random_session, info=field2)
         qrcodegen.qrgen1(
             user, respj["inserted_id"], f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
-
+        if "code=masterlink1" in main_params:
+            return redirect(f'https://100093.pythonanywhere.com/masterlink?session_id={random_session}&{main_params}')
         if url is not None:
             return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
         return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}')
@@ -490,6 +493,12 @@ def login(request):
     redirect_url = request.GET.get('redirect_url', None)
     country = ""
     city = ""
+
+    main_params = request.get_full_path()
+    main_params = main_params[main_params.find('?')+1:]
+    if "code=masterlink1" in main_params:
+        return redirect(f"linklogin?{main_params}")
+    
     saved_browser_session = request.session.session_key
     if saved_browser_session:
         if orgs:
