@@ -1212,10 +1212,18 @@ def PublicApi(request):
 
 @api_view(['GET', 'POST'])
 def login_init_api(request):
+    # masterlink1
     if request.method == "POST":
         mainparams = request.data.get('mainparams', None)
         context = {}
         past_login = request.COOKIES.get('DOWELL_LOGIN')
+
+        main_params = request.get_full_path()
+        main_params = main_params[main_params.find('?')+1:]
+        if "code=masterlink1" in main_params:
+          link_url = f"linklogin?{main_params}"
+          return Response({'url': link_url})
+    
         if past_login:
             test_session = CustomSession.objects.filter(
                 sessionID=past_login).first()
@@ -1517,7 +1525,7 @@ def main_login(request):
     main_params = main_params[main_params.find('?')+1:]
     if "code=masterlink1" in main_params:
         link_url = f"linklogin?{main_params}"
-        return Response({'link_url': link_url})
+        return Response({'url': link_url})
     if user is not None:
         field = {"Username": username}
         id = dowellconnection("login", "bangalore", "login", "registration",
