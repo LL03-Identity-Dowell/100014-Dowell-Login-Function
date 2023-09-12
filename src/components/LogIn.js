@@ -22,7 +22,6 @@ const LogIn = () => {
 
   // Get the random session ID from the Redux store
   const { initSession } = useSelector((state) => state.init);
-
   const randomSession = initSession.random_session;
 
   // Access the dispatch function
@@ -78,7 +77,6 @@ const LogIn = () => {
         // Redirect to specific url
         window.location.href = `${URL}`;
       }
-
       // Update the username ref
       usernameRef.current = username.value;
     } catch (error) {
@@ -104,23 +102,8 @@ const LogIn = () => {
   // Iframe URL
   const iframeURL = () => {
     const url = `https://100014.pythonanywhere.com/check_status?username=${usernameRef.current}`;
-    console.log("Iframe URL:", url);
     return url;
   };
-
-  // Create a variable for the content to be displayed in the iframe
-  const iframeContent = `
-  <html>
-    <head>
-      <!-- Any necessary CSS or head content can be placed here -->
-    </head>
-    <body>
-    <p>Logging In</p>
-    <p>Connecting to UX Living Lab</p>
-    <p>Verifying User</p>
-    </body>
-  </html>
-`;
 
   return (
     <>
@@ -129,7 +112,7 @@ const LogIn = () => {
           <div className="flex relative w-48 h-48">
             {/* Spinner */}
             <div className="block absolute top-0 left-0 w-full h-full justify-center items-center z-20">
-              <RotatingLines
+              <Radio
                 visible={true}
                 height={96}
                 width={96}
@@ -153,8 +136,6 @@ const LogIn = () => {
             height="330px"
             id="myiFrame"
             className="py-4 px-6"
-            display="initial"
-            srcDoc={iframeContent} // Use srcDoc to set the HTML content of the iframe
           />
         </div>
       ) : (

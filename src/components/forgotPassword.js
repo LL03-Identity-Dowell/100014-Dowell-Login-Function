@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { forgotPasswordAsync, sendOTP } from "../redux/forgotPasswordSlice";
 import { Radio } from "react-loader-spinner";
 import useTimedMessage from "./useTimedMessage";
-import PasswordInput from "./passwordInput";
+import ResetPasswordForm from "./resetPasswordForm";
 
 const schema = yup.object().shape({
   username: yup
@@ -23,28 +23,6 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  otp: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .required("OTP is required")
-      .matches(/^[0-9]+$/, "OTP must contain only numbers"),
-  }),
-  new_password: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .max(99)
-      .required("Password is required"),
-  }),
-  confirm_password: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .oneOf([yup.ref("new_password")], "Passwords must match")
-      .required("Confirm Password is required"),
-  }),
 });
 
 const ForgotPassword = () => {
@@ -56,8 +34,6 @@ const ForgotPassword = () => {
     handleSubmit,
     register,
     formState: { errors },
-    setValue,
-    getValues,
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
@@ -78,7 +54,7 @@ const ForgotPassword = () => {
   // password reset handler
   const handleForgotPassword = (data) => {
     const { username, email, otp, new_password, confirm_password } = data;
-    if (otp && new_password && confirm_password) {
+    if (otpSent) {
       dispatch(
         forgotPasswordAsync({
           username,
@@ -236,49 +212,8 @@ const ForgotPassword = () => {
             </div>
           </div>
 
-          {otpSent && (
-            <div className="mt-2.5">
-              <label className="label" htmlFor="otp">
-                Enter OTP from Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="otp"
-                id="otp"
-                placeholder="Enter OTP from Email"
-                autoComplete="otp"
-                className="input-field"
-                {...register("otp")}
-              />
-              {errors?.otp && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.otp.message}
-                </p>
-              )}
-            </div>
-          )}
-
-          <div className="mt-2">
-            <PasswordInput
-              name="new_password"
-              register={register}
-              value={getValues("new_password")}
-              errors={errors}
-              isConfirm={false}
-              onChange={setValue}
-            />
-          </div>
-
-          <div className="mt-2">
-            <PasswordInput
-              name="confirm_password"
-              register={register}
-              value={getValues("confirm_password")}
-              errors={errors}
-              isConfirm={true}
-              onChange={setValue}
-            />
-          </div>
+          {/* if otpSent show other inputs */}
+          {otpSent && <ResetPasswordForm />}
 
           <div className="mt-4">
             <button type="submit" className="submit-btn" disabled={loading}>
