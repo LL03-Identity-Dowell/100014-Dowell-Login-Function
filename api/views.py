@@ -1706,3 +1706,88 @@ def user_status(request):
             return Response({'msg': 'error', 'info': "Please Enter valid status"})
     else:
         return Response({'msg': 'error', 'info': "Username not found"})
+
+@api_view(['POST'])
+def otp_verify(request):
+    otp = generateOTP()
+    username = request.data.get('username', None)
+    email = request.data.get('email', None)
+    phone = request.data.get('phone', None)
+    otp_input = request.data.get('otp',None)
+    if email and username and not otp_input:
+        field = {
+          "email":email,
+          "username":username
+        }
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field = {"email":email,"username":username}
+            field_update = {"otp":otp,"status":"active"}
+            updated = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+        else:
+            field = {"username":username,"email":email,"otp":otp,"status":"active"}
+            insert = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","insert",field,"nil")
+            inserted = json.loads(insert)
+        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+        payload = json.dumps({
+            "toEmail": email,
+            "toName": username,
+            "topic": "RegisterOtp",
+            "otp": otp
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response1 = requests.request(
+            "POST", url, headers=headers, data=payload)
+        return Response({'msg':'success','otp':otp})
+    elif email and username and otp_input:
+        field = {"email":email,"username":username,"otp":otp_input}
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field = {"email":email,"username":username,"otp":otp_input}
+            field_update = {"status":"verified"}
+            dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+            return Response({"msg":"success","info":"Verification complete"})
+        else:
+            return Response({"msg":"error","info":"Wrong OTP provided"})
+
+    elif phone and username and not otp_input:
+        field = {"phone":phone,"username":username}
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field = {"phone":phone,"username":username}
+            field_update = {"otp":otp,"status":"active"}
+            updated = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+        else:
+            field = {"phone":phone,"otp":otp,"status":"active","username":username}
+            insert = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","insert",field,"nil")
+            inserted = json.loads(insert)
+        url = "https://100085.pythonanywhere.com/api/sms/"
+        payload = {
+            "sender": "DowellLogin",
+            "recipient": phone,
+            "content": f"Enter the following OTP to create your dowell account: {otp}",
+            "created_by": "Manish"
+        }
+        response = requests.request("POST", url, data=payload)
+        if len(response.json()) > 1:
+            return Response({'msg':'success','otp':otp})
+        else:
+            return Response({'msg': 'error','error':'The phone number is not valid'})
+    elif phone and username and otp_input:
+        field = {"phone":phone,"username":username,"otp":otp_input}
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field={"phone":phone,"username":username,"otp":otp_input}
+            field_update = {"status":"verified"}
+            dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+            return Response({"msg":"success","info":"Verification complete"})
+        else:
+            return Response({"msg":"error","info":"Wrong OTP provided"})
+    else:
+        return Response({'msg': 'error','error':'Provide either email or phone number along with username'})

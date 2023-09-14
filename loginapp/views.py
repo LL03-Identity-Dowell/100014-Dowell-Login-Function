@@ -501,9 +501,9 @@ def login(request):
     
     saved_browser_session = request.session.session_key
     if saved_browser_session:
-        if orgs:
+        if orgs: # Invite link
             return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
-        elif redirect_url:
+        elif redirect_url: # redirect_url params
             logindetail = CustomSession.objects.filter(
                 sessionID=saved_browser_session).first()
             info = json.loads(logindetail.info)
@@ -519,7 +519,6 @@ def login(request):
                     return redirect(f'https://ll07-team-dowell.github.io/Jobportal?session_id={session}')
             else:
                 return HttpResponse(f"<script>window.location.replace('{url}?session_id={session}');</script>")
-                return redirect(f'{url}?session_id={session}')
         elif hr_invitation:
             hr_invitation = jwt.decode(
                 jwt=hr_invitation, key='secret', algorithms=["HS256"])
