@@ -19,7 +19,6 @@ function App() {
       <Router>
         <Routes>
           <Route exact path="/beta" element={<Home />} />
-          <Route path="/beta/signin" element={<LogIn />} />
           <Route path="/beta/signup" element={<SignUp />} />
           <Route exact path="/beta/logout" element={<SignOutPage />} />
           <Route path="/beta/splash/:Username" element={<SplashPage />} />

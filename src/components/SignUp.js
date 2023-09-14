@@ -54,38 +54,23 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid Email format")
     .required("Email is required"),
-  otp: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .required("OTP is required")
-      .matches(/^[0-9]+$/, "OTP must contain only numbers"),
-  }),
-  user_country: yup.string().when("otpSent", {
-    is: true,
-    then: yup.string().required("Country is required"),
-  }),
-  phonecode: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .required("Country Code is required")
-      .matches(/^\d{1,3}$/, "Country Code must be 1 to 3 digits"),
-  }),
-  Phone: yup.string().when("otpSent", {
-    is: true,
-    then: yup
-      .string()
-      .required("Phone number is required")
-      .matches(/^\d{9,}$/, "Phone number must have at least 9 digits"),
-  }),
-  sms: yup.string().when(["smsSent", "exempted"], {
-    is: (smsSent, exempted) => smsSent && !exempted,
-    then: yup
-      .string()
-      .required("OTP is required")
-      .matches(/^[0-9]+$/, "SMS must contain only numbers"),
-  }),
+  otp: yup
+    .string()
+    .required("OTP is required")
+    .matches(/^[0-9]+$/, "OTP must contain only numbers"),
+  user_country: yup.string().required("Country is required"),
+  phonecode: yup
+    .string()
+    .required("Country Code is required")
+    .matches(/^\d{1,3}$/, "Country Code must be 1 to 3 digits"),
+  Phone: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^\d{9,15}$/, "Phone number must have 9 to 15 digits"),
+  sms: yup
+    .string()
+    .required("SMS is required")
+    .matches(/^[0-9]+$/, "SMS must contain only numbers"),
   Profile_Image: yup
     .mixed()
     .test("fileFormat", "Unsupported file format", (value) => {
@@ -100,17 +85,13 @@ const schema = yup.object().shape({
       if (!value || !value[0]) return true; // Allow empty value
       return value[0].size <= 1024 * 1024;
     }),
-  policy_status: yup.boolean().when(["otpSent", "smsSent"], {
-    is: (otpSent, smsSent) => otpSent || smsSent,
-    then: yup
-      .boolean()
-      .required("Please accept the Terms & Conditions")
-      .oneOf([true], "Please accept the Terms & Conditions"),
-  }),
-  newsletter: yup.boolean().when(["otpSent", "smsSent"], {
-    is: (otpSent, smsSent) => otpSent || smsSent,
-    then: yup.boolean().oneOf([true], "Accept Newsletter Terms & Conditions"),
-  }),
+  policy_status: yup
+    .boolean()
+    .required("Please accept the Terms & Conditions")
+    .oneOf([true], "Please accept the Terms & Conditions"),
+  newsletter: yup
+    .boolean()
+    .oneOf([true], "Accept Newsletter Terms & Conditions"),
 });
 
 const SignUp = () => {
@@ -415,7 +396,6 @@ const SignUp = () => {
                   <button
                     className="btn-send px-2 py-1 self-start"
                     onClick={() => handleEmailOTP(watch())}
-                    // onClick={handleSubmit(handleEmailOTP)}
                     disabled={
                       loading ||
                       (otpSent && otpCountdown > 0) ||
@@ -473,30 +453,28 @@ const SignUp = () => {
               </div>
             </div>
 
-            {otpSent && (
-              <div>
-                <label htmlFor="otp-Email" className="label">
-                  Enter OTP from Email <span className="text-red-500">*</span>
-                </label>
+            <div>
+              <label htmlFor="otp-Email" className="label">
+                Enter OTP from Email <span className="text-red-500">*</span>
+              </label>
 
-                <div className="mt-2.5">
-                  <input
-                    type="text"
-                    name="otp"
-                    id="otp"
-                    placeholder="Enter OTP from Email"
-                    autoComplete="otp"
-                    className="input-field"
-                    {...register("otp")}
-                  />
-                  {errors.otp && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.otp.message}
-                    </p>
-                  )}
-                </div>
+              <div className="mt-2.5">
+                <input
+                  type="text"
+                  name="otp"
+                  id="otp"
+                  placeholder="Enter OTP from Email"
+                  autoComplete="otp"
+                  className="input-field"
+                  {...register("otp")}
+                />
+                {errors.otp && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.otp.message}
+                  </p>
+                )}
               </div>
-            )}
+            </div>
 
             <div>
               <label htmlFor="user_country" className="label">
