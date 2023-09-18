@@ -372,14 +372,36 @@ def register(request):
             json_data = open('loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
-            main = {"username": [],"member_type": "owner","product": "Living Lab Admin","data_type": "Real_Data","operations_right": "Add/Edit","role": "default","portfolio_name": "default","portfolio_code": "01","portfolio_specification": "default","portfolio_uni_code": "default","portfolio_details": "default","status": "enable"}
-            product_list = ["Workflow AI", "Digital Queue", "Wifi QR Code", "Living Lab Chat","User Experience Live","Social Media Automation","Living Lab Scales","Logo Scan","Legalzard","Living Lab Maps","Customer Experience","Living Lab Admin","Team Management","Living Lab Monitoring","Live Stream Dashboard","Sales Agent","Permutation Calculator","Dowell Customer Support Centre","Secure Repositories","Secure Data"]
-            for i in range(len(product_list)):
-                main["username"]=[user]
-                main["product"]=product_list[i]
-                main["portfolio_code"]=i+1
-                # print(main)
-                data["portfolio"].append(main.copy())
+
+            default = {
+              "org_id": user,
+              "org_name":user,
+              "username": [user],
+              "member_type": "owner",
+              "product": "all",
+              "data_type": "Real_data",
+              "operations_right": "Add/Edit",
+              "role": "owner",
+              "security_layer": "None",
+              "portfolio_name": "default",
+              "portfolio_code": "123456",
+              "portfolio_specification": "",
+              "portfolio_uni_code": "default",
+              "portfolio_details": "",
+              "status": "enable"
+            }
+
+            data["portpolio"].append(default)
+            data["document_name"] = user
+            data["Username"] = user
+            update_data1 = {"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
+            data["profile_info"].update(update_data1)
+            data["organisations"][0]["org_name"]=user
+            update_data2 = {"first_name":first,"last_name":last,"email":email}
+            data["members"]["team_members"]["accept_members"][0].update(update_data2)
+            client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data,"nil")
+            client_admin_res = json.loads(client_admin)
+            org_id = client_admin_res["inserted_id"]
 
             # Change document name and username
             data["document_name"] = user
@@ -456,6 +478,7 @@ def register(request):
                 return render(request, 'after_register_v2.html', {'user': user})
         else:
             return HttpResponse("check")
+        
     else:
         ...
     return render(request, 'register_v2.html', {'title': 'Register here', 'country_resp': country_codes, 'org': orgs, 'type': _type})
