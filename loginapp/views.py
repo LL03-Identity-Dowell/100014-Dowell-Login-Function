@@ -526,6 +526,8 @@ def login(request):
     if saved_browser_session:
         if orgs: # Invite link
             return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
+        elif "code=masterlink" in main_params or "code=masterlink1" in main_params:
+            return redirect(f'https://100093.pythonanywhere.com/masterlink?session_id={saved_browser_session}&{main_params}')
         elif redirect_url: # redirect_url params
             logindetail = CustomSession.objects.filter(
                 sessionID=saved_browser_session).first()
@@ -1261,3 +1263,70 @@ def allow_location(request):
             return HttpResponse("User not found")
     else:
         return HttpResponse("Not location given to update..")
+
+from django.db.models import Count
+from django.db.models.functions import TruncDay
+def userdetails(request):
+    products_list=["Client_admin","Exhibitoe form","Living Lab Admin","Workflow AI"]
+    field={}
+    details=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",field,"nil")
+    ok=json.loads(details)
+    users=[]
+    count=0
+    team_members=[]
+    public_members=[]
+    owners=[]
+    for data in ok["data"]:
+        count+=1
+        for team in data["members"]["team_members"]["accept_members"]:
+            if not team["name"] in team_members:
+                # if team["name"]=="owner":
+                #     if not data["document_name"] in team_members:
+                #         team_members.append(data["document_name"])
+                # else:
+                if not team["name"]=="owner":
+                    team_members.append(team["name"])
+                else:
+                    owners.append(data["document_name"])
+        for guest in data["members"]["guest_members"]["accept_members"]:
+            users.append(guest["name"])
+        for public in data["members"]["public_members"]["accept_members"]:
+            try:
+                public_members.append(public["username"])
+            except:
+                pass
+    team_members=list(set(team_members))
+    owners=list(set(owners))
+    public_members=list(set(public_members))
+    users=list(set(users))
+    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
+    obj_live=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S")).values_list('username', flat=True).order_by('username').distinct()
+    response={'users':len(set(obj_live).intersection(users)),'live_team_members':len(set(obj_live).intersection(team_members)),'live_public_members':len(set(obj_live).intersection(public_members)),'live_owners':len(set(obj_live).intersection(owners))}
+    current={}
+    weekly={}
+    for product in products_list:
+        product_wise=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
+        current[product]={'team_members':len(set(product_wise).intersection(team_members)),'public_members':len(set(product_wise).intersection(public_members)),'users':len(set(product_wise).intersection(users)),'owners':len(set(product_wise).intersection(owners))}
+        weekly[product]={}
+        # date_start= datetime.datetime.now()-datetime.timedelta(days=6)
+        # obj = LiveStatus.objects.filter(
+        #     updated__gte=date_start.strftime("%Y-%m-%d %H:%M:%S"),
+        # ).annotate(
+        #     day=TruncDay('updated'),
+        #     created_count=Count('updated__date')
+        # ).values(
+        #     'day',
+        #     'created_count'
+        # )
+        # weekly[product]=f'{obj}'
+        for r in range(0,7):
+            date_start= datetime.datetime.now()-datetime.timedelta(days=r+1)
+            date_end=datetime.datetime.now()-datetime.timedelta(days=r)
+            if range ==0:
+                date_end=datetime.datetime.now()+datetime.timedelta(days=1)
+            obj=LiveStatus.objects.filter(updated__gt=date_start.strftime("%Y-%m-%d %H:%M:%S"),updated__lte=date_end.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
+            weekly[product][r]=len(obj)
+    response["current"]=current
+    response["weekly"]=weekly
+    resp=response
+    return render(request,'login/userdetails1.html',{"resp":resp})
