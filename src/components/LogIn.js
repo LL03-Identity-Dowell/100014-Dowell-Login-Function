@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
@@ -13,9 +13,8 @@ import Iframe from "react-iframe";
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
-
-  // Define a ref for username
-  const usernameRef = useRef(null);
+  const [username, setUsername] = useState("");
+  const [redirecting, setRedirecting] = useState(false);
 
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
@@ -53,6 +52,9 @@ const LogIn = () => {
 
     const { username, password } = e.target.elements;
 
+    // update the username state
+    setUsername(username.value);
+
     const userData = {
       username: username.value,
       password: password.value,
@@ -74,11 +76,12 @@ const LogIn = () => {
       const URL = response?.payload?.url;
 
       if (sessionID) {
+        // Set the redirecting state to true
+        setRedirecting(true);
+
         // Redirect to specific url
-        window.location.href = `${URL}`;
+        window.location.href = URL;
       }
-      // Update the username ref
-      usernameRef.current = username.value;
     } catch (error) {
       throw new Error(error.response?.data.info);
     }
@@ -101,13 +104,13 @@ const LogIn = () => {
 
   // Iframe URL
   const iframeURL = () => {
-    const url = `https://100014.pythonanywhere.com/check_status?username=${usernameRef.current.value}`;
+    const url = `https://100014.pythonanywhere.com/check_status?username=${username}`;
     return url;
   };
 
   return (
     <>
-      {loading ? (
+      {loading || redirecting ? (
         <div className="flex flex-col justify-center items-center h-screen">
           <div className="flex relative w-48 h-48">
             {/* Spinner */}
@@ -188,7 +191,6 @@ const LogIn = () => {
                         placeholder="Enter Your Username"
                         autoComplete="username"
                         className="input-field"
-                        ref={usernameRef}
                       />
                     </div>
                   </div>
