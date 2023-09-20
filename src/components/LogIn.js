@@ -112,34 +112,39 @@ const LogIn = () => {
     <>
       {loading || redirecting ? (
         <div className="flex flex-col justify-center items-center h-screen">
-          <div className="flex relative w-48 h-48">
-            {/* Spinner */}
-            <div className="block absolute top-0 left-0 w-full h-full justify-center items-center z-20">
-              <RotatingLines
-                visible={true}
-                height={96}
-                width={96}
-                ariaLabel="radio-loading"
-                wrapperStyle={{}}
-                color="#1ff507"
-                strokeWidth="5"
-              />
-            </div>
-
-            {/* Timer (background) */}
-            {showTimer && (
-              <div className="block bg-no-repeat w-10 h-12 absolute top-10 left-8 z-10 opacity-60">
-                <img src={Timer} alt="Loading timer" />
+          <div className="flex flex-col justify-center items-center">
+            <div className="relative w-48 h-48">
+              {/* Spinner */}
+              <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center z-30">
+                <RotatingLines
+                  visible={true}
+                  height={96}
+                  width={96}
+                  ariaLabel="radio-loading"
+                  wrapperStyle={{}}
+                  color="#1ff507"
+                  strokeWidth="5"
+                />
               </div>
-            )}
+
+              {/* Timer (background) */}
+              {showTimer && (
+                <div className="absolute inset-0 flex items-center justify-center z-20">
+                  <img src={Timer} alt="Loading timer" className="w-10 h-8" />
+                </div>
+              )}
+            </div>
           </div>
-          <Iframe
-            url={iframeURL()}
-            width="100%"
-            height="330px"
-            id="myiFrame"
-            className="py-4 px-6"
-          />
+
+          <div className="flex flex-col items-center">
+            <Iframe
+              url={iframeURL()}
+              width="100%"
+              height="330px"
+              id="myiFrame"
+              className="py-4 px-6"
+            />
+          </div>
         </div>
       ) : (
         <div className="flex w-full items-center justify-center">
