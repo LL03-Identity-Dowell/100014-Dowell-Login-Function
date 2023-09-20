@@ -885,10 +885,6 @@ def all_liveusers(request):
         count += 1
         for team in data["members"]["team_members"]["accept_members"]:
             if not team["name"] in team_members:
-                # if team["name"]=="owner":
-                #     if not data["document_name"] in team_members:
-                #         team_members.append(data["document_name"])
-                # else:
                 if not team["name"] == "owner":
                     team_members.append(team["name"])
                 else:

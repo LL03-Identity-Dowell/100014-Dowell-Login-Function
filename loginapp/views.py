@@ -1280,10 +1280,6 @@ def userdetails(request):
         count+=1
         for team in data["members"]["team_members"]["accept_members"]:
             if not team["name"] in team_members:
-                # if team["name"]=="owner":
-                #     if not data["document_name"] in team_members:
-                #         team_members.append(data["document_name"])
-                # else:
                 if not team["name"]=="owner":
                     team_members.append(team["name"])
                 else:
@@ -1308,17 +1304,6 @@ def userdetails(request):
         product_wise=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
         current[product]={'team_members':len(set(product_wise).intersection(team_members)),'public_members':len(set(product_wise).intersection(public_members)),'users':len(set(product_wise).intersection(users)),'owners':len(set(product_wise).intersection(owners))}
         weekly[product]={}
-        # date_start= datetime.datetime.now()-datetime.timedelta(days=6)
-        # obj = LiveStatus.objects.filter(
-        #     updated__gte=date_start.strftime("%Y-%m-%d %H:%M:%S"),
-        # ).annotate(
-        #     day=TruncDay('updated'),
-        #     created_count=Count('updated__date')
-        # ).values(
-        #     'day',
-        #     'created_count'
-        # )
-        # weekly[product]=f'{obj}'
         for r in range(0,7):
             date_start= datetime.datetime.now()-datetime.timedelta(days=r+1)
             date_end=datetime.datetime.now()-datetime.timedelta(days=r)
