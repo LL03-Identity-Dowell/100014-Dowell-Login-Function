@@ -136,7 +136,9 @@ const SignUp = () => {
   // Redirect when `registered` changes
   useEffect(() => {
     if (registered) {
-      navigate(`/beta/splash/${watch().Username}/${mainParams}`);
+      navigate(
+        `/beta/splash/${watch().Username}${mainParams ? `/${mainParams}` : ""}`
+      );
     }
   }, [registered, navigate, watch, mainParams]);
 
