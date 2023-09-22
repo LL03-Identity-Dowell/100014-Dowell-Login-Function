@@ -4,7 +4,73 @@ import CanvasJSReact from "@canvasjs/react-charts";
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const UsersData = ({ resp }) => {
+  const lineData = {
+    animationEnabled: true,
+    exportEnabled: true,
+    theme: "light2",
+    title: {
+      text: "Line Chart",
+      suffix: "%",
+    },
+    axisX: {
+      title: "Date",
+      prefix: "D",
+    },
+    axisY: {
+      title: "Value",
+    },
+    data: [
+      {
+        type: "spline",
+        showInLegend: true,
+        name: "Living Lab Admin",
+        dataPoints: [
+          { label: 1, y: 8 },
+          { label: 2, y: 12 },
+          { label: 3, y: 76 },
+          { label: 4, y: 28 },
+          { label: 5, y: 34 },
+          { label: 6, y: 67 },
+          { label: 7, y: 75 },
+        ],
+        color: "#FF4069",
+      },
+      {
+        type: "spline",
+        showInLegend: true,
+        name: "Exhibitoe Form",
+        dataPoints: [
+          { label: 1, y: 81 },
+          { label: 2, y: 29 },
+          { label: 3, y: 64 },
+          { label: 4, y: 82 },
+          { label: 5, y: 4 },
+          { label: 6, y: 65 },
+          { label: 7, y: 33 },
+        ],
+        color: "cyan",
+      },
+      {
+        type: "spline",
+        showInLegend: true,
+        name: "Workflow AI",
+        dataPoints: [
+          { label: 1, y: 43 },
+          { label: 2, y: 26 },
+          { label: 3, y: 62 },
+          { label: 4, y: 23 },
+          { label: 5, y: 45 },
+          { label: 6, y: 87 },
+          { label: 7, y: 32 },
+        ],
+        color: "blue",
+      },
+    ],
+  };
   const barChartData = {
+    exportEnabled: true,
+    animationEnabled: true,
+    theme: "light2",
     title: {
       text: "Product Wise Users",
     },
@@ -65,6 +131,7 @@ const UsersData = ({ resp }) => {
   const pieChartData = {
     exportEnabled: true,
     animationEnabled: true,
+    theme: "light2",
     title: {
       text: "Live User",
     },
@@ -96,7 +163,15 @@ const UsersData = ({ resp }) => {
   };
   return (
     <div className="flex flex-wrap justify-between">
-      <div className="w-full md:w-1/2 lg:w-1/2 p-4">
+      <div className="w-full md:w-1/2 lg:w-1/3 p-4">
+        <div className="bg-white rounded-lg shadow-lg">
+          <div className="p-4">
+            <CanvasJSChart options={lineData} />
+          </div>
+        </div>
+      </div>
+
+      <div className="w-full md:w-1/2 lg:w-1/3 p-4">
         <div className="bg-white rounded-lg shadow-lg">
           <div className="p-4">
             <CanvasJSChart options={pieChartData} />
@@ -104,7 +179,7 @@ const UsersData = ({ resp }) => {
         </div>
       </div>
 
-      <div className="w-full md:w-1/2 lg:w-1/2 p-4">
+      <div className="w-full md:w-1/2 lg:w-1/3 p-4">
         <div className="bg-white rounded-lg shadow-lg">
           <div className="p-4">
             <CanvasJSChart options={barChartData} />
