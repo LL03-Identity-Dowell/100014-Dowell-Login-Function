@@ -11,6 +11,7 @@ import SignOutPage from "./pages/SignOutPage";
 import NotFound from "./pages/NotFound";
 import ChangePassword from "./components/changePassword";
 import ForgotPassword from "./components/forgotPassword";
+import UsersData from "./pages/usersData";
 
 function App() {
   return (
@@ -28,6 +29,8 @@ function App() {
           <Route path="/beta/policy" element={<Policy />} />
           <Route path="/beta/help" element={<Help />} />
           <Route path="/beta/faq" element={<FAQ />} />
+          <Route path="/beta/usersData" element={<UsersData />} />
+
           <Route path="*" component={NotFound} />
         </Routes>
       </Router>
