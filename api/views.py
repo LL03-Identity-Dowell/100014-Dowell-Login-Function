@@ -913,11 +913,12 @@ def all_liveusers(request):
         for r in range(0, 7):
             date_start = datetime.datetime.now()-datetime.timedelta(days=r+1)
             date_end = datetime.datetime.now()-datetime.timedelta(days=r)
-            obj = LiveStatus.objects.filter(date_updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), date_updated__lte=date_end.strftime(
+            obj = LiveStatus.objects.filter(updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), updated__lte=date_end.strftime(
                 '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
             weekly[product][r] = obj
-    response["current"] = current
-    response["weekly"] = weekly
+    response["product_wise"] = current
+    response["weekly_product_wise"] = weekly
+    response["Note"]="In weekly part '0' means 24 hrs ahead of current time, '1' means between 48 and 24 hrs ahead of current time and so on.."
     return Response(response)
 
 
