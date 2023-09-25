@@ -142,7 +142,7 @@ const UsersData = ({ resp }) => {
         toolTipContent: "<b>{label}</b> {y}%",
         showInLegend: true,
         legendText: "{label}",
-        indexLabelFontSize: 16,
+        indexLabelFontSize: 14,
         indexLabel: "{label} - {y}%",
         dataPoints: [
           {
@@ -162,27 +162,29 @@ const UsersData = ({ resp }) => {
     ],
   };
   return (
-    <div className="flex flex-wrap justify-between">
-      <div className="w-full md:w-1/2 lg:w-1/3 p-4">
-        <div className="bg-white rounded-lg shadow-lg">
+    <div className="flex flex-col justify-center items-center">
+      <div className="w-full lg:w-3/4 p-4 h-1/2">
+        <div className="bg-white rounded-lg shadow-xl">
           <div className="p-4">
             <CanvasJSChart options={lineData} />
           </div>
         </div>
       </div>
 
-      <div className="w-full md:w-1/2 lg:w-1/3 p-4">
-        <div className="bg-white rounded-lg shadow-lg">
-          <div className="p-4">
-            <CanvasJSChart options={pieChartData} />
+      <div className="flex flex-col lg:flex-row w-full h-1/2">
+        <div className="w-full md:w-1/2 lg:w-1/2 p-4">
+          <div className="bg-white rounded-lg shadow-xl">
+            <div className="p-4">
+              <CanvasJSChart options={pieChartData} />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="w-full md:w-1/2 lg:w-1/3 p-4">
-        <div className="bg-white rounded-lg shadow-lg">
-          <div className="p-4">
-            <CanvasJSChart options={barChartData} />
+        <div className="w-full md:w-1/2 lg:w-1/2 p-4">
+          <div className="bg-white rounded-lg shadow-2xl">
+            <div className="p-4">
+              <CanvasJSChart options={barChartData} />
+            </div>
           </div>
         </div>
       </div>
