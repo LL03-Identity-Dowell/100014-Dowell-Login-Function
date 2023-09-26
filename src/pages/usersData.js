@@ -4,7 +4,7 @@ import CanvasJSReact from "@canvasjs/react-charts";
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const UsersData = ({ resp }) => {
-  const lineData = {
+  const lineGraphData = {
     animationEnabled: true,
     exportEnabled: true,
     theme: "light2",
@@ -162,27 +162,27 @@ const UsersData = ({ resp }) => {
     ],
   };
   return (
-    <div className="flex flex-col justify-center items-center">
-      <div className="w-full lg:w-3/4 p-4 h-1/2">
-        <div className="bg-white rounded-lg shadow-xl">
-          <div className="p-4">
-            <CanvasJSChart options={lineData} />
-          </div>
+    <div className="flex flex-wrap justify-center items-center">
+      {/* Line Graph */}
+      <div className="w-full lg:w-3/4 p-2">
+        <div className="bg-white rounded-lg shadow-lg">
+          <CanvasJSChart options={lineGraphData} />
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row w-full h-1/2">
-        <div className="w-full md:w-1/2 lg:w-1/2 p-4">
-          <div className="bg-white rounded-lg shadow-xl">
-            <div className="p-4">
+      {/* Pie Chart and Bar Chart */}
+      <div className="w-full md:w-3/4">
+        <div className="flex flex-wrap justify-center items-center">
+          {/* Pie Chart */}
+          <div className="w-full md:w-1/2 p-2">
+            <div className="bg-white rounded-lg shadow-lg">
               <CanvasJSChart options={pieChartData} />
             </div>
           </div>
-        </div>
 
-        <div className="w-full md:w-1/2 lg:w-1/2 p-4">
-          <div className="bg-white rounded-lg shadow-2xl">
-            <div className="p-4">
+          {/* Bar Chart */}
+          <div className="w-full md:w-1/2 p-2">
+            <div className="bg-white rounded-lg shadow-lg">
               <CanvasJSChart options={barChartData} />
             </div>
           </div>
