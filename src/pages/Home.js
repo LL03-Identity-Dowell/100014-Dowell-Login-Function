@@ -82,7 +82,7 @@ const Home = () => {
                 <img
                   src={sideImage}
                   alt="DoWell logo"
-                  className="mt-4 h-full w-32 drop-shadow-lg"
+                  className="mt-4 h-full w-32 drop-shadow-lg border border-solid border-black"
                 />
               )}
               <MyTabs />

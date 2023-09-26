@@ -21,25 +21,25 @@ const MyTabs = () => {
     ],
     Chat: [
       {
-        id: 1,
+        id: 2,
         content: <Chat />,
       },
     ],
     Policy: [
       {
-        id: 1,
+        id: 3,
         content: <Policy />,
       },
     ],
     Help: [
       {
-        id: 1,
+        id: 4,
         content: <Help />,
       },
     ],
     FAQ: [
       {
-        id: 1,
+        id: 5,
         content: <FAQ />,
       },
     ],
@@ -47,8 +47,8 @@ const MyTabs = () => {
 
   return (
     <Tab.Group>
-      <div className="w-full max-w-3xl mx-auto px-2 py-2 sm:px-0">
-        <Tab.List className="flex space-x-1 rounded-xl bg-gray-700 p-1">
+      <div className="w-full max-w-3xl mx-auto md:px-2 md:py-2 sm:px-0">
+        <Tab.List className="flex flex-col justify-center md:flex-row space-x-1 space-y-2 rounded-xl bg-gray-700 p-1">
           {Object.keys(categories).map((category) => {
             const Icon = getCategoryIcon(category);
             return (
@@ -56,16 +56,16 @@ const MyTabs = () => {
                 key={category}
                 className={({ selected }) =>
                   classNames(
-                    "w-full rounded-lg py-2 text-sm font-medium leading-3 text-green-700",
-                    "ring-red-300 ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2",
+                    "w-full h-12 rounded-2xl md:py-2 md:px-2 text-sm font-medium leading-3 text-green-500 bg-gray-600",
+                    "focus:outline-none border-r-2 border-b-2 border-red-800",
                     selected
-                      ? "bg-green-500 text-white shadow"
-                      : "text-green-100 hover:bg-white/[0.12] hover:text-white"
+                      ? "bg-green-400 text-white"
+                      : "text-green-500 hover:bg-green-400 hover:text-white"
                   )
                 }
               >
                 <div className="flex items-center justify-center space-x-1">
-                  {Icon && <Icon className="w-6 h-6" />}
+                  {Icon && <Icon className="w-5 h-5 lg:w-6 lg:h-6" />}
                   <span>{category}</span>
                 </div>
               </Tab>
