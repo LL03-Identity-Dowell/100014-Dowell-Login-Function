@@ -152,7 +152,7 @@ const LogIn = () => {
             className="flex flex-col justify-between md:flex-row md:space-x-4 space-y-2 md:space-y-0 bg-yellow-50
            w-full max-w-3xl p-2 md:p-4 rounded-xl shadow-lg text-gray-500 overflow-hidden"
           >
-            <div className="flex flex-col lg:w-1/2 p-4 space-y-8 bg-gradient-to-r from-yellow-50 to-gray-50">
+            <div className="flex flex-col md:w-1/2 p-4 space-y-8 bg-gradient-to-r from-yellow-50 to-gray-50">
               <h2 className="text-2xl bg-green-600 bg-clip-text text-transparent">
                 Member Login
               </h2>
@@ -174,7 +174,7 @@ const LogIn = () => {
               </div>
             </div>
 
-            <div className="relative lg:w-1/2">
+            <div className="relative md:w-1/2">
               <div
                 className="relative z-10 bg-yellow-50 rounded-xl drop-shadow-sm
               py-4 text-gray-700 border border-solid border-green-200"
