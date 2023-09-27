@@ -67,10 +67,10 @@ const Home = () => {
           />
         </div>
       ) : (
-        <div className="isolate px-2 py-4 md:px-8">
-          <div className="shadow-sm mx-auto max-w-5xl px-2 py-4 md:px-4">
+        <div className="isolate py-4 md:px-4">
+          <div className="shadow-sm mx-auto max-w-5xl px-2 py-4 md:px-6">
             <div
-              className={isMobile ? "flex flex-col items-center" : "flex px-2"}
+              className={isMobile ? "flex flex-col items-center" : "flex p-2"}
             >
               {isMobile ? (
                 <img

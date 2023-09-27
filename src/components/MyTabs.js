@@ -47,7 +47,7 @@ const MyTabs = () => {
 
   return (
     <Tab.Group>
-      <div className="w-full max-w-3xl mx-auto md:px-2 md:py-2 sm:px-0">
+      <div className="w-full max-w-3xl mx-auto md:py-2 sm:px-0">
         <Tab.List className="flex flex-col items-center justify-center md:flex-row space-x-2 rounded-xl bg-gray-700 p-1">
           {Object.keys(categories).map((category) => {
             const Icon = getCategoryIcon(category);
@@ -77,7 +77,7 @@ const MyTabs = () => {
             <Tab.Panel
               key={idx}
               className={classNames(
-                "rounded-xl bg-white p-2",
+                "rounded-xl bg-white p-1",
                 "ring-white ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2"
               )}
             >
@@ -88,9 +88,7 @@ const MyTabs = () => {
                     className="relative rounded-md hover:bg-gray-100"
                   >
                     <h3 className="text-sm font-medium leading-5">
-                      <span className="mr-1">
-                        {getCategoryIcon(post.category)}
-                      </span>
+                      <span>{getCategoryIcon(post.category)}</span>
                       {post.content}
                     </h3>
                   </li>
