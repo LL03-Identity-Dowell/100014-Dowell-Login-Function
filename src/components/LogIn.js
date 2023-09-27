@@ -177,9 +177,9 @@ const LogIn = () => {
             <div className="relative md:w-1/2">
               <div
                 className="relative z-10 bg-yellow-50 rounded-xl drop-shadow-sm
-              py-4 text-gray-700 border border-solid border-green-200"
+              p-4 text-gray-700 border border-solid border-green-200 space-y-2"
               >
-                <div className="flex flex-col space-y-2 px-4 w-80">
+                <div className="flex flex-col space-y-2 px-2 w-72">
                   <p className="label">Select your language</p>
                   <LanguageDropdown
                     selectedLanguage={userLanguage}
@@ -188,7 +188,7 @@ const LogIn = () => {
                 </div>
 
                 <form
-                  className="flex flex-col space-y-4 p-4"
+                  className="flex flex-col space-y-4 p-4 shadow-lg shadow-slate-400"
                   onSubmit={handleUserInfo}
                 >
                   <div>
