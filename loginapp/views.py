@@ -186,6 +186,14 @@ def login_legal_policy(request):
         sessionID=session_id, status="Accepted", username="none")
     return render(request, "policy.html")
 
+@api_view(['POST'])
+def validate_username(request):
+    username = request.data['username']
+    if username:
+        qs = Account.objects.filter(username=username)
+        if qs.exists():
+            return Response({'status': 'error', 'msg': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'status': 'success', 'msg': 'Username is valid'}, status=status.HTTP_200_OK)
 
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt

@@ -1734,6 +1734,7 @@ else
                                                                         required="required" aria-required="true" pattern="[^()/<>[\]\\,'|\x22]+"
                                                                         minlength="12" title="The minimum length is 12 and spaces are not allowed">
                                                                     <span id="user_error" style="color:red"></span>
+                                                                    <span id="user_success" style="color:green"></span>
                                                                 </div>
                                                                 <div
                                                                     class="elementor-field-type-password elementor-field-group elementor-column elementor-field-group-email elementor-col-100 elementor-field-required elementor-mark-required">
@@ -2356,6 +2357,26 @@ else
                                                                     } else {
                                                                         $('#user_error').html("");
                                                                     }
+                                                                    const config = {
+                                                                      method: 'POST',
+                                                                      body: JSON.stringify({ username: $('#username').val() }),
+                                                                      headers: {
+                                                                        'Content-Type': 'application/json'
+                                                                      }
+                                                                    };
+                                                                    fetch('/validate_username/', config)
+                                                                      .then(res => {
+                                                                        return res.json();
+                                                                      })
+                                                                      .then(data => {
+                                                                        if (data.status == 'success') {
+                                                                          $('#user_success').html(data.msg);
+                                                                          $('#user_error').html('');
+                                                                        } else {
+                                                                          $('#user_success').html('');
+                                                                          $('#user_error').html(data.msg);
+                                                                        }
+                                                                      })
                                                                 }),
                                                                 $('#first_name').on('change', function () {
                                                                     for(i=0;i<no_unames.length;i++){
