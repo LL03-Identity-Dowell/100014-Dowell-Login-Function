@@ -29,7 +29,8 @@ urlpatterns = [
     path('main_login/', views.main_login, name='main_login'),
     path('main_logout/', views.main_logout, name='main_logout'),
 
-    path('otp_verify/',views.otp_verify,name="otp_verify")
+    path('otp_verify/',views.otp_verify,name="otp_verify"),
+    path('/linklogin/', views.LinkLogin, name='linklogin'),
 
 
 ]

@@ -1788,3 +1788,25 @@ def otp_verify(request):
             return Response({"msg":"error","info":"Wrong OTP provided"})
     else:
         return Response({'msg': 'error','error':'Provide either email or phone number along with username'})
+
+@api_view(['POST'])
+def LinkLogin(request):
+    user=request.data.get("Username")
+    loc=request.data["Location"]
+    device=request.data["Device"]
+    osver=request.data["OS"]
+    brow=request.data["Browser"]
+    ltime=request.data["Time"]
+    ipuser=request.data["IP"]
+    mobconn=request.data["Connection"]
+    if user is None:
+        user=passgen.generate_random_password1(8)
+    random_session=passgen.generate_random_password1(32)
+    field={"Username":user,"random_session":random_session,"OS":osver,"Device":device,"Browser":brow,"Location":loc,"Time":str(ltime),"SessionID":"linkbased","Connection":mobconn,"qrcode_id":"user6","IP":ipuser}
+    resp=dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field,"nil")
+    respj=json.loads(resp)
+    field1=json.dumps(field)
+    field2=str(field1)
+    Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
+    qrcodegen.qrgen1(user,respj["inserted_id"],f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
+    return Response({"session_id":random_session})
