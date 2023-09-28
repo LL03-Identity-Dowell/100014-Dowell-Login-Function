@@ -256,7 +256,7 @@ const SignUp = () => {
               className="h-34 w-44 rounded-sm drop-shadow-md mx-auto"
             />
             <h2 className="text-xl font-semibold tracking-wide text-green-500 md:text-2xl">
-              Join us New Member
+              Join as New Member
             </h2>
           </div>
         </div>
@@ -735,7 +735,7 @@ const SignUp = () => {
             {error && <p className="text-red-500">{error}</p>}
           </div>
 
-          <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
+          <div className="w-72 flex flex-col items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
             <Link to="/beta" className="text-center">
               Do have an account? Log in
             </Link>
