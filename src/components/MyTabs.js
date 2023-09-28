@@ -6,99 +6,138 @@ import Policy from "../pages/Policy";
 import Help from "../pages/Help";
 import FAQ from "../pages/FAQ";
 import { getCategoryIcon } from "../utils/getCategoryIcon";
+import { MdClose } from "react-icons/md";
+import { FiMenu } from "react-icons/fi";
+import { NavLink } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const MyTabs = () => {
-  let [categories] = useState({
-    LogIn: [
-      {
-        id: 1,
-        content: <LogIn />,
-      },
-    ],
-    Chat: [
-      {
-        id: 2,
-        content: <Chat />,
-      },
-    ],
-    Policy: [
-      {
-        id: 3,
-        content: <Policy />,
-      },
-    ],
-    Help: [
-      {
-        id: 4,
-        content: <Help />,
-      },
-    ],
-    FAQ: [
-      {
-        id: 5,
-        content: <FAQ />,
-      },
-    ],
-  });
+  const [tabMenuOpen, setTabMenuOpen] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  const toggleTabMenu = () => {
+    setTabMenuOpen(!tabMenuOpen);
+  };
+
+  const categories = [
+    { id: 1, title: "LogIn", content: <LogIn /> },
+    { id: 2, title: "Chat", content: <Chat /> },
+    { id: 3, title: "Policy", content: <Policy /> },
+    { id: 4, title: "Help", content: <Help /> },
+    { id: 5, title: "FAQ", content: <FAQ /> },
+  ];
 
   return (
-    <Tab.Group>
-      <div className="w-full max-w-3xl mx-auto md:py-2 sm:px-0">
-        <Tab.List className="flex flex-col items-center justify-center md:flex-row space-x-2 rounded-xl bg-gray-700 p-1">
-          {Object.keys(categories).map((category) => {
-            const Icon = getCategoryIcon(category);
+    <div className="w-full max-w-3xl mx-auto md:py-2 sm:px-0">
+      <div className="md:hidden">
+        <button
+          type="button"
+          onClick={toggleTabMenu}
+          className="p-2 focus:outline-none"
+        >
+          {tabMenuOpen ? (
+            <MdClose
+              style={{ color: "#7b7b7b", width: "40px", height: "40px" }}
+            />
+          ) : (
+            <FiMenu
+              style={{ color: "#7b7b7b", width: "40px", height: "40px" }}
+            />
+          )}
+        </button>
+      </div>
+      <div className="md:flex">
+        <div
+          className={`${
+            tabMenuOpen ? "block" : "hidden"
+          } space-y-2 bg-gray-700 p-1 rounded-xl`}
+        >
+          {categories.map((category, index) => {
+            const Icon = getCategoryIcon(category.title);
             return (
-              <Tab
-                key={category}
-                className={({ selected }) =>
-                  classNames(
-                    "w-full items-center h-12 rounded-2xl md:py-2 md:px-2 text-sm font-medium leading-3 text-green-500 bg-gray-600",
-                    "focus:outline-none border-r-2 border-b-2 border-red-800",
-                    selected
-                      ? "bg-green-400 text-white"
-                      : "text-green-500 hover:bg-green-400 hover:text-white"
-                  )
-                }
+              <button
+                key={category.id}
+                onClick={() => {
+                  setSelectedTab(index);
+                  setTabMenuOpen(false);
+                }}
+                className={classNames(
+                  "w-full items-center h-12 rounded-2xl md:py-2 md:px-2 text-sm font-medium leading-3 text-green-500 bg-gray-600",
+                  "focus:outline-none border-r-2 border-b-2 border-red-800",
+                  selectedTab === index
+                    ? "bg-green-400 text-white"
+                    : "text-green-500 hover:bg-green-400 hover:text-white"
+                )}
               >
                 <div className="flex items-center justify-center space-x-1">
                   {Icon && <Icon className="w-4 h-4 md:w-6 md:h-6" />}
-                  <span>{category}</span>
+                  <span>{category.title}</span>
                 </div>
-              </Tab>
+              </button>
             );
           })}
-        </Tab.List>
-        <Tab.Panels>
-          {Object.values(categories).map((posts, idx) => (
-            <Tab.Panel
-              key={idx}
-              className={classNames(
-                "rounded-xl bg-white p-1",
-                "ring-white ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2"
-              )}
-            >
-              <ul>
-                {posts.map((post) => (
-                  <li
-                    key={post.id}
-                    className="relative rounded-md hover:bg-gray-100"
+        </div>
+        <div className="md:flex-grow">
+          <Tab.Group>
+            <Tab.List className="md:flex md:space-x-2 items-center justify-center rounded-xl bg-gray-700 p-1">
+              {categories.map((category, index) => {
+                const Icon = getCategoryIcon(category.title);
+                return (
+                  <Tab
+                    key={category.id}
+                    onClick={() => {
+                      setSelectedTab(index);
+                    }}
+                    className={`w-full items-center h-12 rounded-2xl md:py-2 md:px-2 text-sm font-medium leading-3 text-green-500 bg-gray-600
+                      focus:outline-none border-r-2 border-b-2 border-red-800
+                      ${
+                        selectedTab === index
+                          ? "bg-green-400 text-white"
+                          : "text-green-500 hover:bg-green-400 hover:text-white"
+                      }`}
                   >
-                    <h3 className="text-sm font-medium leading-5">
-                      <span>{getCategoryIcon(post.category)}</span>
-                      {post.content}
-                    </h3>
-                  </li>
-                ))}
-              </ul>
-            </Tab.Panel>
-          ))}
-        </Tab.Panels>
+                    <div className="flex items-center justify-center space-x-1">
+                      {Icon && <Icon className="w-4 h-4 md:w-6 md:h-6" />}
+                      <span>{category.title}</span>
+                    </div>
+                  </Tab>
+                );
+              })}
+            </Tab.List>
+            <Tab.Panels>
+              {categories.map((category, index) => (
+                <Tab.Panel key={category.id}>
+                  <div
+                    className={`rounded-xl bg-white p-1
+                      ring-white ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2`}
+                  >
+                    <ul>
+                      <li
+                        key={category.id}
+                        className={`relative rounded-md hover:bg-gray-100 ${
+                          selectedTab !== index && "hidden"
+                        }`}
+                      >
+                        <NavLink
+                          to="/"
+                          className="text-sm font-medium leading-5"
+                        >
+                          <span>{getCategoryIcon(category.title)}</span>
+                          {category.content}
+                        </NavLink>
+                      </li>
+                    </ul>
+                  </div>
+                </Tab.Panel>
+              ))}
+            </Tab.Panels>
+          </Tab.Group>
+        </div>
       </div>
-    </Tab.Group>
+    </div>
   );
 };
 
