@@ -247,7 +247,7 @@ const SignUp = () => {
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
-      <div className="shadow-sm  mx-auto max-w-5xl px-2 py-6 md:px-4">
+      <div className="shadow-sm mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
           <div className="text-center space-y-2">
             <img
@@ -734,11 +734,10 @@ const SignUp = () => {
 
             {error && <p className="text-red-500">{error}</p>}
           </div>
-
-          <div className="w-72 mx-auto flex flex-col items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
-            <Link to="/beta" className="text-center">
-              Do have an account? Log in
-            </Link>
+          <div className="flex items-center justify-center">
+            <div className="w-60 rounded-md bg-green-300 py-2.5 mt-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 text-center">
+              <Link to="/beta">Do have an account? Log in</Link>
+            </div>
           </div>
         </form>
       </div>
