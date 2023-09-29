@@ -118,13 +118,10 @@ const MyTabs = () => {
                           selectedTab !== index && "hidden"
                         }`}
                       >
-                        <NavLink
-                          to="/"
-                          className="text-sm font-medium leading-5"
-                        >
+                        <div className="text-sm font-medium leading-5">
                           <span>{getCategoryIcon(category.title)}</span>
                           {category.content}
-                        </NavLink>
+                        </div>
                       </li>
                     </ul>
                   </div>
