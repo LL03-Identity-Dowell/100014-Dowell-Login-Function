@@ -107,8 +107,8 @@ const MyTabs = () => {
               {categories.map((category, index) => (
                 <Tab.Panel key={category.id}>
                   <div
-                    className={`rounded-xl bg-white p-1
-                      ring-white ring-opacity-60 ring-offset-2 ring-offset-green-400 focus:outline-none focus:ring-2`}
+                    className={`rounded-xl bg-white ring-white ring-opacity-60 ring-offset-2
+                     ring-offset-green-400 focus:outline-none focus:ring-2`}
                   >
                     <ul>
                       <li
