@@ -26,7 +26,8 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
-    path('api/', include('api.urls'))
+    path('api/', include('api.urls')),
+    path('beta/ ', TemplateView.as_view(template_name='index.html'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
@@ -41,7 +42,6 @@ if settings.DEBUG:
     mimetypes.add_type("application/javascript", ".js", True)
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.BUILD_URL, document_root=settings.BUILD_ROOT)
 
 
 handler404 = error_404
