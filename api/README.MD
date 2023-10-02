@@ -350,3 +350,92 @@ Required fields:
   "info": "string"
 }
 ```
+
+---
+
+**POST** ` /api/otp_verify/`
+This is a central api for generating otp via email and sms. The request is first initaited with username and email or phone number to generate otp.
+
+Required fields:
+
+- username
+- email
+- phone
+- otp ( After otp has been generated)
+
+#### Request body
+
+```json
+{
+  "username": "string",
+  "email": "string",
+  "phone": "string"
+}
+```
+
+#### Example response
+
+```json
+{
+  "msg": "string",
+  "info": "string"
+}
+```
+
+---
+
+**POST** ` /api/all_liveusers/`
+Required fields:
+
+- session_id
+
+#### Request body
+
+```json
+{
+  "session_id": "string"
+}
+```
+
+#### Example response
+
+```json
+{
+  "product_wise": "array",
+  "weekly_product_wise": "array",
+  "users": "array",
+  "total Live": "array",
+  "Note": "string"
+}
+```
+
+---
+
+**POST** ` /api/otp_verify/`
+This is a central api for generating otp via email and sms. The request is first initaited with username and email or phone number to generate otp.
+
+Required fields:
+
+- username
+- email
+- phone
+- otp ( After otp has been generated)
+
+#### Request body
+
+```json
+{
+  "username": "string",
+  "email": "string",
+  "phone": "string"
+}
+```
+
+#### Example response
+
+```json
+{
+  "msg": "string",
+  "info": "string"
+}
+```

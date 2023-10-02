@@ -885,10 +885,6 @@ def all_liveusers(request):
         count += 1
         for team in data["members"]["team_members"]["accept_members"]:
             if not team["name"] in team_members:
-                # if team["name"]=="owner":
-                #     if not data["document_name"] in team_members:
-                #         team_members.append(data["document_name"])
-                # else:
                 if not team["name"] == "owner":
                     team_members.append(team["name"])
                 else:
@@ -917,11 +913,12 @@ def all_liveusers(request):
         for r in range(0, 7):
             date_start = datetime.datetime.now()-datetime.timedelta(days=r+1)
             date_end = datetime.datetime.now()-datetime.timedelta(days=r)
-            obj = LiveStatus.objects.filter(date_updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), date_updated__lte=date_end.strftime(
+            obj = LiveStatus.objects.filter(updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), updated__lte=date_end.strftime(
                 '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
             weekly[product][r] = obj
-    response["current"] = current
-    response["weekly"] = weekly
+    response["product_wise"] = current
+    response["weekly_product_wise"] = weekly
+    response["Note"]="In weekly part '0' means 24 hrs ahead of current time, '1' means between 48 and 24 hrs ahead of current time and so on.."
     return Response(response)
 
 
@@ -1706,3 +1703,110 @@ def user_status(request):
             return Response({'msg': 'error', 'info': "Please Enter valid status"})
     else:
         return Response({'msg': 'error', 'info': "Username not found"})
+
+@api_view(['POST'])
+def otp_verify(request):
+    otp = generateOTP()
+    username = request.data.get('username', None)
+    email = request.data.get('email', None)
+    phone = request.data.get('phone', None)
+    otp_input = request.data.get('otp',None)
+    if email and username and not otp_input:
+        field = {
+          "email":email,
+          "username":username
+        }
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field = {"email":email,"username":username}
+            field_update = {"otp":otp,"status":"active"}
+            updated = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+        else:
+            field = {"username":username,"email":email,"otp":otp,"status":"active"}
+            insert = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","insert",field,"nil")
+            inserted = json.loads(insert)
+        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+        payload = json.dumps({
+            "toEmail": email,
+            "toName": username,
+            "topic": "RegisterOtp",
+            "otp": otp
+        })
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response1 = requests.request(
+            "POST", url, headers=headers, data=payload)
+        return Response({'msg':'success','otp':otp})
+    elif email and username and otp_input:
+        field = {"email":email,"username":username,"otp":otp_input}
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field = {"email":email,"username":username,"otp":otp_input}
+            field_update = {"status":"verified"}
+            dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+            return Response({"msg":"success","info":"Verification complete"})
+        else:
+            return Response({"msg":"error","info":"Wrong OTP provided"})
+
+    elif phone and username and not otp_input:
+        field = {"phone":phone,"username":username}
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field = {"phone":phone,"username":username}
+            field_update = {"otp":otp,"status":"active"}
+            updated = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+        else:
+            field = {"phone":phone,"otp":otp,"status":"active","username":username}
+            insert = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","insert",field,"nil")
+            inserted = json.loads(insert)
+        url = "https://100085.pythonanywhere.com/api/sms/"
+        payload = {
+            "sender": "DowellLogin",
+            "recipient": phone,
+            "content": f"Enter the following OTP to create your dowell account: {otp}",
+            "created_by": "Manish"
+        }
+        response = requests.request("POST", url, data=payload)
+        if len(response.json()) > 1:
+            return Response({'msg':'success','otp':otp})
+        else:
+            return Response({'msg': 'error','error':'The phone number is not valid'})
+    elif phone and username and otp_input:
+        field = {"phone":phone,"username":username,"otp":otp_input}
+        check = dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","fetch",field,"nil")
+        check1 = json.loads(check)
+        if len(check1["data"])>=1:
+            field={"phone":phone,"username":username,"otp":otp_input}
+            field_update = {"status":"verified"}
+            dowellconnection("login","bangalore","login","otp_verify","otp_verify","1234001","ABCDE","update",field,field_update)
+            return Response({"msg":"success","info":"Verification complete"})
+        else:
+            return Response({"msg":"error","info":"Wrong OTP provided"})
+    else:
+        return Response({'msg': 'error','error':'Provide either email or phone number along with username'})
+
+@api_view(['POST'])
+def LinkLogin(request):
+    user=request.data.get("Username")
+    loc=request.data["Location"]
+    device=request.data["Device"]
+    osver=request.data["OS"]
+    brow=request.data["Browser"]
+    ltime=request.data["Time"]
+    ipuser=request.data["IP"]
+    mobconn=request.data["Connection"]
+    if user is None:
+        user=passgen.generate_random_password1(8)
+    random_session=passgen.generate_random_password1(32)
+    field={"Username":user,"random_session":random_session,"OS":osver,"Device":device,"Browser":brow,"Location":loc,"Time":str(ltime),"SessionID":"linkbased","Connection":mobconn,"qrcode_id":"user6","IP":ipuser}
+    resp=dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field,"nil")
+    respj=json.loads(resp)
+    field1=json.dumps(field)
+    field2=str(field1)
+    Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
+    qrcodegen.qrgen1(user,respj["inserted_id"],f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
+    return Response({"session_id":random_session})

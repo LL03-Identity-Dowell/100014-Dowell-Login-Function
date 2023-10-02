@@ -27,5 +27,7 @@ urlpatterns = [
     path("user_details/", views.user_info, name="userdetails"),
     path('linklogin',views.LinkLogin,name="linklogin"),
 
-    path("user_chart/", TemplateView.as_view(template_name="chart.html"))
+    path("user_chart/", TemplateView.as_view(template_name="chart.html")),
+
+    path('validate_username/', views.validate_username, name='validate-username')
 ]

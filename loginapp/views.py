@@ -186,6 +186,14 @@ def login_legal_policy(request):
         sessionID=session_id, status="Accepted", username="none")
     return render(request, "policy.html")
 
+@api_view(['POST'])
+def validate_username(request):
+    username = request.data['username']
+    if username:
+        qs = Account.objects.filter(username=username)
+        if qs.exists():
+            return Response({'status': 'error', 'msg': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'status': 'success', 'msg': 'Username is valid'}, status=status.HTTP_200_OK)
 
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
@@ -372,14 +380,36 @@ def register(request):
             json_data = open('loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
-            main = {"username": [],"member_type": "owner","product": "Living Lab Admin","data_type": "Real_Data","operations_right": "Add/Edit","role": "default","portfolio_name": "default","portfolio_code": "01","portfolio_specification": "default","portfolio_uni_code": "default","portfolio_details": "default","status": "enable"}
-            product_list = ["Workflow AI", "Digital Queue", "Wifi QR Code", "Living Lab Chat","User Experience Live","Social Media Automation","Living Lab Scales","Logo Scan","Legalzard","Living Lab Maps","Customer Experience","Living Lab Admin","Team Management","Living Lab Monitoring","Live Stream Dashboard","Sales Agent","Permutation Calculator","Dowell Customer Support Centre","Secure Repositories","Secure Data"]
-            for i in range(len(product_list)):
-                main["username"]=[user]
-                main["product"]=product_list[i]
-                main["portfolio_code"]=i+1
-                # print(main)
-                data["portfolio"].append(main.copy())
+
+            default = {
+              "org_id": user,
+              "org_name":user,
+              "username": [user],
+              "member_type": "owner",
+              "product": "all",
+              "data_type": "Real_data",
+              "operations_right": "Add/Edit",
+              "role": "owner",
+              "security_layer": "None",
+              "portfolio_name": "default",
+              "portfolio_code": "123456",
+              "portfolio_specification": "",
+              "portfolio_uni_code": "default",
+              "portfolio_details": "",
+              "status": "enable"
+            }
+
+            data["portpolio"].append(default)
+            data["document_name"] = user
+            data["Username"] = user
+            update_data1 = {"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
+            data["profile_info"].update(update_data1)
+            data["organisations"][0]["org_name"]=user
+            update_data2 = {"first_name":first,"last_name":last,"email":email}
+            data["members"]["team_members"]["accept_members"][0].update(update_data2)
+            client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data,"nil")
+            client_admin_res = json.loads(client_admin)
+            org_id = client_admin_res["inserted_id"]
 
             # Change document name and username
             data["document_name"] = user
@@ -456,6 +486,7 @@ def register(request):
                 return render(request, 'after_register_v2.html', {'user': user})
         else:
             return HttpResponse("check")
+        
     else:
         ...
     return render(request, 'register_v2.html', {'title': 'Register here', 'country_resp': country_codes, 'org': orgs, 'type': _type})
@@ -501,9 +532,11 @@ def login(request):
     
     saved_browser_session = request.session.session_key
     if saved_browser_session:
-        if orgs:
+        if orgs: # Invite link
             return redirect(f'https://100093.pythonanywhere.com/invitelink?session_id={saved_browser_session}&org={orgs}&type={type1}&name={name1}&code={code}&spec={spec}&u_code={u_code}&detail={detail}')
-        elif redirect_url:
+        elif "code=masterlink" in main_params or "code=masterlink1" in main_params:
+            return redirect(f'https://100093.pythonanywhere.com/masterlink?session_id={saved_browser_session}&{main_params}')
+        elif redirect_url: # redirect_url params
             logindetail = CustomSession.objects.filter(
                 sessionID=saved_browser_session).first()
             info = json.loads(logindetail.info)
@@ -519,7 +552,6 @@ def login(request):
                     return redirect(f'https://ll07-team-dowell.github.io/Jobportal?session_id={session}')
             else:
                 return HttpResponse(f"<script>window.location.replace('{url}?session_id={session}');</script>")
-                return redirect(f'{url}?session_id={session}')
         elif hr_invitation:
             hr_invitation = jwt.decode(
                 jwt=hr_invitation, key='secret', algorithms=["HS256"])
@@ -1239,3 +1271,55 @@ def allow_location(request):
             return HttpResponse("User not found")
     else:
         return HttpResponse("Not location given to update..")
+
+from django.db.models import Count
+from django.db.models.functions import TruncDay
+def userdetails(request):
+    products_list=["Client_admin","Exhibitoe form","Living Lab Admin","Workflow AI"]
+    field={}
+    details=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",field,"nil")
+    ok=json.loads(details)
+    users=[]
+    count=0
+    team_members=[]
+    public_members=[]
+    owners=[]
+    for data in ok["data"]:
+        count+=1
+        for team in data["members"]["team_members"]["accept_members"]:
+            if not team["name"] in team_members:
+                if not team["name"]=="owner":
+                    team_members.append(team["name"])
+                else:
+                    owners.append(data["document_name"])
+        for guest in data["members"]["guest_members"]["accept_members"]:
+            users.append(guest["name"])
+        for public in data["members"]["public_members"]["accept_members"]:
+            try:
+                public_members.append(public["username"])
+            except:
+                pass
+    team_members=list(set(team_members))
+    owners=list(set(owners))
+    public_members=list(set(public_members))
+    users=list(set(users))
+    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
+    obj_live=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S")).values_list('username', flat=True).order_by('username').distinct()
+    response={'users':len(set(obj_live).intersection(users)),'live_team_members':len(set(obj_live).intersection(team_members)),'live_public_members':len(set(obj_live).intersection(public_members)),'live_owners':len(set(obj_live).intersection(owners))}
+    current={}
+    weekly={}
+    for product in products_list:
+        product_wise=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
+        current[product]={'team_members':len(set(product_wise).intersection(team_members)),'public_members':len(set(product_wise).intersection(public_members)),'users':len(set(product_wise).intersection(users)),'owners':len(set(product_wise).intersection(owners))}
+        weekly[product]={}
+        for r in range(0,7):
+            date_start= datetime.datetime.now()-datetime.timedelta(days=r+1)
+            date_end=datetime.datetime.now()-datetime.timedelta(days=r)
+            if range ==0:
+                date_end=datetime.datetime.now()+datetime.timedelta(days=1)
+            obj=LiveStatus.objects.filter(updated__gt=date_start.strftime("%Y-%m-%d %H:%M:%S"),updated__lte=date_end.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
+            weekly[product][r]=len(obj)
+    response["current"]=current
+    response["weekly"]=weekly
+    resp=response
+    return render(request,'login/userdetails1.html',{"resp":resp})
