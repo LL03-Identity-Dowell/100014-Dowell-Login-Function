@@ -149,8 +149,8 @@ const LogIn = () => {
       ) : (
         <div className="flex w-full items-center justify-center border border-solid border-gray-600 rounded-xl mt-0">
           <div
-            className="flex flex-col justify-between md:flex-row md:space-x-4 space-y-2 md:space-y-0 bg-yellow-50
-           w-full max-w-3xl md:p-2 rounded-xl shadow-lg text-gray-500 overflow-hidden"
+            className="flex flex-col justify-between md:flex-row space-y-2 bg-yellow-50
+           w-full max-w-3xl rounded-xl shadow-lg text-gray-500 overflow-hidden"
           >
             <div className="flex flex-col md:w-1/2 p-4 space-y-8 bg-gradient-to-r from-yellow-50 to-gray-50">
               <h2 className="text-2xl bg-green-600 bg-clip-text text-transparent">

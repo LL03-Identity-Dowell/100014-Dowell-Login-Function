@@ -8,7 +8,6 @@ import FAQ from "../pages/FAQ";
 import { getCategoryIcon } from "../utils/getCategoryIcon";
 import { MdClose } from "react-icons/md";
 import { FiMenu } from "react-icons/fi";
-import { NavLink } from "react-router-dom";
 import sideImage from "../assets/images/sideImage.webp";
 
 function classNames(...classes) {
