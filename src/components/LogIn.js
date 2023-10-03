@@ -179,7 +179,7 @@ const LogIn = () => {
                 className="z-10 bg-yellow-50 rounded-xl drop-shadow-sm
               p-4 text-gray-700 border border-solid border-green-200 space-y-2"
               >
-                <div className="flex flex-col space-y-2 px-2 w-72">
+                <div className="flex flex-col space-y-2 px-2 w-auto">
                   <p className="label">Select your language</p>
                   <LanguageDropdown
                     selectedLanguage={userLanguage}
