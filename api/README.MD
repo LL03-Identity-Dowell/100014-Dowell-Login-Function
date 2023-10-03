@@ -197,7 +197,7 @@ Required fields
 - username
 - usage
   - "create_account" if you're using this api for register page.
-  - "update_email" if you're using this pai for profile_update.
+  - "update_email" if you're using this page for profile_update.
   - "forgot_password" for respective page
   - "forgot_username" for respective page.
 

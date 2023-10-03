@@ -1489,11 +1489,9 @@ def main_login(request):
         obj.save(update_fields=['current_task'])
     except:
         pass
-    random_session_obj1 = RandomSession.objects.filter(
-        username=username).first()
+    random_session_obj1 = RandomSession.objects.filter(username=username).first()
     if random_session_obj1 is None:
-        random_session_obj = RandomSession.objects.filter(
-            sessionID=random_session).first()
+        random_session_obj = RandomSession.objects.filter(sessionID=random_session).first()
         if random_session_obj is None:
             return Response({'msg': 'error', 'info': 'Please accept the terms in policy page!'})
         random_session_obj.username = username
