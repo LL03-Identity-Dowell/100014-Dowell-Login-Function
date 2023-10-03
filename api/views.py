@@ -1209,14 +1209,14 @@ def PublicApi(request):
 
 @api_view(['GET', 'POST'])
 def login_init_api(request):
-    # masterlink1
     if request.method == "POST":
         mainparams = request.data.get('mainparams', None)
-        context = {}
+        context = {'msg': 'success'}
         past_login = request.COOKIES.get('DOWELL_LOGIN')
 
         main_params = request.get_full_path()
         main_params = main_params[main_params.find('?')+1:]
+
         if "code=masterlink1" in main_params:
           link_url = f"linklogin?{main_params}"
           return Response({'url': link_url})
@@ -1267,22 +1267,23 @@ def login_init_api(request):
                         response[
                             "url"] = f'https://100093.pythonanywhere.com/home?session_id={past_login}'
                     return Response(response)
+        
         random_text = passgen.generate_random_password1(24)
         context["random_session"] = random_text
+
         if request.COOKIES.get('qrid_login'):
-            context["qrid_login"] = request.COOKIES.get('qrid_login')
-        qrid_obj_1 = QR_Creation.objects.filter(
-            qrid=context["qrid_login"]).first()
-        if qrid_obj_1.info == "":
+          context["qrid_login"] = request.COOKIES.get('qrid_login')
+          qrid_obj_1 = QR_Creation.objects.filter(qrid=context["qrid_login"]).first()
+          if qrid_obj_1.info == "":
             context["qrid_login_type"] = "new"
-        else:
+          else:
             context["qrid_login_type"] = "old"
-        res = Response()
-        res.data = context
-        return res
-    else:
-        qrid_obj = QR_Creation.objects.filter(status="new").first()
-        if qrid_obj is None:
+          res = Response()
+          res.data = context
+          return res
+        else:
+          qrid_obj = QR_Creation.objects.filter(status="new").first()
+          if qrid_obj is None:
             ruser = passgen.generate_random_password1(24)
             rpass = "DoWell@123"
             new_obj = QR_Creation.objects.create(
@@ -1295,7 +1296,7 @@ def login_init_api(request):
             res.set_cookie('qrid_login', new_obj.qrid, max_age=365*24*60*60)
             res.data = context
             return res
-        else:
+          else:
             qrid_obj.status = "used"
             qrid_obj.save(update_fields=['status'])
 
