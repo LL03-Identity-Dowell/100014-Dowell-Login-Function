@@ -11,6 +11,7 @@ import {
   registerUser,
   sendEmailOTP,
   sendMobileOTP,
+  validateUsernameAsync,
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
@@ -107,7 +108,7 @@ const SignUp = () => {
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { loading, error, registered, otpSent, smsSent } =
+  const { loading, error, registered, otpSent, smsSent, isUsernameAvailable } =
     useSelector((state) => state.registration) || {};
 
   const {
@@ -202,6 +203,12 @@ const SignUp = () => {
       return () => clearTimeout(smsTimer);
     }
   }, [smsCountdown]);
+
+  // username validation
+  const handleUsernameChange = async (event) => {
+    const newUsername = event.target.value;
+    await dispatch(validateUsernameAsync(newUsername));
+  };
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -322,10 +329,17 @@ const SignUp = () => {
                   autoComplete="Username"
                   className="input-field"
                   {...register("Username")}
+                  onChange={handleUsernameChange}
                 />
                 {errors.Username && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.Username.message}
+                  </p>
+                )}
+
+                {isUsernameAvailable && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {isUsernameAvailable.msg}
                   </p>
                 )}
               </div>

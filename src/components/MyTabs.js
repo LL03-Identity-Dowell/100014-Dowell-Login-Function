@@ -9,6 +9,8 @@ import { getCategoryIcon } from "../utils/getCategoryIcon";
 import { MdClose } from "react-icons/md";
 import { FiMenu } from "react-icons/fi";
 import sideImage from "../assets/images/sideImage.webp";
+import { useMediaQuery } from "react-responsive";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -17,6 +19,9 @@ function classNames(...classes) {
 const MyTabs = () => {
   const [tabMenuOpen, setTabMenuOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
+
+  // Use media queries to determine the screen size
+  const isMobile = useMediaQuery({ maxWidth: 767 });
 
   const toggleTabMenu = () => {
     setTabMenuOpen(!tabMenuOpen);
@@ -35,11 +40,19 @@ const MyTabs = () => {
       <div className="w-full max-w-3xl mx-auto md:py-2 sm:px-0">
         <div className="relative items-center md:flex md:flex-row">
           <div className="flex justify-between items-center p-2">
-            <img
-              src={sideImage}
-              alt="DoWell logo"
-              className="mt-4 h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
-            />
+            {isMobile ? (
+              <img
+                src={DoWellVerticalLogo}
+                alt="DoWell logo"
+                className="mt-4 h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
+              />
+            ) : (
+              <img
+                src={sideImage}
+                alt="DoWell logo"
+                className="mt-4 h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
+              />
+            )}
 
             <div className="md:hidden">
               <button
