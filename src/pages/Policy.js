@@ -32,10 +32,8 @@ const Policy = () => {
       ) : (
         <Iframe
           url={getIframeURL()}
-          width="100%"
-          height="330px"
           id="myFrame"
-          className="py-1"
+          className="py-1 w-full h-[500px] md:h-[350px]"
           display="initial"
           position="relative"
           scrolling="yes"
