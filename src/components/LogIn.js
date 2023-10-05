@@ -111,11 +111,11 @@ const LogIn = () => {
   return (
     <>
       {loading || redirecting ? (
-        <div className="flex flex-col justify-center items-center h-screen">
-          <div className="flex flex-col justify-center items-center">
-            <div className="relative w-48 h-48">
+        <div className="w-full items-center justify-center rounded-xl mt-0 bg-gray-50">
+          <div className="flex flex-col w-full rounded-xl shadow-lg text-gray-500 overflow-hidden">
+            <div className="relative w-48 h-48 mx-auto">
               {/* Spinner */}
-              <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center z-30">
+              <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center z-10">
                 <RotatingLines
                   visible={true}
                   height={96}
@@ -129,21 +129,19 @@ const LogIn = () => {
 
               {/* Timer (background) */}
               {showTimer && (
-                <div className="absolute inset-0 flex items-center justify-center z-20">
+                <div className="absolute inset-0 flex items-center justify-center">
                   <img src={Timer} alt="Loading timer" className="w-10 h-8" />
                 </div>
               )}
             </div>
-          </div>
 
-          <div className="flex flex-col items-center">
-            <Iframe
-              url={iframeURL()}
-              width="100%"
-              height="330px"
-              id="myiFrame"
-              className="py-4 px-6"
-            />
+            <div className="">
+              <Iframe
+                url={iframeURL()}
+                className="py-1 w-full h-[500px] md:h-[350px]"
+                id="myiFrame"
+              />
+            </div>
           </div>
         </div>
       ) : (

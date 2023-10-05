@@ -39,18 +39,18 @@ const MyTabs = () => {
     <Tab.Group>
       <div className="w-full max-w-3xl mx-auto md:py-2 sm:px-0">
         <div className="relative items-center md:flex md:flex-row">
-          <div className="flex justify-between items-center p-2">
+          <div className="flex justify-between items-center">
             {isMobile ? (
               <img
                 src={DoWellVerticalLogo}
                 alt="DoWell logo"
-                className="mt-4 h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
+                className="h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
               />
             ) : (
               <img
                 src={sideImage}
                 alt="DoWell logo"
-                className="mt-4 h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
+                className="mr-2 h-14 w-14 drop md:h-full rounded-lg md:w-32 drop-shadow-lg border border-solid border-black"
               />
             )}
 

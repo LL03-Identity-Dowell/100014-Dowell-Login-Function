@@ -3,12 +3,11 @@ import MyTabs from "../components/MyTabs";
 import { useDispatch, useSelector } from "react-redux";
 import { initSessionID } from "../redux/initSlice";
 import { Radio } from "react-loader-spinner";
-import { NavLink, Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 const Home = () => {
   const dispatch = useDispatch();
   const { initSession, isLoading, error } = useSelector((state) => state.init);
-  // const navigate = useNavigate();
 
   // Get the query parameters
   const urlString = window.location.href;
@@ -65,7 +64,7 @@ const Home = () => {
       ) : error ? (
         <Navigate to="/503" />
       ) : (
-        <div className="isolate py-4 md:px-4">
+        <div className="isolate md:py-4 md:px-4">
           <div className="shadow-sm mx-auto md:mt-14 max-w-5xl px-2 py-2 md:py-6 md:px-6">
             <MyTabs />
           </div>
