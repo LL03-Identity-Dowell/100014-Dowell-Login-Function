@@ -1,11 +1,8 @@
 import React, { useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const checkRequests = (Wrapped) => {
   function CheckRequests(props) {
-    const navigate = useNavigate();
-
     useEffect(() => {
       axios.interceptors.response.use(
         function (response) {
@@ -15,7 +12,7 @@ const checkRequests = (Wrapped) => {
         function (error) {
           switch (error.response.status) {
             case 503:
-              navigate("/503"); //we will redirect user into 503 page
+              props.history.push("/503"); //we will redirect user into 503 page
               break;
             default:
               break;
@@ -24,7 +21,7 @@ const checkRequests = (Wrapped) => {
           return Promise.reject(error);
         }
       );
-    }, [navigate]); // Add navigate as a dependency to avoid stale closure
+    }); // Add navigate as a dependency to avoid stale closure
 
     return <Wrapped {...props} />;
   }
