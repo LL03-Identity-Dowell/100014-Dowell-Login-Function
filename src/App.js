@@ -12,8 +12,10 @@ import NotFound from "./pages/NotFound";
 import ChangePassword from "./components/changePassword";
 import ForgotPassword from "./components/forgotPassword";
 import UsersData from "./pages/usersData";
+import checkRequests from "./Hoc/CheckRequests";
+import Error503 from "./pages/Error503";
 
-function App() {
+function App(props) {
   return (
     <>
       <Router>
@@ -31,11 +33,12 @@ function App() {
           <Route path="/beta/faq" element={<FAQ />} />
           <Route path="/beta/usersData" element={<UsersData />} />
 
-          <Route path="*" component={NotFound} />
+          <Route path="*" element={<NotFound />} />
+          <Route path="/503" element={<Error503 />} />
         </Routes>
       </Router>
     </>
   );
 }
 
-export default App;
+export default checkRequests(App);

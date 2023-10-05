@@ -67,7 +67,6 @@ const Home = () => {
           </div>
         </div>
       )}
-      {error && <p className="text-red-500">{error}</p>}
     </>
   );
 };

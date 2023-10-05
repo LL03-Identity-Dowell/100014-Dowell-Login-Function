@@ -3,22 +3,6 @@ import axios from "axios";
 
 const base_url = "https://100014.pythonanywhere.com";
 
-export const validateUsernameAsync = createAsyncThunk(
-  "registration/validateUsernameAsync",
-  async (username) => {
-    try {
-      const response = await axios.post(`${base_url}/api/validate_username/`, {
-        username,
-      });
-      console.log("object", response.data);
-
-      return response.data;
-    } catch (error) {
-      throw new Error(error.message);
-    }
-  }
-);
-
 // Async thunk function to handle the email OTP request.
 export const sendEmailOTP = createAsyncThunk(
   "registration/sendEmailOTP",
@@ -112,7 +96,6 @@ const registrationSlice = createSlice({
     otpSent: false,
     smsSent: false,
     error: null,
-    isUsernameAvailable: null,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -150,18 +133,6 @@ const registrationSlice = createSlice({
         state.registered = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      })
-      .addCase(validateUsernameAsync.pending, (state) => {
-        state.loading = true;
-        state.isUsernameAvailable = null;
-      })
-      .addCase(validateUsernameAsync.fulfilled, (state, action) => {
-        state.loading = false;
-        state.isUsernameAvailable = action.payload;
-      })
-      .addCase(validateUsernameAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });
