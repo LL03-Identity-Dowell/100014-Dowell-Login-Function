@@ -27,10 +27,6 @@ function App(props) {
           <Route path="/forgot_password" element={<ForgotPassword />} />
           <Route path="/change_password" element={<ChangePassword />} />
           <Route path="/forgot_username" element={<UsernameForgot />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/help" element={<Help />} />
-          <Route path="/faq" element={<FAQ />} />
           <Route path="/usersData" element={<UsersData />} />
 
           <Route path="*" element={<NotFound />} />
