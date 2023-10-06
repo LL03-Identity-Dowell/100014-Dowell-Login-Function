@@ -67,10 +67,14 @@ const schema = yup.object().shape({
     .string()
     .required("Phone number is required")
     .matches(/^\d{9,15}$/, "Phone number must have 9 to 15 digits"),
-  sms: yup
-    .string()
-    .required("SMS is required")
-    .matches(/^[0-9]+$/, "SMS must contain only numbers"),
+  sms: yup.string().when("exempted", {
+    is: false,
+    then: yup
+      .string()
+      .required("SMS is required")
+      .matches(/^[0-9]+$/, "SMS must contain only numbers"),
+    otherwise: yup.string(),
+  }),
   Profile_Image: yup
     .mixed()
     .test("fileFormat", "Unsupported file format", (value) => {
@@ -628,7 +632,7 @@ const SignUp = () => {
                     placeholder="Enter OTP from SMS"
                     autoComplete="sms"
                     className="input-field"
-                    {...register("sms", { required: exempted })}
+                    {...register("sms", { required: !exempted })}
                     disabled={exempted}
                   />
                   {errors.sms && (
