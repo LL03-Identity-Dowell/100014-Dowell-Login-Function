@@ -20,18 +20,18 @@ function App(props) {
     <>
       <Router>
         <Routes>
-          <Route exact path="/beta" element={<Home />} />
-          <Route path="/beta/signup" element={<SignUp />} />
-          <Route exact path="/beta/logout" element={<SignOutPage />} />
-          <Route path="/beta/splash/:Username" element={<SplashPage />} />
-          <Route path="/beta/forgotPassword" element={<ForgotPassword />} />
-          <Route path="/beta/changePassword" element={<ChangePassword />} />
-          <Route path="/beta/username" element={<UsernameForgot />} />
-          <Route path="/beta/chat" element={<Chat />} />
-          <Route path="/beta/policy" element={<Policy />} />
-          <Route path="/beta/help" element={<Help />} />
-          <Route path="/beta/faq" element={<FAQ />} />
-          <Route path="/beta/usersData" element={<UsersData />} />
+          <Route exact path="/" element={<Home />} />
+          <Route path="/register" element={<SignUp />} />
+          <Route exact path="/logout" element={<SignOutPage />} />
+          <Route path="/splash/:Username" element={<SplashPage />} />
+          <Route path="/forgot_password" element={<ForgotPassword />} />
+          <Route path="/change_password" element={<ChangePassword />} />
+          <Route path="/forgot_username" element={<UsernameForgot />} />
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/policy" element={<Policy />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/usersData" element={<UsersData />} />
 
           <Route path="*" element={<NotFound />} />
           <Route path="/503" element={<Error503 />} />

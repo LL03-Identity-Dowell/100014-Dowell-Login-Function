@@ -159,24 +159,21 @@ const LogIn = () => {
                 <p className=" text-gray-500 text-base">
                   Do not remember username or password?
                 </p>
-                <Link to="/beta/forgotPassword">
+                <Link to="/forgot_password">
                   <span className="text-green-500 text-base">Click here</span>
                 </Link>
               </div>
 
               <div className="text-gray-500 text-base">
                 <p>Don't have an account?</p>
-                <Link to={`/beta/signup?${mainparams}`}>
+                <Link to={`/register?${mainparams}`}>
                   <span className="text-green-500 text-base">Sign up</span>
                 </Link>
               </div>
             </div>
 
             <div className="relative md:w-96">
-              <div
-                className="z-10 bg-yellow-50 rounded-xl drop-shadow-sm
-              p-4 text-gray-700 border border-solid border-green-200 space-y-2"
-              >
+              <div className="z-10 bg-yellow-50 rounded-xl drop-shadow-sm p-4 text-gray-700 border border-solid border-green-200 space-y-2">
                 <div className="flex flex-col space-y-2 px-2 w-auto">
                   <p className="label">Select your language</p>
                   <LanguageDropdown

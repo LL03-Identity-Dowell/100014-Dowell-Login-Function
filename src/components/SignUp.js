@@ -11,7 +11,6 @@ import {
   registerUser,
   sendEmailOTP,
   sendMobileOTP,
-  validateUsernameAsync,
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
@@ -138,7 +137,7 @@ const SignUp = () => {
   useEffect(() => {
     if (registered) {
       navigate(
-        `/beta/splash/${watch().Username}${mainParams ? `/${mainParams}` : ""}`
+        `/splash/${watch().Username}${mainParams ? `?${mainParams}` : ""}`
       );
     }
   }, [registered, navigate, watch, mainParams]);
@@ -737,7 +736,7 @@ const SignUp = () => {
           </div>
           <div className="flex items-center justify-center">
             <div className="w-60 rounded-md bg-green-300 py-2.5 mt-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 text-center">
-              <Link to="/beta">Do have an account? Log in</Link>
+              <Link to="/">Do have an account? Log in</Link>
             </div>
           </div>
         </form>
