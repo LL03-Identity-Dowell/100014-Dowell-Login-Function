@@ -67,14 +67,7 @@ const schema = yup.object().shape({
     .string()
     .required("Phone number is required")
     .matches(/^\d{9,15}$/, "Phone number must have 9 to 15 digits"),
-  sms: yup.string().when("exempted", {
-    is: false,
-    then: yup
-      .string()
-      .required("SMS is required")
-      .matches(/^[0-9]+$/, "SMS must contain only numbers"),
-    otherwise: yup.string(),
-  }),
+  sms: yup.string().matches(/^[0-9]+$/, "SMS must contain only numbers"),
   Profile_Image: yup
     .mixed()
     .test("fileFormat", "Unsupported file format", (value) => {
@@ -114,6 +107,12 @@ const SignUp = () => {
   const { loading, error, registered, otpSent, smsSent } =
     useSelector((state) => state.registration) || {};
 
+  const conditionalSchema = !exempted
+    ? schema
+    : yup.object().shape({
+        sms: yup.string().nullable(),
+      });
+
   const {
     handleSubmit,
     register,
@@ -122,7 +121,7 @@ const SignUp = () => {
     setValue,
     getValues,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(conditionalSchema),
   });
 
   // a hook to redirect the user to the signin page
@@ -216,16 +215,18 @@ const SignUp = () => {
       user_type,
       Email,
       Password,
-      confirm_Password,
+      confirm_password,
       user_country,
       phonecode,
       Phone,
       otp,
-      sms,
       Profile_Image,
       policy_status,
       newsletter,
     } = watch();
+
+    // Determine the value of sms based on the exempted checkbox
+    const smsValue = exempted ? null : getValues("sms");
 
     // Dispatch the registerUser action with the form data
     dispatch(
@@ -236,12 +237,12 @@ const SignUp = () => {
         user_type,
         Email,
         Password,
-        confirm_Password,
+        confirm_password,
         user_country,
         phonecode,
         Phone,
         otp,
-        sms,
+        sms: smsValue,
         Profile_Image,
         policy_status,
         newsletter,
@@ -604,8 +605,9 @@ const SignUp = () => {
                         name="exempt-checkbox"
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                        onChange={() => setExempted(!exempted)}
-                        checked={exempted}
+                        // onChange={() => setExempted(!exempted)}
+                        // checked={exempted}
+                        onChange={(e) => setExempted(e.target.checked)}
                       />
                     </div>
                     <div className="text-sm leading-6">
@@ -632,7 +634,7 @@ const SignUp = () => {
                     placeholder="Enter OTP from SMS"
                     autoComplete="sms"
                     className="input-field"
-                    {...register("sms", { required: !exempted })}
+                    {...register("sms")}
                     disabled={exempted}
                   />
                   {errors.sms && (

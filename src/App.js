@@ -1,10 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import SignUp from "./components/SignUp";
-import Policy from "./pages/Policy";
-import Chat from "./pages/Chat";
-import Help from "./pages/Help";
-import FAQ from "./pages/FAQ";
 import UsernameForgot from "./components/UsernameForgot";
 import SplashPage from "./pages/SplashPage";
 import SignOutPage from "./pages/SignOutPage";
@@ -16,6 +12,8 @@ import checkRequests from "./Hoc/CheckRequests";
 import Error503 from "./pages/Error503";
 
 function App(props) {
+  /* TODO: change routes to /beta version */
+
   return (
     <>
       <Router>

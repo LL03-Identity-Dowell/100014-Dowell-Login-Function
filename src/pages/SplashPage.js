@@ -24,8 +24,7 @@ const SplashPage = () => {
           </h1>
           <p className="text-gray-600 mb-4 text-center">
             User{" "}
-            <strong className="underline text-green-500">{Username}</strong>
-            {""}
+            <strong className="underline text-green-500">{Username}</strong>{" "}
             successfully registered!
           </p>
           <div className="flex flex-row items-center justify-center mt-20">
