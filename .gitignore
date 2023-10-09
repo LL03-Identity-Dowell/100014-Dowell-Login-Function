@@ -135,3 +135,6 @@ local.py
 node_modules
 .DS_Store
 node_modules
+
+test.py
+data.json
