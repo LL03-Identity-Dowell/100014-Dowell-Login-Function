@@ -27,7 +27,7 @@ export const sendMobileOTP = createAsyncThunk(
   "registration/sendMobileOTP",
   async ({ phonecode, Phone }) => {
     try {
-      const response = await axios.post(`${base_url}/api/register/`, {
+      const response = await axios.post(`${base_url}/api/mobilesms/`, {
         phonecode,
         Phone,
       });

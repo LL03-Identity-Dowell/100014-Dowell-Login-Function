@@ -93,7 +93,7 @@ const schema = yup.object().shape({
 
 const SignUp = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
-  const [attemptsSms, setAttemptsSms] = useState(5);
+  const [attemptsSms, setAttemptsSms] = useState(1);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
@@ -101,6 +101,7 @@ const SignUp = () => {
   // Use the custom hook to handle the email and SMS sent messages
   const [emailMessages, setEmailMessage] = useTimedMessage();
   const [smsMessages, setSmsMessage] = useTimedMessage();
+  const [verificationRequested, setVerificationRequested] = useState(false);
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
@@ -154,6 +155,7 @@ const SignUp = () => {
       if (email && username) {
         dispatch(sendEmailOTP({ email, username, usage: "create_account" }));
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
+        setVerificationRequested(true);
       }
     }
   };
@@ -173,6 +175,7 @@ const SignUp = () => {
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
         setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
+        setVerificationRequested(true);
       }
     } else {
       setExempted(true);
@@ -208,29 +211,8 @@ const SignUp = () => {
 
   // dispatch registered user
   const registeredUserInfo = () => {
-    const {
-      Firstname,
-      Lastname,
-      Username,
-      user_type,
-      Email,
-      Password,
-      confirm_password,
-      user_country,
-      phonecode,
-      Phone,
-      otp,
-      Profile_Image,
-      policy_status,
-      newsletter,
-    } = watch();
-
-    // Determine the value of sms based on the exempted checkbox
-    const smsValue = exempted ? null : getValues("sms");
-
-    // Dispatch the registerUser action with the form data
-    dispatch(
-      registerUser({
+    if (verificationRequested) {
+      const {
         Firstname,
         Lastname,
         Username,
@@ -242,12 +224,37 @@ const SignUp = () => {
         phonecode,
         Phone,
         otp,
-        sms: smsValue,
         Profile_Image,
         policy_status,
         newsletter,
-      })
-    );
+      } = watch();
+
+      // Determine the value of sms based on the exempted checkbox
+      const smsValue = exempted ? null : getValues("sms");
+
+      // Dispatch the registerUser action with the form data
+      dispatch(
+        registerUser({
+          Firstname,
+          Lastname,
+          Username,
+          user_type,
+          Email,
+          Password,
+          confirm_password,
+          user_country,
+          phonecode,
+          Phone,
+          otp,
+          sms: smsValue,
+          Profile_Image,
+          policy_status,
+          newsletter,
+        })
+      );
+    } else {
+      throw new Error(error.response.data.info);
+    }
   };
 
   return (
@@ -605,8 +612,6 @@ const SignUp = () => {
                         name="exempt-checkbox"
                         type="checkbox"
                         className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                        // onChange={() => setExempted(!exempted)}
-                        // checked={exempted}
                         onChange={(e) => setExempted(e.target.checked)}
                       />
                     </div>
