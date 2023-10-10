@@ -20,7 +20,7 @@ function App(props) {
         <Routes>
           <Route exact path="/" element={<Home />} />
           <Route path="/register" element={<SignUp />} />
-          <Route exact path="/logout" element={<SignOutPage />} />
+          <Route exact path="/sign-out" element={<SignOutPage />} />
           <Route path="/splash/:Username" element={<SplashPage />} />
           <Route path="/forgot_password" element={<ForgotPassword />} />
           <Route path="/change_password" element={<ChangePassword />} />
