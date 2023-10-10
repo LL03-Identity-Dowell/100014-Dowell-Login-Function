@@ -49,7 +49,7 @@ const SignOutPage = () => {
           />
         </div>
         <div className="pt-6 md:p-8 text-center md:text-left space-y-8">
-          <div className="md:flex rounded-xl p-6 md:p-0 dark:bg-slate-800 space-y-6 space-x-2 md:space-x-6 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden">
+          <div className="md:flex rounded-xl p-6 md:p-0 space-y-6 space-x-2 md:space-x-6 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden">
             <div className="pt-6 md:p-8 text-center md:text-left space-y-4 flex flex-col justify-between">
               <h3 className="font-base text-slate-900">
                 Scan QR Code to contribute your comments and suggestions about
@@ -77,7 +77,7 @@ const SignOutPage = () => {
             </div>
           </div>
 
-          <div className="rounded-xl p-8  dark:bg-slate-800 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden space-y-4">
+          <div className="rounded-xl p-8 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden space-y-4">
             <p className="text-gray-600 mb-4 text-center">
               Thank you, Do you want to exit?
             </p>
@@ -135,7 +135,7 @@ const SignOutPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col p-8 rounded-xl dark:bg-slate-800 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden space-y-4">
+          <div className="flex flex-col p-8 rounded-xl text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden space-y-4">
             <p className="text-gray-600 mb-4 text-center">
               Do you wish to recommend this application to your friend?
             </p>
