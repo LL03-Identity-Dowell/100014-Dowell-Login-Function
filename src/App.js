@@ -12,8 +12,6 @@ import checkRequests from "./Hoc/CheckRequests";
 import Error503 from "./pages/Error503";
 
 function App(props) {
-  /* TODO: change routes to /beta version */
-
   return (
     <>
       <Router>
