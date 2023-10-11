@@ -6,9 +6,9 @@ const api_url = "https://100014.pythonanywhere.com/api/login_init_api/";
 // Async Thunks
 export const initSessionID = createAsyncThunk(
   "init/initSessionID",
-  async ({ mainparams }) => {
+  async ({ mainparams, redirectUrl }) => {
     try {
-      const response = await axios.post(api_url, { mainparams });
+      const response = await axios.post(api_url, { mainparams, redirectUrl });
       return response?.data;
     } catch (error) {
       throw new Error("Error generating init session ID:", error);

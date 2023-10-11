@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
@@ -46,6 +46,13 @@ const LogIn = () => {
         .join("&")
     : "";
 
+  // Use the useLocation hook to access the URL parameters
+  const locationParams = useLocation();
+  const queryParams = new URLSearchParams(locationParams.search);
+
+  // Extract the redirect_url parameter from the query parameters
+  const redirectUrl = queryParams.get("redirect_url");
+
   // Handle user information
   const handleUserInfo = async (e) => {
     e.preventDefault();
@@ -68,6 +75,7 @@ const LogIn = () => {
       location,
       randomSession,
       mainparams,
+      redirectUrl,
     };
 
     try {

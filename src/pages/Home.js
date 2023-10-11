@@ -3,7 +3,7 @@ import MyTabs from "../components/MyTabs";
 import { useDispatch, useSelector } from "react-redux";
 import { initSessionID } from "../redux/initSlice";
 import { Radio } from "react-loader-spinner";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -22,9 +22,17 @@ const Home = () => {
         .join("&")
     : "";
 
+  // Use the useLocation hook to access the URL parameters
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
+  // Extract the redirect_url parameter from the query parameters
+  const redirectUrl = queryParams.get("redirect_url");
+
   const handleLoadingPage = async (e) => {
     const userData = {
       mainparams,
+      redirectUrl,
     };
 
     try {

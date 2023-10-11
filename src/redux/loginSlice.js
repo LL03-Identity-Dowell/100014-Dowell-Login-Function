@@ -18,6 +18,7 @@ export const loginUser = createAsyncThunk(
     browser,
     mainparams,
     randomSession,
+    redirectUrl,
   }) => {
     try {
       const response = await axios.post(api_url, {
@@ -33,6 +34,7 @@ export const loginUser = createAsyncThunk(
         browser,
         mainparams,
         randomSession,
+        redirectUrl,
       });
 
       if (response?.data.msg === "success") {
