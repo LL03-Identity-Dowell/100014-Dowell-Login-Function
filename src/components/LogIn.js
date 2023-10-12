@@ -121,7 +121,7 @@ const LogIn = () => {
       {loading || redirecting ? (
         <div className="w-full items-center justify-center rounded-xl mt-0 bg-gray-50">
           <div className="flex flex-col w-full rounded-xl shadow-lg text-gray-500 overflow-hidden">
-            <div className="relative w-48 h-48 mx-auto">
+            <div className="relative w-32 h-32 md:w-48 md:h-48 mx-auto">
               {/* Spinner */}
               <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center z-10">
                 <RotatingLines
@@ -146,7 +146,7 @@ const LogIn = () => {
             <div className="">
               <Iframe
                 url={iframeURL()}
-                className="py-1 w-full h-[500px] md:h-[350px]"
+                className="py-1 w-full h-[192px] md:h-[250px]"
                 id="myiFrame"
               />
             </div>
