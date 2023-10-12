@@ -41,7 +41,8 @@ const schema = yup.object().shape({
 const ForgotPassword = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [passwordMessages, setPasswordMessage] = useTimedMessage();
+  const [otpMessages, setOtpMessages] = useTimedMessage();
+  const [passwordMessages, setPasswordMessages] = useTimedMessage();
 
   const dispatch = useDispatch();
   const { loading, otpSent, passwordReset, error } =
@@ -76,6 +77,7 @@ const ForgotPassword = () => {
     formState: { errors },
     setValue,
     getValues,
+    watch,
   } = useForm({ resolver: yupResolver(conditionalSchema) });
 
   const handleSendOTP = (data) => {
@@ -105,15 +107,6 @@ const ForgotPassword = () => {
     }
   };
 
-  // Use useEffect to show the email message when otpSent becomes true
-  useEffect(() => {
-    if (otpSent || passwordReset) {
-      setPasswordMessage(otpSent || passwordReset, "success", 10000);
-    } else {
-      setPasswordMessage(error, "error", 10000);
-    }
-  }, [otpSent, passwordReset, error]);
-
   // Countdown timer for OTP
   useEffect(() => {
     if (otpCountdown > 0) {
@@ -123,6 +116,24 @@ const ForgotPassword = () => {
       return () => clearTimeout(otpTimer);
     }
   }, [otpCountdown]);
+
+  // Use useEffect to show the email and error message
+  useEffect(() => {
+    if (otpSent) {
+      setOtpMessages(otpSent, "success", 5000);
+    } else {
+      setOtpMessages(error, "error", 5000);
+    }
+  }, [otpSent, error]);
+
+  // Use useEffect to show the password and error message
+  useEffect(() => {
+    if (passwordReset) {
+      setPasswordMessages(passwordReset, "success", 5000);
+    } else {
+      setPasswordMessages(error, "error", 5000);
+    }
+  }, [passwordReset, error]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -164,9 +175,9 @@ const ForgotPassword = () => {
                 className="input-field"
                 {...register("username")}
               />
-              {errors?.username && (
+              {errors.username && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors?.username?.message}
+                  {errors.username.message}
                 </p>
               )}
             </div>
@@ -186,9 +197,9 @@ const ForgotPassword = () => {
                 className="input-field"
                 {...register("email")}
               />
-              {errors?.email && (
+              {errors.email && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors?.email?.message}
+                  {errors.email.message}
                 </p>
               )}
             </div>
@@ -196,7 +207,7 @@ const ForgotPassword = () => {
               <div className="flex flex-row space-x-3 items-center">
                 <button
                   className="btn-send px-2 py-1 self-start"
-                  onClick={handleSubmit(handleSendOTP)}
+                  onClick={() => handleSendOTP(watch())}
                   disabled={
                     loading || (otpSent && otpCountdown) || attemptsOtp === 0
                   }
@@ -215,11 +226,11 @@ const ForgotPassword = () => {
                     "Get OTP"
                   )}
                 </button>
-                {passwordMessages.map((msg) => (
+                {otpMessages.map((msg) => (
                   <p
                     key={msg.id}
                     className={`text-base font-normal ${
-                      msg.type === "success" ? "text-green-600" : "text-red-500"
+                      msg.type === "success" ? "text-green-500" : "text-red-500"
                     }`}
                   >
                     {msg.message}
@@ -267,7 +278,7 @@ const ForgotPassword = () => {
               className="input-field"
               {...register("otp")}
             />
-            {errors?.otp && (
+            {errors.otp && (
               <p className="text-red-500 text-xs mt-1">{errors.otp.message}</p>
             )}
           </div>

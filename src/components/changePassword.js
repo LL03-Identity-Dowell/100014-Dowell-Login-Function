@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import { Radio } from "react-loader-spinner";
 import PasswordInput from "./passwordInput";
 import { useDispatch, useSelector } from "react-redux";
 import { changePasswordAsync } from "../redux/changePasswordSlice";
+import useTimedMessage from "./useTimedMessage";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -36,6 +37,8 @@ const schema = yup.object().shape({
 });
 
 const ChangePassword = () => {
+  const [passwordMessages, setPasswordMessages] = useTimedMessage();
+
   const dispatch = useDispatch();
   const { loading, changePassword, error } =
     useSelector((state) => state.changePassword) || {};
@@ -54,6 +57,15 @@ const ChangePassword = () => {
       dispatch(changePasswordAsync(data));
     }
   };
+
+  // Use useEffect to show the password and error message
+  useEffect(() => {
+    if (changePassword) {
+      setPasswordMessages(changePassword, "success", 5000);
+    } else {
+      setPasswordMessages(error, "error", 5000);
+    }
+  }, [changePassword, error]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -165,11 +177,17 @@ const ChangePassword = () => {
                   "Change Password"
                 )}
               </button>
-              {changePassword && (
-                <p className="text-green-500 font-base">{changePassword}</p>
-              )}
 
-              {error && <p className="text-red-500">{error}</p>}
+              {passwordMessages.map((msg) => (
+                <p
+                  key={msg.id}
+                  className={`text-base font-normal ${
+                    msg.type === "success" ? "text-green-600" : "text-red-500"
+                  }`}
+                >
+                  {msg.message}
+                </p>
+              ))}
             </div>
 
             <div className="flex items-center justify-center">

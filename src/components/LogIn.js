@@ -118,7 +118,7 @@ const LogIn = () => {
     return url;
   };
 
-  // Use useEffect to show the email message when otpSent becomes true or false
+  // Use useEffect to show the login message
   useEffect(() => {
     if (userInfo) {
       setLoginMessage(userInfo.info, "success", 5000);
