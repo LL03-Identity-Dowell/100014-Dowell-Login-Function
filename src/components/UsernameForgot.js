@@ -23,7 +23,8 @@ const schema = yup.object().shape({
 const UsernameForgot = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [emailMessages, setEmailMessage] = useTimedMessage();
+  const [otpMessages, setOtpMessages] = useTimedMessage();
+  const [usernameMessages, setUsernameMessages] = useTimedMessage();
 
   const {
     handleSubmit,
@@ -48,13 +49,6 @@ const UsernameForgot = () => {
     }
   };
 
-  // Use useEffect to show the email message when otpSent becomes true
-  useEffect(() => {
-    if (otpSent) {
-      setEmailMessage(otpSent, 10000);
-    }
-  }, [otpSent]);
-
   // Countdown timer for OTP
   useEffect(() => {
     if (otpCountdown > 0) {
@@ -64,6 +58,24 @@ const UsernameForgot = () => {
       return () => clearTimeout(otpTimer);
     }
   }, [otpCountdown]);
+
+  // Use useEffect to show the email message when otpSent becomes true
+  useEffect(() => {
+    if (otpSent) {
+      setOtpMessages(otpSent, "success", 5000);
+    } else {
+      setOtpMessages(error, "error", 5000);
+    }
+  }, [otpSent, error]);
+
+  // Use useEffect to show the email message when otpSent becomes true
+  useEffect(() => {
+    if (usernameList) {
+      setUsernameMessages(usernameList, "success", 5000);
+    } else {
+      setUsernameMessages(error, "error", 5000);
+    }
+  }, [usernameList, error]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -131,10 +143,12 @@ const UsernameForgot = () => {
                     "Get OTP"
                   )}
                 </button>
-                {emailMessages.map((msg) => (
+                {otpMessages.map((msg) => (
                   <p
                     key={msg.id}
-                    className="text-base font-normal text-green-600"
+                    className={`text-base font-normal ${
+                      msg.type === "success" ? "text-green-500" : "text-red-500"
+                    }`}
                   >
                     {msg.message}
                   </p>
@@ -168,29 +182,27 @@ const UsernameForgot = () => {
             </div>
           </div>
 
-          {otpSent && (
+          <div className="mt-2.5">
+            <label className="label" htmlFor="otp">
+              Enter OTP from Email <span className="text-red-500">*</span>
+            </label>
             <div className="mt-2.5">
-              <label className="label" htmlFor="otp">
-                Enter OTP from Email <span className="text-red-500">*</span>
-              </label>
-              <div className="mt-2.5">
-                <input
-                  type="text"
-                  name="otp"
-                  id="otp"
-                  placeholder="Enter OTP from Email"
-                  autoComplete="otp"
-                  className="input-field"
-                  {...register("otp", { required: otpSent })}
-                />
-                {errors?.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
-                )}
-              </div>
+              <input
+                type="text"
+                name="otp"
+                id="otp"
+                placeholder="Enter OTP from Email"
+                autoComplete="otp"
+                className="input-field"
+                {...register("otp", { required: otpSent })}
+              />
+              {errors?.otp && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.otp.message}
+                </p>
+              )}
             </div>
-          )}
+          </div>
 
           <div className="mt-4">
             <button type="submit" className="submit-btn" disabled={loading}>
@@ -208,11 +220,16 @@ const UsernameForgot = () => {
                 "Verify"
               )}
             </button>
-            <p className="text-base font-normal text-green-600">
-              {usernameList}
-            </p>
-
-            {error && <p className="text-red-500">{error}</p>}
+            {usernameMessages.map((msg) => (
+              <p
+                key={msg.id}
+                className={`text-base font-normal ${
+                  msg.type === "success" ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {msg.message}
+              </p>
+            ))}
           </div>
           <div className="flex items-center justify-center">
             <div className="w-60 rounded-md bg-green-300 py-2.5 mt-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 text-center">

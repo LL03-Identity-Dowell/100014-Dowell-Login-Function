@@ -325,7 +325,7 @@ const ForgotPassword = () => {
               <p
                 key={msg.id}
                 className={`text-base font-normal ${
-                  msg.type === "success" ? "text-green-600" : "text-red-500"
+                  msg.type === "success" ? "text-green-500" : "text-red-500"
                 }`}
               >
                 {msg.message}
