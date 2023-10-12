@@ -41,7 +41,7 @@ const schema = yup.object().shape({
 const ForgotPassword = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [emailMessages, setEmailMessage] = useTimedMessage();
+  const [passwordMessages, setPasswordMessage] = useTimedMessage();
 
   const dispatch = useDispatch();
   const { loading, otpSent, passwordReset, error } =
@@ -107,10 +107,12 @@ const ForgotPassword = () => {
 
   // Use useEffect to show the email message when otpSent becomes true
   useEffect(() => {
-    if (otpSent) {
-      setEmailMessage(otpSent, 10000);
+    if (otpSent || passwordReset) {
+      setPasswordMessage(otpSent || passwordReset, "success", 10000);
+    } else {
+      setPasswordMessage(error, "error", 10000);
     }
-  }, [otpSent]);
+  }, [otpSent, passwordReset, error]);
 
   // Countdown timer for OTP
   useEffect(() => {
@@ -213,10 +215,12 @@ const ForgotPassword = () => {
                     "Get OTP"
                   )}
                 </button>
-                {emailMessages.map((msg) => (
+                {passwordMessages.map((msg) => (
                   <p
                     key={msg.id}
-                    className="text-base font-normal text-green-600"
+                    className={`text-base font-normal ${
+                      msg.type === "success" ? "text-green-600" : "text-red-500"
+                    }`}
                   >
                     {msg.message}
                   </p>
@@ -250,51 +254,45 @@ const ForgotPassword = () => {
             </div>
           </div>
 
-          {otpSent && (
-            <>
-              <div className="mt-2.5">
-                <label className="label" htmlFor="otp">
-                  Enter OTP from Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="otp"
-                  id="otp"
-                  placeholder="Enter OTP from Email"
-                  autoComplete="otp"
-                  className="input-field"
-                  {...register("otp")}
-                />
-                {errors?.otp && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.otp.message}
-                  </p>
-                )}
-              </div>
+          <div className="mt-2.5">
+            <label className="label" htmlFor="otp">
+              Enter OTP from Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="otp"
+              id="otp"
+              placeholder="Enter OTP from Email"
+              autoComplete="otp"
+              className="input-field"
+              {...register("otp")}
+            />
+            {errors?.otp && (
+              <p className="text-red-500 text-xs mt-1">{errors.otp.message}</p>
+            )}
+          </div>
 
-              <div className="mt-2">
-                <PasswordInput
-                  name="new_password"
-                  register={register}
-                  value={getValues("new_password")}
-                  errors={errors}
-                  isConfirm={false}
-                  onChange={setValue}
-                />
-              </div>
+          <div className="mt-2">
+            <PasswordInput
+              name="new_password"
+              register={register}
+              value={getValues("new_password")}
+              errors={errors}
+              isConfirm={false}
+              onChange={setValue}
+            />
+          </div>
 
-              <div className="mt-2">
-                <PasswordInput
-                  name="confirm_password"
-                  register={register}
-                  value={getValues("confirm_password")}
-                  errors={errors}
-                  isConfirm={true}
-                  onChange={setValue}
-                />
-              </div>
-            </>
-          )}
+          <div className="mt-2">
+            <PasswordInput
+              name="confirm_password"
+              register={register}
+              value={getValues("confirm_password")}
+              errors={errors}
+              isConfirm={true}
+              onChange={setValue}
+            />
+          </div>
 
           <div className="mt-4">
             <button type="submit" className="submit-btn" disabled={loading}>
@@ -312,12 +310,16 @@ const ForgotPassword = () => {
                 "Change Password"
               )}
             </button>
-            {passwordReset && (
-              <p className="text-base font-normal text-green-600">
-                {passwordReset}
+            {passwordMessages.map((msg) => (
+              <p
+                key={msg.id}
+                className={`text-base font-normal ${
+                  msg.type === "success" ? "text-green-600" : "text-red-500"
+                }`}
+              >
+                {msg.message}
               </p>
-            )}
-            {error && <p className="text-red-500">{error}</p>}
+            ))}
           </div>
 
           <div className="flex items-center justify-center">

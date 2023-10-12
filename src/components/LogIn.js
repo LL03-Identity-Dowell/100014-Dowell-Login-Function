@@ -9,12 +9,14 @@ import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
 import Iframe from "react-iframe";
+import useTimedMessage from "./useTimedMessage";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
   const [username, setUsername] = useState("");
   const [redirecting, setRedirecting] = useState(false);
+  const [loginMessages, setLoginMessage] = useTimedMessage();
 
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
@@ -115,6 +117,15 @@ const LogIn = () => {
     const url = `https://100014.pythonanywhere.com/check_status?username=${username}`;
     return url;
   };
+
+  // Use useEffect to show the email message when otpSent becomes true or false
+  useEffect(() => {
+    if (userInfo) {
+      setLoginMessage(userInfo.info, "success", 5000);
+    } else if (error) {
+      setLoginMessage(error, "error", 5000);
+    }
+  }, [userInfo, error]);
 
   return (
     <>
@@ -235,13 +246,18 @@ const LogIn = () => {
                       Login
                     </button>
 
-                    {userInfo && (
-                      <p className="text-green-500 font-base">
-                        {userInfo.info}
+                    {loginMessages.map((msg) => (
+                      <p
+                        key={msg.id}
+                        className={`text-sm font-normal ${
+                          msg.type === "success"
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {msg.message}
                       </p>
-                    )}
-
-                    {error && <p className="text-red-500">{error}</p>}
+                    ))}
                   </div>
                 </form>
               </div>
