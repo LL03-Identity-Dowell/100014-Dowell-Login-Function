@@ -99,8 +99,9 @@ const SignUp = () => {
   const [exempted, setExempted] = useState(false);
 
   // Use the custom hook to handle the email and SMS sent messages
-  const [emailMessages, setEmailMessage] = useTimedMessage();
-  const [smsMessages, setSmsMessage] = useTimedMessage();
+  const [emailMessages, setEmailMessages] = useTimedMessage();
+  const [smsMessages, setSmsMessages] = useTimedMessage();
+  const [registeredMessages, setRegisteredMessages] = useTimedMessage();
   const [verificationRequested, setVerificationRequested] = useState(false);
 
   const dispatch = useDispatch();
@@ -160,12 +161,24 @@ const SignUp = () => {
     }
   };
 
+  // Countdown timer for OTP
+  useEffect(() => {
+    if (otpCountdown > 0) {
+      const otpTimer = setTimeout(() => {
+        setOtpCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000); // 1 second
+      return () => clearTimeout(otpTimer);
+    }
+  }, [otpCountdown]);
+
   // Use useEffect to show the email message when otpSent becomes true
   useEffect(() => {
     if (otpSent) {
-      setEmailMessage(otpSent, 10000); // Show the email message for 10 seconds
+      setEmailMessages(otpSent, "success", 5000);
+    } else {
+      setEmailMessages(error, "error", 5000);
     }
-  }, [otpSent]);
+  }, [otpSent, error]);
 
   // Dispatch mobile sms
   const handleMobileOTP = (data) => {
@@ -182,23 +195,6 @@ const SignUp = () => {
     }
   };
 
-  // Use useEffect to show the email message when otpSent becomes true
-  useEffect(() => {
-    if (smsSent) {
-      setSmsMessage(smsSent, 10000); // Show the SMS message for 10 seconds
-    }
-  }, [smsSent]);
-
-  // Countdown timer for OTP
-  useEffect(() => {
-    if (otpCountdown > 0) {
-      const otpTimer = setTimeout(() => {
-        setOtpCountdown((prevCountdown) => prevCountdown - 1);
-      }, 1000); // 1 second
-      return () => clearTimeout(otpTimer);
-    }
-  }, [otpCountdown]);
-
   // Countdown timer for SMS
   useEffect(() => {
     if (smsCountdown > 0) {
@@ -208,6 +204,24 @@ const SignUp = () => {
       return () => clearTimeout(smsTimer);
     }
   }, [smsCountdown]);
+
+  // Use useEffect to show the sms message when smsSent becomes true
+  useEffect(() => {
+    if (smsSent) {
+      setSmsMessages(smsSent, "success", 5000);
+    } else {
+      setSmsMessages(error, "error", 5000);
+    }
+  }, [smsSent, error]);
+
+  // Use useEffect to show registered message when registered becomes true
+  useEffect(() => {
+    if (registered) {
+      setRegisteredMessages(registered, "success", 5000);
+    } else {
+      setRegisteredMessages(error, "error", 5000);
+    }
+  }, [registered, error]);
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -433,7 +447,11 @@ const SignUp = () => {
                   {emailMessages.map((msg) => (
                     <p
                       key={msg.id}
-                      className="text-base font-normal text-green-600"
+                      className={`text-base font-normal ${
+                        msg.type === "success"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
                     >
                       {msg.message}
                     </p>
@@ -582,7 +600,11 @@ const SignUp = () => {
                   {smsMessages.map((msg) => (
                     <p
                       key={msg.id}
-                      className="text-base font-normal text-green-600"
+                      className={`text-base font-normal ${
+                        msg.type === "success"
+                          ? "text-green-500"
+                          : "text-red-500"
+                      }`}
                     >
                       {msg.message}
                     </p>
@@ -625,7 +647,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            {smsSent && !exempted && (
+            {!exempted && (
               <div>
                 <label htmlFor="sms" className="label">
                   Enter OTP from SMS <span className="text-red-500">*</span>
@@ -741,9 +763,16 @@ const SignUp = () => {
                 "Join as a new member"
               )}
             </button>
-            <p className="text-base font-normal text-green-600">{registered}</p>
-
-            {error && <p className="text-red-500">{error}</p>}
+            {registeredMessages.map((msg) => (
+              <p
+                key={msg.id}
+                className={`text-base font-normal ${
+                  msg.type === "success" ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                {msg.message}
+              </p>
+            ))}
           </div>
           <div className="flex items-center justify-center">
             <div className="w-60 rounded-md bg-green-300 py-2.5 mt-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 text-center">
