@@ -85,10 +85,12 @@ const schema = yup.object().shape({
   policy_status: yup
     .boolean()
     .required("Please accept the Terms & Conditions")
-    .oneOf([true], "Please accept the Terms & Conditions"),
+    .oneOf([true], "Please accept the Terms & Conditions")
+    .default(false),
   newsletter: yup
     .boolean()
-    .oneOf([true], "Accept Newsletter Terms & Conditions"),
+    .oneOf([true], "Accept Newsletter Terms & Conditions")
+    .default(false),
 });
 
 const SignUp = () => {
@@ -122,6 +124,7 @@ const SignUp = () => {
     watch,
     setValue,
     getValues,
+    reset,
   } = useForm({
     resolver: yupResolver(conditionalSchema),
   });
@@ -269,6 +272,9 @@ const SignUp = () => {
     } else {
       throw new Error(error.response.data.info);
     }
+
+    // Reset the form after successful submission
+    reset();
   };
 
   return (
