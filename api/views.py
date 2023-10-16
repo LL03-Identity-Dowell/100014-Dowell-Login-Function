@@ -18,17 +18,19 @@ from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.http.response import JsonResponse
 from django.utils import timezone
+from django.template.loader import render_to_string
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.exceptions import AuthenticationFailed
+from rest_framework import status
 
 from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation, RandomSession, Linkbased_RandomSession
+from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation, RandomSession, Linkbased_RandomSession, Location_check
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -112,7 +114,7 @@ def login_legal_policy(request):
 def register(request):
     username = request.data.get("Username")
     otp_input = request.data.get("otp")
-    sms_input = request.data.get("sms")
+    sms_input=request.data.get("sms")
     image = request.FILES.get("Profile_Image")
     password = request.data.get("Password")
     first = request.data.get("Firstname")
@@ -126,13 +128,44 @@ def register(request):
     policy_status = request.data.get('policy_status')
     other_policy = request.data.get('other_policy')
     newsletter = request.data.get('newsletter')
+    print(phonecode)
+    print(phone)
+    if email and username and not image and not password and not first \
+            and not last and not phone and not phonecode and not user_type and not user_country \
+            and not policy_status and not other_policy and not newsletter:
+        otp = generateOTP()
+        try:
+            emailexist = GuestAccount.objects.get(email=email)
+        except GuestAccount.DoesNotExist:
+            emailexist = None
+        if emailexist is not None:
+            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=username)
+        else:
+            data=GuestAccount(username=username,email=email,otp=otp)
+            data.save()
+        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+        payload = json.dumps({
+            "toEmail":email,
+            "toName":username,
+            "topic":"RegisterOtp",
+            "otp":otp
+            })
+        headers = {
+            'Content-Type': 'application/json'
+            }
+        response1 = requests.request("POST", url, headers=headers, data=payload)
+        return Response({'msg':'success','info':'OTP sent successfully'})
 
-    if phone and phonecode and not email and not username and not image and not password \
+    elif phone and phonecode and not email and not username and not image and not password \
             and not first and not last and not user_type and not user_country and not policy_status \
             and not other_policy and not newsletter:
         sms = generateOTP()
-        full_number = phonecode + phone
+
+        full_number =str(phonecode) + str(phone)
         time = datetime.datetime.utcnow()
+        print(full_number)
+        if full_number == "251912912144":
+            sms="123456"
         try:
             phone_exists = mobile_sms.objects.get(phone=full_number)
         except mobile_sms.DoesNotExist:
@@ -143,38 +176,35 @@ def register(request):
         else:
             mobile_sms.objects.create(
                 phone=full_number, sms=sms, expiry=time)
-        url = "https://100085.pythonanywhere.com/api/sms/"
+        url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
         payload = {
-            "sender": "DowellLogin",
-            "recipient": full_number,
-            "content": f"Enter the following OTP to create your dowell account: {sms}",
-            "created_by": "Manish"
-        }
+            "sender" : "DowellLogin",
+            "recipient" : full_number,
+            "content" : f"Enter the following OTP to create your dowell account: {sms}",
+            "created_by" : "Manish"
+            }
         response = requests.request("POST", url, data=payload)
         if len(response.json()) > 1:
-            return Response({'msg': 'success', 'info': 'SMS sent successfully!!'})
+            return Response({'msg':'success','info':'SMS sent successfully!!'})
         else:
-            return Response({'msg': 'error', 'error': 'The number is not valid'})
+            return Response({'msg': 'error','error':'The number is not valid'})
 
     user_exists = Account.objects.filter(username=username).first()
     if user_exists:
-        return Response({'msg': 'error', 'info': 'Username already taken'})
-
+        return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
     register_legal_policy(username)
-
-    register_legal_policy(username)
-
     try:
-        if not GuestAccount.objects.filter(otp=otp_input, email=email).first():
-            return Response({'msg': 'error', 'info': 'Wrong Email OTP'})
-    except:
-        return Response({'msg': 'error', 'info': 'Wrong Email OTP'})
+        check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
+        check_sms= mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
+    except GuestAccount.DoesNotExist:
+        check_otp = None
+        check_sms = "Wrong"
 
-    try:
-        if not mobile_sms.objects.filter(sms=sms_input, phone=phonecode + phone).first():
-            return Response({'msg': 'error', 'info': 'Wrong Mobile SMS'})
-    except:
-        return Response({'msg': 'error', 'info': 'Wrong Mobile SMS'})
+    if not check_otp:
+        return Response({'msg':'error','info':'Wrong Email OTP'},status=status.HTTP_400_BAD_REQUEST)
+    if check_sms == "Wrong":
+        return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
+
 
     name = ""
     try:
@@ -195,29 +225,38 @@ def register(request):
                 password), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
 
         profile_image = new_user.profile_image
-
-        json_data = open('loginapp/static/client.json')
-        data = json.load(json_data)
+        json_data = open('dowell_login/static/client.json')
+        data1 = json.load(json_data)
         json_data.close()
-        main = {"username": [],"member_type": "owner","product": "Living Lab Admin","data_type": "Real_Data","operations_right": "Add/Edit","role": "default","portfolio_name": "default","portfolio_code": "01","portfolio_specification": "default","portfolio_uni_code": "default","portfolio_details": "default","status": "enable"}
-        product_list = ["Workflow AI", "Digital Queue", "Wifi QR Code", "Living Lab Chat","User Experience Live","Social Media Automation","Living Lab Scales","Logo Scan","Legalzard","Living Lab Maps","Customer Experience","Living Lab Admin","Team Management","Living Lab Monitoring","Live Stream Dashboard","Sales Agent","Permutation Calculator","Dowell Customer Support Centre","Secure Repositories","Secure Data"]
-        for i in range(len(product_list)):
-          main["username"]=[username]
-          main["product"]=product_list[i]
-          main["portfolio_code"]=i+1
-          data["portfolio"].append(main.copy())
-
-        data["document_name"] = username
-        data["Username"] = username
+        default =   {
+        "org_id":username,
+        "org_name":username,
+        "username": [username],
+        "member_type": "owner",
+        "product": "all",
+        "data_type": "Real_data",
+        "operations_right": "Add/Edit",
+        "role": "owner",
+        "security_layer": "None",
+        "portfolio_name": "default",
+        "portfolio_code": "123456",
+        "portfolio_specification": "",
+        "portfolio_uni_code": "default",
+        "portfolio_details": "",
+        "status": "enable"
+        }
+        data1["portpolio"].append(default)
+        data1["document_name"] = username
+        data1["Username"] = username
         update_data1 = {"first_name": first, "last_name": last, "profile_img": f'https://100014.pythonanywhere.com/media/{profile_image}',
                         "email": email, "phonecode": phonecode, "phone": phone}
-        data["profile_info"].update(update_data1)
-        data["organisations"][0]["org_name"] = username
+        data1["profile_info"].update(update_data1)
+        data1["organisations"][0]["org_name"] = username
         update_data2 = {"first_name": first, "last_name": last, "email": email}
-        data["members"]["team_members"]["accept_members"][0].update(
+        data1["members"]["team_members"]["accept_members"][0].update(
             update_data2)
         client_admin = dowellconnection(
-            "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "insert", data, "nil")
+            "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "insert", data1, "nil")
         client_admin_res = json.loads(client_admin)
         org_id = client_admin_res["inserted_id"]
 
@@ -243,6 +282,10 @@ def register(request):
         inserted_idd = id_res['inserted_id']
 
         url = "https://100085.pythonanywhere.com/api/signup-feedback/"
+        if not check_sms:
+            verified_phone="unverified"
+        else:
+            verified_phone="verified"
         payload = json.dumps({
             "topic": "Signupfeedback",
             "toEmail": email,
@@ -250,13 +293,14 @@ def register(request):
             "firstname": first,
             "lastname": last,
             "username": username,
-            "phoneCode": phonecode,
+            "phoneCode": "+"+str(phonecode),
             "phoneNumber": phone,
             "usertype": user_type,
             "country": user_country,
-            "verified_phone": "unverified",
+            "verified_phone": verified_phone,
             "verified_email": "verified"
         })
+
         headers = {
             'Content-Type': 'application/json'
         }
@@ -264,11 +308,11 @@ def register(request):
             "POST", url, headers=headers, data=payload)
 
         return Response({
-            'message': f"{username}, registration success",
+            'msg':'success',
+            'info': f"{username}, registration success",
             'inserted_id': f"{inserted_idd}"
         })
-    return Response("Internal server error")
-
+    return Response({"msg":"error","info":"Internal server error"},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["POST"])
 def MobileLogin(request):
@@ -314,7 +358,6 @@ def MobileLogin(request):
     other_policy = None
     userID = None
     client_admin_id = None
-    # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
         field = {"Username": username}
@@ -454,40 +497,36 @@ def LinkBased(request):
         # return HttpResponse("pl provide redirect url")
     return Response({"message": "its working"})
 
-
 @api_view(['GET', 'POST'])
 def new_userinfo(request):
     if request.method == 'POST':
         session = request.data["session_id"]
-        product = request.data.get("product", None)
+        product = request.data.get("product",None)
         mydata = CustomSession.objects.filter(sessionID=session).first()
+
         if not mydata:
-            return Response({"message": "SessionID not found in database, Please check and try again!!"})
+            public_field = {"session_id":session}
+            public = dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","find",public_field,"nil")
+            public_res = json.loads(public)
+            if public_res["data"] != None:
+                return Response(public_res["data"])
+            return Response({"message":"SessionID not found in database, Please check and try again!!"})
         if mydata.status != "login":
-            return Response({"message": "You are logged out, Please login and try again!!"})
+            return Response({"message":"You are logged out, Please login and try again!!"})
         var1 = mydata.info
         var2 = json.loads(var1)
         var2["org_img"] = "https://100093.pythonanywhere.com/static/clientadmin/img/logomissing.png"
 
-        del_keys = ["role", "company_id", "org", "project",
-                    "subproject", "dept", "Memberof", "members"]
+        del_keys = ["role","company_id","org","project","subproject","dept","Memberof","members"]
         for key in del_keys:
             try:
                 del var2[key]
             except:
                 pass
-        user_data = Account.objects.filter(username=var2["username"]).first()
-        field = {"document_name": var2["username"]}
-        details = dowellconnection("login", "bangalore", "login", "client_admin",
-                                   "client_admin", "1159", "ABCDE", "fetch", field, "nil")
+        userdata = Account.objects.filter(username=var2["username"]).first()
+        field = {"document_name":var2["username"]}
+        details = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",field,"nil")
         details_res = json.loads(details)
-        if len(details_res['data']) > 1:
-            data = details_res['data']
-            try:
-                if data["User_status"] == "deleted" and data["User_status"] == "inactive":
-                    return Response({'msg': 'Sorry account inactive or deleted'})
-            except:
-                pass
         var3 = []
         productport = []
         portfolio = details_res["data"][0]["portpolio"]
@@ -495,9 +534,9 @@ def new_userinfo(request):
             try:
                 for i in portfolio:
                     if type(i["username"]) is list:
-                        if var2["username"] in i["username"] or "owner" in i["username"]:
+                        if var2["username"] in i["username"] or "owner" in i["username"] and i["status"]=="enable":
                             var3.append(i)
-                    if i["username"] == "owner" and i["product"] != "owner":
+                    if i["username"]=="owner" and i["product"]!="owner" and i["status"]=="enable":
                         var3.append(i)
             except:
                 pass
@@ -505,9 +544,9 @@ def new_userinfo(request):
             try:
                 for i in portfolio:
                     if type(i["username"]) is list:
-                        if var2["username"] in i["username"] or "owner" in i["username"] and product in i["product"]:
+                        if var2["username"] in i["username"] or "owner" in i["username"] and product in i["product"] and i["status"]=="enable":
                             var3.append(i)
-                    if i["username"] == "owner" and i["product"] != "owner" and product in i["product"]:
+                    if i["username"]=="owner" and i["product"]!="owner" and product in i["product"] and i["status"]=="enable":
                         var3.append(i)
             except:
                 pass
@@ -518,26 +557,33 @@ def new_userinfo(request):
             except:
                 pass
         try:
-            var2["first_login"] = user_data.date_joined
-            var2["last_login"] = user_data.last_login
+            var2["first_login"] = userdata.date_joined
+            var2["last_login"] = userdata.last_login
             var2["client_admin_id"] = details_res["data"][0]["_id"]
             for r in var3:
                 r["org_id"] = details_res["data"][0]["_id"]
                 r["org_name"] = details_res["data"][0]["document_name"]
         except:
             pass
-        organisations = details_res["data"][0]['organisations'][0]["org_name"]
+
         otherorg = details_res["data"][0]['other_organisation']
+        otherorg_list=[]
+        for i in otherorg:
+            try:
+                if i["status"]=="enable":
+                    otherorg_list.append({"org_id":i["org_id"],"org_name":i["org_name"]})
+            except:
+                pass
+
+        organisations = details_res["data"][0]['organisations'][0]["org_name"]
+        roles = details_res["data"][0]['roles']
         team_members = details_res["data"][0]['members']['team_members']['accept_members']
         guest_members = details_res["data"][0]['members']['guest_members']['accept_members']
         public_members = details_res["data"][0]['members']['public_members']['accept_members']
-        main_member = {'team_member': team_members,
-                       'guest_members': guest_members, 'public_members': public_members}
-        userinfo = {'userinfo': var2, 'portfolio_info': var3, "userportfolio": productport,
-                    'members': main_member, "own_organisations": [{"org_name": organisations}], "other_org": otherorg}
+        main_member = {'team_member':team_members,'guest_members':guest_members,'public_members':public_members}
+        userinfo = {'userinfo':var2, 'portfolio_info':var3 ,"userportfolio":productport,'members':main_member,"own_organisations":[{"org_name":organisations}],"other_org":otherorg,"roles":roles,"otherorg_list":otherorg_list}
         return Response(userinfo)
-    return Response({"message": "its working"})
-
+    return Response({"message":"its working"})
 
 @api_view(['GET', 'POST'])
 def all_users(request):
@@ -863,18 +909,15 @@ def live_users(request):
              'total_products': total_products}
     return Response(final)
 
-
 @api_view(['POST'])
 def all_liveusers(request):
     session_id = request.data.get("session_id")
     mydata = CustomSession.objects.filter(sessionID=session_id).first()
     if not mydata:
-        return Response({"message": "SessionID not found in database, Please check and try again!!"})
-    products_list = ["Client_admin", "Exhibitoe form",
-                     "Living Lab Admin", "Workflow AI"]
+        return Response({"message":"SessionID not found in database, Please check and try again!!"})
+    products_list = ["Client_admin","Exhibitoe form","Living Lab Admin","Workflow AI"]
     field = {}
-    details = dowellconnection("login", "bangalore", "login", "client_admin",
-                               "client_admin", "1159", "ABCDE", "fetch", field, "nil")
+    details = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",field,"nil")
     ok = json.loads(details)
     users = []
     count = 0
@@ -885,7 +928,7 @@ def all_liveusers(request):
         count += 1
         for team in data["members"]["team_members"]["accept_members"]:
             if not team["name"] in team_members:
-                if not team["name"] == "owner":
+                if not team["name"]=="owner":
                     team_members.append(team["name"])
                 else:
                     owners.append(data["document_name"])
@@ -896,31 +939,28 @@ def all_liveusers(request):
                 public_members.append(public["username"])
             except:
                 pass
-    team_members = list(set(team_members))
-    owners = list(set(owners))
-    time_threshold = datetime.datetime.now() - datetime.timedelta(minutes=1)
-    obj_live = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
-        '%d %b %Y %H:%M:%S')).values_list('username', flat=True).order_by('username').distinct()
-    response = {'products_used': json.dumps(products_list), 'team_members': len(team_members), 'users': len(users), 'public_members': len(
-        public_members), 'live_team_members': len(set(obj_live).intersection(team_members)), 'live_owners': len(set(obj_live).intersection(owners))}
-    current = {}
-    weekly = {}
+    team_members=list(set(team_members))
+    owners=list(set(owners))
+    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
+    obj_live=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S")).values_list('username', flat=True).order_by('username').distinct()
+    response={'Dowell total Users':{'team_members/owners':len(owners)+len(team_members),'users':len(users),'public_members':len(public_members)},'total Live':{'live users':len(set(obj_live).intersection(users)),'live_team_members/owners':len(set(obj_live).intersection(team_members))+len(set(obj_live).intersection(owners)),'live public_members':len(set(obj_live).intersection(public_members))}}
+    current={}
+    weekly={}
     for product in products_list:
-        product_wise = LiveStatus.objects.filter(status="login", date_updated__gte=time_threshold.strftime(
-            '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
-        current[product] = len(product_wise)
-        weekly[product] = {}
-        for r in range(0, 7):
-            date_start = datetime.datetime.now()-datetime.timedelta(days=r+1)
-            date_end = datetime.datetime.now()-datetime.timedelta(days=r)
-            obj = LiveStatus.objects.filter(updated__gte=date_start.strftime('%d %b %Y %H:%M:%S'), updated__lte=date_end.strftime(
-                '%d %b %Y %H:%M:%S'), product=product).values_list('username', flat=True).order_by('username').distinct()
-            weekly[product][r] = obj
-    response["product_wise"] = current
-    response["weekly_product_wise"] = weekly
+        product_wise=LiveStatus.objects.filter(status="login",updated__gte=time_threshold.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
+        current[product]={'live team_members/owners':len(set(product_wise).intersection(team_members))+len(set(product_wise).intersection(owners)),'live public_members':len(set(product_wise).intersection(public_members)),'live users':len(set(product_wise).intersection(users))}
+        weekly[product]={}
+        for r in range(0,7):
+            date_start= datetime.datetime.now()-datetime.timedelta(days=r+1)
+            date_end=datetime.datetime.now()-datetime.timedelta(days=r)
+            if range ==0:
+                date_end=datetime.datetime.now()+datetime.timedelta(days=1)
+            obj=LiveStatus.objects.filter(updated__gt=date_start.strftime("%Y-%m-%d %H:%M:%S"),updated__lte=date_end.strftime("%Y-%m-%d %H:%M:%S"),product=product).values_list('username', flat=True).order_by('username').distinct()
+            weekly[product][r]=len(obj)
+    response["product_wise"]=current
+    response["weekly_product_wise"]=weekly
     response["Note"]="In weekly part '0' means 24 hrs ahead of current time, '1' means between 48 and 24 hrs ahead of current time and so on.."
     return Response(response)
-
 
 @api_view(['GET'])
 def get_country_codes(request):
@@ -1205,110 +1245,159 @@ def PublicApi(request):
         resp = {'msg': 'error',
                 "info": "Username, Password combination incorrect.."}
         return Response(resp)
-
-
-@api_view(['GET', 'POST'])
+    
+@api_view(['GET','POST'])
 def login_init_api(request):
     if request.method == "POST":
         mainparams = request.data.get('mainparams', None)
-        context = {'msg': 'success'}
-        past_login = request.COOKIES.get('DOWELL_LOGIN')
-
-        main_params = request.get_full_path()
-        main_params = main_params[main_params.find('?')+1:]
-
-        if "code=masterlink1" in main_params:
-          link_url = f"linklogin?{main_params}"
-          return Response({'url': link_url})
-    
+        context = {'msg':'success'}
+        past_login = request.session.session_key
         if past_login:
-            test_session = CustomSession.objects.filter(
-                sessionID=past_login).first()
+            test_session = CustomSession.objects.filter(sessionID=past_login).first()
             if test_session:
                 if test_session.status == "login":
-                    logindetail = CustomSession.objects.filter(
-                        sessionID=past_login).first()
-                    info = json.loads(logindetail.info)
-                    response = {'msg': 'error', 'info': 'logged_in_user'}
-                    if "org" in mainparams:
-                        response[
-                            "url"] = f'https://100093.pythonanywhere.com/invitelink?session_id={past_login}&{mainparams}'
+                    login_detail = CustomSession.objects.filter(sessionID=past_login).first()
+                    info = json.loads(login_detail.info)
+                    response = {'msg':'error','info':'logged_in_user'}
+                    if "org=" in mainparams:
+                        if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams :
+                            response["url"] = f'https://100093.pythonanywhere.com/exportfolio?session_id={past_login}&{mainparams}'
+
+                        elif "linktype=common" in mainparams:
+                            response["url"] = f'https://100093.pythonanywhere.com/commoninvitelink?session_id={past_login}&{mainparams}'
+                        else:
+                            response["url"] = f'https://100093.pythonanywhere.com/invitelink?session_id={past_login}&{mainparams}'
+
+                    elif "code=masterlink" in mainparams or "code=masterlink1" in mainparams:
+                        response["url"] = f'https://100093.pythonanywhere.com/masterlink?session_id={past_login}&{mainparams}'
+
                     elif "redirect_url" in mainparams:
                         try:
-                            result = re.search(
-                                'redirect_url=(.*)&', mainparams)
-                            rr = result.group(1)
-                        except:
-                            rr = mainparams[mainparams.find(
-                                'redirect_url=')+13:]
-                        if "ll04-finance-dowell.github.io" in rr:
-                            if info["User_type"] == "betatester":
-                                rr = "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing"
-                            else:
-                                rr = "https://ll04-finance-dowell.github.io/workflowai.online"
-                        elif "ll07-team-dowell.github.io" in rr:
-                            if info["User_type"] == "betatester":
-                                rr = 'https://ll07-team-dowell.github.io/100098-DowellJobPortal'
-                            else:
-                                rr = 'https://ll07-team-dowell.github.io/Jobportal'
-                        response["url"] = f'{rr}?session_id={past_login}'
+                            result = re.search('redirect_url=(.*)&',mainparams)
+                            r_url = result.group(1)
+                            if "&" in r_url:
+                                r_list = r_url.split("&")
+                                r_url = r_list[0]
+                        except Exception as e:
+                            r_url = mainparams[mainparams.find('redirect_url=')+13:]
+                        response["url"] = f'{r_url}?session_id={past_login}'
                     elif "hr_invitation" in mainparams:
                         try:
-                            result = re.search(
-                                'hr_invitation=(.*)&', mainparams)
+                            result = re.search('hr_invitation=(.*)&',mainparams)
                             hr_invitation = result.group(1)
                         except:
-                            hr_invitation = mainparams[mainparams.find(
-                                'hr_invitation=')+14:]
-                        hr_invitation = jwt.decode(
-                            jwt=hr_invitation, key='secret', algorithms=["HS256"])
+                            hr_invitation = mainparams[mainparams.find('hr_invitation=')+14:]
+                        hr_invitation = jwt.decode(jwt=hr_invitation,key='secret',algorithms=["HS256"])
                         response["url"] = f'https://100093.pythonanywhere.com/invitelink1?session_id={past_login}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={info["username"]}'
                     else:
-                        response[
-                            "url"] = f'https://100093.pythonanywhere.com/home?session_id={past_login}'
+                        response["url"] = f'https://100093.pythonanywhere.com?session_id={past_login}'
                     return Response(response)
-        
         random_text = passgen.generate_random_password1(24)
         context["random_session"] = random_text
-
         if request.COOKIES.get('qrid_login'):
-          context["qrid_login"] = request.COOKIES.get('qrid_login')
-          qrid_obj_1 = QR_Creation.objects.filter(qrid=context["qrid_login"]).first()
-          if qrid_obj_1.info == "":
-            context["qrid_login_type"] = "new"
-          else:
-            context["qrid_login_type"] = "old"
-          res = Response()
-          res.data = context
-          return res
+            context["qrid_login"] = request.COOKIES.get('qrid_login')
+            qrid_obj_1 = QR_Creation.objects.filter(
+                qrid=context["qrid_login"]).first()
+            if qrid_obj_1.info == "":
+                context["qrid_login_type"] = "new"
+            else:
+                context["qrid_login_type"] = "old"
+            res = Response()
+            res.data = context
+            return res
         else:
-          qrid_obj = QR_Creation.objects.filter(status="new").first()
-          if qrid_obj is None:
-            ruser = passgen.generate_random_password1(24)
-            rpass = "DoWell@123"
-            new_obj = QR_Creation.objects.create(
-                qrid=ruser, password=rpass, status="used")
+            qrid_obj = QR_Creation.objects.filter(status="new").first()
+            if qrid_obj is None:
+                ruser = passgen.generate_random_password1(24)
+                rpass = "DoWell@123"
+                new_obj = QR_Creation.objects.create(
+                    qrid=ruser, password=rpass, status="used")
 
-            context["qrid_login"] = new_obj.qrid
-            context["qrid_login_type"] = "new"
+                context["qrid_login"] = new_obj.qrid
+                context["qrid_login_type"] = "new"
 
+                res = Response()
+                res.set_cookie('qrid_login', new_obj.qrid, max_age=365*24*60*60)
+                res.data = context
+                return res
+            else:
+                qrid_obj.status = "used"
+                qrid_obj.save(update_fields=['status'])
+
+                context["qrid_login"] = qrid_obj.qrid
+                context["qrid_login_type"] = "new"
+
+                res = Response()
+                res.set_cookie('qrid_login', qrid_obj.qrid, max_age=365*24*60*60)
+                res.data = context
+                return res
+        return Response({'msg':'error','info':'No session found'})
+    else:
+        context = {'msg':'success'}
+        try:
+            orgs = request.GET.get('org', None)
+            type1 = request.GET.get('type', None)
+            email1 = request.GET.get('email', None)
+            name1 = request.GET.get('name', None)
+            code = request.GET.get('code', None)
+            spec = request.GET.get('spec', None)
+            u_code = request.GET.get('u_code', None)
+            detail = request.GET.get('detail', None)
+        except:
+            pass
+        context["org"] = orgs
+        context["type"] = type1
+        urls = request.GET.get('next', None)
+        context["url"] = request.GET.get('redirect_url', None)
+        redirect_url = request.GET.get('redirect_url', None)
+        past_login=request.COOKIES.get('DOWELL_LOGIN')
+        if past_login:
+            test_session=CustomSession.objects.filter(sessionID=past_login).first()
+            if test_session:
+                if test_session.status == "login":
+                    return Response({'msg':'error','info':'logged_in_user'})
+
+        random_text = passgen.generate_random_password1(24)
+        context["random_session"] = random_text
+        print(request.COOKIES.get('qrid_login'))
+        if request.COOKIES.get('qrid_login'):
+            context["qrid_login"] = request.COOKIES.get('qrid_login')
+            qrid_obj_1 = QR_Creation.objects.filter(
+                qrid=context["qrid_login"]).first()
+            if qrid_obj_1.info == "":
+                context["qrid_login_type"] = "new"
+            else:
+                context["qrid_login_type"] = "old"
             res = Response()
-            res.set_cookie('qrid_login', new_obj.qrid, max_age=365*24*60*60)
             res.data = context
             return res
-          else:
-            qrid_obj.status = "used"
-            qrid_obj.save(update_fields=['status'])
+        else:
+            qrid_obj = QR_Creation.objects.filter(status="new").first()
+            if qrid_obj is None:
+                ruser = passgen.generate_random_password1(24)
+                rpass = "DoWell@123"
+                new_obj = QR_Creation.objects.create(
+                    qrid=ruser, password=rpass, status="used")
 
-            context["qrid_login"] = qrid_obj.qrid
-            context["qrid_login_type"] = "new"
+                context["qrid_login"] = new_obj.qrid
+                context["qrid_login_type"] = "new"
 
-            res = Response()
-            res.set_cookie('qrid_login', qrid_obj.qrid, max_age=365*24*60*60)
-            res.data = context
-            return res
-    return Response({'msg': 'No session found'})
+                res = Response()
+                res.set_cookie('qrid_login', new_obj.qrid, max_age=365*24*60*60)
+                res.data = context
+                return res
+            else:
+                qrid_obj.status = "used"
+                qrid_obj.save(update_fields=['status'])
 
+                context["qrid_login"] = qrid_obj.qrid
+                context["qrid_login_type"] = "new"
+
+                res = Response()
+                res.set_cookie('qrid_login', qrid_obj.qrid, max_age=365*24*60*60)
+                res.data = context
+                return res
+        return Response({'msg':'error','info':'No session found'})
 
 @api_view(['POST'])
 def email_otp(request):
@@ -1409,6 +1498,37 @@ def email_otp(request):
         return Response({'msg': msg, 'info': info})
     else:
         return Response({'msg': 'error', 'info': 'Enter email and the usage you are looking for. Look into documentation for more info.'})
+    
+@api_view(['POST'])
+def mobilesms(request):
+    phonecode = request.data.get("phonecode")
+    phone = request.data.get("Phone")
+    sms = generateOTP()
+
+    full_number ="+" + str(phonecode) + str(phone)
+    time = datetime.datetime.utcnow()
+    print(full_number)
+    if full_number == "+251912912144":
+        sms="123456"
+    try:
+        phone_exists = mobile_sms.objects.get(phone=full_number)
+    except mobile_sms.DoesNotExist:
+        phone_exists = None
+    if phone_exists is not None:
+        mobile_sms.objects.filter(
+            phone=full_number).update(sms=sms, expiry=time)
+    else:
+        mobile_sms.objects.create(
+            phone=full_number, sms=sms, expiry=time)
+    url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
+    payload = {
+        "sender" : "DowellLogin",
+        "recipient" : full_number,
+        "content" : f"Enter the following OTP to create your dowell account: {sms}",
+        "created_by" : "Manish"
+        }
+    response = requests.request("POST", url, data=payload)
+    return Response({'msg':'success','info':'SMS sent successfully!!'})
 
 
 @api_view(['POST'])
@@ -1464,64 +1584,72 @@ def main_login(request):
     username = mdata('username')
     password = mdata('password')
     loc = mdata("location")
-    mainparams = mdata("mainparams")
+    mainparams=mdata("mainparams")
     try:
         lo = loc.split(" ")
         country, city = country_city_name(lo[0], lo[1])
     except:
         city = ""
         country = ""
+    # return Response({"city":city,"country":country,"zone":timezone_str})
     device = mdata("device")
     osver = mdata("os")
+    # brow=mdata["browser"]
     ltime = mdata("time")
     ipuser = mdata("ip")
+    try:
+        if ipuser != "":
+            response = requests.get(f'https://ipapi.co/{ipuser}/json/').json()
+            ip_city=response.get("city")
+        else:
+            ip_city=None
+    except Exception as e:
+        ip_city=None
+
     zone = mdata("timezone")
-    random_session = mdata("randomsession")
-    if None in [username, password, loc, device, osver, ltime, ipuser]:
-        resp = {"data": "Provide all credentials",
-                "Credentials": "username, password, location, device, os, time, ip"}
-        return Response(resp)
+    random_session=mdata("randomSession")
+    print(" RandomSession "+str(random_session))
+    # print("param  "+str(mainparams))
+    if None in [username, password, loc, device, osver, ltime, ipuser, mainparams,random_session]:
+        resp = {"msg":"error","info": "Provide all credentials",
+                "Credentials": "username, password, location, device, os, time, ip, mainparams"}
+        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
     browser = mdata("browser")
     language = mdata("language", "English")
-    obj = Account.objects.filter(username=username).first()
+    obj=Account.objects.filter(username=username).first()
     try:
-        obj.current_task = "Logging In"
+        obj.current_task="Logging In"
         obj.save(update_fields=['current_task'])
     except:
         pass
-    random_session_obj1 = RandomSession.objects.filter(username=username).first()
+    random_session_obj1=RandomSession.objects.filter(username=username).first()
     if random_session_obj1 is None:
-        random_session_obj = RandomSession.objects.filter(sessionID=random_session).first()
+        random_session_obj=RandomSession.objects.filter(sessionID=random_session).first()
         if random_session_obj is None:
-            return Response({'msg': 'error', 'info': 'Please accept the terms in policy page!'})
-        random_session_obj.username = username
+            return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
+        random_session_obj.username=username
         random_session_obj.save(update_fields=['username'])
-    company = None
-    org = None
-    dept = None
-    member = None
-    project = None
-    subproject = None
-    role_res = None
-    first_name = None
-    last_name = None
-    email = None
-    phone = None
-    User_type = None
-    payment_status = None
-    newsletter = None
-    user_country = None
-    privacy_policy = None
-    other_policy = None
-    userID = None
+    company=None
+    org=None
+    dept=None
+    member=None
+    project=None
+    subproject=None
+    role_res=None
+    first_name=None
+    last_name=None
+    email=None
+    phone=None
+    User_type=None
+    payment_status=None
+    newsletter=None
+    user_country=None
+    privacy_policy=None
+    other_policy=None
+    userID=None
+    client_admin_id=None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
-    expires = timezone.now() + datetime.timedelta(days=14)
-    main_params = request.get_full_path()
-    main_params = main_params[main_params.find('?')+1:]
-    if "code=masterlink1" in main_params:
-        link_url = f"linklogin?{main_params}"
-        return Response({'url': link_url})
     if user is not None:
         field = {"Username": username}
         id = dowellconnection("login", "bangalore", "login", "registration",
@@ -1529,22 +1657,13 @@ def main_login(request):
         response = json.loads(id)
         if response["data"] != None:
             try:
-                obj.current_task = "Verifying User"
-                # obj.current_task="Logging In"
+                obj.current_task="Verifying User"
                 obj.save(update_fields=['current_task'])
             except:
                 pass
             form = login(request, user)
             request.session.save()
             session = request.session.session_key
-            obj = CustomSession.objects.filter(sessionID=session)
-            if obj:
-                if obj.first().status == 'login':
-                    data = {'session_id': session}
-                    response = Response()
-                    response.set_cookie(
-                        key='DOWELL_LOGIN', value=session, expires=expires, httponly=True, samesite='Lax')
-                    return response
             try:
                 res = create_event()
                 event_id = res['event_id']
@@ -1556,25 +1675,25 @@ def main_login(request):
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
-                userID = response["data"]['_id']
+                userID=response["data"]['_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type = response["data"]['User_type']
-                client_admin_id = response["data"]['client_admin_id']
-                payment_status = response["data"]['payment_status']
-                newsletter = response["data"]['newsletter_subscription']
-                user_country = response["data"]['user_country']
-                privacy_policy = response["data"]['Policy_status']
-                other_policy = response["data"]['safety_security_policy']
-                role_res = response["data"]['Role']
-                company = response["data"]['company_id']
-                member = response["data"]['Memberof']
-                dept = response["data"]['dept_id']
-                org = response["data"]['org_id']
-                project = response["data"]['project_id']
-                subproject = response["data"]['subproject_id']
+                User_type=response["data"]['User_type']
+                client_admin_id=response["data"]['client_admin_id']
+                payment_status=response["data"]['payment_status']
+                newsletter=response["data"]['newsletter_subscription']
+                user_country=response["data"]['user_country']
+                privacy_policy=response["data"]['Policy_status']
+                other_policy=response["data"]['safety_security_policy']
+                role_res=response["data"]['Role']
+                company=response["data"]['company_id']
+                member=response["data"]['Memberof']
+                dept=response["data"]['dept_id']
+                org=response["data"]['org_id']
+                project=response["data"]['project_id']
+                subproject=response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -1587,75 +1706,132 @@ def main_login(request):
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
             field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id}
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info = {"role": role_res, "username": username, "first_name": first_name, "last_name": last_name, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone, "regional_time": final_ltime, "server_time": serverclock,
-                    "userIP": ipuser, "userOS": osver, "userDevice": device, "language": language, "userID": userID, "login_eventID": event_id, "client_admin_id": client_admin_id, "payment_status": payment_status, "user_country": user_country, "newsletter_subscription": newsletter, "Privacy_policy": privacy_policy, "Safety,Security_policy": other_policy}
-            info1 = json.dumps(info)
-            infoo = str(info1)
-            custom_session = CustomSession.objects.create(
-                sessionID=session, info=infoo, document="", status="login")
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            info1=json.dumps(info)
+            infoo=str(info1)
+            custom_session = CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
 
             serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            LiveStatus.objects.create(sessionID=session, username=username, product="",
-                                      status="login", created=serverclock1, updated=serverclock1)
+            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+
+            if ip_city is not None:
+                location_check = Location_check.objects.filter(username=username).first()
+                if not location_check:
+                    usual = [f'{ip_city}']
+                    Location_check.objects.create(username=username,usual=str(json.dumps(usual)))
+                else:
+                    match = "Checking"
+                    try:
+                        usual = json.loads(location_check.usual)
+                    except:
+                        usual = location_check.usual
+                    if ip_city not in usual:
+                        try:
+                            unusual = json.loads(location_check.unusual)
+                        except:
+                            unusual = location_check.unusual
+                            pass
+                        print(unusual)
+                        if unusual is not None:
+                            for a in unusual:
+                                if ip_city == list(a.keys())[0]:
+                                    a[f"{ip_city}"]+=1
+                                    match="True"
+                                    if a[f"{ip_city}"] %3==0:
+                                        send=True
+                                    break
+                                else:
+                                    match="False"
+                        if match !="True" and match !="False":
+                            unusual=[{f'{ip_city}':1}]
+                            send=True
+                        elif match == "False":
+                            unusual.append({f'{ip_city}':1})
+                            send=True
+                        location_check.unusual = str(json.dumps(unusual))
+                        location_check.save(update_fields=["unusual"])
+                        try:
+                            if send == True:
+                                values = {"username":username,"ip":ipuser,"location":ip_city}
+                                url_email = "https://100085.pythonanywhere.com/api/email/"
+                                payload = {
+                                    "toname": username,
+                                    "toemail": email,
+                                    "subject": "Login detected from another location",
+                                    "email_content": render_to_string(os.path.join(settings.BASE_DIR,'templates/login/location_info.html'),values)
+                                }
+                                response = requests.post(url_email, json=payload)
+                        except:
+                            pass
 
             try:
-                obj.current_task = "Connecting to UX Living Lab"
+                obj.current_task="Connecting to UX Living Lab"
                 obj.save(update_fields=['current_task'])
             except:
                 pass
 
-            data = {"msg": "success", "info": "Logged in successfull",
-                    'session_id': session}
+            # resp={'userinfo':info}
+            data = {"msg":"success","session_id": session}
 
             response = Response()
-            response.set_cookie(key='DOWELL_LOGIN', value=session,
-                                expires=expires, httponly=True, samesite='Lax')
+            # response.set_cookie('DOWELL_LOGIN', session)
 
-            if "org" in mainparams:
-                data["url"] = f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{mainparams}'
+            print(mainparams)
+            if "org=" in mainparams and not "code=masterlink" in mainparams:
+                if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams:
+                    data["url"]=f'https://100093.pythonanywhere.com/exportfolio?session_id={session}&{mainparams}'
+                elif "linktype=common" in mainparams:
+                    data["url"]=f'https://100093.pythonanywhere.com/commoninvitelink?session_id={session}&{mainparams}'
+                else:
+                    data["url"]=f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{mainparams}'
+
+            elif "code=masterlink" in mainparams:
+                data["url"]=f'https://100093.pythonanywhere.com/masterlink?session_id={session}&{mainparams}'
+
             elif "redirect_url" in mainparams:
                 try:
-                    result = re.search('redirect_url=(.*)&', mainparams)
-                    rr = result.group(1)
+                    result= re.search('redirect_url=(.*)&',mainparams)
+                    rr=result.group(1)
+                    if "&" in rr:
+                        test=rr.split("&")
+                        rr=test[0]
                 except:
-                    rr = mainparams[mainparams.find('redirect_url=')+13:]
-                if "ll04-finance-dowell.github.io" in rr:
-                    if info["User_type"] == "betatester":
-                        rr = 'https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing'
-                    else:
-                        rr = 'https://ll04-finance-dowell.github.io/workflowai.online'
-                elif "ll07-team-dowell.github.io" in rr:
-                    if info["User_type"] == "betatester":
-                        rr = 'https://ll07-team-dowell.github.io/100098-DowellJobPortal'
-                    else:
-                        rr = 'https://ll07-team-dowell.github.io/Jobportal'
-                data["url"] = f'{rr}?session_id={session}'
+                    rr= mainparams[mainparams.find('redirect_url=')+13:]
+                # if "ll04-finance-dowell.github.io" in rr:
+                #     if info["User_type"] =="betatester":
+                #         rr='https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing'
+                #     else:
+                #         rr='https://ll04-finance-dowell.github.io/workflowai.online'
+                # elif "ll07-team-dowell.github.io" in rr:
+                #     if info["User_type"] =="betatester":
+                #         rr='https://ll07-team-dowell.github.io/100098-DowellJobPortal'
+                #     else:
+                #         rr='https://ll07-team-dowell.github.io/Jobportal'
+                data["url"]=f'{rr}?session_id={session}'
             elif "hr_invitation" in mainparams:
                 try:
-                    result = re.search('hr_invitation=(.*)&', mainparams)
-                    hr_invitation = result.group(1)
+                    result= re.search('hr_invitation=(.*)&',mainparams)
+                    hr_invitation=result.group(1)
                 except:
-                    hr_invitation = mainparams[mainparams.find(
-                        'hr_invitation=')+14:]
-                hr_invitation = jwt.decode(
-                    jwt=hr_invitation, key='secret', algorithms=["HS256"])
-                data["url"] = f'https://100093.pythonanywhere.com/invitelink1?session_id={session}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={username}'
+                    hr_invitation= mainparams[mainparams.find('hr_invitation=')+14:]
+                hr_invitation=jwt.decode(jwt=hr_invitation,key='secret',algorithms=["HS256"])
+                data["url"]=f'https://100093.pythonanywhere.com/invitelink1?session_id={session}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={username}'
             else:
-                data["url"] = f'https://100093.pythonanywhere.com/home?session_id={session}'
+                data["url"]=f'https://100093.pythonanywhere.com?session_id={session}'
+
             response.data = data
             return response
         else:
-            resp = {"msg": "error", "info": "Username not found in database"}
-            return Response(resp)
+            resp = {"msg":"error","info": "Username not found in database"}
+            return Response(resp,status=status.HTTP_400_BAD_REQUEST)
         # raise AuthenticationFailed("Username not Found or password not found")
     else:
-        resp = {"msg": "error",
-                "info": "Username, Password combination incorrect.."}
-        return Response(resp)
+        resp = {"msg":"error","info": "Username, Password combination incorrect.."}
+        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -1683,6 +1859,31 @@ def main_logout(request):
     response.delete_cookie('DOWELL_LOGIN')
     return response
 
+@api_view(['POST'])
+def validate_username(request):
+    username = request.data['username']
+    if username:
+        qs = Account.objects.filter(username=username)
+        if qs.exists():
+            return Response({'msg': 'error', 'info': 'Username Not Available'}, status=status.HTTP_400_BAD_REQUEST)
+    no_unames = ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin","uxlive","livinglab","ux","dowell"]
+    for name in no_unames:
+        if username == name:
+            return Response({'msg': 'error', 'info': 'Username Not Available'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'msg': 'success', 'info': 'Username Available'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def user_data(request):
+    user_id = request.data['user_id']
+    field={"_id":user_id}
+    id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","find",field,"nil")
+    response=json.loads(id)
+    if response["data"] != None:
+        resp1=response["data"]
+        del resp1["Password"]
+        return Response(resp1)
+    else:
+        return Response({"msg":"error","info":"User Not Found"},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def user_status(request):

@@ -32,5 +32,9 @@ urlpatterns = [
     path('otp_verify/',views.otp_verify,name="otp_verify"),
     path('linklogin/', views.LinkLogin, name='linklogin'),
 
+    path('mobilesms/',views.mobilesms,name="mobilesms"),
+    path('validate_username/', views.validate_username, name='validate-username'),
+    path('user_data/',views.user_data,name="user_data"),
+
 
 ]

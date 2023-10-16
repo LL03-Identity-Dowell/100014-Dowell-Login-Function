@@ -112,10 +112,15 @@ def linked_based(request):
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 def LinkLogin(request):
-    main_params = request.get_full_path()
-    main_params = main_params[main_params.find('?')+1:]
-    url = request.GET.get("redirect_url", None)
-    user = request.GET.get("user", None)
+    mainparams = request.get_full_path()
+    mainparams = mainparams[mainparams.find('?')+1:]
+    r_url = request.GET.get("redirect_url",None)
+    user = request.GET.get("user",None)
+    portfolio_name = request.GET.get("portfolio_name",None)
+    portfolio_code = request.GET.get("portfolio_code",None)
+    org_name = request.GET.get("org_name",None)
+    murl = request.GET.get("mobileapp",None)
+    mobileurl = f'intent://{murl}/_n/mainfeed/#Intent;package={murl};scheme=https;end'
     context = {}
     if request.method == 'POST':
         loc = request.POST["loc"]
@@ -125,27 +130,75 @@ def LinkLogin(request):
         ltime = request.POST["time"]
         ipuser = request.POST["ip"]
         mobconn = request.POST["conn"]
-        if user is None:
-            user = passgen.generate_random_password1(8)
-        random_session = passgen.generate_random_password1(32)
-        field = {"Username": user, "random_session": random_session, "OS": osver, "Device": device, "Browser": brow,
-                 "Location": loc, "Time": str(ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
-        resp = dowellconnection("login", "bangalore", "login", "login",
-                                "login", "6752828281", "ABCDE", "insert", field, "nil")
+        if user is None and portfolio_code is None:
+            field = {"status":"offline"}
+            resp = dowellconnection("login","bangalore","login","public_members","public_members","1242001","ABCDE","fetch",field,"nil")
+            respj = json.loads(resp)
+            this_user = respj["data"][0]
+            del this_user["status"]
+            field_up = {"status":"online"}
+            resp_up = dowellconnection("login","bangalore","login","public_members","public_members","1242001","ABCDE","update",this_user,field_up)
+            respj_up = json.loads(resp_up)
+
+            random_session = passgen.generate_random_password1(32)
+            field_session = {"session_id":random_session,"userinfo":{"Username":this_user["Username"],"OS":osver,"Device":device,"Browser":brow,"Location":loc,"Time":str(ltime),"Connection":mobconn,"qrcode_id":"user6","IP":ipuser}}
+            final = dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field_session,"nil")
+            final_r = json.loads(final)
+            qrcodegen.qrgen1(user,final_r["inserted_id"],f"dowell_login/media/userqrcodes/{final_r['inserted_id']}.png")
+            if murl is not None:
+                return HttpResponse(f'<script>url={mobileurl};window.location.replace(r_url);</script>')
+            if r_url is not None:
+                return redirect(f'{r_url}?qrid={final_r["inserted_id"]}')
+            return HttpResponse("pl provide redirect url")
+
+        field = {"Username":user}
+        resp = dowellconnection("login","bangalore","login","public_members","public_members","1242001","ABCDE","find",field,"nil")
         respj = json.loads(resp)
-        field1 = json.dumps(field)
-        field2 = str(field1)
-        Linkbased_RandomSession.objects.create(
-            sessionID=random_session, info=field2)
-        qrcodegen.qrgen1(
-            user, respj["inserted_id"], f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
-        if "code=masterlink1" in main_params:
-            return redirect(f'https://100093.pythonanywhere.com/masterlink?session_id={random_session}&{main_params}')
+        if respj["data"] == None:
+            return HttpResponse("Username is invalid..")
+        up_field1 = {"status":"online"}
+        resp1 = dowellconnection("login","bangalore","login","public_members","public_members","1242001","ABCDE","update",field,up_field1)
+        respj1 = json.loads(resp1)
+
+        client_field = {"document_name":org_name}
+        client_resp = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","find",client_field,"nil")
+        client_respj = json.loads(client_resp)
+        if client_respj["data"] != None:
+            port=client_respj["data"]["portpolio"]
+            try:
+                for i in port:
+                    if i["portfolio_code"]== portfolio_code:
+                        break
+                if i["portfolio_code"] != portfolio_code:
+                    return HttpResponse("Portfolio Code is invalid..")
+            except:
+                return HttpResponse("Provided data is invalid")
+        else:
+            return HttpResponse("Org Name is invalid..")
+
+        product_list = ["Workflow AI","Living Lab Scales","Legalzard","Permutation Calculator","Team Management","Social Media Automation","Customer Experience", "Living Lab Chat","Living Lab Admin","Wifi QR Code","Living Lab Monitoring","Living Lab API","Secure Repositories"]
+        urls = ["https://ll04-finance-dowell.github.io/workflowai.online","https://100035.pythonanywhere.com/client","https://ll09-legalcompliance-dowell.github.io","https://100050.pythonanywhere.com/calculator","https://ll07-team-dowell.github.io/Jobportal","https://www.socialmediaautomation.uxlivinglab.online","https://ll03-identity-dowell.github.io/100096-DowellChat/#/customer-support","https://ll03-identity-dowell.github.io/100096-DowellChat/#/living-lab-chat","https://100093.pythonanywhere.com/home","https://l.ead.me/dowellwifiqrcode","http://100082.pythonanywhere.com","https://ll05-ai-dowell.github.io/100105-DowellApiKeySystem","https://ll07-team-dowell.github.io/100045-SecureRepository"]
+        if i["product"] in product_list:
+            url = urls[product_list.index(i["product"])]
+        else:
+            url = "https://100014.pythonanywhere.com/testingRoshan"
+
+        i["org_id"] = client_respj["data"]["_id"]
+        random_session = passgen.generate_random_password1(32)
+        field_session = {"session_id":random_session,"userinfo":{"Username":user,"OS":osver,"Device":device,"Browser":brow,"Location":loc,"Time":str(ltime),"Connection":mobconn,"IP":ipuser},"portfolio_info":i,"type":"public_members"}
+        dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field_session,"nil")
+
+
+        return redirect(f'{url}?session_id={random_session}&mainparams')
+
+        if "code=masterlink1" in mainparams:
+            return redirect(f'https://100093.pythonanywhere.com/masterlink?session_id={random_session}&{mainparams}')
+
         if url is not None:
             return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
-        return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}')
-    return render(request, "link_based.html", context)
-
+        return redirect(f'https://100093.pythonanywhere.com/public_link?linklogin_id={random_session}')
+    
+    return render(request,"login/linkbased.html",context)
 
 def register_legal_policy(request):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
