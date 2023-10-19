@@ -1607,24 +1607,26 @@ def main_login(request):
         ip_city=None
 
     zone = mdata("timezone")
-    random_session=mdata("randomSession")
-    print(" RandomSession "+str(random_session))
-    # print("param  "+str(mainparams))
+    random_session = mdata("randomSession")
+    
     if None in [username, password, loc, device, osver, ltime, ipuser, mainparams,random_session]:
         resp = {"msg":"error","info": "Provide all credentials",
                 "Credentials": "username, password, location, device, os, time, ip, mainparams"}
         return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+    
     browser = mdata("browser")
     language = mdata("language", "English")
     obj=Account.objects.filter(username=username).first()
+    
     try:
         obj.current_task="Logging In"
         obj.save(update_fields=['current_task'])
     except:
         pass
-    random_session_obj1=RandomSession.objects.filter(username=username).first()
+    
+    random_session_obj1 = RandomSession.objects.filter(username=username).first()
     if random_session_obj1 is None:
-        random_session_obj=RandomSession.objects.filter(sessionID=random_session).first()
+        random_session_obj = RandomSession.objects.filter(sessionID=random_session).first()
         if random_session_obj is None:
             return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
         random_session_obj.username=username

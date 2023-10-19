@@ -3,6 +3,9 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
+DATABASES = {
+  'default': env.db()
+}
 
 USE_I18N = True
 USE_TZ = True
