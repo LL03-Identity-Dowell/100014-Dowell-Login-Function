@@ -11,6 +11,7 @@ import {
   registerUser,
   sendEmailOTP,
   sendMobileOTP,
+  validateUsernameAsync,
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
@@ -104,11 +105,12 @@ const SignUp = () => {
   const [emailMessages, setEmailMessages] = useTimedMessage();
   const [smsMessages, setSmsMessages] = useTimedMessage();
   const [registeredMessages, setRegisteredMessages] = useTimedMessage();
+  const [usernameMessages, setUsernameMessages] = useTimedMessage();
   const [verificationRequested, setVerificationRequested] = useState(false);
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { loading, error, registered, otpSent, smsSent } =
+  const { loading, error, registered, otpSent, smsSent, isUsernameAvailable } =
     useSelector((state) => state.registration) || {};
 
   const conditionalSchema = !exempted
@@ -269,13 +271,33 @@ const SignUp = () => {
           newsletter,
         })
       );
+
+      // Reset the form after successful submission
+      reset();
     } else {
       throw new Error(error.response.data.info);
     }
-
-    // Reset the form after successful submission
-    reset();
   };
+
+  // Check a username availability
+
+  const checkUsernameAvailability = async () => {
+    const username = watch("Username");
+    if (username) {
+      await dispatch(validateUsernameAsync(username));
+    }
+  };
+
+  useEffect(() => {
+    if (isUsernameAvailable) {
+      // Do not reset the form if the username is not available
+      setUsernameMessages(isUsernameAvailable, "success", 5000);
+    } else {
+      // Reset the form if the username is available
+      setUsernameMessages(error, "error", 5000);
+      reset();
+    }
+  }, [isUsernameAvailable, error]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -348,18 +370,30 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="text"
-                  name="username"
+                  name="Username"
                   id="Username"
                   placeholder="Enter Your Username"
                   autoComplete="Username"
                   className="input-field"
                   {...register("Username")}
+                  onBlur={checkUsernameAvailability}
                 />
                 {errors.Username && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.Username.message}
                   </p>
                 )}
+
+                {usernameMessages.map((msg) => (
+                  <p
+                    key={msg.id}
+                    className={`text-base font-normal ${
+                      msg.type === "success" ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {msg.message}
+                  </p>
+                ))}
               </div>
             </div>
 
@@ -411,7 +445,7 @@ const SignUp = () => {
               <div className="mt-2.5">
                 <input
                   type="Email"
-                  name="email"
+                  name="Email"
                   id="Email"
                   placeholder="Enter Your Email"
                   autoComplete="Email"

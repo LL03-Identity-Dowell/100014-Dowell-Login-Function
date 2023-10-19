@@ -1,24 +1,24 @@
-const Coordinate = async () => {
-  let location = null;
-
-  try {
+const Coordinate = () => {
+  return new Promise((resolve, reject) => {
     if ("geolocation" in navigator) {
-      const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-      });
-
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
-      location = `${latitude} ${longitude}`;
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          const location = `${latitude} ${longitude}`;
+          console.log("loc", location);
+          resolve(location);
+        },
+        (error) => {
+          console.error("Error getting user location:", error);
+          reject("Unavailable");
+        }
+      );
     } else {
-      location = "Geolocation is not supported";
+      console.error("Geolocation is not supported");
+      reject("Geolocation is not supported");
     }
-  } catch (error) {
-    console.log("Error getting user location:", error);
-    location = "Unavailable";
-  }
-
-  return location;
+  });
 };
 
 export default Coordinate;
