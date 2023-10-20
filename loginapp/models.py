@@ -115,3 +115,27 @@ class products(models.Model):
     url=models.CharField(max_length=1000,blank=True)
     ip=models.CharField(max_length=1000,blank=True)
     status=models.CharField(max_length=100,default="active")
+
+
+
+
+class UserModel(models.Model):
+    profile_image = models.CharField(max_length=455)
+    username = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phonecode = models.CharField(max_length=255)
+    phone = models.CharField(max_length=255)
+    profile_id = models.PositiveBigIntegerField()
+    client_admin_id = models.CharField(max_length=255)
+    policy_status = models.BooleanField()
+    user_type = models.CharField(max_length=255)
+    event_id = models.CharField(max_length=255)
+    payment_status = models.CharField(max_length=255)
+    safty_secruity_policy = models.CharField(max_length=255)
+    country = models.CharField(max_length=255)
+    newsletter_subscription = models.BooleanField(default=True)
+
+    def __str__(self) -> str:
+        return self.username
