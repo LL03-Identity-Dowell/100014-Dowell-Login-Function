@@ -125,6 +125,7 @@ class UserModel(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField()
+    password = models.CharField(max_length=255)
     phonecode = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
     profile_id = models.PositiveBigIntegerField()
