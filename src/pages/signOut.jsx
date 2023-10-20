@@ -49,156 +49,162 @@ const SignOut = () => {
       setLoggedOutMessages(error, "error", 5000);
     }
   }, [loggedOut, error]);
+
   return (
-    <div className="isolate px-2 py-4 sm:py-12 lg:px-8 flex justify-center">
-      <div className="shadow-sm mx-auto max-w-5xl px-2 py-6 md:px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-w-3xl w-full p-6 space-y-6 bg-white rounded-lg shadow-lg">
         <div className="flex items-center justify-center">
           <img
             src={DoWellVerticalLogo}
             alt="DoWell logo"
-            className="h-28 w-28 md:h-36 md:w-36 rounded-sm drop-shadow-md"
+            className="h-28 w-28 md:h-36 md:w-36 rounded-xl drop-shadow-xl"
           />
         </div>
-        <div className="pt-6 md:p-8 text-center md:text-left space-y-8">
-          <div className="md:flex rounded-xl p-6 md:p-0 space-y-6 space-x-2 md:space-x-6 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden border border-green-300">
-            <div className="pt-6 md:p-8 text-center md:text-left space-y-4 flex flex-col justify-between">
-              <div className="flex justify-evenly space-x-4 mx-auto p-4 items-center">
-                <h3 className="font-base text-slate-900 w-1/3">
-                  Scan QR Code to contribute your comments and suggestions about
-                  this application in 2 minutes and get rewarded!
-                </h3>
+
+        <div className="rounded-xl text-gray-500 bg-gray-50 drop-shadow-lg border border-green-300">
+          <div className="flex flex-col md:flex-row mx-auto md:space-x-4 space-x-4 space-y-2 p-2 items-center justify-center">
+            <div className="bg-green-200 p-4 rounded-lg w-full md:w-96">
+              <h3 className="font-base text-slate-900 leading-normal text-justify">
+                Scan QR Code to contribute your comments and suggestions about
+                this application in two minutes and get rewarded!
+              </h3>
+            </div>
+
+            <div className="flex flex-row space-x-2">
+              <div className="">
                 <img
                   src={QR_Code}
                   alt="QR_Code"
-                  className="h-28 w-28 md:h-36 md:w-36 md:rounded-none rounded-md drop-shadow-sm"
+                  className="h-28 w-28 md:h-36 md:w-36 rounded-xl drop-shadow-xl"
                   loading="lazy"
                 />
-                <div>
-                  <img
-                    src={Samanta}
-                    alt="Samanta"
-                    className="h-24 w-24 md:h-32 md:w-32 md:rounded-none rounded-md drop-shadow-sm"
-                    loading="lazy"
-                  />
-                  <p className="font-base text-lg text-slate-900 text-center">
-                    Samanta
-                  </p>
-                </div>
+              </div>
+
+              <div className="">
+                <img
+                  src={Samanta}
+                  alt="Samanta"
+                  className="h-24 w-24 md:h-32 md:w-32 rounded-xl drop-shadow-xl"
+                  loading="lazy"
+                />
+                <p className="font-normal text-base text-slate-900 text-center">
+                  Samanta
+                </p>
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="rounded-xl p-8 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden space-y-4 border border-green-300">
+        <div className="rounded-xl py-6 text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden border border-green-300">
+          {!loggedOut && (
             <p className="text-gray-600 mb-4 text-center">
               Thank you, Do you want to exit?
             </p>
-            <div className="flex flex-row items-center justify-center">
-              {loggedOut ? (
-                <div className="text-center">
-                  {loggedOutMessages.map((msg) => (
-                    <p
-                      key={msg.id}
-                      className={`text-base font-normal ${
-                        msg.type === "success"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {msg.message}
-                    </p>
-                  ))}
-                  <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
-                    <Link
-                      to={redirectUrl ? `/?redirect_url=${redirectUrl}` : "/"}
-                    >
-                      Log in
-                    </Link>
-                  </div>
+          )}
+          <div className="flex flex-row items-center justify-center">
+            {loggedOut ? (
+              <div className="text-center">
+                {loggedOutMessages.map((msg) => (
+                  <p
+                    key={msg.id}
+                    className={`text-base font-normal ${
+                      msg.type === "success" ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {msg.message}
+                  </p>
+                ))}
+                <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
+                  <Link
+                    to={redirectUrl ? `/?redirect_url=${redirectUrl}` : "/"}
+                  >
+                    Log in
+                  </Link>
                 </div>
-              ) : (
-                <>
-                  <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-4"
-                    onClick={handleSignOut}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <Radio
-                        visible={true}
-                        height={30}
-                        width={30}
-                        ariaLabel="radio-loading"
-                        wrapperStyle={{}}
-                        wrapperClassName="radio-wrapper"
-                        color="#1ff507"
-                      />
-                    ) : (
-                      "😀 Yes 👍"
-                    )}
-                  </button>
-                  <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleCancel}
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <Radio
-                        visible={true}
-                        height={30}
-                        width={30}
-                        ariaLabel="radio-loading"
-                        wrapperStyle={{}}
-                        wrapperClassName="radio-wrapper"
-                        color="#1ff507"
-                      />
-                    ) : (
-                      "😞 No 👎"
-                    )}
-                  </button>
-                </>
-              )}
-            </div>
+              </div>
+            ) : (
+              <>
+                <button
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl drop-shadow-xl mr-4"
+                  onClick={handleSignOut}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Radio
+                      visible={true}
+                      height={30}
+                      width={30}
+                      ariaLabel="radio-loading"
+                      wrapperStyle={{}}
+                      wrapperClassName="radio-wrapper"
+                      color="#1ff507"
+                    />
+                  ) : (
+                    "Yes 👍"
+                  )}
+                </button>
+                <button
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl drop-shadow-xl"
+                  onClick={handleCancel}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <Radio
+                      visible={true}
+                      height={30}
+                      width={30}
+                      ariaLabel="radio-loading"
+                      wrapperStyle={{}}
+                      wrapperClassName="radio-wrapper"
+                      color="#1ff507"
+                    />
+                  ) : (
+                    "No 👎"
+                  )}
+                </button>
+              </>
+            )}
           </div>
+        </div>
 
-          <div className="flex flex-col p-8 rounded-xl text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden space-y-4 border border-green-300">
-            <p className="text-gray-600 mb-4 text-center">
-              Do you wish to recommend this application to your friend?
+        <div className="flex flex-col py-6 rounded-xl text-gray-500 bg-gray-50 drop-shadow-lg overflow-hidden border border-green-300">
+          <p className="text-gray-600 mb-4 text-center">
+            Do you wish to recommend this application to your friend?
+          </p>
+          <div className="flex flex-row items-center justify-center space-x-2">
+            <p className={clicked ? "text-center bg-green" : ""}>
+              {clicked ? "Thank you for your response!" : ""}
             </p>
-            <div className="flex flex-row items-center justify-center space-x-2">
-              <p className={clicked ? "text-center bg-green" : ""}>
-                {clicked ? "Thank you for your response!" : ""}
-              </p>
-              {!clicked && (
-                <>
-                  <button
-                    value="Yes"
-                    type="button"
-                    onClick={() => setClicked(true)}
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    😀 Yes 👍
-                  </button>
+            {!clicked && (
+              <>
+                <button
+                  value="Yes"
+                  type="button"
+                  onClick={() => setClicked(true)}
+                  className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-xl drop-shadow-xl"
+                >
+                  Yes 👍
+                </button>
 
-                  <button
-                    value="Maybe"
-                    type="button"
-                    onClick={() => setClicked(true)}
-                    className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    😞 Maybe 🫣
-                  </button>
+                <button
+                  value="Maybe"
+                  type="button"
+                  onClick={() => setClicked(true)}
+                  className="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-xl drop-shadow-xl"
+                >
+                  Maybe 🫣
+                </button>
 
-                  <button
-                    value="No"
-                    type="button"
-                    onClick={() => setClicked(true)}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    😞 No 👎
-                  </button>
-                </>
-              )}
-            </div>
+                <button
+                  value="No"
+                  type="button"
+                  onClick={() => setClicked(true)}
+                  className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl drop-shadow-xl"
+                >
+                  No 👎
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
