@@ -765,6 +765,11 @@ const SignUp = () => {
                   <div className="text-sm leading-6">
                     <p className="text-gray-600">Do you accept our policies?</p>
                   </div>
+                  {errors.policy_status && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.policy_status.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="relative flex gap-x-3">
