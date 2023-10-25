@@ -128,8 +128,6 @@ def register(request):
     policy_status = request.data.get('policy_status')
     other_policy = request.data.get('other_policy')
     newsletter = request.data.get('newsletter')
-    print(phonecode)
-    print(phone)
     if email and username and not image and not password and not first \
             and not last and not phone and not phonecode and not user_type and not user_country \
             and not policy_status and not other_policy and not newsletter:
@@ -161,11 +159,11 @@ def register(request):
             and not other_policy and not newsletter:
         sms = generateOTP()
 
-        full_number =str(phonecode) + str(phone)
+        full_number = str(phonecode) + str(phone)
         time = datetime.datetime.utcnow()
-        print(full_number)
+        
         if full_number == "251912912144":
-            sms="123456"
+            sms = "123456"
         try:
             phone_exists = mobile_sms.objects.get(phone=full_number)
         except mobile_sms.DoesNotExist:
@@ -175,7 +173,7 @@ def register(request):
                 phone=full_number).update(sms=sms, expiry=time)
         else:
             mobile_sms.objects.create(
-                phone=full_number, sms=sms, expiry=time)
+                phone = full_number, sms=sms, expiry=time)
         url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
         payload = {
             "sender" : "DowellLogin",
@@ -195,7 +193,7 @@ def register(request):
     register_legal_policy(username)
     try:
         check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
-        check_sms= mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
+        check_sms = mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
     except GuestAccount.DoesNotExist:
         check_otp = None
         check_sms = "Wrong"
@@ -225,7 +223,7 @@ def register(request):
                 password), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
 
         profile_image = new_user.profile_image
-        json_data = open('dowell_login/static/client.json')
+        json_data = open('loginapp/static/client.json')
         data1 = json.load(json_data)
         json_data.close()
         default =   {
@@ -377,6 +375,7 @@ def MobileLogin(request):
             request.session.save()
             session = request.session.session_key
             obj = CustomSession.objects.filter(sessionID=session)
+            # session_obj = 
             if obj:
                 if obj.first().status == 'login':
                     data = {'session_id': session}
@@ -433,19 +432,21 @@ def MobileLogin(request):
             infoo = str(info1)
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
+            
+            custom_session_data = {'sessionID': session, 'info': infoo, 'status': 'login'}
+            m_custom_session = dowellconnection("login", "bangalore", "login", "session",
+                             "session", "1121", "ABCDE", "insert", custom_session_data, "nil")
 
             serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             LiveStatus.objects.create(sessionID=session, username=username, product="",
                                       status="login", created=serverclock1, updated=serverclock1)
 
-            # resp={'userinfo':info}
             data = {'session_id': session}
 
             return Response(data)
         else:
             resp = {"data": "Username not found in database"}
             return Response(resp)
-        # raise AuthenticationFailed("Username not Found or password not found")
     else:
         resp = {"data": "Username, Password combination incorrect.."}
         return Response(resp)
@@ -1886,6 +1887,21 @@ def user_data(request):
         return Response(resp1)
     else:
         return Response({"msg":"error","info":"User Not Found"},status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+def user_report(request):
+    response = {}
+    session_id = request.data.get("session_id")
+    data = CustomSession.objects.filter(sessionID=session_id).first()
+    if not data:
+        return Response({"message":"SessionID not found in database, Please check and try again!!"})
+    three_months_ago = datetime.datetime.today() - datetime.timedelta(days=90)
+    total_3moths = Account.objects.filter(last_login__lt=three_months_ago)
+    grand_total = Account.objects.all()
+    response["grand_total_users"] = len(grand_total)
+    response["active"] = len(total_3moths)
+    response["inactive"] = len(grand_total)-len(total_3moths)
+    return Response(response)
 
 @api_view(['POST'])
 def user_status(request):

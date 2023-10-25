@@ -35,6 +35,7 @@ urlpatterns = [
     path('mobilesms/',views.mobilesms,name="mobilesms"),
     path('validate_username/', views.validate_username, name='validate-username'),
     path('user_data/',views.user_data,name="user_data"),
+    path('user_report/',views.user_report,name="user_report"),
 
 
 ]
