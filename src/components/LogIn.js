@@ -59,10 +59,6 @@ const LogIn = () => {
   const handleUserInfo = async (e) => {
     e.preventDefault();
     try {
-      console.log("location", location);
-
-      // Check if geolocation is supported and user location is available
-
       const { username, password } = e.target.elements;
 
       // update the username state
