@@ -611,6 +611,11 @@ const SignUp = () => {
                   className="input-field"
                   {...register("Phone")}
                 />
+                {errors.Phone && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.Phone.message}
+                  </p>
+                )}
               </div>
               <div className="mt-2.5">
                 <div className="flex flex-row space-x-3 items-center">
