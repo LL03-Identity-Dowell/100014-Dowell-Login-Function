@@ -109,6 +109,12 @@ def login_legal_policy(request):
     else:
         return Response({'msg': 'errror', 'info': 'Session_id is required'})
 
+def get_custom_session_data(session_id):
+    json_data = dowellconnection("login", "bangalore", "login", "session",
+                             "session", "1121", "ABCDE", "find", {'sessionID': session_id }, "nil")
+    res_data = json.loads(json_data)
+    return res_data.get('data')
+
 
 @api_view(["POST"])
 def register(request):
@@ -374,10 +380,10 @@ def MobileLogin(request):
             form = login(request, user)
             request.session.save()
             session = request.session.session_key
-            obj = CustomSession.objects.filter(sessionID=session)
+            obj = get_custom_session_data(session)
             # session_obj = 
             if obj:
-                if obj.first().status == 'login':
+                if obj['status'] == 'login':
                     data = {'session_id': session}
                     return Response(data)
             try:
@@ -455,16 +461,10 @@ def MobileLogin(request):
 @api_view(["POST"])
 def MobileLogout(request):
     session = request.data.get("session_id")
-    mydata = CustomSession.objects.filter(sessionID=session).first()
+    mydata = get_custom_session_data(session)
     if mydata is not None:
-        a2 = mydata.info
-        a3 = json.loads(a2)
-        a3["status"] = "logout"
-        a4 = json.dumps(a3)
-        a5 = str(a4)
-        mydata.info = a5
-        if mydata.status != "logout":
-            mydata.status = "logout"
+        if mydata['status'] != "logout":
+            mydata['status'] = "logout"
         mydata.save(update_fields=['info', 'status'])
     field_session = {'sessionID': session}
     update_field = {'status': 'logout'}
@@ -913,7 +913,7 @@ def live_users(request):
 @api_view(['POST'])
 def all_liveusers(request):
     session_id = request.data.get("session_id")
-    mydata = CustomSession.objects.filter(sessionID=session_id).first()
+    mydata = get_custom_session_data(session_id)
     if not mydata:
         return Response({"message":"SessionID not found in database, Please check and try again!!"})
     products_list = ["Client_admin","Exhibitoe form","Living Lab Admin","Workflow AI"]
@@ -1131,12 +1131,12 @@ def PublicApi(request):
             form = login(request, user)
             request.session.save()
             session = request.session.session_key
-            obj = CustomSession.objects.filter(sessionID=session)
+            obj = get_custom_session_data(session)
             if obj:
-                if obj.first().status == 'login':
-                    info = json.loads(obj.first().info)
+                if obj['status'] == 'login':
+                    # info = json.loads(obj.first().info)
                     user_obj = Account.objects.filter(
-                        username=info["username"]).first()
+                        username=obj["username"]).first()
                     try:
                         resp = {'msg': 'success', 'info': 'Logged In Successfully', 'session_id': session, 'remaining_times':
                                 api_resp1["count"]/10, 'first_name': user_obj.first_name, 'last_name': user_obj.last_name, 'last_login': user_obj.last_login, 'first_login': user_obj.date_joined}
@@ -1254,11 +1254,10 @@ def login_init_api(request):
         context = {'msg':'success'}
         past_login = request.session.session_key
         if past_login:
-            test_session = CustomSession.objects.filter(sessionID=past_login).first()
+            test_session = get_custom_session_data(past_login)
             if test_session:
-                if test_session.status == "login":
-                    login_detail = CustomSession.objects.filter(sessionID=past_login).first()
-                    info = json.loads(login_detail.info)
+                if test_session['status'] == "login":
+                    login_detail = get_custom_session_data(past_login)
                     response = {'msg':'error','info':'logged_in_user'}
                     if "org=" in mainparams:
                         if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams :
@@ -1289,7 +1288,7 @@ def login_init_api(request):
                         except:
                             hr_invitation = mainparams[mainparams.find('hr_invitation=')+14:]
                         hr_invitation = jwt.decode(jwt=hr_invitation,key='secret',algorithms=["HS256"])
-                        response["url"] = f'https://100093.pythonanywhere.com/invitelink1?session_id={past_login}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={info["username"]}'
+                        response["url"] = f'https://100093.pythonanywhere.com/invitelink1?session_id={past_login}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={login_detail["Username"]}'
                     else:
                         response["url"] = f'https://100093.pythonanywhere.com?session_id={past_login}'
                     return Response(response)
@@ -1353,9 +1352,9 @@ def login_init_api(request):
         redirect_url = request.GET.get('redirect_url', None)
         past_login=request.COOKIES.get('DOWELL_LOGIN')
         if past_login:
-            test_session=CustomSession.objects.filter(sessionID=past_login).first()
+            test_session = get_custom_session_data(past_login) 
             if test_session:
-                if test_session.status == "login":
+                if test_session['status'] == "login":
                     return Response({'msg':'error','info':'logged_in_user'})
 
         random_text = passgen.generate_random_password1(24)
@@ -1804,16 +1803,6 @@ def main_login(request):
                         rr=test[0]
                 except:
                     rr= mainparams[mainparams.find('redirect_url=')+13:]
-                # if "ll04-finance-dowell.github.io" in rr:
-                #     if info["User_type"] =="betatester":
-                #         rr='https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing'
-                #     else:
-                #         rr='https://ll04-finance-dowell.github.io/workflowai.online'
-                # elif "ll07-team-dowell.github.io" in rr:
-                #     if info["User_type"] =="betatester":
-                #         rr='https://ll07-team-dowell.github.io/100098-DowellJobPortal'
-                #     else:
-                #         rr='https://ll07-team-dowell.github.io/Jobportal'
                 data["url"]=f'{rr}?session_id={session}'
             elif "hr_invitation" in mainparams:
                 try:
@@ -1887,12 +1876,13 @@ def user_data(request):
         return Response(resp1)
     else:
         return Response({"msg":"error","info":"User Not Found"},status=status.HTTP_400_BAD_REQUEST)
+
     
 @api_view(['POST'])
 def user_report(request):
     response = {}
     session_id = request.data.get("session_id")
-    data = CustomSession.objects.filter(sessionID=session_id).first()
+    data = get_custom_session_data(session_id)
     if not data:
         return Response({"message":"SessionID not found in database, Please check and try again!!"})
     three_months_ago = datetime.datetime.today() - datetime.timedelta(days=90)
