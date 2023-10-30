@@ -765,16 +765,8 @@ def profile_update(request):
         return Response({"msg": "error", "info": "User doesn't exist"})
 
     if Profile_Image is not None:
-        img = Image.open(io.BytesIO(
-            base64.decodebytes(bytes(Profile_Image, "utf-8"))))
         if obj.profile_image == "":
-            img.save(f"dowell_login/static/img/api_upload/{username}.png")
-            im = Image.open(
-                f"dowell_login/static/img/api_upload/{username}.png")
-            thumb_io = io.BytesIO()
-            im.save(thumb_io, im.format, quality=60)
-            obj.profile_image.save(im.filename, ContentFile(
-                thumb_io.getvalue()), save=False)
+            obj.profile_image.save(name=Profile_Image.name, content=Profile_Image, save=True)
             try:
                 os.remove(f"dowell_login/static/img/api_upload/{username}.png")
             except:
@@ -786,7 +778,9 @@ def profile_update(request):
             data1["profile_info"].update(update_data1)
             resp2["success_fields"].append("Profile Image")
         else:
-            img.save(f"dowell_login/media/{obj.profile_image}")
+            print(Profile_Image.name)
+            print(type(Profile_Image.name))
+            obj.profile_image.save(name=Profile_Image.name, content=Profile_Image, save=True)
             resp2["success_fields"].append("Profile Image")
             up_field["Profile_Image"] = f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
     if Firstname is not None:
@@ -1616,7 +1610,7 @@ def main_login(request):
     
     browser = mdata("browser")
     language = mdata("language", "English")
-    obj=Account.objects.filter(username=username).first()
+    obj = Account.objects.filter(username=username).first()
     
     try:
         obj.current_task="Logging In"
@@ -1631,25 +1625,25 @@ def main_login(request):
             return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
         random_session_obj.username=username
         random_session_obj.save(update_fields=['username'])
-    company=None
-    org=None
-    dept=None
-    member=None
-    project=None
-    subproject=None
-    role_res=None
-    first_name=None
-    last_name=None
-    email=None
-    phone=None
-    User_type=None
-    payment_status=None
-    newsletter=None
-    user_country=None
-    privacy_policy=None
-    other_policy=None
-    userID=None
-    client_admin_id=None
+    company = None
+    org = None
+    dept = None
+    member = None
+    project = None
+    subproject = None
+    role_res = None
+    first_name = None
+    last_name = None
+    email = None
+    phone = None
+    User_type = None
+    payment_status = None
+    newsletter = None
+    user_country = None
+    privacy_policy = None
+    other_policy = None
+    userID = None
+    client_admin_id = None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
@@ -1682,20 +1676,20 @@ def main_login(request):
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type=response["data"]['User_type']
-                client_admin_id=response["data"]['client_admin_id']
-                payment_status=response["data"]['payment_status']
-                newsletter=response["data"]['newsletter_subscription']
-                user_country=response["data"]['user_country']
-                privacy_policy=response["data"]['Policy_status']
-                other_policy=response["data"]['safety_security_policy']
-                role_res=response["data"]['Role']
-                company=response["data"]['company_id']
-                member=response["data"]['Memberof']
-                dept=response["data"]['dept_id']
-                org=response["data"]['org_id']
-                project=response["data"]['project_id']
-                subproject=response["data"]['subproject_id']
+                User_type = response["data"]['User_type']
+                client_admin_id = response["data"]['client_admin_id']
+                payment_status = response["data"]['payment_status']
+                newsletter = response["data"]['newsletter_subscription']
+                user_country = response["data"]['user_country']
+                privacy_policy = response["data"]['Policy_status']
+                other_policy = response["data"]['safety_security_policy']
+                role_res = response["data"]['Role']
+                company = response["data"]['company_id']
+                member = response["data"]['Memberof']
+                dept = response["data"]['dept_id']
+                org = response["data"]['org_id']
+                project = response["data"]['project_id']
+                subproject = response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -1777,12 +1771,10 @@ def main_login(request):
                 pass
 
             # resp={'userinfo':info}
-            data = {"msg":"success","session_id": session}
+            data = { "msg":"success", "session_id": session }
 
             response = Response()
-            # response.set_cookie('DOWELL_LOGIN', session)
-
-            print(mainparams)
+            
             if "org=" in mainparams and not "code=masterlink" in mainparams:
                 if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams:
                     data["url"]=f'https://100093.pythonanywhere.com/exportfolio?session_id={session}&{mainparams}'
