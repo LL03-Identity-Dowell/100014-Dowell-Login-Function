@@ -295,9 +295,10 @@ const SignUp = () => {
     } else {
       // Reset the form if the username is available
       setUsernameMessages(error, "error", 5000);
-      reset();
+      // Reset only the username field
+      reset({ Username: "" });
     }
-  }, [isUsernameAvailable, error]);
+  }, [isUsernameAvailable, error, reset]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
