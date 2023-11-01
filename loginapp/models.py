@@ -5,7 +5,7 @@ from django.utils.crypto import get_random_string
 
 
 def get_profile_image_path(self, filename):
-    return f'profile_images/{"profile_image.jpg"}'
+    return f'profile_images/{filename}'
 
 
 def get_default_profile_image():
@@ -120,7 +120,7 @@ class products(models.Model):
 
 
 class UserModel(models.Model):
-    profile_image = models.CharField(max_length=455)
+    profile_image = models.ImageField()
     username = models.CharField(max_length=255)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)

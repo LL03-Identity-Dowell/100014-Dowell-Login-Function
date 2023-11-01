@@ -30,7 +30,18 @@ from dateutil import parser
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
-from loginapp.models import CustomSession, Account, LiveStatus, GuestAccount, mobile_sms, QR_Creation, RandomSession, Linkbased_RandomSession, Location_check
+from loginapp.models import (
+  CustomSession, 
+  Account, 
+  LiveStatus, 
+  GuestAccount, 
+  mobile_sms, 
+  QR_Creation, 
+  RandomSession, 
+  Linkbased_RandomSession, 
+  Location_check,
+  UserModel
+)
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
 from server.utils import dowell_hash
@@ -211,6 +222,19 @@ def register(request):
 
 
     name = ""
+    # New user model
+    UserModel.objects.create(
+        username=username,
+        first_name=first,
+        last_name=last,
+        email=email,
+        phonecode=phonecode,
+        user_type=user_type,
+        phone=phone,
+        country=user_country,
+        policy_status=policy_status,
+        newsletter=newsletter
+    )
     try:
         accounts = Account.objects.filter(email=email)
 
