@@ -5,7 +5,7 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 const SplashPage = () => {
   const navigate = useNavigate();
   const { Username } = useParams();
-
+  const decodedUsername = decodeURIComponent(Username);
   // Use the useLocation hook to access the URL parameters passed from the login page
   const location = useLocation();
   const mainparams = location.search.substring(1); // Remove the leading '?' character
@@ -24,7 +24,9 @@ const SplashPage = () => {
           </h1>
           <p className="text-gray-600 mb-4 text-center">
             User{" "}
-            <strong className="underline text-green-500">{Username}</strong>{" "}
+            <strong className="underline text-green-500">
+              {decodedUsername}
+            </strong>{" "}
             successfully registered!
           </p>
           <div className="flex flex-row items-center justify-center mt-20">

@@ -149,7 +149,9 @@ const SignUp = () => {
   useEffect(() => {
     if (registered) {
       navigate(
-        `/splash/${watch().Username}${mainParams ? `?${mainParams}` : ""}`
+        `/splash/${encodeURIComponent(watch().Username)}${
+          mainParams ? `?${mainParams}` : ""
+        }`
       );
     }
   }, [registered, navigate, watch, mainParams]);
