@@ -112,7 +112,14 @@ const registrationSlice = createSlice({
     isUsernameAvailable: null,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    resetIsUsernameAvailable: (state, action) => {
+      state.isUsernameAvailable = null;
+    },
+    resetError: (state, action) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(sendEmailOTP.pending, (state) => {
@@ -165,5 +172,8 @@ const registrationSlice = createSlice({
       });
   },
 });
+
+export const { resetIsUsernameAvailable, resetError } =
+  registrationSlice.actions;
 
 export default registrationSlice.reducer;

@@ -9,6 +9,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
   registerUser,
+  resetError,
+  resetIsUsernameAvailable,
   sendEmailOTP,
   sendMobileOTP,
   validateUsernameAsync,
@@ -292,10 +294,13 @@ const SignUp = () => {
     if (isUsernameAvailable) {
       // Do not reset the form if the username is not available
       setUsernameMessages(isUsernameAvailable, "success", 2000);
-    } else {
-      // Reset the form if the username is available
+      dispatch(resetIsUsernameAvailable());
+    }
+
+    if (error) {
       setUsernameMessages(error, "error", 2000);
       // Reset only the username field
+      dispatch(resetError());
       reset({ Username: "" });
     }
   }, [isUsernameAvailable, error, reset]);
