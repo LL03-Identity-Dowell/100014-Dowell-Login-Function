@@ -10,7 +10,6 @@ import ForgotPassword from "./components/forgotPassword";
 import UsersData from "./pages/usersData";
 import checkRequests from "./Hoc/CheckRequests";
 import Error503 from "./pages/Error503";
-import SignOut from "./pages/signOut";
 
 function App(props) {
   return (
@@ -20,7 +19,6 @@ function App(props) {
           <Route exact path="/" element={<Home />} />
           <Route path="/register" element={<SignUp />} />
           <Route exact path="/sign-out" element={<SignOutPage />} />
-          <Route exact path="/logout" element={<SignOut />} />
           <Route path="/splash/:Username" element={<SplashPage />} />
           <Route path="/forgot_password" element={<ForgotPassword />} />
           <Route path="/change_password" element={<ChangePassword />} />
