@@ -120,7 +120,7 @@ class products(models.Model):
 
 
 class UserModel(models.Model):
-    profile_image = models.ImageField()
+    profile_image = models.ImageField(null=True, blank=True)
     username = models.CharField(max_length=255)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -128,13 +128,13 @@ class UserModel(models.Model):
     password = models.CharField(max_length=255)
     phonecode = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
-    profile_id = models.PositiveBigIntegerField()
-    client_admin_id = models.CharField(max_length=255)
+    profile_id = models.PositiveBigIntegerField(null=True, blank=True)
+    client_admin_id = models.CharField(max_length=255, null=True, blank=True)
     policy_status = models.BooleanField()
     user_type = models.CharField(max_length=255)
-    event_id = models.CharField(max_length=255)
+    event_id = models.CharField(max_length=255, null=True, blank=True)
     payment_status = models.CharField(max_length=255)
-    safty_secruity_policy = models.CharField(max_length=255)
+    safty_secruity_policy = models.CharField(max_length=255, null=True, blank=True)
     country = models.CharField(max_length=255)
     newsletter_subscription = models.BooleanField(default=True)
 

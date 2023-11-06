@@ -233,7 +233,7 @@ def register(request):
         phone=phone,
         country=user_country,
         policy_status=policy_status,
-        newsletter=newsletter
+        newsletter_subscription=newsletter
     )
     try:
         accounts = Account.objects.filter(email=email)
@@ -527,7 +527,7 @@ def new_userinfo(request):
     if request.method == 'POST':
         session = request.data["session_id"]
         product = request.data.get("product",None)
-        mydata = CustomSession.objects.filter(sessionID=session).first()
+        # mydata = CustomSession.objects.filter(sessionID=session).first()
 
         if not mydata:
             public_field = {"session_id":session}
@@ -2034,3 +2034,13 @@ def LinkLogin(request):
     Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
     qrcodegen.qrgen1(user,respj["inserted_id"],f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
     return Response({"session_id":random_session})
+
+
+@api_view(['POST'])
+def all_username(request):
+    pwd = request.data.get("pwd")
+    if pwd == dpass:
+        names=Account.objects.all().values_list('username', flat=True).order_by('username').distinct()
+        return Response(names)
+    else:
+        return Response("Verification Failed !")
