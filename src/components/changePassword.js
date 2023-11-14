@@ -3,12 +3,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link } from "react-router-dom";
 import { useForm, FormProvider } from "react-hook-form";
-import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Radio } from "react-loader-spinner";
-import PasswordInput from "./passwordInput";
+import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
 import { changePasswordAsync } from "../redux/changePasswordSlice";
-import useTimedMessage from "./useTimedMessage";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import PasswordInput from "./passwordInput";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -37,8 +37,6 @@ const schema = yup.object().shape({
 });
 
 const ChangePassword = () => {
-  const [passwordMessages, setPasswordMessages] = useTimedMessage();
-
   const dispatch = useDispatch();
   const { loading, changePassword, error } =
     useSelector((state) => state.changePassword) || {};
@@ -61,9 +59,9 @@ const ChangePassword = () => {
   // Use useEffect to show the password and error message
   useEffect(() => {
     if (changePassword) {
-      setPasswordMessages(changePassword, "success", 5000);
+      toast.success(changePassword);
     } else {
-      setPasswordMessages(error, "error", 5000);
+      toast.error(error);
     }
   }, [changePassword, error]);
 
@@ -177,17 +175,6 @@ const ChangePassword = () => {
                   "Change Password"
                 )}
               </button>
-
-              {passwordMessages.map((msg) => (
-                <p
-                  key={msg.id}
-                  className={`text-base font-normal ${
-                    msg.type === "success" ? "text-green-500" : "text-red-500"
-                  }`}
-                >
-                  {msg.message}
-                </p>
-              ))}
             </div>
 
             <div className="flex items-center justify-center">

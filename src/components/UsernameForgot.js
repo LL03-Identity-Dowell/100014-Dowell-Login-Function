@@ -4,10 +4,10 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { Radio } from "react-loader-spinner";
+import { toast } from "react-toastify";
+import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { useDispatch, useSelector } from "react-redux";
-import useTimedMessage from "./useTimedMessage";
 
 const schema = yup.object().shape({
   email: yup
@@ -23,8 +23,6 @@ const schema = yup.object().shape({
 const UsernameForgot = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [otpMessages, setOtpMessages] = useTimedMessage();
-  const [usernameMessages, setUsernameMessages] = useTimedMessage();
 
   const {
     handleSubmit,
@@ -59,23 +57,18 @@ const UsernameForgot = () => {
     }
   }, [otpCountdown]);
 
-  // Use useEffect to show the email message when otpSent becomes true
+  //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
-    if (otpSent) {
-      setOtpMessages(otpSent, "success", 5000);
-    } else {
-      setOtpMessages(error, "error", 5000);
-    }
-  }, [otpSent, error]);
+    const showToast = (message, isSuccess = false) => {
+      if (message) {
+        isSuccess ? toast.success(message) : toast.error(message);
+      }
+    };
 
-  // Use useEffect to show the email message when otpSent becomes true
-  useEffect(() => {
-    if (usernameList) {
-      setUsernameMessages(usernameList, "success", 5000);
-    } else {
-      setUsernameMessages(error, "error", 5000);
-    }
-  }, [usernameList, error]);
+    showToast(otpSent, true);
+    showToast(usernameList, true);
+    showToast(error);
+  }, [otpSent, usernameList, error]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -143,16 +136,6 @@ const UsernameForgot = () => {
                     "Get OTP"
                   )}
                 </button>
-                {otpMessages.map((msg) => (
-                  <p
-                    key={msg.id}
-                    className={`text-base font-normal ${
-                      msg.type === "success" ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {msg.message}
-                  </p>
-                ))}
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
@@ -220,16 +203,6 @@ const UsernameForgot = () => {
                 "Verify"
               )}
             </button>
-            {usernameMessages.map((msg) => (
-              <p
-                key={msg.id}
-                className={`text-base font-normal ${
-                  msg.type === "success" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {msg.message}
-              </p>
-            ))}
           </div>
           <div className="flex items-center justify-center">
             <div className="w-60 rounded-md bg-green-300 py-2.5 mt-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 text-center">

@@ -5,9 +5,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPasswordAsync, sendOTP } from "../redux/forgotPasswordSlice";
 import { Radio } from "react-loader-spinner";
-import useTimedMessage from "./useTimedMessage";
+import { toast } from "react-toastify";
+import { forgotPasswordAsync, sendOTP } from "../redux/forgotPasswordSlice";
 import PasswordInput from "./passwordInput";
 
 const schema = yup.object().shape({
@@ -41,8 +41,6 @@ const schema = yup.object().shape({
 const ForgotPassword = () => {
   const [attemptsOtp, setAttemptsOtp] = useState(5);
   const [otpCountdown, setOtpCountdown] = useState(0);
-  const [otpMessages, setOtpMessages] = useTimedMessage();
-  const [passwordMessages, setPasswordMessages] = useTimedMessage();
 
   const dispatch = useDispatch();
   const { loading, otpSent, passwordReset, error } =
@@ -117,23 +115,18 @@ const ForgotPassword = () => {
     }
   }, [otpCountdown]);
 
-  // Use useEffect to show the email and error message
+  //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
-    if (otpSent) {
-      setOtpMessages(otpSent, "success", 5000);
-    } else {
-      setOtpMessages(error, "error", 5000);
-    }
-  }, [otpSent, error]);
+    const showToast = (message, isSuccess = false) => {
+      if (message) {
+        isSuccess ? toast.success(message) : toast.error(message);
+      }
+    };
 
-  // Use useEffect to show the password and error message
-  useEffect(() => {
-    if (passwordReset) {
-      setPasswordMessages(passwordReset, "success", 5000);
-    } else {
-      setPasswordMessages(error, "error", 5000);
-    }
-  }, [passwordReset, error]);
+    showToast(otpSent, true);
+    showToast(passwordReset, true);
+    showToast(error);
+  }, [otpSent, passwordReset, error]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -226,16 +219,6 @@ const ForgotPassword = () => {
                     "Get OTP"
                   )}
                 </button>
-                {otpMessages.map((msg) => (
-                  <p
-                    key={msg.id}
-                    className={`text-base font-normal ${
-                      msg.type === "success" ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {msg.message}
-                  </p>
-                ))}
               </div>
 
               {/* Display the countdown timer only after the first OTP attempt */}
@@ -321,16 +304,6 @@ const ForgotPassword = () => {
                 "Change Password"
               )}
             </button>
-            {passwordMessages.map((msg) => (
-              <p
-                key={msg.id}
-                className={`text-base font-normal ${
-                  msg.type === "success" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {msg.message}
-              </p>
-            ))}
           </div>
 
           <div className="flex items-center justify-center">

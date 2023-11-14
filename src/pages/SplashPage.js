@@ -4,8 +4,8 @@ import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 
 const SplashPage = () => {
   const navigate = useNavigate();
-  const { Username } = useParams();
-  const decodedUsername = decodeURIComponent(Username);
+  const { username } = useParams();
+  const decodedUsername = decodeURIComponent(username);
   // Use the useLocation hook to access the URL parameters passed from the login page
   const location = useLocation();
   const mainparams = location.search.substring(1); // Remove the leading '?' character

@@ -17,7 +17,7 @@ import {
 } from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
-import useTimedMessage from "./useTimedMessage";
+import { toast } from "react-toastify";
 import PasswordInput from "./passwordInput";
 
 // Schema for validation inputs
@@ -103,11 +103,7 @@ const SignUp = () => {
   const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
 
-  // Use the custom hook to handle the email and SMS sent messages
-  const [emailMessages, setEmailMessages] = useTimedMessage();
-  const [smsMessages, setSmsMessages] = useTimedMessage();
-  const [registeredMessages, setRegisteredMessages] = useTimedMessage();
-  const [usernameMessages, setUsernameMessages] = useTimedMessage();
+  // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
 
   const dispatch = useDispatch();
@@ -147,11 +143,13 @@ const SignUp = () => {
 
   // Redirect when `registered` changes
   useEffect(() => {
+    const username = watch("Username");
+    console.log("Username", username);
     if (registered) {
+      const encodedUsername = encodeURIComponent(watch().Username);
+      console.log("username", encodedUsername);
       navigate(
-        `/splash/${encodeURIComponent(watch().Username)}${
-          mainParams ? `?${mainParams}` : ""
-        }`
+        `/splash/${encodedUsername}${mainParams ? `?${mainParams}` : ""}`
       );
     }
   }, [registered, navigate, watch, mainParams]);
@@ -180,15 +178,6 @@ const SignUp = () => {
     }
   }, [otpCountdown]);
 
-  // Use useEffect to show the email message when otpSent becomes true
-  useEffect(() => {
-    if (otpSent) {
-      setEmailMessages(otpSent, "success", 5000);
-    } else {
-      setEmailMessages(error, "error", 5000);
-    }
-  }, [otpSent, error]);
-
   // Dispatch mobile sms
   const handleMobileOTP = (data) => {
     if (attemptsSms > 0 && !exempted && smsCountdown === 0) {
@@ -213,24 +202,6 @@ const SignUp = () => {
       return () => clearTimeout(smsTimer);
     }
   }, [smsCountdown]);
-
-  // Use useEffect to show the sms message when smsSent becomes true
-  useEffect(() => {
-    if (smsSent) {
-      setSmsMessages(smsSent, "success", 5000);
-    } else {
-      setSmsMessages(error, "error", 5000);
-    }
-  }, [smsSent, error]);
-
-  // Use useEffect to show registered message when registered becomes true
-  useEffect(() => {
-    if (registered) {
-      setRegisteredMessages(registered, "success", 5000);
-    } else {
-      setRegisteredMessages(error, "error", 5000);
-    }
-  }, [registered, error]);
 
   // dispatch registered user
   const registeredUserInfo = () => {
@@ -292,20 +263,30 @@ const SignUp = () => {
     }
   };
 
+  //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
+    const showToast = (message, isSuccess = false) => {
+      if (message) {
+        isSuccess ? toast.success(message) : toast.error(message);
+      }
+    };
+
+    showToast(otpSent, true);
+    showToast(smsSent, true);
+    showToast(registered, true);
+    showToast(isUsernameAvailable, true);
+    showToast(error);
+
+    // Additional logic for isUsernameAvailable and error
     if (isUsernameAvailable) {
-      // Do not reset the form if the username is not available
-      setUsernameMessages(isUsernameAvailable, "success", 2000);
       dispatch(resetIsUsernameAvailable());
     }
 
     if (error) {
-      setUsernameMessages(error, "error", 2000);
-      // Reset only the username field
       dispatch(resetError());
       reset({ Username: "" });
     }
-  }, [isUsernameAvailable, error, reset]);
+  }, [otpSent, smsSent, registered, isUsernameAvailable, error, reset]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -391,17 +372,6 @@ const SignUp = () => {
                     {errors.Username.message}
                   </p>
                 )}
-
-                {usernameMessages.map((msg) => (
-                  <p
-                    key={msg.id}
-                    className={`text-base font-normal ${
-                      msg.type === "success" ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {msg.message}
-                  </p>
-                ))}
               </div>
             </div>
 
@@ -492,18 +462,6 @@ const SignUp = () => {
                       "Get OTP"
                     )}
                   </button>
-                  {emailMessages.map((msg) => (
-                    <p
-                      key={msg.id}
-                      className={`text-base font-normal ${
-                        msg.type === "success"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {msg.message}
-                    </p>
-                  ))}
                 </div>
 
                 {/* Display the countdown timer only after the first OTP attempt */}
@@ -650,18 +608,6 @@ const SignUp = () => {
                       "Get SMS"
                     )}
                   </button>
-                  {smsMessages.map((msg) => (
-                    <p
-                      key={msg.id}
-                      className={`text-base font-normal ${
-                        msg.type === "success"
-                          ? "text-green-500"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {msg.message}
-                    </p>
-                  ))}
                 </div>
 
                 {/* Display the countdown timer only after the first SMS attempt */}
@@ -821,16 +767,6 @@ const SignUp = () => {
                 "Join as a new member"
               )}
             </button>
-            {registeredMessages.map((msg) => (
-              <p
-                key={msg.id}
-                className={`text-base font-normal ${
-                  msg.type === "success" ? "text-green-500" : "text-red-500"
-                }`}
-              >
-                {msg.message}
-              </p>
-            ))}
           </div>
           <div className="flex items-center justify-center">
             <div className="w-60 rounded-md bg-green-300 py-2.5 mt-6 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700 text-center">

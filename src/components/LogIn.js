@@ -5,18 +5,17 @@ import { loginUser } from "../redux/loginSlice";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import { detectBrowser } from "../utils/browserUtils";
 import { RotatingLines } from "react-loader-spinner";
+import Iframe from "react-iframe";
+import { toast } from "react-toastify";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
-import Iframe from "react-iframe";
-import useTimedMessage from "./useTimedMessage";
 
 const LogIn = () => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
   const [username, setUsername] = useState("");
   const [redirecting, setRedirecting] = useState(false);
-  const [loginMessages, setLoginMessage] = useTimedMessage();
 
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
@@ -117,12 +116,12 @@ const LogIn = () => {
     return url;
   };
 
-  // Use useEffect to show the login message
+  // Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     if (userInfo) {
-      setLoginMessage(userInfo.info, "success", 5000);
-    } else if (error) {
-      setLoginMessage(error, "error", 5000);
+      toast.success(userInfo);
+    } else {
+      toast.error(error);
     }
   }, [userInfo, error]);
 
@@ -244,19 +243,6 @@ const LogIn = () => {
                     >
                       Login
                     </button>
-
-                    {loginMessages.map((msg) => (
-                      <p
-                        key={msg.id}
-                        className={`text-sm font-normal ${
-                          msg.type === "success"
-                            ? "text-green-500"
-                            : "text-red-500"
-                        }`}
-                      >
-                        {msg.message}
-                      </p>
-                    ))}
                   </div>
                 </form>
               </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Radio } from "react-loader-spinner";
-import useTimedMessage from "../components/useTimedMessage";
+import { toast } from "react-toastify";
 import { logoutUser } from "../redux/logoutSlice";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import QR_Code from "../assets/images/QR-Code.png";
@@ -10,7 +10,6 @@ import Samanta from "../assets/images/samanta.webp";
 
 const SignOutPage = () => {
   const [clicked, setClicked] = useState(false);
-  const [loggedOutMessages, setLoggedOutMessages] = useTimedMessage();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,9 +43,9 @@ const SignOutPage = () => {
   // Display the loggedOut and error messages
   useEffect(() => {
     if (loggedOut) {
-      setLoggedOutMessages(loggedOut, "success", 5000);
+      toast.success(loggedOut);
     } else {
-      setLoggedOutMessages(error, "error", 5000);
+      toast.error(error);
     }
   }, [loggedOut, error]);
 
@@ -104,16 +103,6 @@ const SignOutPage = () => {
           <div className="flex flex-row items-center justify-center">
             {loggedOut ? (
               <div className="text-center">
-                {loggedOutMessages.map((msg) => (
-                  <p
-                    key={msg.id}
-                    className={`text-base font-normal ${
-                      msg.type === "success" ? "text-green-500" : "text-red-500"
-                    }`}
-                  >
-                    {msg.message}
-                  </p>
-                ))}
                 <div className="w-72 mx-auto flex items-center justify-center rounded-md bg-green-300 space-x-2 px-3.5 py-2.5 mt-8 text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700">
                   <Link
                     to={redirectUrl ? `/?redirect_url=${redirectUrl}` : "/"}
