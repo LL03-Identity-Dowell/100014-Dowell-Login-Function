@@ -19,6 +19,7 @@ import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PasswordInput from "./passwordInput";
+import useTimedMessage from "./useTimedMessage";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -102,6 +103,7 @@ const SignUp = () => {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
+  const [usernameMessages, setUsernameMessages] = useTimedMessage();
 
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
@@ -256,6 +258,21 @@ const SignUp = () => {
     }
   };
 
+  useEffect(() => {
+    if (isUsernameAvailable) {
+      // Do not reset the form if the username is not available
+      setUsernameMessages(isUsernameAvailable, "success", 2000);
+      dispatch(resetIsUsernameAvailable());
+    }
+
+    if (error) {
+      setUsernameMessages(error, "error", 2000);
+      // Reset only the username field
+      dispatch(resetError());
+      reset({ Username: "" });
+    }
+  }, [isUsernameAvailable, error, reset]);
+
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
@@ -267,19 +284,8 @@ const SignUp = () => {
     showToast(otpSent, true);
     showToast(smsSent, true);
     showToast(registered, true);
-    showToast(isUsernameAvailable, true);
     showToast(error);
-
-    // Additional logic for isUsernameAvailable and error
-    if (isUsernameAvailable) {
-      dispatch(resetIsUsernameAvailable());
-    }
-
-    if (error) {
-      dispatch(resetError());
-      reset({ Username: "" });
-    }
-  }, [otpSent, smsSent, registered, isUsernameAvailable, error, reset]);
+  }, [otpSent, smsSent, registered, error, reset]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -365,6 +371,17 @@ const SignUp = () => {
                     {errors.Username.message}
                   </p>
                 )}
+
+                {usernameMessages.map((msg) => (
+                  <p
+                    key={msg.id}
+                    className={`text-base font-normal ${
+                      msg.type === "success" ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {msg.message}
+                  </p>
+                ))}
               </div>
             </div>
 
