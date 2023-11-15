@@ -141,19 +141,6 @@ const SignUp = () => {
     dispatch(fetchCountries());
   }, [dispatch]);
 
-  // Redirect when `registered` changes
-  useEffect(() => {
-    const username = watch("Username");
-    console.log("Username", username);
-    if (registered) {
-      const encodedUsername = encodeURIComponent(watch().Username);
-      console.log("username", encodedUsername);
-      navigate(
-        `/splash/${encodedUsername}${mainParams ? `?${mainParams}` : ""}`
-      );
-    }
-  }, [registered, navigate, watch, mainParams]);
-
   // dispatch email otp
   const handleEmailOTP = () => {
     if (attemptsOtp > 0) {
@@ -246,16 +233,22 @@ const SignUp = () => {
           newsletter,
         })
       );
-
-      // Reset the form after successful submission
-      reset();
     } else {
       throw new Error(error.response.data.info);
     }
   };
 
-  // Check a username availability
+  // Redirect when `registered` changes
+  useEffect(() => {
+    if (registered) {
+      const username = getValues("Username");
+      setTimeout(() => {
+        navigate(`/splash/${username}${mainParams ? `?${mainParams}` : ""}`);
+      }, 1000);
+    }
+  }, [getValues, registered, navigate, mainParams]);
 
+  // Check a username availability
   const checkUsernameAvailability = async () => {
     const username = watch("Username");
     if (username) {
