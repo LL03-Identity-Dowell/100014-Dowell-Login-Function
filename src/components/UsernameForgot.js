@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Radio } from "react-loader-spinner";
 import { toast } from "react-toastify";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -28,22 +28,28 @@ const UsernameForgot = () => {
     handleSubmit,
     register,
     formState: { errors },
+    watch,
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
   const { loading, usernameList, otpSent, error } =
     useSelector((state) => state.username) || {};
 
-  const handleVerification = (data) => {
+  const handleEmailOTP = (data) => {
     if (attemptsOtp > 0) {
       setAttemptsOtp((prevAttempts) => prevAttempts - 1);
-      const { email, otp } = data;
-      if (email && !otpSent) {
+      const { email } = data;
+      if (email) {
         dispatch(userSendOTP({ email, usage: "forgot_username" }));
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
-      } else {
-        dispatch(verifyOTP({ email, otp }));
       }
+    }
+  };
+
+  const handleVerification = (data) => {
+    const { email, otp } = data;
+    if (email && otp) {
+      dispatch(verifyOTP({ email, otp }));
     }
   };
 
@@ -60,7 +66,7 @@ const UsernameForgot = () => {
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
-      if (message) {
+      if (message && !loading) {
         isSuccess ? toast.success(message) : toast.error(message);
       }
     };
@@ -68,7 +74,7 @@ const UsernameForgot = () => {
     showToast(otpSent, true);
     showToast(usernameList, true);
     showToast(error);
-  }, [otpSent, usernameList, error]);
+  }, [otpSent, usernameList, error, loading]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -116,6 +122,7 @@ const UsernameForgot = () => {
                 <button
                   type="submit"
                   className="btn-send px-2 py-1 self-start"
+                  onClick={() => handleEmailOTP(watch())}
                   disabled={
                     loading ||
                     (otpSent && otpCountdown > 0) ||
@@ -177,7 +184,7 @@ const UsernameForgot = () => {
                 placeholder="Enter OTP from Email"
                 autoComplete="otp"
                 className="input-field"
-                {...register("otp", { required: otpSent })}
+                {...register("otp")}
               />
               {errors?.otp && (
                 <p className="text-red-500 text-xs mt-1">

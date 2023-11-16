@@ -276,7 +276,7 @@ const SignUp = () => {
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
-      if (message) {
+      if (message && !loading) {
         isSuccess ? toast.success(message) : toast.error(message);
       }
     };
@@ -285,7 +285,7 @@ const SignUp = () => {
     showToast(smsSent, true);
     showToast(registered, true);
     showToast(error);
-  }, [otpSent, smsSent, registered, error, reset]);
+  }, [otpSent, smsSent, registered, error, reset, loading]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">

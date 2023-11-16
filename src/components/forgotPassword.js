@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { Radio } from "react-loader-spinner";
 import { toast } from "react-toastify";
+import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { forgotPasswordAsync, sendOTP } from "../redux/forgotPasswordSlice";
 import PasswordInput from "./passwordInput";
 
@@ -118,7 +118,7 @@ const ForgotPassword = () => {
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
-      if (message) {
+      if (message && !loading) {
         isSuccess ? toast.success(message) : toast.error(message);
       }
     };
@@ -126,7 +126,7 @@ const ForgotPassword = () => {
     showToast(otpSent, true);
     showToast(passwordReset, true);
     showToast(error);
-  }, [otpSent, passwordReset, error]);
+  }, [otpSent, passwordReset, error, loading]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
