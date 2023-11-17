@@ -527,7 +527,7 @@ def new_userinfo(request):
     if request.method == 'POST':
         session = request.data["session_id"]
         product = request.data.get("product",None)
-        # mydata = CustomSession.objects.filter(sessionID=session).first()
+        mydata = CustomSession.objects.filter(sessionID=session).first()
 
         if not mydata:
             public_field = {"session_id":session}
@@ -615,7 +615,6 @@ def all_users(request):
     if request.method == 'POST':
         username = request.data["username"]
         password1 = request.data["password"]
-        # password=base64.b64decode(password1.encode('utf-8')).decode()
         user = authenticate(request, username=username, password=password1)
         if user is not None:
             userfield = {}
@@ -1244,7 +1243,6 @@ def PublicApi(request):
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
 
-            # resp={'userinfo':info}
             resp = {
                 'msg': 'success',
                 'info': 'Logged In Successfully',
@@ -1259,7 +1257,6 @@ def PublicApi(request):
         else:
             resp = {'msg': 'error', 'info': "Username not found in database"}
             return Response(resp)
-        # raise AuthenticationFailed("Username not Found or password not found")
     else:
         resp = {'msg': 'error',
                 "info": "Username, Password combination incorrect.."}
@@ -1668,7 +1665,6 @@ def main_login(request):
     other_policy = None
     userID = None
     client_admin_id = None
-    # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
         field = {"Username": username}
@@ -1794,7 +1790,6 @@ def main_login(request):
             except:
                 pass
 
-            # resp={'userinfo':info}
             data = { "msg":"success", "session_id": session }
 
             response = Response()
@@ -2039,7 +2034,7 @@ def LinkLogin(request):
 @api_view(['POST'])
 def all_username(request):
     pwd = request.data.get("pwd")
-    if pwd == dpass:
+    if pwd == 'dpass':
         names=Account.objects.all().values_list('username', flat=True).order_by('username').distinct()
         return Response(names)
     else:
