@@ -7,6 +7,7 @@ import logoutReducer from "./logoutSlice";
 import changePasswordReducer from "./changePasswordSlice";
 import initSliceReducer from "./initSlice";
 import forgotPasswordReducer from "./forgotPasswordSlice";
+import validateUsernameReducer from "./validateUsernameSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     logout: logoutReducer,
     changePassword: changePasswordReducer,
     init: initSliceReducer,
+    validateUsername: validateUsernameReducer,
   },
 });
 

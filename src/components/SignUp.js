@@ -7,19 +7,21 @@ import { fetchCountries } from "../redux/countriesSlice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import {
-  registerUser,
-  resetError,
-  resetIsUsernameAvailable,
-  sendEmailOTP,
-  sendMobileOTP,
-  validateUsernameAsync,
-} from "../redux/registrationSlice";
 import { Radio } from "react-loader-spinner";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {
+  registerUser,
+  sendEmailOTP,
+  sendMobileOTP,
+} from "../redux/registrationSlice";
 import PasswordInput from "./passwordInput";
 import useTimedMessage from "./useTimedMessage";
+import {
+  resetUsernameAvailability,
+  resetUsernameError,
+  validateUsernameAsync,
+} from "../redux/validateUsernameSlice";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -110,8 +112,10 @@ const SignUp = () => {
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { loading, error, registered, otpSent, smsSent, isUsernameAvailable } =
+  const { loading, error, registered, otpSent, smsSent } =
     useSelector((state) => state.registration) || {};
+  const { isLoading, isError, isUsernameAvailable } =
+    useSelector((state) => state.validateUsername) || {};
 
   const conditionalSchema = !exempted
     ? schema
@@ -261,17 +265,17 @@ const SignUp = () => {
   useEffect(() => {
     if (isUsernameAvailable) {
       // Do not reset the form if the username is not available
-      setUsernameMessages(isUsernameAvailable, "success", 2000);
-      dispatch(resetIsUsernameAvailable());
+      setUsernameMessages(isUsernameAvailable, "success", 3000);
+      dispatch(resetUsernameAvailability());
     }
 
-    if (error) {
-      setUsernameMessages(error, "error", 2000);
+    if (isError) {
+      setUsernameMessages(isError, "error", 3000);
       // Reset only the username field
-      dispatch(resetError());
+      dispatch(resetUsernameError());
       reset({ Username: "" });
     }
-  }, [isUsernameAvailable, error, reset]);
+  }, [isUsernameAvailable, isError, reset]);
 
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
@@ -366,6 +370,7 @@ const SignUp = () => {
                   {...register("Username")}
                   onBlur={checkUsernameAvailability}
                 />
+
                 {errors.Username && (
                   <p className="text-red-500 text-xs mt-1">
                     {errors.Username.message}
