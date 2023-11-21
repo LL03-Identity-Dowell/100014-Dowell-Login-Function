@@ -380,7 +380,7 @@ const SignUp = () => {
                 {usernameMessages.map((msg) => (
                   <p
                     key={msg.id}
-                    className={`text-base font-normal ${
+                    className={`text-sm font-light ${
                       msg.type === "success" ? "text-green-500" : "text-red-500"
                     }`}
                   >
