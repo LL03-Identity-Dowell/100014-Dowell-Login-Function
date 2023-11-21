@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { postData } from "./instance";
 
 export const userSendOTP = createAsyncThunk(
-  "username/userSendOTP",
+  "forgotUsername/userSendOTP",
   async ({ email, usage }) => {
     const response = await postData("/api/emailotp/", {
       email,
@@ -13,7 +13,7 @@ export const userSendOTP = createAsyncThunk(
 );
 
 export const verifyOTP = createAsyncThunk(
-  "username/verifyOTP",
+  "forgotUsername/verifyOTP",
   async ({ email, otp }) => {
     const response = await postData("/api/forgot_username/", {
       email,
@@ -23,8 +23,8 @@ export const verifyOTP = createAsyncThunk(
   }
 );
 
-const usernameSlice = createSlice({
-  name: "username",
+const forgotUsernameSlice = createSlice({
+  name: "forgotUsername",
   initialState: {
     usernameList: "",
     otpSent: false,
@@ -61,4 +61,4 @@ const usernameSlice = createSlice({
   },
 });
 
-export default usernameSlice.reducer;
+export default forgotUsernameSlice.reducer;

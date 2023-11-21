@@ -6,8 +6,8 @@ import * as yup from "yup";
 import { Radio } from "react-loader-spinner";
 import { toast } from "react-toastify";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import { verifyOTP, userSendOTP } from "../redux/usernameSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { userSendOTP, verifyOTP } from "../redux/forgotUsernameSlice";
 
 const schema = yup.object().shape({
   email: yup
@@ -33,7 +33,7 @@ const UsernameForgot = () => {
 
   const dispatch = useDispatch();
   const { loading, usernameList, otpSent, error } =
-    useSelector((state) => state.username) || {};
+    useSelector((state) => state.forgotUsername) || {};
 
   const handleEmailOTP = (data) => {
     if (attemptsOtp > 0) {
