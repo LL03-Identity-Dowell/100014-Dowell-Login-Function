@@ -265,12 +265,12 @@ const SignUp = () => {
   useEffect(() => {
     if (isUsernameAvailable) {
       // Do not reset the form if the username is not available
-      setUsernameMessages(isUsernameAvailable, "success", 3000);
+      setUsernameMessages(isUsernameAvailable, "success", 5000);
       dispatch(resetUsernameAvailability());
     }
 
     if (isError) {
-      setUsernameMessages(isError, "error", 3000);
+      setUsernameMessages(isError, "error", 5000);
       // Reset only the username field
       dispatch(resetUsernameError());
       reset({ Username: "" });
