@@ -79,7 +79,7 @@ Clone this repository to your desired folder:
 
 ```sh
   cd Login_function
-  brew install python
+  npm install
 ```
 
 ### Usage
