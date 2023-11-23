@@ -91,7 +91,9 @@ export const registerUser = createAsyncThunk(
 const registrationSlice = createSlice({
   name: "registration",
   initialState: {
-    loading: false,
+    otpLoading: false,
+    smsLoading: false,
+    regLoading: false,
     registered: false,
     otpSent: false,
     smsSent: false,
@@ -101,39 +103,39 @@ const registrationSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(sendEmailOTP.pending, (state) => {
-        state.loading = true;
+        state.otpLoading = true;
         state.error = null;
       })
       .addCase(sendEmailOTP.fulfilled, (state, action) => {
-        state.loading = false;
+        state.otpLoading = false;
         state.otpSent = action.payload;
       })
       .addCase(sendEmailOTP.rejected, (state, action) => {
-        state.loading = false;
+        state.otpLoading = false;
         state.error = action.error.message;
       })
       .addCase(sendMobileOTP.pending, (state) => {
-        state.loading = true;
+        state.smsLoading = true;
         state.error = null;
       })
       .addCase(sendMobileOTP.fulfilled, (state, action) => {
-        state.loading = false;
+        state.smsLoading = false;
         state.smsSent = action.payload;
       })
       .addCase(sendMobileOTP.rejected, (state, action) => {
-        state.loading = false;
+        state.smsLoading = false;
         state.error = action.error.message;
       })
       .addCase(registerUser.pending, (state) => {
-        state.loading = true;
+        state.regLoading = true;
         state.error = null;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading = false;
+        state.regLoading = false;
         state.registered = action.payload;
       })
       .addCase(registerUser.rejected, (state, action) => {
-        state.loading = false;
+        state.regLoading = false;
         state.error = action.error.message;
       });
   },
