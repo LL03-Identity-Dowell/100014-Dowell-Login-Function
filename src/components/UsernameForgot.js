@@ -32,7 +32,7 @@ const UsernameForgot = () => {
   } = useForm({ resolver: yupResolver(schema) });
 
   const dispatch = useDispatch();
-  const { loading, usernameList, otpSent, error } =
+  const { otpLoading, vfyLoading, usernameList, otpSent, error } =
     useSelector((state) => state.forgotUsername) || {};
 
   const handleEmailOTP = (data) => {
@@ -66,15 +66,18 @@ const UsernameForgot = () => {
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
-      if (message && !loading) {
+      if (message && !otpLoading && !vfyLoading) {
         isSuccess ? toast.success(message) : toast.error(message);
       }
     };
 
-    showToast(otpSent, true);
+    if (!usernameList) {
+      showToast(otpSent, true);
+    }
+
     showToast(usernameList, true);
     showToast(error);
-  }, [otpSent, usernameList, error, loading]);
+  }, [otpSent, usernameList, error, otpLoading, vfyLoading]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -124,12 +127,12 @@ const UsernameForgot = () => {
                   className="btn-send px-2 py-1 self-start"
                   onClick={() => handleEmailOTP(watch())}
                   disabled={
-                    loading ||
+                    otpLoading ||
                     (otpSent && otpCountdown > 0) ||
                     attemptsOtp === 0
                   }
                 >
-                  {loading ? (
+                  {otpLoading ? (
                     <Radio
                       visible={true}
                       height={30}
@@ -195,8 +198,8 @@ const UsernameForgot = () => {
           </div>
 
           <div className="mt-4">
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? (
+            <button type="submit" className="submit-btn" disabled={vfyLoading}>
+              {vfyLoading ? (
                 <Radio
                   visible={true}
                   height={30}
