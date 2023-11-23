@@ -105,6 +105,7 @@ const SignUp = () => {
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);
+  const [lastClickedButton, setLastClickedButton] = useState(null);
   const [usernameMessages, setUsernameMessages] = useTimedMessage();
 
   // Use the custom hook to handle the verification
@@ -121,7 +122,7 @@ const SignUp = () => {
     otpSent,
     smsSent,
   } = useSelector((state) => state.registration) || {};
-  const { isLoading, isError, isUsernameAvailable } =
+  const { isError, isUsernameAvailable } =
     useSelector((state) => state.validateUsername) || {};
 
   const conditionalSchema = !exempted
@@ -164,6 +165,7 @@ const SignUp = () => {
         dispatch(sendEmailOTP({ email, username, usage: "create_account" }));
         setOtpCountdown(60); // Reset the OTP countdown timer to 60 seconds
         setVerificationRequested(true);
+        setLastClickedButton("otp");
       }
     }
   };
@@ -187,6 +189,7 @@ const SignUp = () => {
         dispatch(sendMobileOTP({ phonecode, Phone }));
         setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
         setVerificationRequested(true);
+        setLastClickedButton("sms");
       }
     } else {
       setExempted(true);
@@ -292,11 +295,15 @@ const SignUp = () => {
       }
     };
 
+    // Show toasts only if registered is false
     if (!registered) {
-      showToast(otpSent, true);
-      showToast(smsSent, true);
+      if (otpSent && lastClickedButton === "otp") {
+        showToast(otpSent, true);
+      }
+      if (smsSent && lastClickedButton === "sms") {
+        showToast(smsSent, true);
+      }
     }
-
     showToast(registered, true);
     showToast(error);
   }, [
@@ -308,6 +315,7 @@ const SignUp = () => {
     otpLoading,
     smsLoading,
     regLoading,
+    lastClickedButton,
   ]);
 
   return (
