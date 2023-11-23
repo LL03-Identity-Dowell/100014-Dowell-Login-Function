@@ -124,7 +124,11 @@ const ForgotPassword = () => {
       }
     };
 
-    showToast(otpSent, true);
+    // Show toasts only if passwordReset is false
+    if (!passwordReset) {
+      showToast(otpSent, true);
+    }
+
     showToast(passwordReset, true);
     showToast(error);
   }, [otpSent, passwordReset, error, otpLoading, pwLoading]);
