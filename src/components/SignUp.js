@@ -112,8 +112,15 @@ const SignUp = () => {
 
   const dispatch = useDispatch();
   const countries = useSelector((state) => state.countries);
-  const { loading, error, registered, otpSent, smsSent } =
-    useSelector((state) => state.registration) || {};
+  const {
+    otpLoading,
+    smsLoading,
+    regLoading,
+    error,
+    registered,
+    otpSent,
+    smsSent,
+  } = useSelector((state) => state.registration) || {};
   const { isLoading, isError, isUsernameAvailable } =
     useSelector((state) => state.validateUsername) || {};
 
@@ -280,16 +287,28 @@ const SignUp = () => {
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
-      if (message && !loading) {
+      if (message && !otpLoading && !smsLoading && !regLoading) {
         isSuccess ? toast.success(message) : toast.error(message);
       }
     };
 
-    showToast(otpSent, true);
-    showToast(smsSent, true);
+    if (!registered) {
+      showToast(otpSent, true);
+      showToast(smsSent, true);
+    }
+
     showToast(registered, true);
     showToast(error);
-  }, [otpSent, smsSent, registered, error, reset, loading]);
+  }, [
+    otpSent,
+    smsSent,
+    registered,
+    error,
+    reset,
+    otpLoading,
+    smsLoading,
+    regLoading,
+  ]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -458,12 +477,12 @@ const SignUp = () => {
                     className="btn-send px-2 py-1 self-start"
                     onClick={() => handleEmailOTP(watch())}
                     disabled={
-                      loading ||
+                      otpLoading ||
                       (otpSent && otpCountdown > 0) ||
                       attemptsOtp === 0
                     }
                   >
-                    {loading ? (
+                    {otpLoading ? (
                       <Radio
                         visible={true}
                         height={30}
@@ -604,12 +623,12 @@ const SignUp = () => {
                     className="btn-send px-2 py-1 self-start"
                     onClick={() => handleMobileOTP(watch())}
                     disabled={
-                      loading ||
+                      smsLoading ||
                       (smsSent && smsCountdown > 0) ||
                       (attemptsSms === 0 && !exempted)
                     }
                   >
-                    {loading ? (
+                    {smsLoading ? (
                       <Radio
                         visible={true}
                         height={30}
@@ -767,8 +786,8 @@ const SignUp = () => {
           </div>
 
           <div className="mt-8">
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? (
+            <button type="submit" className="submit-btn" disabled={regLoading}>
+              {regLoading ? (
                 <Radio
                   visible={true}
                   height={30}
