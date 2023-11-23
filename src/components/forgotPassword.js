@@ -43,7 +43,7 @@ const ForgotPassword = () => {
   const [otpCountdown, setOtpCountdown] = useState(0);
 
   const dispatch = useDispatch();
-  const { loading, otpSent, passwordReset, error } =
+  const { otpLoading, pwLoading, otpSent, passwordReset, error } =
     useSelector((state) => state.forgotPassword) || {};
 
   const conditionalSchema = otpSent
@@ -76,6 +76,7 @@ const ForgotPassword = () => {
     setValue,
     getValues,
     watch,
+    reset,
   } = useForm({ resolver: yupResolver(conditionalSchema) });
 
   const handleSendOTP = (data) => {
@@ -118,7 +119,7 @@ const ForgotPassword = () => {
   //  Use useEffect to show success and error messages using react-toastify
   useEffect(() => {
     const showToast = (message, isSuccess = false) => {
-      if (message && !loading) {
+      if (message && !otpLoading && !pwLoading) {
         isSuccess ? toast.success(message) : toast.error(message);
       }
     };
@@ -126,7 +127,7 @@ const ForgotPassword = () => {
     showToast(otpSent, true);
     showToast(passwordReset, true);
     showToast(error);
-  }, [otpSent, passwordReset, error, loading]);
+  }, [otpSent, passwordReset, error, otpLoading, pwLoading]);
 
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
@@ -202,10 +203,10 @@ const ForgotPassword = () => {
                   className="btn-send px-2 py-1 self-start"
                   onClick={() => handleSendOTP(watch())}
                   disabled={
-                    loading || (otpSent && otpCountdown) || attemptsOtp === 0
+                    otpLoading || (otpSent && otpCountdown) || attemptsOtp === 0
                   }
                 >
-                  {loading ? (
+                  {otpLoading ? (
                     <Radio
                       visible={true}
                       height={30}
@@ -289,8 +290,8 @@ const ForgotPassword = () => {
           </div>
 
           <div className="mt-4">
-            <button type="submit" className="submit-btn" disabled={loading}>
-              {loading ? (
+            <button type="submit" className="submit-btn" disabled={pwLoading}>
+              {pwLoading ? (
                 <Radio
                   visible={true}
                   height={30}
