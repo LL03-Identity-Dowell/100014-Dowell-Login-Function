@@ -517,9 +517,6 @@ def LinkBased(request):
         qrcodegen.qrgen1(
             user, respj["inserted_id"], f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
         return Response({"qrid": respj["inserted_id"]})
-        # if url is not None:
-        #     return redirect(f'{url}?qrid={respj["inserted_id"]}')
-        # return HttpResponse("pl provide redirect url")
     return Response({"message": "its working"})
 
 @api_view(['GET', 'POST'])
@@ -609,45 +606,6 @@ def new_userinfo(request):
         userinfo = {'userinfo':var2, 'portfolio_info':var3 ,"userportfolio":productport,'members':main_member,"own_organisations":[{"org_name":organisations}],"other_org":otherorg,"roles":roles,"otherorg_list":otherorg_list}
         return Response(userinfo)
     return Response({"message":"its working"})
-
-@api_view(['GET', 'POST'])
-def all_users(request):
-    if request.method == 'POST':
-        username = request.data["username"]
-        password1 = request.data["password"]
-        user = authenticate(request, username=username, password=password1)
-        if user is not None:
-            userfield = {}
-            main = dowellconnection("login", "bangalore", "login", "registration",
-                                    "registration", "10004545", "ABCDE", "fetch", userfield, "nil")
-            main_res = json.loads(main)
-            final = main_res["data"]
-            final2 = []
-            for a in final:
-                try:
-                    if not a["User_status"] == "deleted" and not a["User_status"] == "inactive":
-                        try:
-                            username = a['Username']
-                            payment_status = a['payment_status']
-                            user_id = a['_id']
-                            user_type = a['User_type']
-                            final2.append({"username": username, "org_name": username,
-                                          "payment_status": payment_status, "user_id": user_id, "user_type": user_type})
-                        except:
-                            pass
-                    else:
-                        pass
-                except:
-                    try:
-                        username = a['Username']
-                        payment_status = a['payment_status']
-                        user_id = a['_id']
-                        user_type = a['User_type']
-                        final2.append({"username": username, "org_name": username,
-                                      "payment_status": payment_status, "user_id": user_id, "user_type": user_type})
-                    except:
-                        pass
-            return Response({"data": final2})
 
 
 @api_view(['GET', 'POST'])
@@ -769,6 +727,9 @@ def profile_update(request):
     Email = request.data.get("email")
     Phone = request.data.get("phone")
     Profile_Image = request.data.get("image")
+    img = request.FILES.get('image')
+    teamcode = request.data.get('teamcode')
+
     obj = Account.objects.filter(username=username).first()
     field = {"document_name": username}
     client_admin = dowellconnection(
@@ -2033,8 +1994,9 @@ def LinkLogin(request):
 
 @api_view(['POST'])
 def all_username(request):
+    password = "d0wellre$tp@$$"
     pwd = request.data.get("pwd")
-    if pwd == 'dpass':
+    if pwd == password:
         names=Account.objects.all().values_list('username', flat=True).order_by('username').distinct()
         return Response(names)
     else:
