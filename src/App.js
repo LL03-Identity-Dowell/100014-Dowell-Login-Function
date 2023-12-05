@@ -10,6 +10,9 @@ import ForgotPassword from "./components/forgotPassword";
 import UsersData from "./pages/usersData";
 import checkRequests from "./Hoc/CheckRequests";
 import Error503 from "./pages/Error503";
+import UploadPhoto from "./components/UploadPhoto.js";
+import CameraPhoto from "./components/CameraPhoto.js";
+import ProfilePicture from "./pages/ProfilePicture.js";
 
 function App(props) {
   return (
@@ -24,6 +27,9 @@ function App(props) {
           <Route path="/change_password" element={<ChangePassword />} />
           <Route path="/forgot_username" element={<UsernameForgot />} />
           <Route path="/usersData" element={<UsersData />} />
+          <Route path="/profile-picture" element={<ProfilePicture />} />
+          <Route path="/camera-photo" element={<CameraPhoto />} />
+          <Route path="/upload-photo" element={<UploadPhoto />} />
 
           <Route path="*" element={<NotFound />} />
           <Route path="/503" element={<Error503 />} />

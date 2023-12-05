@@ -73,7 +73,7 @@ const Home = () => {
         <Navigate to="/503" />
       ) : (
         <div className="isolate md:py-4 md:px-4">
-          <div className="shadow-sm mx-auto md:mt-14 max-w-5xl px-2 py-2 md:py-6 md:px-6">
+          <div className="mx-auto md:mt-14 max-w-5xl px-2 py-2 md:py-6 md:px-6">
             <MyTabs />
           </div>
         </div>
