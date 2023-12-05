@@ -10,7 +10,7 @@ const ProfilePicture = () => {
       <div className="md:flex max-w-md mx-auto bg-gray-100 rounded-xl drop-shadow-lg overflow-hidden md:max-w-3xl">
         <div className="md:shrink-0">
           <img
-            class="h-24 w-24 mx-auto object-cover rounded-full md:w-48 md:h-auto md:rounded-none"
+            className="h-24 w-24 mx-auto object-cover rounded-full md:w-48 md:h-auto md:rounded-none"
             src={DoWellVerticalLogo}
             alt="Dowell logo"
             loading="lazy"
