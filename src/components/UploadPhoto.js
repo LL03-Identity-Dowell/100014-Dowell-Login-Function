@@ -28,10 +28,10 @@ const UploadPhoto = () => {
             <img
               src={URL.createObjectURL(avatar)}
               alt="User Avatar"
-              className="h-20 w-20 object-cover rounded-full mb-4"
+              className="h-24 w-24 object-cover rounded-full mb-4"
             />
           ) : (
-            <MdAddAPhoto className="h-12 w-12 text-gray-400" />
+            <MdAddAPhoto className="h-20 w-20 text-gray-400 object-cover" />
           )}
           <span className="text-sm text-gray-600">
             {avatar ? "Change" : "Upload a file"}
