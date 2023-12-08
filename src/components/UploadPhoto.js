@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
+import { RiArrowLeftCircleLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const UploadPhoto = () => {
   const [avatar, setAvatar] = useState(null);
+  const navigate = useNavigate();
 
   const handlePicUpload = async () => {
     try {
@@ -17,9 +20,17 @@ const UploadPhoto = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
-    <div className="flex flex-col justify-center items-center h-screen mx-auto space-y-4">
-      <div className="mt-4 p-6 border border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center">
+    <div className="flex flex-col justify-center items-center h-screen space-y-4 mx-auto">
+      <RiArrowLeftCircleLine
+        className="bg-white text-green-500 absolute top-0 left-0 m-4 w-7 h-7 shadow-md rounded-full"
+        onClick={handleBack}
+      />
+      <div className="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center">
         <label
           htmlFor="file-upload"
           className="cursor-pointer bg-white p-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:outline-none focus:border-cyan-500"
@@ -31,10 +42,10 @@ const UploadPhoto = () => {
               className="h-24 w-24 object-cover rounded-full mb-4"
             />
           ) : (
-            <MdAddAPhoto className="h-20 w-20 text-gray-400 object-cover" />
+            <MdAddAPhoto className="h-24 w-24 text-gray-400 object-cover" />
           )}
-          <span className="text-sm text-gray-600">
-            {avatar ? "Change" : "Upload a file"}
+          <span className="text-sm text-green-500">
+            {avatar ? "Change avatar" : "Upload a file"}
           </span>
           <input
             id="file-upload"
@@ -54,7 +65,7 @@ const UploadPhoto = () => {
 
       <button
         type="button"
-        className="h-12 px-6 font-semibold rounded-md bg-green-500 hover:bg-green-700 text-white"
+        className="h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
         onClick={handlePicUpload}
       >
         Upload Photo
