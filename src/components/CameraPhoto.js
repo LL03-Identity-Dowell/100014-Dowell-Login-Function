@@ -1,13 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { toast } from "react-toastify";
-import { RiArrowLeftCircleLine } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
 
 const CameraPhoto = () => {
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
-  const navigate = useNavigate();
 
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -33,16 +30,8 @@ const CameraPhoto = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-50 relative">
-      <RiArrowLeftCircleLine
-        className="bg-white text-green-500 absolute top-0 left-0 m-4 w-7 h-7 shadow-md rounded-full"
-        onClick={handleBack}
-      />
+    <div className="flex justify-center items-center bg-gray-50 relative">
       <div className="bg-white rounded-xl p-2">
         {imgSrc ? (
           <div className="mt-4 space-y-2">

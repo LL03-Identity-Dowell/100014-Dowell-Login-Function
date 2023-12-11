@@ -1,12 +1,9 @@
 import React, { useState } from "react";
 import { MdAddAPhoto } from "react-icons/md";
-import { RiArrowLeftCircleLine } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const UploadPhoto = () => {
   const [avatar, setAvatar] = useState(null);
-  const navigate = useNavigate();
 
   const handlePicUpload = async () => {
     try {
@@ -20,16 +17,8 @@ const UploadPhoto = () => {
     }
   };
 
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   return (
-    <div className="flex flex-col justify-center items-center h-screen space-y-4 mx-auto">
-      <RiArrowLeftCircleLine
-        className="bg-white text-green-500 absolute top-0 left-0 m-4 w-7 h-7 shadow-md rounded-full"
-        onClick={handleBack}
-      />
+    <div className="flex flex-col justify-center items-center space-y-4 mx-auto">
       <div className="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center">
         <label
           htmlFor="file-upload"
