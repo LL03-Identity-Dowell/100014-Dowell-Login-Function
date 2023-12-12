@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { FaFileUpload } from "react-icons/fa";
 import { MdAddAPhoto } from "react-icons/md";
 import { toast } from "react-toastify";
 
@@ -19,7 +20,7 @@ const UploadPhoto = () => {
 
   return (
     <div className="flex flex-col justify-center items-center space-y-4 mx-auto">
-      <div className="mt-4 p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center">
+      <div className="p-4 border border-dashed border-gray-300 rounded-lg bg-gray-50 flex flex-col items-center justify-center">
         <label
           htmlFor="file-upload"
           className="cursor-pointer bg-white p-4 rounded-lg border border-gray-300 hover:border-gray-400 focus:outline-none focus:border-cyan-500"
@@ -54,10 +55,11 @@ const UploadPhoto = () => {
 
       <button
         type="button"
-        className="h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
+        className="flex items-center justify-center h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
         onClick={handlePicUpload}
       >
-        Upload Photo
+        <FaFileUpload className="mr-2" />
+        Save
       </button>
     </div>
   );

@@ -1,6 +1,8 @@
 import React, { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { toast } from "react-toastify";
+import { FaCamera, FaFileUpload } from "react-icons/fa";
+import { MdAddAPhoto } from "react-icons/md";
 
 const CameraPhoto = () => {
   const webcamRef = useRef(null);
@@ -31,8 +33,8 @@ const CameraPhoto = () => {
   };
 
   return (
-    <div className="flex justify-center items-center bg-gray-50 relative">
-      <div className="bg-white rounded-xl p-2">
+    <div className="flex justify-center items-center relative">
+      <div className="bg-gray-200 rounded-xl p-2">
         {imgSrc ? (
           <div className="mt-4 space-y-2">
             <img
@@ -44,18 +46,20 @@ const CameraPhoto = () => {
               <div className="flex space-x-3 items-center justify-center">
                 <button
                   type="button"
-                  className="h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
+                  className="flex items-center justify-center h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
                   onClick={handleRetake}
                 >
-                  Retake Photo
+                  <MdAddAPhoto className="mr-2" />
+                  Retake
                 </button>
 
                 <button
                   type="button"
-                  className="h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
+                  className="flex items-center justify-center h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
                   onClick={handleUpload}
                 >
-                  Upload Photo
+                  <FaFileUpload className="mr-2" />
+                  Save
                 </button>
               </div>
             </div>
@@ -72,10 +76,11 @@ const CameraPhoto = () => {
             />
             <button
               type="button"
-              className="w-full h-10 px-4 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
+              className="flex items-center justify-center w-full h-10 px-4 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
               onClick={handleCapture}
             >
-              Capture Photo
+              <FaCamera className="mr-2" />
+              Capture
             </button>
           </>
         )}

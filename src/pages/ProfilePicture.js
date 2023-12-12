@@ -2,53 +2,71 @@ import React, { useState } from "react";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import CameraPhoto from "../components/CameraPhoto";
 import UploadPhoto from "../components/UploadPhoto";
+import { FaFileUpload } from "react-icons/fa";
+import { MdAddAPhoto, MdLogin } from "react-icons/md";
 
 const ProfilePicture = () => {
   const [activeComponent, setActiveComponent] = useState(null);
+  const [activeButton, setActiveButton] = useState(null);
 
-  const handleComponentChange = (component) => {
+  const handleComponentChange = (component, buttonName) => {
     setActiveComponent(component);
+    setActiveButton(buttonName);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-      <div className="md:flex max-w-md mx-auto bg-gray-100 rounded-xl drop-shadow-lg md:max-w-3xl">
-        <div className="md:shrink-0">
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-50 mx-auto mt-0">
+      <div className="max-w-screen-lg bg-white rounded-xl shadow-md overflow-hidden mb-6">
+        <div className="p-8 text-center">
           <img
-            className="h-24 w-24 mx-auto object-cover rounded-full md:w-48 md:h-auto md:rounded-none"
+            className="h-28 w-28 mx-auto object-cover rounded-full mb-4"
             src={DoWellVerticalLogo}
             alt="Dowell logo"
             loading="lazy"
           />
-        </div>
-
-        <div className="p-8 text-center md:text-left space-y-8 mx-auto">
-          <h1 className="uppercase tracking-wide text-sm text-gray-900 font-semibold">
-            Face Authentication by FaceIO
+          <h1 className="uppercase tracking-wide text-sm text-gray-900 font-semibold mb-6">
+            Login using variety ways
           </h1>
 
-          <div className="text-center md:text-left space-y-8">
-            <div className="flex space-x-4">
-              <button
-                className="h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
-                type="submit"
-                onClick={() => handleComponentChange(<CameraPhoto />)}
-              >
-                Open Camera
-              </button>
-              <button
-                className="h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
-                type="button"
-                onClick={() => handleComponentChange(<UploadPhoto />)}
-              >
-                Upload Photo
-              </button>
-            </div>
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
+            <button
+              className={`flex items-center justify-center h-10 px-6 font-semibold rounded-md border md:mb-0 ${
+                activeButton === "camera" ? "bg-green-900" : "bg-green-500"
+              } hover:bg-green-600 text-white`}
+              type="submit"
+              onClick={() => handleComponentChange(<CameraPhoto />, "camera")}
+            >
+              <MdAddAPhoto className="mr-2" />
+              Take Photo
+            </button>
+
+            <button
+              className={`flex items-center justify-center h-10 px-6 font-semibold rounded-md border mb-2 md:mb-0 ${
+                activeButton === "upload" ? "bg-green-900" : "bg-green-500"
+              } hover:bg-green-600 text-white`}
+              type="button"
+              onClick={() => handleComponentChange(<UploadPhoto />, "upload")}
+            >
+              <FaFileUpload className="mr-2" />
+              Upload Photo
+            </button>
+
+            <button
+              className={`flex items-center justify-center h-10 px-6 font-semibold rounded-md border ${
+                activeButton === "login" ? "bg-green-900" : "bg-green-500"
+              } hover:bg-green-600 text-white`}
+              type="button"
+              onClick={() => {}}
+              disabled={!activeComponent}
+            >
+              <MdLogin className="mr-2" />
+              Login
+            </button>
           </div>
         </div>
       </div>
 
-      <div className="mt-8">{activeComponent}</div>
+      <div className="mx-auto">{activeComponent}</div>
     </div>
   );
 };
