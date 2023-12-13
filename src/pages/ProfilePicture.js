@@ -1,13 +1,16 @@
 import React, { useState } from "react";
+import { FaFileUpload } from "react-icons/fa";
+import { MdAddAPhoto, MdLogin } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import CameraPhoto from "../components/CameraPhoto";
 import UploadPhoto from "../components/UploadPhoto";
-import { FaFileUpload } from "react-icons/fa";
-import { MdAddAPhoto, MdLogin } from "react-icons/md";
 
 const ProfilePicture = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [activeButton, setActiveButton] = useState(null);
+  const navigate = useNavigate();
 
   const handleComponentChange = (component, buttonName) => {
     setActiveComponent(component);
@@ -25,7 +28,7 @@ const ProfilePicture = () => {
             loading="lazy"
           />
           <h1 className="uppercase tracking-wide text-sm text-gray-900 font-semibold mb-6">
-            Login using variety ways
+            Log-in using different ways
           </h1>
 
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4">
@@ -56,7 +59,7 @@ const ProfilePicture = () => {
                 activeButton === "login" ? "bg-green-900" : "bg-green-500"
               } hover:bg-green-600 text-white`}
               type="button"
-              onClick={() => {}}
+              onClick={() => navigate("/")}
               disabled={!activeComponent}
             >
               <MdLogin className="mr-2" />
