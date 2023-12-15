@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { FaCamera, FaFileUpload } from "react-icons/fa";
 import { MdAddAPhoto } from "react-icons/md";
 
-const CameraPhoto = () => {
+const FaceLogin = () => {
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
 
@@ -25,6 +25,9 @@ const CameraPhoto = () => {
 
   const handleUpload = () => {
     try {
+      const formData = new FormData();
+      formData.append("avatar", imgSrc);
+      console.log("FormData:", formData);
       toast.success("Photo uploaded successfully 🚀");
     } catch (error) {
       toast.error("An error occurred.");
@@ -89,4 +92,4 @@ const CameraPhoto = () => {
   );
 };
 
-export default CameraPhoto;
+export default FaceLogin;

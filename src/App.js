@@ -10,7 +10,7 @@ import ForgotPassword from "./components/forgotPassword";
 import UsersData from "./pages/usersData";
 import checkRequests from "./Hoc/CheckRequests";
 import Error503 from "./pages/Error503";
-import ProfilePicture from "./pages/ProfilePicture.js";
+import MediaLogin from "./pages/MediaLogin.js";
 
 function App(props) {
   return (
@@ -25,7 +25,7 @@ function App(props) {
           <Route path="/change_password" element={<ChangePassword />} />
           <Route path="/forgot_username" element={<UsernameForgot />} />
           <Route path="/usersData" element={<UsersData />} />
-          <Route path="/profile-picture" element={<ProfilePicture />} />
+          <Route path="/media" element={<MediaLogin />} />
 
           <Route path="*" element={<NotFound />} />
           <Route path="/503" element={<Error503 />} />

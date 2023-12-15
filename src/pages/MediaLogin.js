@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { FaFileUpload } from "react-icons/fa";
-import { MdAddAPhoto, MdLogin } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { MdAddAPhoto, MdLogin } from "react-icons/md";
+import { AiFillAudio } from "react-icons/ai";
 
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
-import CameraPhoto from "../components/CameraPhoto";
-import UploadPhoto from "../components/UploadPhoto";
+import FaceLogin from "../components/FaceLogin";
+import AudioLogin from "../components/AudioLogin";
 
-const ProfilePicture = () => {
+const MediaLogin = () => {
   const [activeComponent, setActiveComponent] = useState(null);
   const [activeButton, setActiveButton] = useState(null);
   const navigate = useNavigate();
@@ -37,7 +37,7 @@ const ProfilePicture = () => {
                 activeButton === "camera" ? "bg-green-900" : "bg-green-500"
               } hover:bg-green-600 text-white`}
               type="submit"
-              onClick={() => handleComponentChange(<CameraPhoto />, "camera")}
+              onClick={() => handleComponentChange(<FaceLogin />, "camera")}
             >
               <MdAddAPhoto className="mr-2" />
               Take Photo
@@ -48,10 +48,10 @@ const ProfilePicture = () => {
                 activeButton === "upload" ? "bg-green-900" : "bg-green-500"
               } hover:bg-green-600 text-white`}
               type="button"
-              onClick={() => handleComponentChange(<UploadPhoto />, "upload")}
+              onClick={() => handleComponentChange(<AudioLogin />, "audio")}
             >
-              <FaFileUpload className="mr-2" />
-              Upload Photo
+              <AiFillAudio className="mr-2" />
+              Record Voice
             </button>
 
             <button
@@ -74,4 +74,4 @@ const ProfilePicture = () => {
   );
 };
 
-export default ProfilePicture;
+export default MediaLogin;
