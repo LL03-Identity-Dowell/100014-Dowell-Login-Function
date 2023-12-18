@@ -1,39 +1,53 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { toast } from "react-toastify";
 import { FaCamera, FaFileUpload } from "react-icons/fa";
 import { MdAddAPhoto } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+
+import { uploadPhoto } from "../redux/faceLoginSlice";
 
 const FaceLogin = () => {
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
+  const dispatch = useDispatch();
+  const { error, upload, picLoading } = useSelector((state) => state.faceLogin);
 
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setImgSrc(imageSrc);
-    try {
-      toast.success("Photo captured successfully 🚀");
-    } catch (error) {
-      toast.error("An error occurred.");
-      console.log("Error capturing photo:", error);
-    }
   }, [webcamRef, setImgSrc]);
 
   const handleRetake = () => {
     setImgSrc(null);
   };
 
-  const handleUpload = () => {
-    try {
-      const formData = new FormData();
-      formData.append("avatar", imgSrc);
-      console.log("FormData:", formData);
-      toast.success("Photo uploaded successfully 🚀");
-    } catch (error) {
-      toast.error("An error occurred.");
-      console.log("Error uploading photo:", error);
+  const handleUpload = async () => {
+    // Check if imageSrc is not null
+    if (!imgSrc) {
+      toast.error("No image to upload.");
+      return;
     }
+
+    const formData = new FormData();
+    const imageBlob = await fetch(imgSrc).then((res) => res.blob());
+    formData.append("image", imageBlob);
+
+    console.log("Uploading image:", imgSrc);
+    dispatch(uploadPhoto(formData));
   };
+
+  //  Use useEffect to show success and error messages using react-toastify
+  useEffect(() => {
+    const showToast = (message, isSuccess = false) => {
+      if (message && !picLoading) {
+        isSuccess ? toast.success(message) : toast.error(message);
+      }
+    };
+
+    showToast(upload, true);
+    showToast(error);
+  }, [error, upload, picLoading]);
 
   return (
     <div className="flex justify-center items-center relative">

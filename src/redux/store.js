@@ -8,6 +8,7 @@ import initSliceReducer from "./initSlice";
 import forgotPasswordReducer from "./forgotPasswordSlice";
 import forgotUsernameSlice from "./forgotUsernameSlice";
 import validateUsernameReducer from "./validateUsernameSlice";
+import faceLoginReducer from "./faceLoginSlice";
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     changePassword: changePasswordReducer,
     init: initSliceReducer,
     validateUsername: validateUsernameReducer,
+    faceLogin: faceLoginReducer,
   },
 });
 
