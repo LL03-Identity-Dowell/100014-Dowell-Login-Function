@@ -29,11 +29,19 @@ const FaceLogin = () => {
       return;
     }
 
-    const formData = new FormData();
+    // Convert base64 to Blob
     const imageBlob = await fetch(imgSrc).then((res) => res.blob());
+
+    // Create an object URL for the Blob
+    const imageUrl = URL.createObjectURL(imageBlob);
+
+    // Display the image
+    setImgSrc(imageUrl);
+    // Now you can send the imageBlob to the server if needed
+    const formData = new FormData();
     formData.append("image", imageBlob);
 
-    console.log("Uploading image:", imgSrc);
+    console.log("Uploading image:", imageUrl);
     dispatch(uploadPhoto(formData));
   };
 
@@ -76,7 +84,7 @@ const FaceLogin = () => {
                   onClick={handleUpload}
                 >
                   <FaFileUpload className="mr-2" />
-                  Save
+                  Upload
                 </button>
               </div>
             </div>
