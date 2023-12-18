@@ -49,7 +49,7 @@ const AudioLogin = () => {
         onClick={handleAudioUpload}
       >
         <FaFileUpload className="mr-2" />
-        Save
+        Upload
       </button>
     </div>
   );
