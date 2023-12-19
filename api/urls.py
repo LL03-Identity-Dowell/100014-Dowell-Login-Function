@@ -36,6 +36,8 @@ urlpatterns = [
     path('validate_username/', views.validate_username, name='validate-username'),
     path('user_data/',views.user_data,name="user_data"),
     path('user_report/',views.user_report,name="user_report"),
-    path('all_username/',views.all_username,name="all_username")
+    path('all_username/',views.all_username,name="all_username"),
+
+    path('face_login_api/', views.face_login_api, name="face_login_api"),
 
 ]
