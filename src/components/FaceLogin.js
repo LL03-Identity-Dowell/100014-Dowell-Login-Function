@@ -6,6 +6,7 @@ import { MdAddAPhoto } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 
 import { uploadPhoto } from "../redux/faceLoginSlice";
+import dataURItoBlob from "../utils/dataURItoBlob";
 
 const FaceLogin = () => {
   const webcamRef = useRef(null);
@@ -30,18 +31,13 @@ const FaceLogin = () => {
     }
 
     // Convert base64 to Blob
-    const imageBlob = await fetch(imgSrc).then((res) => res.blob());
+    const imageBlob = dataURItoBlob(imgSrc);
 
-    // Create an object URL for the Blob
-    const imageUrl = URL.createObjectURL(imageBlob);
-
-    // Display the image
-    setImgSrc(imageUrl);
     // Now you can send the imageBlob to the server if needed
     const formData = new FormData();
     formData.append("image", imageBlob);
 
-    console.log("Uploading image:", imageUrl);
+    console.log("Uploading image:", imageBlob);
     dispatch(uploadPhoto(formData));
   };
 
