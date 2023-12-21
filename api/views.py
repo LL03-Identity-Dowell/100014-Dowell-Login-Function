@@ -2081,14 +2081,12 @@ def face_login_api(request):
 
     # Get all accounts from register collection
     field = {}
-    register_collection = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",field,"nil")
-    account_list = json.loads(register_collection)
-    account_data_list = account_list["data"]
+    accounts = Account.objects.all()
 
     username = None
     # Compare faces and retrieve username
-    for account in account_data_list:
-      known_img = face_recognition.load_image_file(f"dowell_login{account['Profile_Image']}")
+    for account in accounts:
+      known_img = face_recognition.load_image_file(f"dowell_login{account.profile_image}")
       try:
         known_encoding = face_recognition.face_encodings(known_img)[0]
         result = face_recognition.compare_faces([known_encoding], unknown_encoding)
