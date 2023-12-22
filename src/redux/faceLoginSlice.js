@@ -1,18 +1,17 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const base_url = "https://100014.pythonanywhere.com";
+const base_url = "https://100014.pythonanywhere.com/api";
 
 export const uploadPhoto = createAsyncThunk(
   "faceLogin/uploadPhoto",
   async (data) => {
     const {
-      formData,
+      image,
       time,
       os,
       device,
       timezone,
-      userLanguage,
       browser,
       location,
       randomSession,
@@ -20,27 +19,18 @@ export const uploadPhoto = createAsyncThunk(
       redirectUrl,
     } = data;
     try {
-      const response = await axios.post(
-        `${base_url}/api/face_login_api/`,
-        formData,
-        {
-          headers: {
-            // If needed, add any headers here
-          },
-          params: {
-            time,
-            os,
-            device,
-            timezone,
-            userLanguage,
-            browser,
-            location,
-            randomSession,
-            mainparams,
-            redirectUrl,
-          },
-        }
-      );
+      const response = await axios.post(`${base_url}/face_login_api/`, {
+        image,
+        time,
+        os,
+        device,
+        timezone,
+        browser,
+        location,
+        randomSession,
+        mainparams,
+        redirectUrl,
+      });
 
       console.log("Pic", response.data);
       return response.data;

@@ -1,8 +1,9 @@
-import Coordinate from "./Coordinate";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+import Coordinate from "./Coordinate";
 import { detectBrowser } from "./browserUtils";
 import { getDeviceType, getOperatingSystem } from "./deviceUtils";
-import { useSelector } from "react-redux";
 
 // commonUtils.js
 export const CommonData = () => {
@@ -44,8 +45,8 @@ export const CommonData = () => {
     timezone,
     browser,
     location,
-    mainparams,
     randomSession,
+    mainparams,
     redirectUrl,
   };
 };

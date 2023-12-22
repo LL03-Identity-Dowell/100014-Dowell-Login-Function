@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/loginSlice";
-import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
-import { detectBrowser } from "../utils/browserUtils";
 import { RotatingLines } from "react-loader-spinner";
 import Iframe from "react-iframe";
 import { toast } from "react-toastify";
+
+import { loginUser } from "../redux/loginSlice";
+import { detectBrowser } from "../utils/browserUtils";
+import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";

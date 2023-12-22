@@ -46,8 +46,8 @@ const FaceLogin = () => {
     const imageBlob = dataURItoBlob(imgSrc);
 
     // Now you can send the imageBlob to the server if needed
-    const formData = new FormData();
-    formData.append("image", imageBlob);
+    const image = new FormData();
+    image.append("image", imageBlob);
 
     console.log("Uploading image:", imageBlob);
     // Additional data
@@ -56,7 +56,6 @@ const FaceLogin = () => {
       os,
       device,
       timezone,
-      userLanguage: navigator.language || navigator.userLanguage,
       browser,
       location,
       randomSession,
@@ -68,7 +67,7 @@ const FaceLogin = () => {
 
     try {
       // Dispatch the action with both formData and additional data
-      await dispatch(uploadPhoto({ formData, ...additionalData }));
+      await dispatch(uploadPhoto({ image, ...additionalData }));
     } catch (error) {
       // Handle error
       console.error("Error uploading photo:", error);
