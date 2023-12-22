@@ -8,7 +8,10 @@ import csv
 import requests
 import re
 import jwt
-import face_recognition
+try:
+    import face_recognition
+except:
+    pass 
 
 from django.shortcuts import render
 from django.core.files.base import ContentFile
@@ -43,7 +46,8 @@ from loginapp.models import (
   RandomSession, 
   Linkbased_RandomSession, 
   Location_check,
-  UserModel
+  UserModel,
+  Face_Login
 )
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
@@ -2004,7 +2008,8 @@ def all_username(request):
         return Response(names)
     else:
         return Response("Verification Failed !")
-
+    
+@csrf_exempt
 @api_view(['POST'])
 def face_login_api(request):
     # Initialize variables
@@ -2035,18 +2040,20 @@ def face_login_api(request):
     osver = request.data.get("os", None)
     ltime = request.data.get("time", None)
     ip_user = request.data.get("ip", None)
-    zone = request.data("timezone", None)
-    random_session = request.data("randomSession", None)
+    zone = request.data.get("timezone", None)
+    random_session = request.data.get("randomSession", None)
     browser = request.data.get("browser", None)
     language = request.data.get("language", "English")
-    
+
+    print(image)
+
     try: # Get country and city from location
         location_list = location.split(" ")
         country, city = country_city_name(location_list[0], location_list[1])
     except:
         city = ""
         country = ""
-    
+
     try: # Set IP for user
         if ip_user != "":
             response = requests.get(f'https://ipapi.co/{ip_user}/json/').json()
@@ -2057,14 +2064,14 @@ def face_login_api(request):
         ip_city = None
 
     # Validation Errors
-    if None in [image, location, device, osver, ltime, ip_user, mainparams, random_session]:
+    if None in [image, device, osver, ltime, ip_user, mainparams, random_session]:
         resp = {
             "msg": "error",
             "info": "Provide all credentials",
-            "Credentials": "username, password, location, device, os, time, ip, mainparams"
+            "Credentials": "image, device, os, time, ip, mainparams, randomSession"
         }
         return Response(resp,status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Get face encoding for unknown image
     filename = default_storage.save(image.name, image)
     image_path = default_storage.path(filename)
@@ -2080,215 +2087,256 @@ def face_login_api(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
     # Get all accounts from register collection
-    field = {}
-    accounts = Account.objects.all()
+    # field = {}
+    # register_collection = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",field,"nil")
+    # account_list = json.loads(register_collection)
+    # account_data_list = account_list["data"]
+    # return Response({"data":account_data_list})
+    few_days=datetime.datetime.now() + relativedelta(days=-10)
+    # print(three_month)
 
+    accounts = Account.objects.filter(last_login__gt=few_days).exclude(profile_image="user.png").exclude(profile_image__exact='').exclude(profile_image__isnull=True)
+
+    print(len(accounts))
     username = None
     # Compare faces and retrieve username
     for account in accounts:
-      known_img = face_recognition.load_image_file(f"dowell_login{account.profile_image}")
-      try:
-        known_encoding = face_recognition.face_encodings(known_img)[0]
-        result = face_recognition.compare_faces([known_encoding], unknown_encoding)
-        if result[0] == True:
-            username = account['Username']
-      except:
+        if account.profile_image is not None and 'pythonanywhere.com' not in str(account.profile_image):
+            try:
+                known_img = face_recognition.load_image_file(f"dowell_login/media/{account.profile_image}")
+            except:
+                pass
+            try:
+                known_encoding = face_recognition.face_encodings(known_img)[0]
+                result = face_recognition.compare_faces([known_encoding], unknown_encoding)
+                if result[0] == True:
+                    username = account.username
+                    break
+            except:
+                pass
+                # return Response({
+                #     'msg': "error",
+                #     'info': "Face not detected in image",
+                #     'Credentials': 'image'
+                # }, status=status.HTTP_400_BAD_REQUEST)
+
+    if username is not None:
+      # Get user model and update current task
+        obj = Account.objects.filter(username=username).first()
+
+        try:
+            obj.current_task = "Logging In"
+            obj.save(update_fields=['current_task'])
+        except:
+            pass
+    else:
+        resp = {"msg":"error","info": "User not found"}
+        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+
+      # Get random session or create random session
+    random_session_obj1 = RandomSession.objects.filter(username=username).first()
+    if random_session_obj1 is None:
+        random_session_obj = RandomSession.objects.filter(sessionID=random_session).first()
+        if random_session_obj is None:
+            return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
+        random_session_obj.username=username
+        random_session_obj.save(update_fields=['username'])
+
+    user = obj
+    if user is not None:
+        field = {"Username": username}
+        id = dowellconnection("login", "bangalore", "login", "registration",
+                            "registration", "10004545", "ABCDE", "find", field, "nil")
+        response = json.loads(id)
+        if response["data"] != None:
+            try:
+                obj.current_task="Verifying User"
+                obj.save(update_fields=['current_task'])
+            except:
+                pass
+            form = login(request, user)
+            request.session.save()
+            session = request.session.session_key
+            try:
+                res = create_event()
+                event_id = res['event_id']
+            except:
+                event_id = None
+            profile_image = "https://100014.pythonanywhere.com/media/user.png"
+            first_name = response["data"]['Firstname']
+            last_name = response["data"]['Lastname']
+            email = response["data"]['Email']
+            phone = response["data"]['Phone']
+            try:
+                userID=response["data"]['_id']
+                if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
+                    profile_image = "https://100014.pythonanywhere.com/media/user.png"
+                else:
+                    profile_image = response["data"]['Profile_Image']
+                User_type = response["data"]['User_type']
+                client_admin_id = response["data"]['client_admin_id']
+                payment_status = response["data"]['payment_status']
+                newsletter = response["data"]['newsletter_subscription']
+                user_country = response["data"]['user_country']
+                privacy_policy = response["data"]['Policy_status']
+                other_policy = response["data"]['safety_security_policy']
+                role_res = response["data"]['Role']
+                company = response["data"]['company_id']
+                member = response["data"]['Memberof']
+                dept = response["data"]['dept_id']
+                org = response["data"]['org_id']
+                project = response["data"]['project_id']
+                subproject = response["data"]['subproject_id']
+            except:
+                pass
+            try:
+                final_ltime = parser.parse(ltime).strftime('%d %b %Y %H:%M:%S')
+                dowell_time = time.strftime(
+                    "%d %b %Y %H:%M:%S", time.gmtime(dowellclock()+1609459200))
+            except:
+                final_ltime = ''
+                dowell_time = ''
+            serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+
+            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
+                            'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ip_user, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            dowellconnection("login", "bangalore", "login", "session",
+                            "session", "1121", "ABCDE", "insert", field_session, "nil")
+
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ip_user,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            info1=json.dumps(info)
+            infoo=str(info1)
+            custom_session = CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
+
+            serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+
+            if ip_city is not None:
+                location_check = Location_check.objects.filter(username=username).first()
+                if not location_check:
+                    usual = [f'{ip_city}']
+                    Location_check.objects.create(username=username,usual=str(json.dumps(usual)))
+                else:
+                    match = "Checking"
+                    try:
+                        usual = json.loads(location_check.usual)
+                    except:
+                        usual = location_check.usual
+                    if ip_city not in usual:
+                        try:
+                            unusual = json.loads(location_check.unusual)
+                        except:
+                            unusual = location_check.unusual
+                            pass
+                        if unusual is not None:
+                            for a in unusual:
+                                if ip_city == list(a.keys())[0]:
+                                    a[f"{ip_city}"]+=1
+                                    match="True"
+                                    if a[f"{ip_city}"] %3==0:
+                                        send=True
+                                    break
+                                else:
+                                    match="False"
+                        if match !="True" and match !="False":
+                            unusual=[{f'{ip_city}':1}]
+                            send=True
+                        elif match == "False":
+                            unusual.append({f'{ip_city}':1})
+                            send=True
+                        location_check.unusual = str(json.dumps(unusual))
+                        location_check.save(update_fields=["unusual"])
+                        try:
+                            if send == True:
+                                values = {"username":username,"ip":ip_user,"location":ip_city}
+                                url_email = "https://100085.pythonanywhere.com/api/email/"
+                                payload = {
+                                    "toname": username,
+                                    "toemail": email,
+                                    "subject": "Login detected from another location",
+                                    "email_content": render_to_string(os.path.join(settings.BASE_DIR,'templates/login/location_info.html'),values)
+                                }
+                                response = requests.post(url_email, json=payload)
+                        except:
+                            pass
+
+            try:
+                obj.current_task="Connecting to UX Living Lab"
+                obj.save(update_fields=['current_task'])
+            except:
+                pass
+
+            data = { "msg":"success", "session_id": session }
+
+            response = Response()
+
+            if "org=" in mainparams and not "code=masterlink" in mainparams:
+                if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams:
+                    data["url"]=f'https://100093.pythonanywhere.com/exportfolio?session_id={session}&{mainparams}'
+                elif "linktype=common" in mainparams:
+                    data["url"]=f'https://100093.pythonanywhere.com/commoninvitelink?session_id={session}&{mainparams}'
+                else:
+                    data["url"]=f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{mainparams}'
+
+            elif "code=masterlink" in mainparams:
+                data["url"]=f'https://100093.pythonanywhere.com/masterlink?session_id={session}&{mainparams}'
+
+            elif "redirect_url" in mainparams:
+                try:
+                    result= re.search('redirect_url=(.*)&',mainparams)
+                    rr=result.group(1)
+                    if "&" in rr:
+                        test=rr.split("&")
+                        rr=test[0]
+                except:
+                    rr= mainparams[mainparams.find('redirect_url=')+13:]
+                data["url"]=f'{rr}?session_id={session}'
+            elif "hr_invitation" in mainparams:
+                try:
+                    result= re.search('hr_invitation=(.*)&',mainparams)
+                    hr_invitation=result.group(1)
+                except:
+                    hr_invitation= mainparams[mainparams.find('hr_invitation=')+14:]
+                hr_invitation=jwt.decode(jwt=hr_invitation,key='secret',algorithms=["HS256"])
+                data["url"]=f'https://100093.pythonanywhere.com/invitelink1?session_id={session}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={username}'
+            else:
+                data["url"]=f'https://100093.pythonanywhere.com?session_id={session}'
+
+            response.data = data
+            return response
+        else:
+            resp = {"msg":"error","info": "Username not found in database"}
+            return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+        # raise AuthenticationFailed("Username not Found or password not found")
+    else:
+        resp = {"msg":"error","info": "User not found"}
+        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def face_id(request):
+    username=request.data.get("username")
+    image=request.FILES.get("image")
+
+    if None in [username,image]:
+        return Response({'msg':'error','info':'All details not provided'},status.HTTP_400_BAD_REQUEST)
+
+    filename = default_storage.save(image.name, image)
+    image_path = default_storage.path(filename)
+    unknown_img = face_recognition.load_image_file(image_path)
+    try:
+        unknown_encoding = face_recognition.face_encodings(unknown_img)[0]
+        unknown_encoding_list = str(unknown_encoding.tolist())
+    except:
         return Response({
             'msg': "error",
             'info': "Face not detected in image",
             'Credentials': 'image'
         }, status=status.HTTP_400_BAD_REQUEST)
-    
-    if username is not None:
-      # Get user model and update current task
-      obj = Account.objects.filter(username=username).first()
-    
-      try:
-        obj.current_task = "Logging In"
-        obj.save(update_fields=['current_task'])
-      except:
-        pass          
 
-      # Get random session or create random session    
-      random_session_obj1 = RandomSession.objects.filter(username=username).first()
-      if random_session_obj1 is None:
-          random_session_obj = RandomSession.objects.filter(sessionID=random_session).first()
-          if random_session_obj is None:
-              return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
-          random_session_obj.username=username
-          random_session_obj.save(update_fields=['username'])
-    
-      user = obj
-      if user is not None:
-          field = {"Username": username}
-          id = dowellconnection("login", "bangalore", "login", "registration",
-                                "registration", "10004545", "ABCDE", "find", field, "nil")
-          response = json.loads(id)
-          if response["data"] != None:
-              try:
-                  obj.current_task="Verifying User"
-                  obj.save(update_fields=['current_task'])
-              except:
-                  pass
-              form = login(request, user)
-              request.session.save()
-              session = request.session.session_key
-              try:
-                  res = create_event()
-                  event_id = res['event_id']
-              except:
-                  event_id = None
-              profile_image = "https://100014.pythonanywhere.com/media/user.png"
-              first_name = response["data"]['Firstname']
-              last_name = response["data"]['Lastname']
-              email = response["data"]['Email']
-              phone = response["data"]['Phone']
-              try:
-                  userID=response["data"]['_id']
-                  if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
-                      profile_image = "https://100014.pythonanywhere.com/media/user.png"
-                  else:
-                      profile_image = response["data"]['Profile_Image']
-                  User_type = response["data"]['User_type']
-                  client_admin_id = response["data"]['client_admin_id']
-                  payment_status = response["data"]['payment_status']
-                  newsletter = response["data"]['newsletter_subscription']
-                  user_country = response["data"]['user_country']
-                  privacy_policy = response["data"]['Policy_status']
-                  other_policy = response["data"]['safety_security_policy']
-                  role_res = response["data"]['Role']
-                  company = response["data"]['company_id']
-                  member = response["data"]['Memberof']
-                  dept = response["data"]['dept_id']
-                  org = response["data"]['org_id']
-                  project = response["data"]['project_id']
-                  subproject = response["data"]['subproject_id']
-              except:
-                  pass
-              try:
-                  final_ltime = parser.parse(ltime).strftime('%d %b %Y %H:%M:%S')
-                  dowell_time = time.strftime(
-                      "%d %b %Y %H:%M:%S", time.gmtime(dowellclock()+1609459200))
-              except:
-                  final_ltime = ''
-                  dowell_time = ''
-              serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
-
-              field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                              'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ip_user, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
-              dowellconnection("login", "bangalore", "login", "session",
-                              "session", "1121", "ABCDE", "insert", field_session, "nil")
-
-              info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ip_user,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
-              info1=json.dumps(info)
-              infoo=str(info1)
-              custom_session = CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
-
-              serverclock1 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-              LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
-
-              if ip_city is not None:
-                  location_check = Location_check.objects.filter(username=username).first()
-                  if not location_check:
-                      usual = [f'{ip_city}']
-                      Location_check.objects.create(username=username,usual=str(json.dumps(usual)))
-                  else:
-                      match = "Checking"
-                      try:
-                          usual = json.loads(location_check.usual)
-                      except:
-                          usual = location_check.usual
-                      if ip_city not in usual:
-                          try:
-                              unusual = json.loads(location_check.unusual)
-                          except:
-                              unusual = location_check.unusual
-                              pass
-                          if unusual is not None:
-                              for a in unusual:
-                                  if ip_city == list(a.keys())[0]:
-                                      a[f"{ip_city}"]+=1
-                                      match="True"
-                                      if a[f"{ip_city}"] %3==0:
-                                          send=True
-                                      break
-                                  else:
-                                      match="False"
-                          if match !="True" and match !="False":
-                              unusual=[{f'{ip_city}':1}]
-                              send=True
-                          elif match == "False":
-                              unusual.append({f'{ip_city}':1})
-                              send=True
-                          location_check.unusual = str(json.dumps(unusual))
-                          location_check.save(update_fields=["unusual"])
-                          try:
-                              if send == True:
-                                  values = {"username":username,"ip":ip_user,"location":ip_city}
-                                  url_email = "https://100085.pythonanywhere.com/api/email/"
-                                  payload = {
-                                      "toname": username,
-                                      "toemail": email,
-                                      "subject": "Login detected from another location",
-                                      "email_content": render_to_string(os.path.join(settings.BASE_DIR,'templates/login/location_info.html'),values)
-                                  }
-                                  response = requests.post(url_email, json=payload)
-                          except:
-                              pass
-
-              try:
-                  obj.current_task="Connecting to UX Living Lab"
-                  obj.save(update_fields=['current_task'])
-              except:
-                  pass
-
-              data = { "msg":"success", "session_id": session }
-
-              response = Response()
-              
-              if "org=" in mainparams and not "code=masterlink" in mainparams:
-                  if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams:
-                      data["url"]=f'https://100093.pythonanywhere.com/exportfolio?session_id={session}&{mainparams}'
-                  elif "linktype=common" in mainparams:
-                      data["url"]=f'https://100093.pythonanywhere.com/commoninvitelink?session_id={session}&{mainparams}'
-                  else:
-                      data["url"]=f'https://100093.pythonanywhere.com/invitelink?session_id={session}&{mainparams}'
-
-              elif "code=masterlink" in mainparams:
-                  data["url"]=f'https://100093.pythonanywhere.com/masterlink?session_id={session}&{mainparams}'
-
-              elif "redirect_url" in mainparams:
-                  try:
-                      result= re.search('redirect_url=(.*)&',mainparams)
-                      rr=result.group(1)
-                      if "&" in rr:
-                          test=rr.split("&")
-                          rr=test[0]
-                  except:
-                      rr= mainparams[mainparams.find('redirect_url=')+13:]
-                  data["url"]=f'{rr}?session_id={session}'
-              elif "hr_invitation" in mainparams:
-                  try:
-                      result= re.search('hr_invitation=(.*)&',mainparams)
-                      hr_invitation=result.group(1)
-                  except:
-                      hr_invitation= mainparams[mainparams.find('hr_invitation=')+14:]
-                  hr_invitation=jwt.decode(jwt=hr_invitation,key='secret',algorithms=["HS256"])
-                  data["url"]=f'https://100093.pythonanywhere.com/invitelink1?session_id={session}&org={hr_invitation["org_name"]}&org_id={hr_invitation["org_id"]}&type={hr_invitation["member_type"]}&member_name={hr_invitation["toname"]}&code={hr_invitation["unique_id"]}&spec=hr_invite&u_code=hr_invite&detail=&qr_id={hr_invitation["qr_id"]}&owner_name={hr_invitation["owner_name"]}&portfolio_name={hr_invitation["portfolio_name"]}&product={hr_invitation["product"]}&role={hr_invitation["job_role"]}&toemail={hr_invitation["toemail"]}&data_type={hr_invitation["data_type"]}&date_time={hr_invitation["date_time"]}&name={username}'
-              else:
-                  data["url"]=f'https://100093.pythonanywhere.com?session_id={session}'
-
-              response.data = data
-              return response
-          else:
-              resp = {"msg":"error","info": "Username not found in database"}
-              return Response(resp,status=status.HTTP_400_BAD_REQUEST)
-          # raise AuthenticationFailed("Username not Found or password not found")
-      else:
-          resp = {"msg":"error","info": "Username, Password combination incorrect.."}
-          return Response(resp,status=status.HTTP_400_BAD_REQUEST)
-
-    return Response({
-        'success': True,
-        'result': result
-    })
+    face_obj = Face_Login.objects.filter(username=username).first()
+    if face_obj is not None:
+        face_obj.image = unknown_encoding_list
+        face_obj.save(update_fields=['image'])
+        return Response({'msg':'success','info':'Face ID is updated !!'})
+    Face_Login.objects.create(username=username, image=unknown_encoding_list)
+    return Response({'msg':'success','info':'Face ID is saved !!'})
