@@ -7,8 +7,20 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { uploadPhoto } from "../redux/faceLoginSlice";
 import dataURItoBlob from "../utils/dataURItoBlob";
+import { CommonData } from "../utils/commonUtils";
 
 const FaceLogin = () => {
+  const {
+    time,
+    os,
+    device,
+    timezone,
+    browser,
+    location,
+    randomSession,
+    mainparams,
+    redirectUrl,
+  } = CommonData();
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
   const dispatch = useDispatch();
@@ -38,7 +50,29 @@ const FaceLogin = () => {
     formData.append("image", imageBlob);
 
     console.log("Uploading image:", imageBlob);
-    dispatch(uploadPhoto(formData));
+    // Additional data
+    const additionalData = {
+      time,
+      os,
+      device,
+      timezone,
+      userLanguage: navigator.language || navigator.userLanguage,
+      browser,
+      location,
+      randomSession,
+      mainparams,
+      redirectUrl,
+    };
+
+    console.log("commonUtils", additionalData);
+
+    try {
+      // Dispatch the action with both formData and additional data
+      await dispatch(uploadPhoto({ formData, ...additionalData }));
+    } catch (error) {
+      // Handle error
+      console.error("Error uploading photo:", error);
+    }
   };
 
   //  Use useEffect to show success and error messages using react-toastify

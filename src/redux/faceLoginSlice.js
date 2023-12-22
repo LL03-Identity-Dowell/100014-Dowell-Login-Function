@@ -5,33 +5,41 @@ const base_url = "https://100014.pythonanywhere.com";
 
 export const uploadPhoto = createAsyncThunk(
   "faceLogin/uploadPhoto",
-  async (
-    formData,
-    time,
-    os,
-    device,
-    timezone,
-    userLanguage,
-    browser,
-    location,
-    randomSession,
-    mainparams,
-    redirectUrl
-  ) => {
+  async (data) => {
+    const {
+      formData,
+      time,
+      os,
+      device,
+      timezone,
+      userLanguage,
+      browser,
+      location,
+      randomSession,
+      mainparams,
+      redirectUrl,
+    } = data;
     try {
       const response = await axios.post(
-        `${base_url}/api/face_login/`,
+        `${base_url}/api/face_login_api/`,
         formData,
-        time,
-        os,
-        device,
-        timezone,
-        userLanguage,
-        browser,
-        location,
-        randomSession,
-        mainparams,
-        redirectUrl
+        {
+          headers: {
+            // If needed, add any headers here
+          },
+          params: {
+            time,
+            os,
+            device,
+            timezone,
+            userLanguage,
+            browser,
+            location,
+            randomSession,
+            mainparams,
+            redirectUrl,
+          },
+        }
       );
 
       console.log("Pic", response.data);
