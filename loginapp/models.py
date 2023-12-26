@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.utils.crypto import get_random_string
+from ndarray import NDArrayField
 
 
 def get_profile_image_path(self, filename):
@@ -118,7 +119,7 @@ class products(models.Model):
 
 class Face_Login(models.Model):
     username = models.CharField(max_length=20, unique=True)
-    image = models.CharField(max_length=10000)
+    image = NDArrayField()
 
 
 
