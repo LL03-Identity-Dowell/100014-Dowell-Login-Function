@@ -5,35 +5,21 @@ const base_url = "https://100014.pythonanywhere.com/api";
 
 export const uploadPhoto = createAsyncThunk(
   "faceLogin/uploadPhoto",
-  async (data) => {
-    const {
-      image,
-      time,
-      os,
-      device,
-      timezone,
-      browser,
-      location,
-      randomSession,
-      mainparams,
-      redirectUrl,
-    } = data;
+  async ({ imageElement, ...additionalData }) => {
     try {
-      const response = await axios.post(`${base_url}/face_login_api/`, {
-        image,
-        time,
-        os,
-        device,
-        timezone,
-        browser,
-        location,
-        randomSession,
-        mainparams,
-        redirectUrl,
-      });
+      const response = await axios.post(
+        `${base_url}/face_login_api/`,
+        imageElement,
+        {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+          params: additionalData,
+        }
+      );
 
-      console.log("Pic", response.data);
-      return response.data;
+      console.log("Response", response.data);
+      // return response?.data;
     } catch (error) {
       throw error;
     }
@@ -45,7 +31,7 @@ const faceLoginSlice = createSlice({
   initialState: {
     status: "idle",
     error: null,
-    upload: false,
+    upload: null,
     picLoading: false,
   },
   reducers: {},

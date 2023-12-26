@@ -5,26 +5,33 @@ import { FaCamera, FaFileUpload } from "react-icons/fa";
 import { MdAddAPhoto } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 
-import { uploadPhoto } from "../redux/faceLoginSlice";
-import dataURItoBlob from "../utils/dataURItoBlob";
 import { CommonData } from "../utils/commonUtils";
+// import dataURItoBlob from "../utils/dataURItoBlob";
+import { uploadPhoto } from "../redux/faceLoginSlice";
+import dataURItoImage from "../utils/dataURItoBlob";
 
 const FaceLogin = () => {
   const {
     time,
+    ip,
     os,
     device,
-    timezone,
-    browser,
     location,
-    randomSession,
+    timezone,
+    language,
+    browser,
     mainparams,
+    randomSession,
     redirectUrl,
   } = CommonData();
+
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
   const dispatch = useDispatch();
   const { error, upload, picLoading } = useSelector((state) => state.faceLogin);
+
+  // Get the loading state for initSessionID
+  const { isLoading } = useSelector((state) => state.init);
 
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -42,32 +49,34 @@ const FaceLogin = () => {
       return;
     }
 
-    // Convert base64 to Blob
-    const imageBlob = dataURItoBlob(imgSrc);
-
-    // Now you can send the imageBlob to the server if needed
-    const image = new FormData();
-    image.append("image", imageBlob);
-
-    console.log("Uploading image:", imageBlob);
-    // Additional data
-    const additionalData = {
-      time,
-      os,
-      device,
-      timezone,
-      browser,
-      location,
-      randomSession,
-      mainparams,
-      redirectUrl,
-    };
-
-    console.log("commonUtils", additionalData);
-
     try {
+      // Convert base64 to Blob
+      // const imageBlob = dataURItoBlob(imgSrc);
+      // Convert data URI to image
+      const imageElement = await dataURItoImage(imgSrc);
+
+      // Additional data
+      const additionalData = {
+        time,
+        ip,
+        os,
+        device,
+        location,
+        timezone,
+        language,
+        browser,
+        mainparams,
+        randomSession,
+        redirectUrl,
+      };
+
+      // Create FormData and append the image directly
+      // let formData = new FormData();
+      // formData.append("image", imageElement);
+
+      console.log("Data", imageElement, additionalData);
       // Dispatch the action with both formData and additional data
-      await dispatch(uploadPhoto({ image, ...additionalData }));
+      await dispatch(uploadPhoto({ image: imageElement, ...additionalData }));
     } catch (error) {
       // Handle error
       console.error("Error uploading photo:", error);
@@ -85,6 +94,11 @@ const FaceLogin = () => {
     showToast(upload, true);
     showToast(error);
   }, [error, upload, picLoading]);
+
+  // Render loading state while initializing session ID
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex justify-center items-center relative">

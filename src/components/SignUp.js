@@ -100,8 +100,8 @@ const schema = yup.object().shape({
 });
 
 const SignUp = () => {
-  const [attemptsOtp, setAttemptsOtp] = useState(5);
-  const [attemptsSms, setAttemptsSms] = useState(5);
+  const [attemptsOtp, setAttemptsOtp] = useState(2);
+  const [attemptsSms, setAttemptsSms] = useState(2);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [smsCountdown, setSmsCountdown] = useState(0);
   const [exempted, setExempted] = useState(false);

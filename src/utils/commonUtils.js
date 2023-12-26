@@ -5,11 +5,10 @@ import Coordinate from "./Coordinate";
 import { detectBrowser } from "./browserUtils";
 import { getDeviceType, getOperatingSystem } from "./deviceUtils";
 
-// commonUtils.js
 export const CommonData = () => {
   // Get the random session ID from the Redux store
   const { initSession } = useSelector((state) => state.init);
-  const randomSession = initSession.random_session;
+  const randomSession = initSession ? initSession.random_session : "";
 
   const time = new Date().toLocaleTimeString();
   const os = getOperatingSystem();
@@ -37,16 +36,19 @@ export const CommonData = () => {
 
   // Extract the redirect_url parameter from the query parameters
   const redirectUrl = queryParams.get("redirect_url");
+  const language = navigator.language;
 
   return {
     time,
+    ip: "",
     os,
     device,
-    timezone,
-    browser,
     location,
-    randomSession,
+    timezone,
+    language,
+    browser,
     mainparams,
+    randomSession,
     redirectUrl,
   };
 };
