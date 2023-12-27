@@ -71,12 +71,17 @@ const FaceLogin = () => {
       };
 
       // Create FormData and append the image directly
-      // let formData = new FormData();
-      // formData.append("image", imageElement);
+      let formData = new FormData();
+      formData.append("image", imageElement);
+
+      // Append additional data to formData
+      Object.keys(additionalData).forEach((key) => {
+        formData.append(key, additionalData[key]);
+      });
 
       console.log("Data", imageElement, additionalData);
       // Dispatch the action with both formData and additional data
-      await dispatch(uploadPhoto({ image: imageElement, ...additionalData }));
+      await dispatch(uploadPhoto({ formData, ...additionalData }));
     } catch (error) {
       // Handle error
       console.error("Error uploading photo:", error);
