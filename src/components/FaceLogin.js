@@ -25,6 +25,8 @@ const FaceLogin = () => {
     redirectUrl,
   } = CommonData();
 
+  // Add reference to the webcam
+  // access the webcam instance and take a screenshot
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
   const dispatch = useDispatch();
@@ -33,6 +35,7 @@ const FaceLogin = () => {
   // Get the loading state for initSessionID
   const { isLoading } = useSelector((state) => state.init);
 
+  // create a capture function
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
     setImgSrc(imageSrc);
