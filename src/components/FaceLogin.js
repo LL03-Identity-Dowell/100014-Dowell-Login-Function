@@ -6,9 +6,7 @@ import { MdAddAPhoto } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CommonData } from "../utils/commonUtils";
-// import dataURItoBlob from "../utils/dataURItoBlob";
 import { uploadPhoto } from "../redux/faceLoginSlice";
-import dataURItoImage from "../utils/dataURItoBlob";
 
 const FaceLogin = () => {
   const {
@@ -53,11 +51,6 @@ const FaceLogin = () => {
     }
 
     try {
-      // Convert base64 to Blob
-      // const imageBlob = dataURItoBlob(imgSrc);
-      // Convert data URI to image
-      const imageElement = await dataURItoImage(imgSrc);
-
       // Additional data
       const additionalData = {
         time,
@@ -75,14 +68,14 @@ const FaceLogin = () => {
 
       // Create FormData and append the image directly
       let formData = new FormData();
-      formData.append("image", imageElement);
+      formData.append("image", imgSrc);
 
       // Append additional data to formData
       Object.keys(additionalData).forEach((key) => {
         formData.append(key, additionalData[key]);
       });
 
-      console.log("Data", imageElement, additionalData);
+      console.log("Data", imgSrc, additionalData);
       // Dispatch the action with both formData and additional data
       await dispatch(uploadPhoto({ formData, ...additionalData }));
     } catch (error) {
