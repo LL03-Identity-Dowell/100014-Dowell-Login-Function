@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import { toast } from "react-toastify";
-import { FaCamera, FaFileUpload } from "react-icons/fa";
-import { MdAddAPhoto } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { MdAddAPhoto } from "react-icons/md";
+import { FaCamera, FaFileUpload } from "react-icons/fa";
 
 import { CommonData } from "../utils/commonUtils";
 import { uploadPhoto } from "../redux/faceLoginSlice";

@@ -21,7 +21,7 @@ export const uploadPhoto = createAsyncThunk(
       console.log("Response", response.data);
       return response?.data;
     } catch (error) {
-      throw error;
+      throw new Error(error.response.data);
     }
   }
 );
