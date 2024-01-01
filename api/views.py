@@ -33,6 +33,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import status
 
 from dateutil import parser
+from dateutil.relativedelta import *
 from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
@@ -133,221 +134,100 @@ def get_custom_session_data(session_id):
     res_data = json.loads(json_data)
     return res_data.get('data')
 
-
 @api_view(["POST"])
 def register(request):
-    username = request.data.get("Username")
-    otp_input = request.data.get("otp")
-    sms_input=request.data.get("sms")
+    user = request.data["Username"]
     image = request.FILES.get("Profile_Image")
-    password = request.data.get("Password")
-    first = request.data.get("Firstname")
-    last = request.data.get("Lastname")
-    email = request.data.get("Email")
+    password = request.data["Password"]
+    first = request.data["Firstname"]
+    last = request.data["Lastname"]
+    email = request.data["Email"]
     role1 = "guest"
-    phonecode = request.data.get("phonecode")
-    phone = request.data.get("Phone")
-    user_type = request.data.get('user_type')
-    user_country = request.data.get('user_country')
-    policy_status = request.data.get('policy_status')
-    other_policy = request.data.get('other_policy')
-    newsletter = request.data.get('newsletter')
-    if email and username and not image and not password and not first \
-            and not last and not phone and not phonecode and not user_type and not user_country \
-            and not policy_status and not other_policy and not newsletter:
-        otp = generateOTP()
-        try:
-            emailexist = GuestAccount.objects.get(email=email)
-        except GuestAccount.DoesNotExist:
-            emailexist = None
-        if emailexist is not None:
-            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=username)
+    phonecode = request.data["phonecode"]
+    phone = request.data["Phone"]
+    user_type = request.data['user_type']
+    user_country = request.data['user_country']
+    policy_status = request.data['policy_status']
+    other_policy = request.data['other_policy']
+    newsletter = request.data['newsletter']
+
+    user_exists = Account.objects.filter(username=user).first()
+    if user_exists:
+        return Response({'message':"Username already taken"})
+
+    name = ""
+    try:
+        ro = Account.objects.filter(email=email)#.update(password = password,first_name = first,last_name = last,email = email,role = role,teamcode = ccode,phonecode=phonecode,phone = phone,profile_image=img)
+
+        for i in ro:
+            if email==i.email and role1==i.role:
+                ro=Account.objects.filter(email=email).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
+    except Account.DoesNotExist:
+        name=None
+    if name is not None:
+        if image:
+            new_user=Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone,profile_image=image)
         else:
-            data=GuestAccount(username=username,email=email,otp=otp)
-            data.save()
-        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+            new_user=Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone)
+
+        profile_image=new_user.profile_image
+        json_data = open('dowell_login/static/newnaga2.json')
+        data1 = json.load(json_data)
+        json_data.close()
+        data1["document_name"]=user
+        data1["Username"]=user
+        update_data1={"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
+        data1["profile_info"].update(update_data1)
+        data1["organisations"][0]["org_name"]=user
+        update_data2={"first_name":first,"last_name":last,"email":email}
+        data1["members"]["team_members"]["accept_members"][0].update(update_data2)
+        client_admin=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data1,"nil")
+        client_admin_res=json.loads(client_admin)
+        org_id=client_admin_res["inserted_id"]
+
+        userfield={}
+        userresp=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
+        idd=json.loads(userresp)
+        res_list=idd["data"]
+        profile_id=get_next_pro_id(res_list)
+
+        event_id=None
+        try:
+            res=create_event()
+            event_id=res['event_id']
+        except:
+            pass
+
+        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password":dowell_hash1(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
+        id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
+        id_res=json.loads(id)
+        inserted_idd=id_res['inserted_id']
+
+        url = "https://100085.pythonanywhere.com/api/signup-feedback/"
         payload = json.dumps({
-            "toEmail":email,
-            "toName":username,
-            "topic":"RegisterOtp",
-            "otp":otp
-            })
+            "topic" : "Signupfeedback",
+            "toEmail" : email,
+            "toName" : first +" "+ last,
+            "firstname" : first,
+            "lastname" : last,
+            "username" : user,
+            "phoneCode" : phonecode,
+            "phoneNumber" : phone,
+            "usertype" : user_type,
+            "country" : user_country,
+            "verified_phone":"unverified",
+            "verified_email": "verified"
+                })
         headers = {
             'Content-Type': 'application/json'
             }
         response1 = requests.request("POST", url, headers=headers, data=payload)
-        return Response({'msg':'success','info':'OTP sent successfully'})
-
-    elif phone and phonecode and not email and not username and not image and not password \
-            and not first and not last and not user_type and not user_country and not policy_status \
-            and not other_policy and not newsletter:
-        sms = generateOTP()
-
-        full_number = str(phonecode) + str(phone)
-        time = datetime.datetime.utcnow()
-        
-        if full_number == "251912912144":
-            sms = "123456"
-        try:
-            phone_exists = mobile_sms.objects.get(phone=full_number)
-        except mobile_sms.DoesNotExist:
-            phone_exists = None
-        if phone_exists is not None:
-            mobile_sms.objects.filter(
-                phone=full_number).update(sms=sms, expiry=time)
-        else:
-            mobile_sms.objects.create(
-                phone = full_number, sms=sms, expiry=time)
-        url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
-        payload = {
-            "sender" : "DowellLogin",
-            "recipient" : full_number,
-            "content" : f"Enter the following OTP to create your dowell account: {sms}",
-            "created_by" : "Manish"
-            }
-        response = requests.request("POST", url, data=payload)
-        if len(response.json()) > 1:
-            return Response({'msg':'success','info':'SMS sent successfully!!'})
-        else:
-            return Response({'msg': 'error','error':'The number is not valid'})
-
-    user_exists = Account.objects.filter(username=username).first()
-    if user_exists:
-        return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
-    register_legal_policy(username)
-    try:
-        check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
-        check_sms = mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
-    except GuestAccount.DoesNotExist:
-        check_otp = None
-        check_sms = "Wrong"
-
-    if not check_otp:
-        return Response({'msg':'error','info':'Wrong Email OTP'},status=status.HTTP_400_BAD_REQUEST)
-    if check_sms == "Wrong":
-        return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
-
-
-    name = ""
-    # New user model
-    UserModel.objects.create(
-        username=username,
-        first_name=first,
-        last_name=last,
-        email=email,
-        phonecode=phonecode,
-        user_type=user_type,
-        phone=phone,
-        country=user_country,
-        policy_status=policy_status,
-        newsletter_subscription=newsletter
-    )
-    try:
-        accounts = Account.objects.filter(email=email)
-
-        for account in accounts:
-            if email == account.email and role1 == account.role:
-                account = Account.objects.filter(email=email).update(password=make_password(
-                    password), first_name=first, last_name=last, email=email, phonecode=phonecode, phone=phone, profile_image=image)
-    except Account.DoesNotExist:
-        name = None
-    if name is not None:
-        if image:
-            new_user = Account.objects.create(email=email, username=username, password=make_password(
-                password), first_name=first, last_name=last, phonecode=phonecode, phone=phone, profile_image=image)
-        else:
-            new_user = Account.objects.create(email=email, username=username, password=make_password(
-                password), first_name=first, last_name=last, phonecode=phonecode, phone=phone)
-
-        profile_image = new_user.profile_image
-        json_data = open('loginapp/static/client.json')
-        data1 = json.load(json_data)
-        json_data.close()
-        default =   {
-        "org_id":username,
-        "org_name":username,
-        "username": [username],
-        "member_type": "owner",
-        "product": "all",
-        "data_type": "Real_data",
-        "operations_right": "Add/Edit",
-        "role": "owner",
-        "security_layer": "None",
-        "portfolio_name": "default",
-        "portfolio_code": "123456",
-        "portfolio_specification": "",
-        "portfolio_uni_code": "default",
-        "portfolio_details": "",
-        "status": "enable"
-        }
-        data1["portpolio"].append(default)
-        data1["document_name"] = username
-        data1["Username"] = username
-        update_data1 = {"first_name": first, "last_name": last, "profile_img": f'https://100014.pythonanywhere.com/media/{profile_image}',
-                        "email": email, "phonecode": phonecode, "phone": phone}
-        data1["profile_info"].update(update_data1)
-        data1["organisations"][0]["org_name"] = username
-        update_data2 = {"first_name": first, "last_name": last, "email": email}
-        data1["members"]["team_members"]["accept_members"][0].update(
-            update_data2)
-        client_admin = dowellconnection(
-            "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "insert", data1, "nil")
-        client_admin_res = json.loads(client_admin)
-        org_id = client_admin_res["inserted_id"]
-
-        userfield = {}
-        userresp = dowellconnection("login", "bangalore", "login", "registration",
-                                    "registration", "10004545", "ABCDE", "fetch", userfield, "nil")
-        idd = json.loads(userresp)
-        res_list = idd["data"]
-        profile_id = get_next_pro_id(res_list)
-
-        event_id = None
-        try:
-            res = create_event()
-            event_id = res['event_id']
-        except:
-            pass
-
-        field = {"Profile_Image": f"https://100014.pythonanywhere.com/media/{profile_image}", "Username": username, "Password": dowell_hash.dowell_hash(password), "Firstname": first, "Lastname": last, "Email": email, "phonecode": phonecode, "Phone": phone, "profile_id": profile_id, "client_admin_id": client_admin_res[
-            "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter}
-        id = dowellconnection("login", "bangalore", "login", "registration",
-                              "registration", "10004545", "ABCDE", "insert", field, "nil")
-        id_res = json.loads(id)
-        inserted_idd = id_res['inserted_id']
-
-        url = "https://100085.pythonanywhere.com/api/signup-feedback/"
-        if not check_sms:
-            verified_phone="unverified"
-        else:
-            verified_phone="verified"
-        payload = json.dumps({
-            "topic": "Signupfeedback",
-            "toEmail": email,
-            "toName": first + " " + last,
-            "firstname": first,
-            "lastname": last,
-            "username": username,
-            "phoneCode": "+"+str(phonecode),
-            "phoneNumber": phone,
-            "usertype": user_type,
-            "country": user_country,
-            "verified_phone": verified_phone,
-            "verified_email": "verified"
-        })
-
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        response1 = requests.request(
-            "POST", url, headers=headers, data=payload)
 
         return Response({
-            'msg':'success',
-            'info': f"{username}, registration success",
-            'inserted_id': f"{inserted_idd}"
-        })
-    return Response({"msg":"error","info":"Internal server error"},status=status.HTTP_400_BAD_REQUEST)
+            'message':f"{user}, registration success",
+            'inserted_id':f"{inserted_idd}"
+            })
+    return Response("Internal server error")
 
 @api_view(["POST"])
 def MobileLogin(request):
@@ -691,168 +571,185 @@ def password_change(request):
     username = request.data.get("username")
     old_password = request.data.get("old_password")
     new_password = request.data.get("new_password")
-    obj = authenticate(request, username=username, password=old_password)
-    if None in [username, old_password, new_password]:
-        response = {'msg': 'error', 'info': 'Please provide all fields'}
-        return Response(response)
+    obj = authenticate(request, username = username, password = old_password)
+    if None in [username,old_password,new_password]:
+        response = {'msg':'error','info':'Please provide all fields'}
+        return Response(response,status=status.HTTP_400_BAD_REQUEST)
     if obj is not None:
-        print("ok")
         try:
             obj.set_password(new_password)
             obj.save()
-            field = {'Username': username}
-            up_field = {'Password': dowell_hash.dowell_hash(new_password)}
-            dowellconnection("login", "bangalore", "login", "registration",
-                             "registration", "10004545", "ABCDE", "update", field, up_field)
-            response = {'msg': 'success',
-                        'info': 'Password Changed successfully..'}
+            field = {'Username':username}
+            up_field = {'Password':dowell_hash.dowell_hash(new_password)}
+            dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","update",field,up_field)
+            response = {'msg':'success','info':'Password Changed successfully..'}
             return Response(response)
         except Exception as e:
-            response = {'msg': 'success', 'info': 'Error', 'error': e}
+            response = {'msg':'success','info':'Error','error':e}
             return Response(response)
     else:
-        response = {'msg': 'success',
-                    'info': 'Username, Password combination incorrect'}
-        return Response(response)
-
+        response = {'msg':'success','info':'Username, Password combination incorrect'}
+        return Response(response,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def profile_update(request):
-    email_otp = request.data.get("email_otp")
-    address = request.data.get("address")
-    zip_code = request.data.get("zip_code")
-    user_city = request.data.get("city")
-    user_location = request.data.get("location")
-    user_country = request.data.get("country")
-    native_language = request.data.get("native_language")
-    nationality = request.data.get("nationality")
-    language_preferences = request.data.get("language_preferences")
-    vision = request.data.get("vision")
-    username = request.data.get("username")
-    Firstname = request.data.get("first_name")
-    Lastname = request.data.get("last_name")
-    Email = request.data.get("email")
-    Phone = request.data.get("phone")
-    Profile_Image = request.data.get("image")
-    img = request.FILES.get('image')
-    teamcode = request.data.get('teamcode')
-
-    obj = Account.objects.filter(username=username).first()
-    field = {"document_name": username}
-    client_admin = dowellconnection(
-        "login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "fetch", field, "nil")
-    data2 = json.loads(client_admin)
-    resp2 = {"success_fields": [], "error_fields": []}
+    email_otp=request.data.get("email_otp")
+    phone_sms=request.data.get("phone_sms")
+    address=request.data.get("address")
+    zip_code=request.data.get("zip_code")
+    user_city=request.data.get("city")
+    user_location=request.data.get("location")
+    user_country=request.data.get("country")
+    native_language=request.data.get("native_language")
+    nationality=request.data.get("nationality")
+    language_preferences=request.data.get("language_preferences")
+    vision=request.data.get("vision")
+    username=request.data.get("username")
+    Firstname=request.data.get("first_name")
+    Lastname=request.data.get("last_name")
+    Email=request.data.get("email")
+    Phone=request.data.get("phone")
+    phonecode=request.data.get("phonecode")
+    imgg=request.FILES.get("image")
+    teamcode= request.data.get("teamcode")
+    obj=Account.objects.filter(username=username).first()
+    if obj is None:
+        return Response({"msg":"error","info":"User Not Found !"},status=status.HTTP_400_BAD_REQUEST)
     try:
-        data1 = data2["data"][0]
+        client_admin=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",{"document_name":username},"nil")
+        data2=json.loads(client_admin)
+        data1=data2["data"][0]
     except:
-        return Response({"msg": "error", "info": "User doesn't exist"})
-    up_field = {}
-    update_fields = []
-    img_exists = ""
+        return Response({"msg":"error","info":"User Not Found !"},status=status.HTTP_400_BAD_REQUEST)
+    up_field={}
+    update_fields=[]
+    img_exists=""
+    resp2={"success_fields":[],"error_fields":[]}
+    if username and Email and not imgg and not Phone and not Lastname and not Firstname and not vision \
+        and not language_preferences and not nationality and not native_language and not user_country and not user_location \
+            and not user_city and not zip_code and not address and not email_otp:
+        check=Account.objects.filter(username=username,email=Email)
+        check_guest=GuestAccount.objects.filter(email=Email).first()
+        if not check:
+            otp_input = generateOTP()
+            message = f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to use this email address in your existing dowell account <br><h2>Your OTP is <strong>{otp_input}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
 
-    user_qs = Account.objects.filter(username=username).first()
-    if not user_qs:
-        return Response({"msg": "error", "info": "User doesn't exist"})
+            def send_otp(): return send_mail(
+                'Your otp for changing email in your Dowell account', otp_input, settings.EMAIL_HOST_USER, [Email], fail_silently=False, html_message=message)
 
-    if Profile_Image is not None:
+            if check_guest:
+                check_guest.otp=otp_input
+                check_guest.save(update_fields=['otp'])
+            else:
+                guest_account=GuestAccount(username="user", email=Email, otp=otp_input, expiry=datetime.datetime.utcnow())
+                guest_account.save()
+            send_otp()
+            return Response({'msg':'success','info':'OTP sent successfully'})
+        else:
+            return Response({'msg':'error','info':'Given email is already in use with your account'})
+
+    if imgg is not None:
         if obj.profile_image == "":
-            obj.profile_image.save(name=Profile_Image.name, content=Profile_Image, save=True)
-            try:
-                os.remove(f"dowell_login/static/img/api_upload/{username}.png")
-            except:
-                pass
-            obj.save()
-            up_field["Profile_Image"] = f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
-            update_data1 = {
-                "profile_img": f"https://100014.pythonanywhere.com/media/{obj.profile_image}"}
+            prev_image=obj.profile_image
+            obj.profile_image=imgg
+            obj.save(update_fields=["profile_image"])
+            prev_image.delete(False)
+            up_field["Profile_Image"]=f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
+            update_data1={"profile_img":f"https://100014.pythonanywhere.com/media/{obj.profile_image}"}
             data1["profile_info"].update(update_data1)
             resp2["success_fields"].append("Profile Image")
         else:
-            print(Profile_Image.name)
-            print(type(Profile_Image.name))
-            obj.profile_image.save(name=Profile_Image.name, content=Profile_Image, save=True)
+            obj.profile_image=imgg
+            obj.save(update_fields=["profile_image"])
+            up_field["Profile_Image"]=f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
+            update_data1={"profile_img":f"https://100014.pythonanywhere.com/media/{obj.profile_image}"}
+            data1["profile_info"].update(update_data1)
             resp2["success_fields"].append("Profile Image")
-            up_field["Profile_Image"] = f"https://100014.pythonanywhere.com/media/{obj.profile_image}"
+
     if Firstname is not None:
-        obj.first_name = Firstname
+        obj.first_name=Firstname
         update_fields.append("first_name")
-        up_field["Firstname"] = Firstname
-        update_data1 = {"first_name": Firstname}
+        up_field["Firstname"]=Firstname
+        update_data1={"first_name":Firstname}
         data1["profile_info"].update(update_data1)
         resp2["success_fields"].append("Firstname")
-
     if Lastname is not None:
-        obj.last_name = Lastname
+        obj.last_name=Lastname
         update_fields.append("last_name")
-        up_field["Lastname"] = Lastname
-        update_data1 = {"last_name": Lastname}
+        up_field["Lastname"]=Lastname
+        update_data1={"last_name":Lastname}
         data1["profile_info"].update(update_data1)
         resp2["success_fields"].append("Lastname")
-
     if Email is not None and email_otp is not None:
         try:
-            guest = GuestAccount.objects.get(
+            guest =GuestAccount.objects.get(
                 otp=email_otp, email=Email)
         except GuestAccount.DoesNotExist:
             guest = None
         if guest is not None:
-            obj.email = Email
+            obj.email=Email
             update_fields.append("email")
-            up_field["Email"] = Email
-            update_data1 = {"email": Email}
+            up_field["Email"]=Email
+            update_data1={"email":Email}
             data1["profile_info"].update(update_data1)
             resp2["success_fields"].append("Email")
         else:
-            resp2["error_fields"].append(
-                {"field": "Email", 'msg': 'Wrong OTP'})
-
-    if Phone is not None:
-        obj.phone = Phone
-        update_fields.append("phone")
-        up_field["Phone"] = Phone
-        update_data1 = {"phone": Phone}
-        data1["profile_info"].update(update_data1)
-        resp2["success_fields"].append("Phone")
+            resp2["error_fields"].append({"field":"Email",'msg':'Wrong OTP'})
+    if Phone is not None and phonecode is not None and phone_sms is not None:
+        Phone1="+"+str(phonecode)+str(Phone)
+        try:
+            ok = mobile_sms.objects.get(
+                sms=phone_sms, phone=Phone1)
+        except mobile_sms.DoesNotExist:
+            ok = None
+        if ok is not None:
+            ok.phone=Phone
+            ok.phonecode=phonecode
+            update_fields.append("phone")
+            update_fields.append("phonecode")
+            up_field["Phone"]=Phone
+            up_field["phonecode"]=phonecode
+            update_data1={"phonecode": phonecode, "Phone": Phone}
+            data1["profile_info"].update(update_data1)
+            resp2["success_fields"].append("Phone")
+        else:
+            resp2["error_fields"].append({"field":"Phone",'msg':'Wrong OTP'})
     if address is not None:
-        up_field["address"] = address
+        up_field["address"]=address
         resp2["success_fields"].append("Address")
     if zip_code is not None:
-        up_field["zip_code"] = zip_code
+        up_field["zip_code"]=zip_code
         resp2["success_fields"].append("Zip_code")
     if user_city is not None:
-        up_field["user_city"] = user_city
+        up_field["user_city"]=user_city
         resp2["success_fields"].append("User_city")
     if user_location is not None:
-        up_field["user_location"] = user_location
+        up_field["user_location"]=user_location
         resp2["success_fields"].append("User_location")
     if user_country is not None:
-        up_field["user_country"] = user_country
+        up_field["user_country"]=user_country
         resp2["success_fields"].append("User_country")
     if native_language is not None:
-        up_field["native_language"] = native_language
+        up_field["native_language"]=native_language
         resp2["success_fields"].append("Native_language")
     if nationality is not None:
-        up_field["nationality"] = nationality
+        up_field["nationality"]=nationality
         resp2["success_fields"].append("Nationality")
     if language_preferences is not None:
-        up_field["language_preferences"] = language_preferences
+        up_field["language_preferences"]=language_preferences
         resp2["success_fields"].append("Language_preference")
     if vision is not None:
-        up_field["vision"] = vision
+        up_field["vision"]=vision
         resp2["success_fields"].append("Vision")
 
-    final_data1 = data1.pop("_id")
-    if update_fields != []:
+    final_data1=data1.pop("_id")
+    if update_fields !=[]:
         obj.save(update_fields=update_fields)
-    client_admin = dowellconnection("login", "bangalore", "login", "client_admin", "client_admin", "1159", "ABCDE", "update", {
-                                    "document_name": username}, {'profile_info': data1["profile_info"]})
+    client_admin=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","update",{"document_name":username},{'profile_info':data1["profile_info"]})
 
     if up_field != {}:
-        dowellconnection("login", "bangalore", "login", "registration", "registration",
-                         "10004545", "ABCDE", "update", {"Username": username}, up_field)
+        dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","update",{"Username":username},up_field)
     return Response(resp2)
-
 
 @api_view(['POST'])
 def profile_view(request):
@@ -860,24 +757,22 @@ def profile_view(request):
     password = request.data.get("password")
     obj = "OK"
     if obj is not None:
-        resp = dowellconnection("login", "bangalore", "login", "registration",
-                                "registration", "10004545", "ABCDE", "find", {"Username": username}, "nil")
-        resp1 = json.loads(resp)
+        resp=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","find",{"Username":username},"nil")
+        resp1=json.loads(resp)
         if resp1["data"] != None:
             try:
                 if resp1["data"]["User_status"] == "deleted":
-                    return Response({'msg': 'error', 'info': 'User not found with given credentials..'})
+                    return Response({'msg':'error','info':'User not found with given credentials..'})
                 elif resp1["data"]["User_status"] == "inactive":
-                    return Response({'msg': 'error', 'info': 'Account disabled, please contact admin'})
+                    return Response({'msg':'error','info':'Account disabled, please contact admin'})
                 else:
                     return Response(resp1["data"])
             except:
                 return Response(resp1["data"])
         else:
-            return Response({'msg': 'error', 'info': 'User not found with given credentials..'})
+            return Response({'msg':'error','info':'User not found with given credentials..'})
     else:
-        return Response({"Error": "Credentials wrong"})
-
+        return Response({'msg':'error','info':'User not found with given credentials..'})
 
 @api_view(['GET'])
 def live_users(request):
@@ -1975,7 +1870,7 @@ def otp_verify(request):
             return Response({"msg":"error","info":"Wrong OTP provided"})
     else:
         return Response({'msg': 'error','error':'Provide either email or phone number along with username'})
-
+    
 @api_view(['POST'])
 def LinkLogin(request):
     user=request.data.get("Username")
@@ -2008,7 +1903,7 @@ def all_username(request):
         return Response(names)
     else:
         return Response("Verification Failed !")
-    
+import sys
 @csrf_exempt
 @api_view(['POST'])
 def face_login_api(request):
@@ -2045,8 +1940,10 @@ def face_login_api(request):
     browser = request.data.get("browser", None)
     language = request.data.get("language", "English")
 
-    print(image)
-
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    g = open(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'), "wb")
+    g.write(base64.b64decode(image[23:]))
+    g.close()
     try: # Get country and city from location
         location_list = location.split(" ")
         country, city = country_city_name(location_list[0], location_list[1])
@@ -2073,31 +1970,22 @@ def face_login_api(request):
         return Response(resp,status=status.HTTP_400_BAD_REQUEST)
 
     # Get face encoding for unknown image
-    filename = default_storage.save(image.name, image)
-    image_path = default_storage.path(filename)
-
-    unknown_img = face_recognition.load_image_file(image_path)
+    unknown_img = face_recognition.load_image_file(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
     try:
         unknown_encoding = face_recognition.face_encodings(unknown_img)[0]
     except:
+        os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
         return Response({
             'msg': "error",
             'info': "Face not detected in image",
             'Credentials': 'image'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    # Get all accounts from register collection
-    # field = {}
-    # register_collection = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",field,"nil")
-    # account_list = json.loads(register_collection)
-    # account_data_list = account_list["data"]
-    # return Response({"data":account_data_list})
-    few_days=datetime.datetime.now() + relativedelta(days=-10)
+    few_days = datetime.datetime.now() + relativedelta(days=-10)
     # print(three_month)
 
     accounts = Account.objects.filter(last_login__gt=few_days).exclude(profile_image="user.png").exclude(profile_image__exact='').exclude(profile_image__isnull=True)
 
-    print(len(accounts))
     username = None
     # Compare faces and retrieve username
     for account in accounts:
@@ -2114,12 +2002,6 @@ def face_login_api(request):
                     break
             except:
                 pass
-                # return Response({
-                #     'msg': "error",
-                #     'info': "Face not detected in image",
-                #     'Credentials': 'image'
-                # }, status=status.HTTP_400_BAD_REQUEST)
-
     if username is not None:
       # Get user model and update current task
         obj = Account.objects.filter(username=username).first()
@@ -2130,6 +2012,7 @@ def face_login_api(request):
         except:
             pass
     else:
+        os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
         resp = {"msg":"error","info": "User not found"}
         return Response(resp,status=status.HTTP_400_BAD_REQUEST)
 
@@ -2138,6 +2021,7 @@ def face_login_api(request):
     if random_session_obj1 is None:
         random_session_obj = RandomSession.objects.filter(sessionID=random_session).first()
         if random_session_obj is None:
+            os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
             return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
         random_session_obj.username=username
         random_session_obj.save(update_fields=['username'])
@@ -2302,20 +2186,23 @@ def face_login_api(request):
             else:
                 data["url"]=f'https://100093.pythonanywhere.com?session_id={session}'
 
+            os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
             response.data = data
             return response
         else:
+            os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
             resp = {"msg":"error","info": "Username not found in database"}
             return Response(resp,status=status.HTTP_400_BAD_REQUEST)
         # raise AuthenticationFailed("Username not Found or password not found")
     else:
+        os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
         resp = {"msg":"error","info": "User not found"}
-        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+        return Response(resp,status=status.HTTP_400_BAD_REQUEST) 
 
 @api_view(['POST'])
 def face_id(request):
-    username=request.data.get("username")
-    image=request.FILES.get("image")
+    username = request.data.get("username")
+    image = request.FILES.get("image")
 
     if None in [username,image]:
         return Response({'msg':'error','info':'All details not provided'},status.HTTP_400_BAD_REQUEST)
@@ -2325,7 +2212,7 @@ def face_id(request):
     unknown_img = face_recognition.load_image_file(image_path)
     try:
         unknown_encoding = face_recognition.face_encodings(unknown_img)[0]
-        unknown_encoding_list = str(unknown_encoding.tolist())
+        uke = str(unknown_encoding.tolist())
     except:
         return Response({
             'msg': "error",
@@ -2333,10 +2220,10 @@ def face_id(request):
             'Credentials': 'image'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-    face_obj = Face_Login.objects.filter(username=username).first()
-    if face_obj is not None:
-        face_obj.image = unknown_encoding_list
-        face_obj.save(update_fields=['image'])
+    obj=Face_Login.objects.filter(username=username).first()
+    if obj is not None:
+        obj.image=uke
+        obj.save(update_fields=['image'])
         return Response({'msg':'success','info':'Face ID is updated !!'})
-    Face_Login.objects.create(username=username, image=unknown_encoding_list)
+    Face_Login.objects.create(username=username,image=uke)
     return Response({'msg':'success','info':'Face ID is saved !!'})
