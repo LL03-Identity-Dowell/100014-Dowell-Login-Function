@@ -24,7 +24,6 @@ from server.views import error_404, error_500
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    # path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     re_path(r'.*', TemplateView.as_view(template_name='index.html'))
