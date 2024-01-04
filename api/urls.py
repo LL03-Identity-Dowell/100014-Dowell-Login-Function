@@ -22,7 +22,7 @@ urlpatterns = [
     path('login_legal_policy/', views.login_legal_policy,
          name="login_legal_policy"),
     path('mobile_otp/', views.mobile_otp, name='mobile_otp_api'),
-    path('email_otp/', views.email_otp, name='email_otp_api'),
+    path('emailotp/', views.email_otp, name='email_otp_api'),
     path('linklogin_info/',views.linklogin_info,name="linklogin_info"),
     path('removeaccount/',views.user_status,name="user_status"),
 
@@ -39,5 +39,13 @@ urlpatterns = [
     path('all_username/',views.all_username,name="all_username"),
 
     path('face_login_api/', views.face_login_api, name="face_login_api"),
+    path('face_login/',views.face_login_test,name="face_login"),
+    path('/face_id/',views.face_id,name="face_id"),
 
+    path('/logininfo/',views.logininfo,name="logininfo"),
+
+    path('/product_users/',views.product_users,name="product_users"),
+    path('/live_qr_users/',views.live_qr_users,name="live_qr_users"),
+    path('/live_public_users/',views.live_public_users,name="live_public_users"),
+    path('/live_users/',views.live_users,name="live_users"),
 ]

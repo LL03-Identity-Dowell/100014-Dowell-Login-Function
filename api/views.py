@@ -8,6 +8,7 @@ import csv
 import requests
 import re
 import jwt
+import numpy as np
 try:
     import face_recognition
 except:
@@ -48,7 +49,9 @@ from loginapp.models import (
   Linkbased_RandomSession, 
   Location_check,
   UserModel,
-  Face_Login
+  Face_Login,
+  Live_QR_Status,
+  Live_Public_Status
 )
 
 from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id
@@ -137,6 +140,8 @@ def get_custom_session_data(session_id):
 @api_view(["POST"])
 def register(request):
     user = request.data["Username"]
+    otp_input = request.data.get("otp")
+    sms_input=request.data.get("sms")
     image = request.FILES.get("Profile_Image")
     password = request.data["Password"]
     first = request.data["Firstname"]
@@ -155,6 +160,19 @@ def register(request):
     if user_exists:
         return Response({'message':"Username already taken"})
 
+    register_legal_policy(user)
+    try:
+        check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
+        check_sms= mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
+    except GuestAccount.DoesNotExist:
+        check_otp = None
+        check_sms = "Wrong"
+
+    if not check_otp:
+        return Response({'msg':'error','info':'Wrong Email OTP'},status=status.HTTP_400_BAD_REQUEST)
+    if check_sms == "Wrong":
+        return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
+
     name = ""
     try:
         account_list = Account.objects.filter(email=email)
@@ -171,9 +189,27 @@ def register(request):
             new_user = Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone)
 
         profile_image = new_user.profile_image
-        json_data = open('dowell_login/static/newnaga2.json')
+        json_data = open('dowell_login/static/client.json')
         data1 = json.load(json_data)
         json_data.close()
+        default =   {
+        "org_id":user,
+        "org_name":user,
+        "username": [user],
+        "member_type": "owner",
+        "product": "all",
+        "data_type": "Real_data",
+        "operations_right": "Add/Edit",
+        "role": "owner",
+        "security_layer": "None",
+        "portfolio_name": "default",
+        "portfolio_code": "123456",
+        "portfolio_specification": "",
+        "portfolio_uni_code": "default",
+        "portfolio_details": "",
+        "status": "enable"
+        }
+        data1["portpolio"].append(default)
         data1["document_name"] = user
         data1["Username"] = user
         update_data1 = {"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
@@ -205,6 +241,10 @@ def register(request):
         inserted_idd=id_res['inserted_id']
 
         url = "https://100085.pythonanywhere.com/api/signup-feedback/"
+        if not check_sms:
+            verified_phone="unverified"
+        else:
+            verified_phone="verified"
         payload = json.dumps({
             "topic" : "Signupfeedback",
             "toEmail" : email,
@@ -212,11 +252,11 @@ def register(request):
             "firstname" : first,
             "lastname" : last,
             "username" : user,
-            "phoneCode" : phonecode,
+            "phoneCode" : "+" + str(phonecode),
             "phoneNumber" : phone,
             "usertype" : user_type,
             "country" : user_country,
-            "verified_phone":"unverified",
+            "verified_phone":verified_phone,
             "verified_email": "verified"
                 })
         headers = {
@@ -985,9 +1025,9 @@ def forgot_username(request):
             return Response({'msg':'error','info': 'Wrong OTP'},status=status.HTTP_400_BAD_REQUEST)
 
 def processApikey(api_key, api_services):
-    url = 'https://100105.pythonanywhere.com/api/v1/process-api-key/'
+    url = f'https://100105.pythonanywhere.com/api/v3/process-services/?type=api_service&api_key={api_key}'
     payload = {
-        "api_key": api_key,
+        # "api_key": api_key,
         "api_services": api_services
     }
     response = requests.post(url, json=payload)
@@ -999,8 +1039,8 @@ def PublicApi(request):
     mdata = request.data.get
     username = mdata('username')
     password = mdata('password')
-    if mdata('api_key') != None and mdata('api_services') != None:
-        api_resp = processApikey(mdata('api_key'), mdata('api_services'))
+    if mdata('api_key') != None and mdata('api_service_id') != None:
+        api_resp = processApikey(mdata('api_key'),"DOWELL10004")
     else:
         return Response({"msg": "error", "info": "api_key and api_services fields are needed.."})
     try:
@@ -1012,9 +1052,13 @@ def PublicApi(request):
     if api_resp1["success"] == False:
         return Response({"msg": "error", "info": api_resp1["message"]})
     else:
-        if not "count" in api_resp1:
+        if not "total_credits" in api_resp1:
             return Response({"msg": "error", "info": api_resp1["message"]})
     loc = mdata("location")
+    if loc is not None and loc != "":
+        coordinates=loc.split(" ")
+    else:
+        coordinates="Location not allowed.."
     try:
         lo = loc.split(" ")
         country, city = country_city_name(lo[0], lo[1])
@@ -1034,19 +1078,25 @@ def PublicApi(request):
         return Response(resp)
     browser = mdata("browser")
     language = mdata("language", "English")
-    company = None
-    org = None
-    dept = None
-    member = None
-    project = None
-    subproject = None
-    role_res = None
-    user_id = None
-    first_name = None
-    last_name = None
-    email = None
-    phone = None
-    User_type = None
+    company=None
+    org=None
+    dept=None
+    member=None
+    project=None
+    subproject=None
+    role_res=None
+    first_name=None
+    last_name=None
+    email=None
+    phone=None
+    User_type=None
+    payment_status=None
+    newsletter=None
+    user_country=None
+    privacy_policy=None
+    other_policy=None
+    userID=None
+    client_admin_id=None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
     if user is not None:
@@ -1055,6 +1105,16 @@ def PublicApi(request):
                               "registration", "10004545", "ABCDE", "find", field, "nil")
         response = json.loads(id)
         if response["data"] != None:
+            try:
+                if response["data"]["User_status"]:
+                    if response["data"]["User_status"] == "inactive":
+                        resp = {"msg":"error","info": "Username is termed inactive. Please contact admin.",'total_credits':api_resp1["total_credits"]}
+                        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+                    elif response["data"]["User_status"] == "deleted":
+                        resp = {"msg":"error","info": "User not found.",'total_credits':api_resp1["total_credits"]}
+                        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+            except:
+                pass
             form = login(request, user)
             request.session.save()
             session = request.session.session_key
@@ -1065,11 +1125,10 @@ def PublicApi(request):
                     user_obj = Account.objects.filter(
                         username=obj["username"]).first()
                     try:
-                        resp = {'msg': 'success', 'info': 'Logged In Successfully', 'session_id': session, 'remaining_times':
-                                api_resp1["count"]/10, 'first_name': user_obj.first_name, 'last_name': user_obj.last_name, 'last_login': user_obj.last_login, 'first_login': user_obj.date_joined}
+                        resp = {'msg': 'success', 'info': 'Logged In Successfully', 'session_id': session, 'total_credits':api_resp1["total_credits"], 'first_name': user_obj.first_name, 'last_name': user_obj.last_name, 'last_login': user_obj.last_login, 'first_login': user_obj.date_joined}
                     except Exception as e:
                         resp = {'msg': 'success', 'info': 'Logged In Successfully',
-                                'session_id': session, 'remaining_times': api_resp1["count"]/10}
+                                'session_id': session, 'total_credits':api_resp1["total_credits"]}
                         print(e)
                     return Response(resp)
             try:
@@ -1083,20 +1142,25 @@ def PublicApi(request):
             email = response["data"]['Email']
             phone = response["data"]['Phone']
             try:
+                userID=response["data"]['_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
-                User_type = response["data"]['User_type']
-                client_admin_id = response["data"]['client_admin_id']
-                user_id = response["data"]['_id']
-                role_res = response["data"]['Role']
-                company = response["data"]['company_id']
-                member = response["data"]['Memberof']
-                dept = response["data"]['dept_id']
-                org = response["data"]['org_id']
-                project = response["data"]['project_id']
-                subproject = response["data"]['subproject_id']
+                User_type=response["data"]['User_type']
+                client_admin_id=response["data"]['client_admin_id']
+                payment_status=response["data"]['payment_status']
+                newsletter=response["data"]['newsletter_subscription']
+                user_country=response["data"]['user_country']
+                privacy_policy=response["data"]['Policy_status']
+                other_policy=response["data"]['safety_security_policy']
+                role_res=response["data"]['Role']
+                company=response["data"]['company_id']
+                member=response["data"]['Memberof']
+                dept=response["data"]['dept_id']
+                org=response["data"]['org_id']
+                project=response["data"]['project_id']
+                subproject=response["data"]['subproject_id']
             except:
                 pass
             try:
@@ -1107,47 +1171,14 @@ def PublicApi(request):
                 final_ltime = ''
                 dowell_time = ''
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+            user_obj=Account.objects.filter(username=username).first()
 
-            field_session = {
-                'first_name': first_name,
-                'last_name': last_name,
-                'lat'
-                'sessionID': session,
-                'role': role_res,
-                'username': username,
-                'Email': email,
-                "profile_img": profile_image,
-                'Phone': phone,
-                "User_type": User_type,
-                'language': language,
-                'city': city,
-                'country': country,
-                'org': org,
-                'company_id': company,
-                'project': project,
-                'subproject': subproject,
-                'dept': dept,
-                'Memberof': member,
-                'status': 'login',
-                'dowell_time': dowell_time,
-                'timezone': zone,
-                'regional_time': final_ltime,
-                'server_time': serverclock,
-                'userIP': ipuser,
-                'userOS': osver,
-                'browser': browser,
-                'userdevice': device,
-                'userbrowser': "",
-                'UserID': user_id,
-                'login_eventID': event_id,
-                "redirect_url": "",
-                "client_admin_id": client_admin_id
-            }
+            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info = {"role": role_res, "username": username, "email": email, "profile_img": profile_image, "phone": phone, "User_type": User_type, "language": language, "city": city, "country": country, "status": "login", "dowell_time": dowell_time, "timezone": zone,
-                    "regional_time": final_ltime, "server_time": serverclock, "userIP": ipuser, "browser": browser, "userOS": osver, "userDevice": device, "userBrowser": "", "userID": user_id, "login_eventID": event_id, "client_admin_id": client_admin_id}
+            info = info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates}
             info1 = json.dumps(info)
             infoo = str(info1)
             custom_session = CustomSession.objects.create(
@@ -1157,7 +1188,7 @@ def PublicApi(request):
                 'msg': 'success',
                 'info': 'Logged In Successfully',
                 'session_id': session,
-                'remaining_times': api_resp1["count"]/10,
+                'total_credits':api_resp1["total_credits"],
                 'first_name': first_name,
                 'last_name': last_name,
                 'last_login': user_obj.last_login,
@@ -1509,7 +1540,10 @@ def main_login(request):
     username = mdata('username')
     password = mdata('password')
     loc = mdata("location")
-    print("location: "+str(loc))
+    if loc is not None and loc != "":
+        coordinates=loc.split(" ")
+    else:
+        coordinates="Location not allowed.."    
     mainparams=mdata("mainparams")
     try:
         lo = loc.split(" ")
@@ -1649,11 +1683,11 @@ def main_login(request):
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
             field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy}
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates}
             info1=json.dumps(info)
             infoo=str(info1)
             custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
@@ -1833,7 +1867,8 @@ def user_report(request):
 def user_status(request):
     username = request.data.get("username", None)
     status = request.data.get("status", None)
-    field = {"Username": username}
+    password=request.data.get("password",None)
+    field = {"Username": username,"Password":dowell_hash.dowell_hash(password)}
     id = dowellconnection("login", "bangalore", "login", "registration",
                           "registration", "10004545", "ABCDE", "find", field, "nil")
     response = json.loads(id)
@@ -2289,3 +2324,114 @@ def face_id(request):
         return Response({'msg':'success','info':'Face ID is updated !!'})
     Face_Login.objects.create(username=username,image=uke)
     return Response({'msg':'success','info':'Face ID is saved !!'})
+
+@api_view(['POST'])
+def face_login_test(request):
+    image = request.data.get('image', None)
+    usage=request.data.get('usage')
+    if usage is None:
+        filename = default_storage.save(image.name, image)
+        image_path = default_storage.path(filename)
+
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        known_img = face_recognition.load_image_file(os.path.join(BASE_DIR, 'static/img/test_facelogin/IMG_8787 (4).JPG'))
+        unknown_img = face_recognition.load_image_file(image_path)
+
+        try:
+            known_encoding = face_recognition.face_encodings(known_img)[0]
+            unknown_encoding = face_recognition.face_encodings(unknown_img)[0]
+        except:
+            return Response({
+                'success': True,
+                'result': "false"
+            })
+
+        result = face_recognition.compare_faces([known_encoding], unknown_encoding)
+
+        return Response({
+            'success': True,
+            'result': result
+        })
+    else:
+        obj1=Face_Login.objects.get(username="Roshan_4004")
+        img_list=(obj1.image.strip("][").split(', '))
+        num_arr=np.array(img_list,dtype='float64')
+
+        filename = default_storage.save(image.name, image)
+        image_path = default_storage.path(filename)
+        unknown_img = face_recognition.load_image_file(image_path)
+        try:
+            # known_encoding = face_recognition.face_encodings(known_img)[0]
+            unknown_encoding = face_recognition.face_encodings(unknown_img)[0]
+        except:
+            return Response({
+                'success': True,
+                'result': "false"
+            })
+
+        result = face_recognition.compare_faces([num_arr], unknown_encoding)
+
+        return Response({
+            'success': True,
+            'result': result
+        })
+
+@api_view(['GET', 'POST'])
+def logininfo(request):
+    if request.method == 'POST':
+        session=request.data["session_id"]
+        mydata=CustomSession.objects.filter(sessionID=session).first()
+        if not mydata:
+            return Response({"message":"SessionID not found in database, Please check and try again!!"})
+        if mydata.status != "login":
+            return Response({"message":"You are logged out, Please login and try again!!"})
+        var1=mydata.info
+        var2=json.loads(var1)
+        var2["org_img"]="https://100093.pythonanywhere.com/static/clientadmin/img/logomissing.png"
+
+        del_keys=["role","company_id","org","project","subproject","dept","Memberof","members"]
+        for key in del_keys:
+            try:
+                del var2[key]
+            except:
+                pass
+        return Response({'userinfo':var2})
+    return Response({'msg':'Success','info':'API is working, POST session_id for userinfo'})
+
+@api_view(['GET'])
+def product_users(request):
+    time_threshold = datetime.datetime.now()- datetime.timedelta(days=7)
+    obj_client_admin=LiveStatus.objects.filter(product="Client_admin",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    # obj_live=LiveStatus.objects.filter(status="login",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    final={'Client_admin':obj_client_admin}
+    return Response(final)
+
+@api_view(['GET'])
+def live_users(request):
+    total_products=[]
+    for_product=LiveStatus.objects.values_list('product', flat=True)
+    for a in for_product:
+        if not a in total_products:
+            total_products.append(a)
+    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
+    obj_notlive=LiveStatus.objects.filter(status="login",date_updated__lte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    obj_live=LiveStatus.objects.filter(status="login",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('username', 'sessionID')
+    final={'liveusers':obj_live,'non_liveusers':obj_notlive,'total_products':total_products}
+    return Response(final)
+
+@api_view(['GET'])
+def live_qr_users(request):
+    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
+    obj_notlive=Live_QR_Status.objects.filter(status="online",date_updated__lte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('qrid')
+    obj_live=Live_QR_Status.objects.filter(status="online",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('qrid')
+    final={'liveusers_qr':obj_live,'non_liveusers_qr':obj_notlive}
+    return Response(final)
+
+@api_view(['GET'])
+def live_public_users(request):
+    time_threshold = datetime.datetime.now()- datetime.timedelta(minutes=1)
+    obj_notlive=Live_Public_Status.objects.filter(status="install",date_updated__lte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('unique_key')
+    obj_live=Live_Public_Status.objects.filter(status="install",date_updated__gte=time_threshold.strftime('%d %b %Y %H:%M:%S')).values_list('unique_key')
+    final={'liveusers_public':obj_live,'non_liveusers_public':obj_notlive}
+    return Response(final)
