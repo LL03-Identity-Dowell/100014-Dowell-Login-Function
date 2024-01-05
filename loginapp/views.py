@@ -1294,7 +1294,7 @@ def change_password(request):
                 return JsonResponse({"msg": "error", "info": "Username, Password combination is incorrect"})
         else:
             return JsonResponse({"msg": "success", "info": "Running correctly"})
-    return render(request, 'login/change_password.html', context)
+    return render(request, 'change_password.html', context)
 
 
 def allow_location(request):
@@ -1375,4 +1375,53 @@ def userdetails(request):
     response["current"]=current
     response["weekly"]=weekly
     resp=response
-    return render(request,'login/userdetails1.html',{"resp":resp})
+    return render(request,'user_detail.html',{"resp":resp})
+
+@login_required
+def add_public(request):
+    if request.user.is_superuser:
+        if request.method=="POST":
+            number=request.POST["user_number"]
+            if int(number) > 0:
+                for a in range(int(number)):
+                    ruser=passgen.generate_random_password1(32)
+                    field={"Username":ruser,"status":"offline"}
+                    resp=dowellconnection("login","bangalore","login","public_members","public_members","1242001","ABCDE","insert",field,"nil")
+                    respj=json.loads(resp)
+                return render(request,'login/create_users.html',{'msg':f'Successfully {number} users Created'})
+            else:
+                return render(request,'login/create_users.html',{'msg':'Provide number greater than 0'})
+        return render(request,'create_users.html')
+    else:
+        return HttpResponse("You don not have access to this page")
+    return HttpResponse("You don not have access to this page")
+
+def removeaccount(request):
+    if is_ajax(request=request):
+        username=request.POST.get("username",None)
+        status=request.POST.get("status",None)
+        password=request.POST.get("password",None)
+        field={"Username":username,"Password":dowell_hash(password)}
+        id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","find",field,"nil")
+        response=json.loads(id)
+        if response["data"] != None:
+            try:
+                if response["data"]["User_status"]:
+                    if response["data"]["User_status"] == "inactive":
+                        resp = {"msg":"error","info": "Username is termed inactive. Please contact admin."}
+                        return JsonResponse(resp,)
+                    elif response["data"]["User_status"] == "deleted":
+                        resp = {"msg":"error","info": "User not found."}
+                        return JsonResponse(resp)
+            except:
+                pass
+            if status is not None and status in ["active" , "inactive" , "deleted"]:
+                up_field={"User_status":status}
+                dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","update",field,up_field)
+                return JsonResponse({'msg':'success','info':f"{username}'s status changed to {status}"})
+            else:
+                return JsonResponse({'msg':'error','info':"Please Enter valid status"})
+        else:
+            return JsonResponse({'msg':'error','info':"Username, Password combination is incorrect"})
+    else:
+        return render(request, 'removeaccount.html')

@@ -22,10 +22,26 @@ from django.conf.urls.i18n import i18n_patterns
 from django.views.generic.base import TemplateView
 from server.views import error_404, error_500
 from django.views.generic import TemplateView
+from loginapp import views as main
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
+
+    #endpoints needed from old version
+    path('linklogin',main.LinkLogin,name="linklogin"),
+    path('linkbased',main.linked_based,name="linkbased" ),
+    path('allow_location',main.allow_location,name="allow_location"),
+    path("check_status",main.check_status,name="check_status"),
+    path("live_status/",main.live_status,name="live_status"),
+    path("add_public",main.add_public,name="add_public"),
+    path("userdetails",main.userdetails,name="userdetails"),
+    path("mobile_register",main.register,name="mobile_register"),
+    path("main_signout",main.logout,name="main_signout"),
+    path("removeaccount",main.removeaccount,name="removeaccount"),
+    path("legalpolicy1",main.login_legal_policy,name="legalpolicy1"),
+
+    #main react app
     re_path(r'.*', TemplateView.as_view(template_name='index.html'))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

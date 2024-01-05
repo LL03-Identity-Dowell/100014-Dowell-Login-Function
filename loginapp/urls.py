@@ -9,7 +9,7 @@ urlpatterns = [
     path('sign-out/', views.before_logout, name="before_logout"),
     path('register/legalpolicy/', views.register_legal_policy,
          name="register_legal_policy"),
-    path('login/legalpolicy/', views.login_legal_policy,
+    path('legalpolicy1', views.login_legal_policy,
          name="login_legal_policy"),
 
     path('update_qrobj/', views.update_qrobj, name="update_qrobj"),
@@ -29,5 +29,8 @@ urlpatterns = [
 
     path("user_chart/", TemplateView.as_view(template_name="chart.html")),
 
-    path('validate_username/', views.validate_username, name='validate-username')
+    path('validate_username/', views.validate_username, name='validate-username'),
+
+     path("removeaccount",views.removeaccount,name="removeaccount"),
+     path('add_public/',views.add_public,name="add_public"),
 ]
