@@ -40,12 +40,12 @@ urlpatterns = [
 
     path('face_login_api/', views.face_login_api, name="face_login_api"),
     path('face_login/',views.face_login_test,name="face_login"),
-    path('/face_id/',views.face_id,name="face_id"),
+    path('face_id/',views.face_id,name="face_id"),
 
-    path('/logininfo/',views.logininfo,name="logininfo"),
+    path('logininfo/',views.logininfo,name="logininfo"),
 
-    path('/product_users/',views.product_users,name="product_users"),
-    path('/live_qr_users/',views.live_qr_users,name="live_qr_users"),
-    path('/live_public_users/',views.live_public_users,name="live_public_users"),
-    path('/live_users/',views.live_users,name="live_users"),
+    path('product_users/',views.product_users,name="product_users"),
+    path('live_qr_users/',views.live_qr_users,name="live_qr_users"),
+    path('live_public_users/',views.live_public_users,name="live_public_users"),
+    path('live_users/',views.live_users,name="live_users"),
 ]
