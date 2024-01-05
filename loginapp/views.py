@@ -305,7 +305,7 @@ def register(request):
             else:
                 mobile_sms.objects.create(
                     phone=full_number, sms=sms, expiry=time)
-            url = "https://100085.pythonanywhere.com/api/sms/"
+            url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
             payload = {
                 "sender": "DowellLogin",
                 "recipient": full_number,
@@ -453,16 +453,16 @@ def register(request):
             }
 
             data["portpolio"].append(default)
-            data["document_name"] = user
-            data["Username"] = user
-            update_data1 = {"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
-            data["profile_info"].update(update_data1)
-            data["organisations"][0]["org_name"]=user
-            update_data2 = {"first_name":first,"last_name":last,"email":email}
-            data["members"]["team_members"]["accept_members"][0].update(update_data2)
-            client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data,"nil")
-            client_admin_res = json.loads(client_admin)
-            org_id = client_admin_res["inserted_id"]
+            # data["document_name"] = user
+            # data["Username"] = user
+            # update_data1 = {"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
+            # data["profile_info"].update(update_data1)
+            # data["organisations"][0]["org_name"]=user
+            # update_data2 = {"first_name":first,"last_name":last,"email":email}
+            # data["members"]["team_members"]["accept_members"][0].update(update_data2)
+            # client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data,"nil")
+            # client_admin_res = json.loads(client_admin)
+            # org_id = client_admin_res["inserted_id"]
 
             # Change document name and username
             data["document_name"] = user

@@ -1540,7 +1540,8 @@ def main_login(request):
     username = mdata('username')
     password = mdata('password')
     loc = mdata("location")
-    if loc is not None and loc != "":
+    print(loc)
+    if loc is not None and loc != "" and loc != '{}':
         coordinates=loc.split(" ")
     else:
         coordinates="Location not allowed.."    
