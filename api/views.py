@@ -25,7 +25,7 @@ from django.core.files.storage import default_storage
 from django.http.response import JsonResponse
 from django.utils import timezone
 from django.template.loader import render_to_string
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt,xframe_options_exempt,method_decorator
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -61,6 +61,7 @@ from server.utils import qrcodegen
 from server.utils import passgen
 from api.serializers import UserSerializer
 
+dpass="d0wellre$tp@$$"
 
 def get_html_msg_new(username, otp, purpose):
     return f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to {purpose} of dowell account <br><h2>Your OTP is <strong>{otp}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
@@ -87,40 +88,6 @@ def register_legal_policy(user):
     requests.post(policy_url, data=data)
     return "success"
 
-
-@api_view(['POST'])
-def login_legal_policy(request):
-    session_id = request.data.get('s')
-    if session_id:
-        RandomSession.objects.create(
-            sessionID=session_id, status="Accepted", username="none")
-        return Response({'msg': 'Success', 'info': 'Policy accepted!!'})
-    else:
-        return Response({'msg': 'errror', 'info': 'Session_id is required'})
-
-
-def register_legal_policy(user):
-    policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
-    RandomSession.objects.create(
-        sessionID=user, status="Accepted", username=user)
-    time = datetime.datetime.now()
-    data = {
-        "data": [
-            {
-                "event_id": "FB1010000000167475042357408025",
-                "session_id": user,
-                "i_agree": "true",
-                "log_datetime": time,
-                "i_agreed_datetime": time,
-                "legal_policy_type": "app-privacy-policy"
-            }
-        ],
-        "isSuccess": "true"
-    }
-    requests.post(policy_url, data=data)
-    return "success"
-
-
 @api_view(['POST'])
 def login_legal_policy(request):
     session_id = request.data.get('s')
@@ -137,28 +104,92 @@ def get_custom_session_data(session_id):
     res_data = json.loads(json_data)
     return res_data.get('data')
 
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
 @api_view(["POST"])
 def register(request):
     user = request.data["Username"]
     otp_input = request.data.get("otp")
     sms_input=request.data.get("sms")
     image = request.FILES.get("Profile_Image")
-    password = request.data["Password"]
-    first = request.data["Firstname"]
-    last = request.data["Lastname"]
-    email = request.data["Email"]
+    password = request.data.get("Password")
+    first = request.data.get("Firstname")
+    last = request.data.get("Lastname")
+    email = request.data.get("Email")
     role1 = "guest"
-    phonecode = request.data["phonecode"]
-    phone = request.data["Phone"]
-    user_type = request.data['user_type']
-    user_country = request.data['user_country']
-    policy_status = request.data['policy_status']
-    other_policy = request.data['other_policy']
-    newsletter = request.data['newsletter']
+    phonecode = request.data.get("phonecode")
+    phone = request.data.get("Phone")
+    user_type = request.data.get('user_type')
+    user_country = request.data.get('user_country')
+    policy_status = request.data.get('policy_status')
+    other_policy = request.data.get('other_policy')
+    newsletter = request.data.get('newsletter')
+
+    # Temporary Change..
+    if email and user and not image and not password and not first \
+            and not last and not phone and not phonecode and not user_type and not user_country \
+            and not policy_status and not other_policy and not newsletter:
+        otp = generateOTP()
+        try:
+            emailexist = GuestAccount.objects.get(email=email)
+        except GuestAccount.DoesNotExist:
+            emailexist = None
+        if emailexist is not None:
+            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=user)
+        else:
+            data=GuestAccount(username=user,email=email,otp=otp)
+            data.save()
+        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
+        payload = json.dumps({
+            "toEmail":email,
+            "toName":user,
+            "topic":"RegisterOtp",
+            "otp":otp
+            })
+        headers = {
+            'Content-Type': 'application/json'
+            }
+        response1 = requests.request("POST", url, headers=headers, data=payload)
+        return Response({'msg':'success','info':'OTP sent successfully'})
+
+    elif phone and phonecode and not email and not user and not image and not password \
+            and not first and not last and not user_type and not user_country and not policy_status \
+            and not other_policy and not newsletter:
+        sms = generateOTP()
+
+        full_number =str(phonecode) + str(phone)
+        time = datetime.datetime.utcnow()
+        print(full_number)
+        if full_number == "251912912144":
+            sms="123456"
+        try:
+            phone_exists = mobile_sms.objects.get(phone=full_number)
+        except mobile_sms.DoesNotExist:
+            phone_exists = None
+        if phone_exists is not None:
+            mobile_sms.objects.filter(
+                phone=full_number).update(sms=sms, expiry=time)
+        else:
+            mobile_sms.objects.create(
+                phone=full_number, sms=sms, expiry=time)
+            
+        url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
+        payload = {
+            "sender" : "DowellLogin",
+            "recipient" : full_number,
+            "content" : f"Enter the following OTP to create your dowell account: {sms}",
+            "created_by" : "Manish"
+            }
+        response = requests.request("POST", url, data=payload)
+        if len(response.json()) > 1:
+            return Response({'msg':'success','info':'SMS sent successfully!!'})
+        else:
+            return Response({'msg': 'error','error':'The number is not valid'})
+
 
     user_exists = Account.objects.filter(username=user).first()
     if user_exists:
-        return Response({'message':"Username already taken"})
+        return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
 
     register_legal_policy(user)
     try:
@@ -413,11 +444,6 @@ def MobileLogin(request):
 @api_view(["POST"])
 def MobileLogout(request):
     session = request.data.get("session_id")
-    mydata = get_custom_session_data(session)
-    if mydata is not None:
-        if mydata['status'] != "logout":
-            mydata['status'] = "logout"
-        mydata.save(update_fields=['info', 'status'])
     field_session = {'sessionID': session}
     update_field = {'status': 'logout'}
     dowellconnection("login", "bangalore", "login", "session", "session",
@@ -429,14 +455,16 @@ def MobileLogout(request):
 @api_view(['GET', 'POST'])
 def LinkBased(request):
     if request.method == 'POST':
-        user = request.data["Username"]
+        user = request.data.get("Username")
         loc = request.data["Location"]
-        device = request.data["Device"]
+        device = request.data.get("Device")
         osver = request.data["OS"]
-        brow = request.data["Browser"]
+        brow = request.data.get("Browser")
         ltime = request.data["Time"]
         ipuser = request.data["IP"]
-        mobconn = request.data["Connection"]
+        mobconn = request.data.get("Connection")
+        if user is None:
+            user=passgen.generate_random_password1(8)
         field = {"Username": user, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
             ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
         resp = dowellconnection("login", "bangalore", "login", "login",
@@ -543,32 +571,37 @@ def all_users(request):
         password1 = request.data["password"]
         user = authenticate(request, username=username, password=password1)
         if user is not None:
-            userfield = {}
-            main = dowellconnection("login", "bangalore", "login", "registration",
-                                    "registration", "10004545", "ABCDE", "fetch", userfield, "nil")
-            main_res = json.loads(main)
-            final = main_res["data"]
-            if len(final) > 1:
-                try:
-                    if final["User_status"] == "deleted" and final["User_status"] == "inactive":
-                        return Response({'msg': 'Sorry account inactive or deleted'})
-                except:
-                    pass
-            final2 = []
+            userfield={}
+            main=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
+            main_res=json.loads(main)
+            final=main_res["data"]
+            final2=[]
             for a in final:
                 try:
-                    username = a['Username']
-                    payment_status = a['payment_status']
-                    user_id = a['_id']
-                    user_type = a['User_type']
-                    final2.append({"member_name": username, "org_name": username,
-                                  "payment_status": payment_status, "user_id": user_id, "user_type": user_type})
+                    if not a["User_status"] == "deleted" and not a["User_status"] == "inactive":
+                        try:
+                            username=a['Username']
+                            payment_status=a['payment_status']
+                            user_id=a['_id']
+                            user_type=a['User_type']
+                            final2.append({"username":username,"org_name":username,"payment_status":payment_status,"user_id":user_id,"user_type":user_type})
+                        except:
+                            pass
+                    else:
+                        pass
                 except:
-                    pass
-            return Response({"data": final2})
+                    try:
+                        username=a['Username']
+                        payment_status=a['payment_status']
+                        user_id=a['_id']
+                        user_type=a['User_type']
+                        final2.append({"username":username,"org_name":username,"payment_status":payment_status,"user_id":user_id,"user_type":user_type})
+                    except:
+                        pass
+            return Response({"data":final2})
         else:
-            return Response({"msg": "API working", "data": "Provided credential is wrong, try again!"})
-    return Response({"msg": "API working", "data": "POST your username and password to get list"})
+            return Response({"msg":"API working","data":"Provided credential is wrong, try again!"})
+    return Response({"msg":"API working","data":"POST your username and password to get list"})
 
 
 @api_view(['GET', 'POST'])
@@ -882,6 +915,12 @@ def all_liveusers(request):
     response["product_wise"]=current
     response["weekly_product_wise"]=weekly
     response["Note"]="In weekly part '0' means 24 hrs ahead of current time, '1' means between 48 and 24 hrs ahead of current time and so on.."
+    three_months_ago = datetime.datetime.today() - datetime.timedelta(days=90)
+    total_3moths=Account.objects.filter(last_login__lt=three_months_ago)
+    grand_total=Account.objects.all()
+    response["grand_total_users"]=len(grand_total)
+    response["active"]=len(total_3moths)
+    response["inactive"]=len(grand_total)-len(total_3moths)
     return Response(response)
 
 @api_view(['GET'])
@@ -1023,6 +1062,8 @@ def forgot_username(request):
                 return Response({'msg':'error','info': 'Email not found'},status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'msg':'error','info': 'Wrong OTP'},status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'msg':'error','info':"Request must have field 'email' for getting otp in mail and then add field 'otp' for getting list of username in mail.."},status=status.HTTP_400_BAD_REQUEST)
 
 def processApikey(api_key, api_services):
     url = f'https://100105.pythonanywhere.com/api/v3/process-services/?type=api_service&api_key={api_key}'
@@ -1066,11 +1107,19 @@ def PublicApi(request):
         city = ""
         country = ""
     # return Response({"city":city,"country":country,"zone":timezone_str})
-    device = mdata("device")
+    device = mdata("device","api")
     osver = mdata("os")
     # brow=mdata["browser"]
     ltime = mdata("time")
     ipuser = mdata("ip")
+    try:
+        if ipuser != "":
+            response = requests.get(f'https://ipapi.co/{ipuser}/json/').json()
+            ip_city = response.get("city")
+        else:
+            ip_city = None
+    except Exception as e:
+        ip_city = None
     zone = mdata("timezone")
     if None in [username, password, loc, device, osver, ltime, ipuser]:
         resp = {"msg": "error", "info": "Provide all credentials",
@@ -1184,6 +1233,9 @@ def PublicApi(request):
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
 
+            serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
+
             resp = {
                 'msg': 'success',
                 'info': 'Logged In Successfully',
@@ -1215,7 +1267,7 @@ def login_init_api(request):
                 if test_session['status'] == "login":
                     login_detail = get_custom_session_data(past_login)
                     response = {'msg':'error','info':'logged_in_user'}
-                    if "org=" in mainparams:
+                    if "org=" in mainparams and not "code=masterlink" in mainparams:
                         if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams :
                             response["url"] = f'https://100093.pythonanywhere.com/exportfolio?session_id={past_login}&{mainparams}'
 
@@ -1224,7 +1276,7 @@ def login_init_api(request):
                         else:
                             response["url"] = f'https://100093.pythonanywhere.com/invitelink?session_id={past_login}&{mainparams}'
 
-                    elif "code=masterlink" in mainparams or "code=masterlink1" in mainparams:
+                    elif "code=masterlink" in mainparams:
                         response["url"] = f'https://100093.pythonanywhere.com/masterlink?session_id={past_login}&{mainparams}'
 
                     elif "redirect_url" in mainparams:
@@ -1361,6 +1413,23 @@ def email_otp(request):
     username = request.data.get('username', 'User')
     usage = request.data.get('usage', None)
 
+    #Check if user_status is valid
+    field = {"Username": username,"Email":email}
+    id = dowellconnection("login", "bangalore", "login", "registration",
+                              "registration", "10004545", "ABCDE", "find", field, "nil")
+    response = json.loads(id)
+    try:
+        if response["data"] != None:
+            if response["data"]["User_status"]:
+                if response["data"]["User_status"] == "inactive":
+                    resp = {"msg":"error","info": "Username is termed inactive. Please contact admin."}
+                    return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+                elif response["data"]["User_status"] == "deleted":
+                    resp = {"msg":"error","info": "User not found."}
+                    return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+    except:
+        pass
+
     # Send OTP
     if email and usage:
         otp = generateOTP()
@@ -1378,9 +1447,11 @@ def email_otp(request):
                 else:
                     msg = 'error'
                     info = 'Email not found'
+                    status_code=status.HTTP_400_BAD_REQUEST
             else:
                 msg = 'error'
                 info = 'Email not associated with any user'
+                status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "forgot_password":
             user_qs = Account.objects.filter(email=email, username=username)
             email_qs = GuestAccount.objects.filter(email=email).first()
@@ -1399,6 +1470,7 @@ def email_otp(request):
             else:
                 msg = 'error'
                 info = 'Username, email combination is incorrect'
+                status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "update_email":
             user_qs = Account.objects.filter(
                 email=email, username=username).first()
@@ -1418,6 +1490,7 @@ def email_otp(request):
             else:
                 msg = "error"
                 info = "Given email is already in use with your account"
+                status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "create_account":
             for_html_msg = "use this email for creation"
             subject = "Your otp for creating dowell account"
@@ -1443,17 +1516,22 @@ def email_otp(request):
             }
             response1 = requests.request(
                 "POST", url, headers=headers, data=payload)
+            msg = 'success'
+            info = 'OTP sent Successfully'
             return Response({'msg': 'success', 'info': 'OTP sent successfully'})
         else:
-            return Response({'msg': 'error', 'info': 'Enter email and the usage you are looking for. Look into documentation for more info.'})
+            return Response({'msg': 'error', 'info': 'Enter email and the usage you are looking for. Look into documentation for more info.'},status=status.HTTP_400_BAD_REQUEST)
         if msg == 'success':
             message = get_html_msg_new(username, otp, for_html_msg)
             def send_otp(): return send_mail(
                 subject, otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
             send_otp()
-        return Response({'msg': msg, 'info': info})
+        try:
+            return Response({'msg': msg, 'info': info},status=status_code)
+        except:
+            return Response({'msg': msg, 'info': info})
     else:
-        return Response({'msg': 'error', 'info': 'Enter email and the usage you are looking for. Look into documentation for more info.'})
+        return Response({'msg': 'error', 'info': 'Enter email and the usage you are looking for. Look into documentation for more info.'},status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
 def mobilesms(request):
@@ -1543,7 +1621,12 @@ def main_login(request):
     print(loc)
     if loc is not None and loc != "" and loc != '{}':
         coordinates=loc.split(" ")
+        url = 'https://api.open-elevation.com/api/v1/lookup?'
+        params = {'locations': f"{coordinates[0]},{coordinates[1]}"}
+        result = requests.get(url, params)
+        altitude=result.json()['results'][0]['elevation']
     else:
+        altitude="Location not allowed.."    
         coordinates="Location not allowed.."    
     mainparams=mdata("mainparams")
     try:
@@ -1684,11 +1767,11 @@ def main_login(request):
             serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
             field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates}
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates,"altitude":altitude}
             dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", field_session, "nil")
 
-            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates}
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates,"altitude":altitude}
             info1=json.dumps(info)
             infoo=str(info1)
             custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
@@ -1818,8 +1901,7 @@ def main_logout(request):
                      "1121", "ABCDE", "update", field_session, update_field)
     logout(request)
     response = Response()
-    response.data = {'msg': 'Logged out Successfully..'}
-    response.delete_cookie('DOWELL_LOGIN')
+    response.data = {'msg':'success','info': 'Logged out Successfully..'}
     return response
 
 @api_view(['POST'])
@@ -1829,7 +1911,7 @@ def validate_username(request):
         qs = Account.objects.filter(username=username)
         if qs.exists():
             return Response({'msg': 'error', 'info': 'Username Not Available'}, status=status.HTTP_400_BAD_REQUEST)
-    no_unames = ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin","uxlive","livinglab","ux","dowell"]
+    no_unames = ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin","uxlive","livinglab","ux","dowell","livinglabadmin","livinglab","living_lab_admin"]
     for name in no_unames:
         if username == name:
             return Response({'msg': 'error', 'info': 'Username Not Available'}, status=status.HTTP_400_BAD_REQUEST)
@@ -1867,22 +1949,22 @@ def user_report(request):
 @api_view(['POST'])
 def user_status(request):
     username = request.data.get("username", None)
-    status = request.data.get("status", None)
+    status_1 = request.data.get("status", None)
     password=request.data.get("password",None)
     field = {"Username": username,"Password":dowell_hash.dowell_hash(password)}
     id = dowellconnection("login", "bangalore", "login", "registration",
                           "registration", "10004545", "ABCDE", "find", field, "nil")
     response = json.loads(id)
     if response["data"] != None:
-        if status is not None and status in ['active', 'inactive', 'deleted']:
-            up_field = {"User_status": status}
+        if status_1 is not None and status_1 in ['active', 'inactive', 'deleted']:
+            up_field = {"User_status": status_1}
             dowellconnection("login", "bangalore", "login", "registration",
                              "registration", "10004545", "ABCDE", "update", field, up_field)
-            return Response({'msg': 'success', 'info': f"{username}'s status changed to {status}"})
+            return Response({'msg': 'success', 'info': f"{username}'s status changed to {status_1}"})
         else:
-            return Response({'msg': 'error', 'info': "Please Enter valid status"})
+            return Response({'msg': 'error', 'info': "Please Enter valid status"},status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'msg': 'error', 'info': "Username not found"})
+        return Response({'msg': 'error', 'info': "Username, Password combination is incorrect"},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def otp_verify(request):
@@ -1975,7 +2057,7 @@ def LinkLogin(request):
     loc=request.data["Location"]
     device=request.data["Device"]
     osver=request.data["OS"]
-    brow=request.data["Browser"]
+    brow=request.data.get("Browser")
     ltime=request.data["Time"]
     ipuser=request.data["IP"]
     mobconn=request.data["Connection"]
@@ -1994,9 +2076,8 @@ def LinkLogin(request):
 
 @api_view(['POST'])
 def all_username(request):
-    password = "d0wellre$tp@$$"
     pwd = request.data.get("pwd")
-    if pwd == password:
+    if pwd == dpass:
         names=Account.objects.all().values_list('username', flat=True).order_by('username').distinct()
         return Response(names)
     else:
