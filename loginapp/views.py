@@ -93,7 +93,7 @@ def linked_based(request):
         if user is None:
             user = passgen.generate_random_password1(8)
         field = {"Username": user, "OS": osver, "Device": device, "Browser": brow, "Location": loc, "Time": str(
-            ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser}
+            ltime), "SessionID": "linkbased", "Connection": mobconn, "qrcode_id": "user6", "IP": ipuser,"type":"public_members"}
         resp = dowellconnection("login", "bangalore", "login", "login",
                                 "login", "6752828281", "ABCDE", "insert", field, "nil")
         respj = json.loads(resp)
@@ -293,6 +293,7 @@ def register(request):
             sms = generateOTP()
             code = request.POST.get("phonecode")
             phone = request.POST.get("phone")
+            user=request.POST.get("user")
             full_number = code + phone
             time = datetime.datetime.utcnow()
             try:
@@ -301,7 +302,7 @@ def register(request):
                 phone_exists = None
             if phone_exists is not None:
                 mobile_sms.objects.filter(
-                    phone=full_number).update(sms=sms, expiry=time)
+                    phone=full_number).update(sms=sms, expiry=time,username=user)
             else:
                 mobile_sms.objects.create(
                     phone=full_number, sms=sms, expiry=time)
@@ -536,7 +537,7 @@ def register(request):
             if org != "None":
                 return redirect(f'https://100014.pythonanywhere.com/?{main_params}')
             else:
-                return render(request, 'after_register_v2.html', {'user': user})
+                return render(request, 'after_register_v2.html', {'user': user,'mainparams':main_params})
         else:
             return HttpResponse("check")
         
@@ -913,6 +914,10 @@ def logout(request):
     returnurl = request.GET.get('returnurl', None)
     context["returnurl"] = returnurl
     session = request.session.session_key
+    live_status_obj=LiveStatus.objects.filter(sessionID=session).first()
+    if live_status_obj is not None:
+        live_status_obj.status="logout"
+        live_status_obj.save(update_fields=['status'])
     mydata = CustomSession.objects.filter(sessionID=session).first()
     if mydata is not None:
         info = mydata.info
@@ -1103,8 +1108,11 @@ def check_status(request):
     username = request.GET.get('username')
     if username is not None:
         obj = Account.objects.filter(username=username).first()
-        status = obj.current_task
-        return render(request, 'check_status.html', {'status': status})
+        try:
+            status = obj.current_task
+            return render(request, 'check_status.html', {'status': status})
+        except:
+            return render(request,'login/check_status.html')
     return render(request, 'check_status.html')
 
 

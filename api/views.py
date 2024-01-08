@@ -25,7 +25,9 @@ from django.core.files.storage import default_storage
 from django.http.response import JsonResponse
 from django.utils import timezone
 from django.template.loader import render_to_string
-from django.views.decorators.csrf import csrf_exempt,xframe_options_exempt,method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.clickjacking import xframe_options_exempt
+from django.utils.decorators import method_decorator
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
