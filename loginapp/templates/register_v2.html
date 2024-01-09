@@ -1685,7 +1685,7 @@ else
                                                                         required="required" aria-required="true"
                                                                         pattern="[a-zA-Z]*"
                                                                         title="Only alphabets are allowed">
-                                                                        <span id="first_error" style="color:red"></span>
+                                                                    <span id="first_error" style="color:red"></span>
                                                                 </div>
                                                                 <div
                                                                     class="elementor-field-type-text elementor-field-group elementor-column elementor-field-group-field_76d99f3 elementor-col-100 elementor-field-required elementor-mark-required">
@@ -1698,7 +1698,7 @@ else
                                                                         placeholder="Your last name" pattern="[a-zA-Z]*"
                                                                         required="required" aria-required="true"
                                                                         title="Only alphabets are allowed">
-                                                                        <span id="last_error" style="color:red"></span>
+                                                                    <span id="last_error" style="color:red"></span>
                                                                 </div>
                                                                 <div
                                                                     class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
@@ -1731,10 +1731,9 @@ else
                                                                         id="username"
                                                                         class="elementor-field elementor-size-sm  elementor-field-textual"
                                                                         placeholder="Enter Your User Name"
-                                                                        required="required" aria-required="true" pattern="[^()/<>[\]\\,'|\x22]+"
-                                                                        minlength="12" title="The minimum length is 12 and spaces are not allowed">
+                                                                        required="required" aria-required="true" pattern="[a-zA-Z0-9]*"
+                                                                        minlength="12" title="The minimum length is 12, special characters and spaces are not allowed">
                                                                     <span id="user_error" style="color:red"></span>
-                                                                    <span id="user_success" style="color:green"></span>
                                                                 </div>
                                                                 <div
                                                                     class="elementor-field-type-password elementor-field-group elementor-column elementor-field-group-email elementor-col-100 elementor-field-required elementor-mark-required">
@@ -2177,7 +2176,7 @@ else
                                                                     <label
                                                                     class="elementor-field-label"
                                                                         style=" font-family: 'Roboto', Sans-serif;font-weight: 400;color: #038625;font-style: italic;"
-                                                                        for="sms_not_receive">Did not recieve the otp?</label>
+                                                                        for="sms_not_receive">Did not receive the otp?</label>
                                                                     <input type="checkbox" id="sms_not_receive"
                                                                         value="yes"><br>
                                                                 </div>
@@ -2349,13 +2348,16 @@ else
                                                                         $('#mess').html('Not Matching').css('color', 'red');
                                                                 });</script>
                                                             <script>
-                                                               let no_unames=["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin","uxlive","livinglab","ux","dowell"]
+                                                            no_unames=["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin","uxlive","livinglab","ux","dowell"]
                                                                 $('#username').on('change', function () {
-                                                                    if (["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"].includes($('#username').val())) {
-                                                                        $('#user_error').html("This username is not allowed..");
-                                                                        $('#username').val("");
-                                                                    } else {
-                                                                        $('#user_error').html("");
+                                                                    for(i=0;i<no_unames.length;i++){
+                                                                        if ($(this).val().includes(no_unames[i])){
+                                                                            $('#user_error').html("This username is not allowed..");
+                                                                            $('#username').val("");
+                                                                            break;
+                                                                        } else {
+                                                                            $('#user_error').html("");
+                                                                        }
                                                                     }
                                                                     const config = {
                                                                       method: 'POST',
@@ -2364,20 +2366,22 @@ else
                                                                         'Content-Type': 'application/json'
                                                                       }
                                                                     };
-                                                                    fetch('/validate_username/', config)
+                                                                    fetch('https://100014.pythonanywhere.com/api/validate_username/', config)
                                                                       .then(res => {
                                                                         return res.json();
                                                                       })
                                                                       .then(data => {
-                                                                        if (data.status == 'success') {
+                                                                        if (data.msg == 'success') {
                                                                           $('#user_success').html(data.msg);
                                                                           $('#user_error').html('');
                                                                         } else {
+                                                                          $('#username').val("");
                                                                           $('#user_success').html('');
-                                                                          $('#user_error').html(data.msg);
+                                                                          $('#user_error').html(data.info);
                                                                         }
                                                                       })
-                                                                }),
+
+                                                                })
                                                                 $('#first_name').on('change', function () {
                                                                     for(i=0;i<no_unames.length;i++){
                                                                         if ($(this).val().includes(no_unames[i])){
@@ -2483,11 +2487,24 @@ else
                                                             <script type="text/javascript">
                                                             $("#username").on({
                                                               keydown: function(e) {
-                                                                if (e.which === 32)
-                                                                  return false;
+                                                                if (e.which === 32){
+                                                                    return false;}
+                                                                // if(!/[^a-zA-Z0-9]/.test($(this).val())) {
+                                                                //     console.log("Hello");
+                                                                // }
                                                               },
                                                               change: function() {
+                                                                //   console.log("ok");
                                                                 this.value = this.value.replace(/\s/g, "");
+                                                                // for(i=0;i<no_unames.length;i++){
+                                                                //         if (no_unames[i].includes($this.value)) {
+                                                                //             $('#user_error').html("This username is not allowed..");
+                                                                //             $('#username').val("");
+                                                                //             break;
+                                                                //         } else {
+                                                                //             $('#user_error').html("");
+                                                                //         }
+                                                                // }
                                                               }
                                                             });
                                                                 var mainparams = ""
@@ -2570,15 +2587,17 @@ else
                                                                     e.preventDefault();
                                                                     var phone1 = document.getElementById("phone").value;
                                                                     var phonecode1 = document.getElementById("phonecode").value;
-                                                                    if (phone1 != "" && phonecode1 != "") {
+                                                                    var user1 = document.getElementById("username").value;
+                                                                    if (phone1 != "" && phonecode1 != "" && user1 != "") {
                                                                         if (mobile_otp_remains >= 1) {
                                                                             $.ajax({
                                                                                 type: "POST",
-                                                                                url: "{% url 'register' %}",
+                                                                                url: "{% url 'mobile_register' %}",
                                                                                 data: {
                                                                                     form: "mobileotp",
                                                                                     phonecode: $('#phonecode').val(),
                                                                                     phone: $('#phone').val(),
+                                                                                    user: $('#username').val(),
                                                                                     csrfmiddlewaretoken: '{{ csrf_token }}',
                                                                                     dataType: "json",
                                                                                 },
@@ -2621,7 +2640,7 @@ else
                                                                         }
                                                                     } else {
                                                                         $("#sms_btn").prop("disabled", false);
-                                                                        $('#output1').html("Enter both phone and phonecode for OTP!!")
+                                                                        $('#output1').html("Enter phone, username and phonecode for OTP!!")
                                                                     }
                                                                 });
 
@@ -2638,7 +2657,7 @@ else
                                                                     if (phone1 != "" && sms != "" && phonecode1 != "") {
                                                                         $.ajax({
                                                                             type: "POST",
-                                                                            url: "{% url 'register' %}",
+                                                                            url: "{% url 'mobile_register' %}",
                                                                             data: {
                                                                                 form: 'verify_sms',
                                                                                 sms: $('#sms').val(),
@@ -2685,7 +2704,7 @@ else
                                                                         if (email_otp_remains >= 1) {
                                                                             $.ajax({
                                                                                 type: "POST",
-                                                                                url: "{% url 'register' %}",
+                                                                                url: "{% url 'mobile_register' %}",
                                                                                 data: {
                                                                                     username: $('#username').val(),
                                                                                     email: $('#email').val(),
@@ -2694,29 +2713,35 @@ else
 
                                                                                 },
                                                                                 success: function (data) {
+                                                                                    console.log(data.error);
                                                                                     $('#otp_status').val("")
                                                                                     email_otp_remains--;
                                                                                     localStorage.setItem("email_otp_remains", email_otp_remains);
                                                                                     $('#output').html("");
                                                                                     $('#otp_verify').css('display', 'block');
-                                                                                    if (email_otp_remains < 1) {
-                                                                                        $('#success').html("OTP Sent Successfully!!" + "<br>" + "<span style='color:red'>No chances left, try after five minutes..</span>" + "<span style='color:red' id='email_counter'></span>");
-                                                                                        document.getElementById('email_counter').innerHTML = " (" + email_otp_remains + " chances left)";
-                                                                                        localStorage.setItem("email_otp_restricted", Date());
-                                                                                        $('#otp_btn').html("Resend");
-                                                                                        setTimeout(function () {
-                                                                                            $('#otp_btn').prop('disabled', false);
-                                                                                            localStorage.setItem("email_otp_remains", 5);
-                                                                                            email_otp_remains = localStorage.getItem('email_otp_remains');
-                                                                                            $('#success').html("You can sent otp now..");
-                                                                                            localStorage.removeItem('email_otp_restricted');
-                                                                                        }, 300 * 1000);
-                                                                                    } else {
-                                                                                        otp_countdown();
-                                                                                        $('#success').html("OTP Sent Successfully!! " + " Resend after " + "<span style='color:black' id='js-timeout-otp'>1:00</span> mins." + "<span style='color:red' id='email_counter'></span>");
-                                                                                        document.getElementById('email_counter').innerHTML = " (" + email_otp_remains + " chances left)";
-                                                                                        $('#otp_btn').html("Resend");
-                                                                                    };
+                                                                                    if(data.error!=""){
+                                                                                        if (email_otp_remains < 1) {
+                                                                                            $('#success').html("OTP Sent Successfully!!" + "<br>" + "<span style='color:red'>No chances left, try after five minutes..</span>" + "<span style='color:red' id='email_counter'></span>");
+                                                                                            document.getElementById('email_counter').innerHTML = " (" + email_otp_remains + " chances left)";
+                                                                                            localStorage.setItem("email_otp_restricted", Date());
+                                                                                            $('#otp_btn').html("Resend");
+                                                                                            setTimeout(function () {
+                                                                                                $('#otp_btn').prop('disabled', false);
+                                                                                                localStorage.setItem("email_otp_remains", 5);
+                                                                                                email_otp_remains = localStorage.getItem('email_otp_remains');
+                                                                                                $('#success').html("You can sent otp now..");
+                                                                                                localStorage.removeItem('email_otp_restricted');
+                                                                                            }, 300 * 1000);
+                                                                                        } else {
+                                                                                            otp_countdown();
+                                                                                            $('#success').html("OTP Sent Successfully!! " + " Resend after " + "<span style='color:black' id='js-timeout-otp'>1:00</span> mins." + "<span style='color:red' id='email_counter'></span>");
+                                                                                            document.getElementById('email_counter').innerHTML = " (" + email_otp_remains + " chances left)";
+                                                                                            $('#otp_btn').html("Resend");
+                                                                                        };
+                                                                                    }else{
+                                                                                        $("#otp_btn").prop("disabled", false);
+                                                                                        $('#output').html(data.error)
+                                                                                    }
                                                                                 },
                                                                                 failure: function () {
                                                                                     $('#output').html("Internal error")
@@ -2753,7 +2778,7 @@ else
                                                                     if (email1 != "" && otp != "") {
                                                                         $.ajax({
                                                                             type: "POST",
-                                                                            url: "{% url 'register' %}",
+                                                                            url: "{% url 'mobile_register' %}",
                                                                             data: {
                                                                                 form: 'verify_otp',
                                                                                 otp: $('#otp').val(),
@@ -2796,17 +2821,17 @@ else
                                                                     $('#error_msg').html("")
 
                                                                 });
-                                                                $('#phone').on('change', function () {
-                                                                    if (!sms_timer_status){
-																		$('#success1').html("");
-																	}
-                                                                    $('#sms_status').val("")
-                                                                    $('#success_sms').html("")
-                                                                    $('#output_sms').html("")
-                                                                    $('#output1').html("")
-                                                                    $('#error_msg').html("")
+                //                                                 $('#phone').on('change', function () {
+                //                                                     if (!sms_timer_status){
+																// 		$('#success1').html("");
+																// 	}
+                //                                                     $('#sms_status').val("")
+                //                                                     $('#success_sms').html("")
+                //                                                     $('#output_sms').html("")
+                //                                                     $('#output1').html("")
+                //                                                     $('#error_msg').html("")
 
-                                                                });
+                //                                                 });
 function containsSpecialChars(str) {
   const specialChars = /[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
   return specialChars.test(str);

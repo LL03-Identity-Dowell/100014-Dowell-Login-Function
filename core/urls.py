@@ -40,6 +40,7 @@ urlpatterns = [
     path("main_signout",main.logout,name="main_signout"),
     path("removeaccount",main.removeaccount,name="removeaccount"),
     path("legalpolicy1",main.login_legal_policy,name="legalpolicy1"),
+    path("legalpolicy",main.register_legal_policy,name="legalpolicy"),
 
     #main react app
     re_path(r'.*', TemplateView.as_view(template_name='index.html'))
