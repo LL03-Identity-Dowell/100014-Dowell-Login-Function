@@ -1390,7 +1390,7 @@ def email_otp(request):
                         otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
                     guest_account = GuestAccount(
-                        username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
+                        username = username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
                     guest_account.save()
                 msg = 'success'
                 info = 'OTP sent Successfully'

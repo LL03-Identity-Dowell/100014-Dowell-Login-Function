@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.utils.crypto import get_random_string
 from ndarray import NDArrayField
 
@@ -13,7 +13,7 @@ def get_default_profile_image():
     return 'profile_images/user.png'
 
 
-class Account(AbstractUser):
+class UserModel(AbstractUser):
     role = models.CharField(max_length=300, default="User")
     datatype = models.CharField(max_length=100, default="Testing")
     profile_image = models.ImageField(
@@ -124,9 +124,11 @@ class Face_Login(models.Model):
 
 
 
-class UserModel(models.Model):
+class Account(AbstractBaseUser):
+    USERNAME_FIELD = 'username'
+
     profile_image = models.ImageField(null=True, blank=True)
-    username = models.CharField(max_length=255)
+    username = models.CharField(max_length=255, unique="True")
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     email = models.EmailField()
