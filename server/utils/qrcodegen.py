@@ -2,6 +2,8 @@ import qrcode
 from PIL import Image
 from cryptography.fernet import Fernet
 import json
+import os
+from core.settings import MEDIA_ROOT
 
 
 def encode(key, text):
@@ -62,4 +64,4 @@ def qrgen1(user, userid, imgout):
     img = qrcode.make(json.dumps(dic))
 
     # Saving as an image file
-    img.save(imgout)
+    img.save(os.path.join(MEDIA_ROOT,imgout))
