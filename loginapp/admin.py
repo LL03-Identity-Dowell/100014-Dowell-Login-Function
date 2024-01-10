@@ -1,14 +1,14 @@
 from django.contrib import admin
-from django.contrib.auth.forms import UserChangeForm, UserCreationForm
+from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.admin import UserAdmin
+from . forms import AccountAdminCreationForm
 # Register your models here.
 from . models import Account, GuestAccount, CustomSession, QR_Creation, RandomSession, Linkbased_RandomSession, Location_check, mobile_sms
-
 
 @admin.register(Account)
 class AccountAdmin(UserAdmin):
     form = UserChangeForm
-    add_form = UserCreationForm
+    add_form = AccountAdminCreationForm
 
     list_display = ['username', 'is_admin']
     list_filter = ['is_admin']
@@ -31,7 +31,7 @@ class AccountAdmin(UserAdmin):
 
 
 @admin.register(Location_check)
-class Locatuib_checkAdmin(admin.ModelAdmin):
+class Location_checkAdmin(admin.ModelAdmin):
     pass
 
 
