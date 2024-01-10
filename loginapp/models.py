@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import AbstractUser, AbstractBaseUser
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser, BaseUserManager
 from django.utils.crypto import get_random_string
 from ndarray import NDArrayField
 
@@ -122,28 +122,58 @@ class Face_Login(models.Model):
     image = NDArrayField()
 
 
+class UserManager(BaseUserManager):
+    def create_user(self, username, password=None):
+        user = self.model(username=username)
+        user.set_password(password)
+        user.profile_id = 1
+        user.client_admin_id = "1"
+        user.save(using=self._db)
+        return user
 
+    def create_staffuser(self, username, password):
+        user = self.create_user(username, password=password)
+        user.is_staff = True
+        user.save(using=self._db) 
+    
+    def create_superuser(self, username, password):
+        user = self.create_user(username, password=password)
+        user.is_staff = True
+        user.is_admin = True
+        user.save(using=self._db) 
 
 class Account(AbstractBaseUser):
     USERNAME_FIELD = 'username'
 
     profile_image = models.ImageField(null=True, blank=True)
-    username = models.CharField(max_length=255, unique="True")
+    username = models.CharField(max_length=255, unique="True", db_collation='utf8_bin')
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    email = models.EmailField()
+    email = models.EmailField(default="default@example.com")
     password = models.CharField(max_length=255)
-    phonecode = models.CharField(max_length=255)
-    phone = models.CharField(max_length=255)
-    profile_id = models.PositiveBigIntegerField(null=True, blank=True)
-    client_admin_id = models.CharField(max_length=255, null=True, blank=True)
-    policy_status = models.BooleanField()
-    user_type = models.CharField(max_length=255)
+    phonecode = models.CharField(max_length=255, null=True, blank=True)
+    phone = models.CharField(max_length=255, null=True, blank=True)
+    profile_id = models.PositiveBigIntegerField()
+    client_admin_id = models.CharField(max_length=255)
+    policy_status = models.BooleanField(default=True)
+    user_type = models.CharField(max_length=255, null=True, blank=True)
     event_id = models.CharField(max_length=255, null=True, blank=True)
-    payment_status = models.CharField(max_length=255)
+    payment_status = models.CharField(max_length=255, default="unpaid")
     safty_secruity_policy = models.CharField(max_length=255, null=True, blank=True)
-    country = models.CharField(max_length=255)
+    country = models.CharField(max_length=255, null=True, blank=True)
     newsletter_subscription = models.BooleanField(default=True)
+
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+
+    objects = UserManager()
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
 
     def __str__(self) -> str:
         return self.username
