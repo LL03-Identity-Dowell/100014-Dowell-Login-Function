@@ -62,6 +62,7 @@ from server.utils.event_function import create_event
 from server.utils import qrcodegen
 from server.utils import passgen
 from api.serializers import UserSerializer
+from core.settings import STATIC_ROOT
 
 dpass="d0wellre$tp@$$"
 
@@ -222,7 +223,7 @@ def register(request):
             new_user = Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone)
 
         profile_image = new_user.profile_image
-        json_data = open('dowell_login/static/client.json')
+        json_data = open(os.path.join(STATIC_ROOT,'client.json'))
         data1 = json.load(json_data)
         json_data.close()
         default =   {
@@ -473,7 +474,7 @@ def LinkBased(request):
                                 "login", "6752828281", "ABCDE", "insert", field, "nil")
         respj = json.loads(resp)
         qrcodegen.qrgen1(
-            user, respj["inserted_id"], f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
+            user, respj["inserted_id"], f"userqrcodes\{respj['inserted_id']}.png")
         return Response({"qrid": respj["inserted_id"]})
     return Response({"message": "its working"})
 
@@ -613,7 +614,6 @@ def lastlogins(request):
         logintimelist = []
         # activeuserlist=[]
         all2 = CustomSession.objects.all()
-        print(type(all2))
         all1 = all2[::-1]
         # print(all1)
         for a in all1:
@@ -2072,7 +2072,7 @@ def LinkLogin(request):
     field1=json.dumps(field)
     field2=str(field1)
     Linkbased_RandomSession.objects.create(sessionID=random_session,info=field2)
-    qrcodegen.qrgen1(user,respj["inserted_id"],f"dowell_login/media/userqrcodes/{respj['inserted_id']}.png")
+    qrcodegen.qrgen1(user,respj["inserted_id"],f"userqrcodes\{respj['inserted_id']}.png")
     return Response({"session_id":random_session})
 
 

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.forms import UserChangeForm, UserCreationForm
 from django.contrib.auth.admin import UserAdmin
 # Register your models here.
-from . models import Account, GuestAccount, CustomSession, QR_Creation, RandomSession, Linkbased_RandomSession, Location_check, mobile_sms
+from . models import Account, GuestAccount, CustomSession, QR_Creation, RandomSession, Linkbased_RandomSession, Location_check, mobile_sms, Face_Login
 
 
 @admin.register(Account)
@@ -34,10 +34,18 @@ class AccountAdmin(UserAdmin):
 class Locatuib_checkAdmin(admin.ModelAdmin):
     pass
 
+class mobile_smsAdmin(admin.ModelAdmin):
+    list_display=('phone', 'username', 'sms', 'expiry')
+    search_fields=['phone']
+
+class RandomSessionAdmin(admin.ModelAdmin):
+    list_display=('sessionID', 'username', 'status', 'added')
+    search_fields=['username','sessionID']
 
 admin.site.register(GuestAccount)
 admin.site.register(CustomSession)
 admin.site.register(QR_Creation)
-admin.site.register(RandomSession)
+admin.site.register(RandomSession,RandomSessionAdmin)
 admin.site.register(Linkbased_RandomSession)
-admin.site.register(mobile_sms)
+admin.site.register(mobile_sms,mobile_smsAdmin)
+admin.site.register(Face_Login)
