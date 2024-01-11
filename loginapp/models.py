@@ -13,20 +13,6 @@ def get_default_profile_image():
     return 'profile_images/user.png'
 
 
-class UserModel(AbstractUser):
-    role = models.CharField(max_length=300, default="User")
-    datatype = models.CharField(max_length=100, default="Testing")
-    profile_image = models.ImageField(
-        max_length=255, upload_to=get_profile_image_path, null=True, blank=True, default=get_default_profile_image)
-    teamcode = models.CharField(max_length=20, null=True)
-    phonecode = models.CharField(max_length=20, null=True)
-    phone = models.CharField(max_length=20, null=True)
-    current_task = models.CharField(max_length=200, null=True)
-
-    def __str__(self):
-        return self.username
-
-
 class GuestAccount(models.Model):
     username = models.CharField(max_length=20, unique=False)
     email = models.CharField(max_length=30, unique=True)
@@ -111,11 +97,13 @@ class Location_check(models.Model):
     usual = models.TextField()
     unusual = models.TextField(null=True, blank=True)
 
+
 class products(models.Model):
-    product=models.CharField(max_length=1000,unique=True)
-    url=models.CharField(max_length=1000,blank=True)
-    ip=models.CharField(max_length=1000,blank=True)
-    status=models.CharField(max_length=100,default="active")
+    product = models.CharField(max_length=1000, unique=True)
+    url = models.CharField(max_length=1000, blank=True)
+    ip = models.CharField(max_length=1000, blank=True)
+    status = models.CharField(max_length=100, default="active")
+
 
 class Face_Login(models.Model):
     username = models.CharField(max_length=20, unique=True)
@@ -134,46 +122,35 @@ class UserManager(BaseUserManager):
     def create_staffuser(self, username, password):
         user = self.create_user(username, password=password)
         user.is_staff = True
-        user.save(using=self._db) 
-    
+        user.save(using=self._db)
+
     def create_superuser(self, username, password):
         user = self.create_user(username, password=password)
         user.is_staff = True
         user.is_admin = True
-        user.save(using=self._db) 
+        user.save(using=self._db)
 
-class Account(AbstractBaseUser):
-    USERNAME_FIELD = 'username'
+
+class Account(AbstractUser):
 
     profile_image = models.ImageField(null=True, blank=True)
-    username = models.CharField(max_length=255, unique="True", db_collation='utf8_bin')
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    username = models.CharField(
+        max_length=255, unique="True", db_collation='utf8_bin')
     email = models.EmailField(default="default@example.com")
     password = models.CharField(max_length=255)
     phonecode = models.CharField(max_length=255, null=True, blank=True)
     phone = models.CharField(max_length=255, null=True, blank=True)
-    profile_id = models.PositiveBigIntegerField()
-    client_admin_id = models.CharField(max_length=255)
+    profile_id = models.PositiveBigIntegerField(null=True, blank=True)
+    client_admin_id = models.CharField(max_length=255, null=True, blank=True)
     policy_status = models.BooleanField(default=True)
     user_type = models.CharField(max_length=255, null=True, blank=True)
     event_id = models.CharField(max_length=255, null=True, blank=True)
     payment_status = models.CharField(max_length=255, default="unpaid")
-    safty_secruity_policy = models.CharField(max_length=255, null=True, blank=True)
+    safty_secruity_policy = models.CharField(
+        max_length=255, null=True, blank=True)
     country = models.CharField(max_length=255, null=True, blank=True)
     newsletter_subscription = models.BooleanField(default=True)
 
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
-
-    objects = UserManager()
-
-    def has_perm(self, perm, obj=None):
-        return True
-
-    def has_module_perms(self, app_label):
-        return True
-
     def __str__(self) -> str:
         return self.username
+

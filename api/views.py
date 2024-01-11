@@ -50,7 +50,6 @@ from loginapp.models import (
   RandomSession, 
   Linkbased_RandomSession, 
   Location_check,
-  UserModel,
   Face_Login,
   Live_QR_Status,
   Live_Public_Status
