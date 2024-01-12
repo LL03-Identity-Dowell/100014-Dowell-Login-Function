@@ -5,7 +5,10 @@ const base_url = "https://100014.pythonanywhere.com/api";
 
 export const uploadPhoto = createAsyncThunk(
   "faceLogin/uploadPhoto",
-  async ({ formData, additionalData }) => {
+  async (formData) => {
+    console.log("This is the from", formData);
+    console.log("This is the image", formData.imgSrc);
+    console.log("This is the additional data", formData.additionalData);
     try {
       const response = await axios.post(
         `${base_url}/face_login_api/`,
@@ -14,7 +17,6 @@ export const uploadPhoto = createAsyncThunk(
           headers: {
             "content-type": "multipart/form-data",
           },
-          params: additionalData,
         }
       );
 

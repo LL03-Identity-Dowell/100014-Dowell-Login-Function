@@ -4,9 +4,9 @@ import { toast } from "react-toastify";
 import { FaCamera, FaFileUpload } from "react-icons/fa";
 import { MdAddAPhoto } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-
 import { CommonData } from "../utils/commonUtils";
 import { uploadPhoto } from "../redux/faceLoginSlice";
+import "../../src/index.css";
 
 const FaceLogin = () => {
   const {
@@ -27,12 +27,25 @@ const FaceLogin = () => {
   // access the webcam instance and take a screenshot
   const webcamRef = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
+  const [clock, setClock] = useState(120);
+  const [start, setStart] = useState(false);
   const dispatch = useDispatch();
   const { error, upload, picLoading } = useSelector((state) => state.faceLogin);
 
   // Get the loading state for initSessionID
   const { isLoading } = useSelector((state) => state.init);
+  useEffect(() => {
+    let timerId;
+    if (start && clock > 0) {
+      timerId = setTimeout(() => setClock(clock - 1), 1000);
+    } else if (clock === 0) {
+      setStart(false); // Stop the countdown when time reaches zero
+    }
+    return () => clearTimeout(timerId);
+  }, [clock, start]);
 
+  const minutes = Math.floor(clock / 60);
+  const seconds = clock % 60;
   // create a capture function
   const handleCapture = useCallback(() => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -45,6 +58,8 @@ const FaceLogin = () => {
 
   const handleUpload = async () => {
     // Check if imageSrc is not null
+    setStart(true);
+    setClock(120);
     if (!imgSrc) {
       toast.error("No image to upload.");
       return;
@@ -65,19 +80,13 @@ const FaceLogin = () => {
         randomSession,
         redirectUrl,
       };
+      const formData = {
+        imgSrc,
+        additionalData,
+      };
 
-      // Create FormData and append the image directly
-      let formData = new FormData();
-      formData.append("image", imgSrc);
-
-      // Append additional data to formData
-      Object.keys(additionalData).forEach((key) => {
-        formData.append(key, additionalData[key]);
-      });
-
-      console.log("Data", imgSrc, additionalData);
       // Dispatch the action with both formData and additional data
-      await dispatch(uploadPhoto({ formData, ...additionalData }));
+      dispatch(uploadPhoto(formData));
     } catch (error) {
       // Handle error
       console.error("Error uploading photo:", error);
@@ -126,11 +135,18 @@ const FaceLogin = () => {
                   type="button"
                   className="flex items-center justify-center h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
                   onClick={handleUpload}
+                  disabled={start}
                 >
                   <FaFileUpload className="mr-2" />
                   Upload
                 </button>
               </div>
+              {start && (
+                <h1 className="timerText">
+                  Retry after : {minutes.toString().padStart(2, "0")}:
+                  {seconds.toString().padStart(2, "0")}
+                </h1>
+              )}
             </div>
           </div>
         ) : (
