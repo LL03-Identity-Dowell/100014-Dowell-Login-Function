@@ -33,7 +33,6 @@ const LogIn = () => {
   const device = getDeviceType();
   const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const browser = detectBrowser();
-  const location = Coordinate();
 
   // Get the query parameters
   const urlString = window.location.href;
@@ -59,6 +58,8 @@ const LogIn = () => {
   const handleUserInfo = async (e) => {
     e.preventDefault();
     try {
+      const location = Coordinate();
+
       const { username, password } = e.target.elements;
 
       // update the username state

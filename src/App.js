@@ -25,7 +25,7 @@ function App(props) {
           <Route path="/change_password" element={<ChangePassword />} />
           <Route path="/forgot_username" element={<UsernameForgot />} />
           <Route path="/usersData" element={<UsersData />} />
-          <Route path="/media" element={<MediaLogin />} />
+          {/*   <Route path="/media" element={<MediaLogin />} /> */}
 
           <Route path="*" element={<NotFound />} />
           <Route path="/503" element={<Error503 />} />

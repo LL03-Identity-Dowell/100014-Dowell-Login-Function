@@ -6,12 +6,12 @@ const Coordinate = () => {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
           const location = `${latitude} ${longitude}`;
-          console.log("loc", location);
           resolve(location);
         },
         (error) => {
-          console.error("Error getting user location:", error);
-          reject("Unavailable");
+          //console.error("Error getting user location:", error);
+          //reject("Location required!");
+          console.log("Location required");
         }
       );
     } else {

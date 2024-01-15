@@ -28,3 +28,83 @@
   text-align: center;
   color: green;
 }
+@keyframes bannerMotion {
+  to {
+    opacity: 0;
+  }
+}
+
+@media only screen and (max-width: 530px) {
+  .centerText {
+    display: inline;
+  }
+}
+.mainContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+.locationBanner {
+  background-color: rgb(59, 57, 57);
+  color: white;
+  width: 500px;
+  padding: 40px;
+  margin: 25px;
+  cursor: pointer;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: 649;
+  box-sizing: border-box;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  /* transition: 0.9s ease-in-out; */
+  animation: bannerMotion 0.9s alternate-reverse;
+  box-shadow: 0 18px 22px 0 rgba(0, 0, 0, 0.2),
+    0 20px 34px 0 rgba(0, 0, 0, 0.19);
+}
+@media only screen and (max-width: 430px) {
+  .locationBanner {
+    padding: 32px;
+  }
+}
+.underlineText {
+  text-decoration: underline;
+}
+.indentText {
+  padding-left: 15px;
+}
+.centerText {
+  text-align: center;
+}
+.smallText {
+  text-align: center;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 200;
+}
+.fireFoxBox {
+  margin: 4px auto;
+  width: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: small;
+}
+.locationBannerLogo {
+  margin: auto;
+  width: 240px;
+  height: 80px;
+  margin-bottom: 4px;
+}
+.firefoxCheckbox {
+  margin-right: 4px;
+}
+.boldText {
+  font-weight: bold;
+}
