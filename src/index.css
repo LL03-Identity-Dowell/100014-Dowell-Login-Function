@@ -28,6 +28,9 @@
   text-align: center;
   color: green;
 }
+.locationText {
+  text-align: center;
+}
 @keyframes bannerMotion {
   to {
     opacity: 0;
@@ -35,9 +38,6 @@
 }
 
 @media only screen and (max-width: 530px) {
-  .centerText {
-    display: inline;
-  }
 }
 .mainContainer {
   display: flex;
@@ -73,12 +73,7 @@
 .underlineText {
   text-decoration: underline;
 }
-.indentText {
-  padding-left: 15px;
-}
-.centerText {
-  text-align: center;
-}
+
 .smallText {
   text-align: center;
   font-size: 12px;
@@ -95,12 +90,6 @@
   padding: 5px;
   border-radius: 5px;
   font-size: small;
-}
-.locationBannerLogo {
-  margin: auto;
-  width: 240px;
-  height: 80px;
-  margin-bottom: 4px;
 }
 .firefoxCheckbox {
   margin-right: 4px;

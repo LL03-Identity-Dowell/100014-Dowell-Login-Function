@@ -87,15 +87,7 @@ const Home = () => {
             askLocation();
           }}
         >
-          <img className="locationBannerLogo" src={logo} />
-          <span className="indentText">Select </span>{" "}
-          <span className="underlineText"> Allow</span> to let Dowell Research
-          use your location to proceed on this
-          <div className="centerText"> browser.</div>
-          <h6 className="smallText">
-            {" "}
-            Please note that location is required to proceed.{" "}
-          </h6>
+          <h1 className="locationText">Select Allow to Proceed.</h1>
           {isFirefox && (
             <>
               <p className="smallText">
