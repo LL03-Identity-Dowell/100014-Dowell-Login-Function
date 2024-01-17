@@ -58,10 +58,8 @@ const LogIn = () => {
   const handleUserInfo = async (e) => {
     e.preventDefault();
     try {
-      const location = Coordinate();
-
+      const location = await Coordinate();
       const { username, password } = e.target.elements;
-
       // update the username state
       setUsername(username.value);
 
