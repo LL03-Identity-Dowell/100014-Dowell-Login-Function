@@ -142,15 +142,16 @@ class Account(AbstractUser):
     phone = models.CharField(max_length=255, null=True, blank=True)
     profile_id = models.PositiveBigIntegerField(null=True, blank=True)
     client_admin_id = models.CharField(max_length=255, null=True, blank=True)
-    policy_status = models.BooleanField(default=True)
+    policy_status = models.CharField(
+        default="Accepted", max_length=255, null=True, blank=True)
     user_type = models.CharField(max_length=255, null=True, blank=True)
-    event_id = models.CharField(max_length=255, null=True, blank=True)
+    eventid = models.CharField(max_length=255, null=True, blank=True)
     payment_status = models.CharField(max_length=255, default="unpaid")
-    safty_secruity_policy = models.CharField(
+    safety_secruity_policy = models.CharField(
         max_length=255, null=True, blank=True)
-    country = models.CharField(max_length=255, null=True, blank=True)
-    newsletter_subscription = models.BooleanField(default=True)
+    user_country = models.CharField(max_length=255, null=True, blank=True)
+    newsletter_subscription = models.CharField(
+        default="Accepted", max_length=255, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.username
-

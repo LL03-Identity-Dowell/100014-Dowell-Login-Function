@@ -14,7 +14,7 @@ class AccountAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
         ('Personal info', {'fields': ('profile_image', 'first_name', 'last_name', 'phonecode', 'phone', 'profile_id', 'client_admin_id',
-         'policy_status', 'user_type', 'event_id', 'payment_status', 'safty_secruity_policy', 'country', 'newsletter_subscription'), }),
+         'policy_status', 'user_type', 'eventid', 'payment_status', 'safety_secruity_policy', 'user_country', 'newsletter_subscription'), }),
         ('Permissions', {'fields': ('is_active', 'is_staff',
          'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
@@ -47,4 +47,3 @@ admin.site.register(RandomSession, RandomSessionAdmin)
 admin.site.register(Linkbased_RandomSession)
 admin.site.register(mobile_sms, mobile_smsAdmin)
 admin.site.register(Face_Login)
-
