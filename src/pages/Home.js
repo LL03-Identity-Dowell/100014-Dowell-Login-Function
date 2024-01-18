@@ -87,7 +87,7 @@ const Home = () => {
             askLocation();
           }}
         >
-          <h1 className="locationText">Select Allow to Proceed.</h1>
+          <h1 className="locationText">Select Allow to proceed.</h1>
           {isFirefox && (
             <>
               <p className="smallText">

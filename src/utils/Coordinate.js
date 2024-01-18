@@ -10,8 +10,7 @@ const Coordinate = () => {
         },
         (error) => {
           //console.error("Error getting user location:", error);
-          //reject("Location required!");
-          console.log("Location required");
+          reject("Location required!");
         }
       );
     } else {
