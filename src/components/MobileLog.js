@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RotatingLines } from "react-loader-spinner";
 import Iframe from "react-iframe";
 import { toast } from "react-toastify";
-
+import mobileCoordinate from "../utils/mobileCoordinate";
 import { loginUser } from "../redux/loginSlice";
 import { detectBrowser } from "../utils/browserUtils";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
@@ -58,7 +58,7 @@ const MobileLog = () => {
   const handleUserInfo = async (e) => {
     e.preventDefault();
     try {
-      const location = await Coordinate();
+      const location = await mobileCoordinate();
       const { username, password } = e.target.elements;
       // update the username state
       setUsername(username.value);
