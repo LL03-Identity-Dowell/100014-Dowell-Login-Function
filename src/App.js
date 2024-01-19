@@ -11,7 +11,7 @@ import UsersData from "./pages/usersData";
 import checkRequests from "./Hoc/CheckRequests";
 import Error503 from "./pages/Error503";
 import MediaLogin from "./pages/MediaLogin.js";
-
+import MobileLogIn from "./components/MobileLogin.js";
 function App(props) {
   return (
     <>
@@ -25,6 +25,7 @@ function App(props) {
           <Route path="/change_password" element={<ChangePassword />} />
           <Route path="/forgot_username" element={<UsernameForgot />} />
           <Route path="/usersData" element={<UsersData />} />
+          <Route path="/mobile_login" element={<MobileLogIn />} />
           {/*   <Route path="/media" element={<MediaLogin />} /> */}
 
           <Route path="*" element={<NotFound />} />

