@@ -53,18 +53,6 @@ const MobileLogIn = () => {
       handleLoadingPage();
     }
   }, []);
-  const askLocation = () => {
-    navigator.geolocation.getCurrentPosition(
-      (position) =>
-        //console.log(position)
-        position
-    );
-  };
-
-  useEffect(() => {
-    askLocation();
-  }, []);
-
   return (
     <div className="mainContainer">
       <>
