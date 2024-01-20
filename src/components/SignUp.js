@@ -576,6 +576,11 @@ const SignUp = () => {
                     </option>
                   ))}
                 </select>
+                {errors.user_country && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.user_country.message}
+                  </p>
+                )}
               </div>
             </div>
 
