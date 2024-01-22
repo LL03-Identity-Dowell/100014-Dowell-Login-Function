@@ -12,12 +12,12 @@ import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
 
-const LogIn = () => {
+const LogIn = ({ setSelectedTab }) => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
   const [username, setUsername] = useState("");
   const [redirecting, setRedirecting] = useState(false);
-
+  const [activity, setActivity] = useState(false);
   const { userInfo, loading, error } =
     useSelector((state) => state.login) || {};
 
@@ -126,6 +126,20 @@ const LogIn = () => {
     }
   }, [userInfo, error]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (!activity) {
+        setSelectedTab(1);
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [activity]);
+  const handleInputChange = () => {
+    setActivity(true);
+  };
   return (
     <>
       {loading || redirecting ? (
@@ -216,6 +230,7 @@ const LogIn = () => {
                         placeholder="Enter Your Username"
                         autoComplete="username"
                         className="input-field"
+                        onChange={handleInputChange}
                       />
                     </div>
                   </div>
@@ -232,6 +247,7 @@ const LogIn = () => {
                         placeholder="Enter Your Password"
                         autoComplete="password"
                         className="input-field"
+                        onChange={handleInputChange}
                       />
                     </div>
                   </div>

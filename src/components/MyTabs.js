@@ -28,7 +28,11 @@ const MyTabs = () => {
   };
 
   const categories = [
-    { id: 1, title: "LogIn", content: <LogIn /> },
+    {
+      id: 1,
+      title: "LogIn",
+      content: <LogIn setSelectedTab={setSelectedTab} />,
+    },
     { id: 2, title: "Chat", content: <Chat /> },
     { id: 3, title: "Policy", content: <Policy /> },
     { id: 4, title: "Help", content: <Help /> },
@@ -117,7 +121,13 @@ const MyTabs = () => {
               </div>
             </Tab.List>
             <Tab.Panels>
-              {categories.map((category, index) => (
+              <div
+                className={`rounded-xl bg-white ring-white ring-opacity-60 ring-offset-2
+                     ring-offset-green-400 focus:outline-none focus:ring-2`}
+              >
+                {categories[selectedTab].content}{" "}
+              </div>
+              {/*               {categories.map((category, index) => (
                 <Tab.Panel key={category.id}>
                   <div
                     className={`rounded-xl bg-white ring-white ring-opacity-60 ring-offset-2
@@ -126,9 +136,7 @@ const MyTabs = () => {
                     <ul>
                       <li
                         key={category.id}
-                        className={`relative rounded-md hover:bg-gray-100 ${
-                          selectedTab !== index && "hidden"
-                        }`}
+                        className={`relative rounded-md hover:bg-gray-100 `}
                       >
                         <div className="text-sm font-medium leading-5">
                           <span>{getCategoryIcon(category.title)}</span>
@@ -138,7 +146,7 @@ const MyTabs = () => {
                     </ul>
                   </div>
                 </Tab.Panel>
-              ))}
+              ))} */}
             </Tab.Panels>
           </div>
         </div>
