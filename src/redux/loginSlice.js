@@ -45,6 +45,40 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+export const linkLogin = createAsyncThunk(
+  "login/linklogin",
+  async ({
+    time,
+    ip,
+    os,
+    device,
+    location,
+    timezone,
+    language,
+    browser,
+    mainparams,
+  }) => {
+    try {
+      const response = await axios.post(api_url, {
+        time,
+        ip,
+        os,
+        device,
+        location,
+        timezone,
+        language,
+        browser,
+        mainparams,
+      });
+
+      if (response?.data.msg === "success") {
+        return response?.data;
+      }
+    } catch (error) {
+      throw new Error(error.response?.data.info);
+    }
+  }
+);
 
 // Create the authentication slice
 const loginSlice = createSlice({
@@ -66,6 +100,18 @@ const loginSlice = createSlice({
         state.userInfo = action.payload;
       })
       .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(linkLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(linkLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfo = action.payload;
+      })
+      .addCase(linkLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       });
