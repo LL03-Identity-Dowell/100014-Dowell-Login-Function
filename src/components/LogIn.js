@@ -12,7 +12,7 @@ import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
 
-const LogIn = ({ setSelectedTab }) => {
+const LogIn = ({ setSelectedTab, timer }) => {
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
   const [username, setUsername] = useState("");
@@ -131,8 +131,7 @@ const LogIn = ({ setSelectedTab }) => {
       if (!activity) {
         setSelectedTab(1);
       }
-    }, 3000);
-
+    }, timer);
     return () => {
       clearTimeout(timeoutId);
     };

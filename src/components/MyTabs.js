@@ -19,7 +19,7 @@ function classNames(...classes) {
 const MyTabs = () => {
   const [tabMenuOpen, setTabMenuOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-
+  const [timer, setTimer] = useState(3000);
   // Use media queries to determine the screen size
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -31,14 +31,18 @@ const MyTabs = () => {
     {
       id: 1,
       title: "LogIn",
-      content: <LogIn setSelectedTab={setSelectedTab} />,
+      content: <LogIn setSelectedTab={setSelectedTab} timer={timer} />,
     },
     { id: 2, title: "Chat", content: <Chat /> },
     { id: 3, title: "Policy", content: <Policy /> },
     { id: 4, title: "Help", content: <Help /> },
     { id: 5, title: "FAQ", content: <FAQ /> },
   ];
-
+  const checkClickedTab = (index) => {
+    if (!index) {
+      setTimer(6000);
+    }
+  };
   return (
     <Tab.Group>
       <div className="w-full max-w-3xl mx-auto md:py-2 sm:px-0">
@@ -102,6 +106,7 @@ const MyTabs = () => {
                       onClick={() => {
                         setSelectedTab(index);
                         setTabMenuOpen(false);
+                        checkClickedTab(index);
                       }}
                       className={classNames(
                         "w-full items-center h-12 rounded-2xl md:py-2 md:px-2 text-sm font-medium leading-3 text-green-500 bg-gray-600",
