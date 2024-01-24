@@ -7,7 +7,11 @@ const languageOptions = languages.getAllCodes().map((code) => ({
   label: languages.getName(code),
 }));
 
-const LanguageDropdown = ({ selectedLanguage, onLanguageChange }) => {
+const LanguageDropdown = ({
+  selectedLanguage,
+  onLanguageChange,
+  setActivity,
+}) => {
   const handleChange = (selectedOption) => {
     onLanguageChange(selectedOption.value);
   };
@@ -19,6 +23,9 @@ const LanguageDropdown = ({ selectedLanguage, onLanguageChange }) => {
         (option) => option.value === selectedLanguage
       )}
       onChange={handleChange}
+      onFocus={() => {
+        setActivity(true);
+      }}
     />
   );
 };

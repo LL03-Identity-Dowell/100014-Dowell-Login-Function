@@ -99,6 +99,7 @@ const LogIn = ({ setSelectedTab, timer }) => {
   // Handle language change
   const handleLanguageChange = (language) => {
     setUserLanguage(language);
+    handleInputChange();
   };
 
   // use setTimeout to hide the timer after 10 seconds
@@ -210,6 +211,7 @@ const LogIn = ({ setSelectedTab, timer }) => {
                   <LanguageDropdown
                     selectedLanguage={userLanguage}
                     onLanguageChange={handleLanguageChange}
+                    setActivity={setActivity}
                   />
                 </div>
 
