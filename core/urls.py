@@ -29,7 +29,9 @@ urlpatterns = [
     path('api/', include('api.urls')),
 
     #endpoints needed from old version
-    path('linklogin',main.LinkLogin,name="linklogin"),
+    
+    # path('linklogin',main.LinkLogin,name="linklogin"),
+    path('linklogin',main.master_login,name="linklogin"),
     path('linkbased',main.linked_based,name="linkbased" ),
     path('allow_location',main.allow_location,name="allow_location"),
     path("check_status",main.check_status,name="check_status"),

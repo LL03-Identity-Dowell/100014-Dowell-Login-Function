@@ -1620,12 +1620,15 @@ def main_login(request):
     password = mdata('password')
     loc = mdata("location")
     print(loc)
-    if loc is not None and loc != "" and loc != '{}':
+    if loc is not None and loc != "" and loc != '{}' and loc != {}:
         coordinates=loc.split(" ")
         url = 'https://api.open-elevation.com/api/v1/lookup?'
         params = {'locations': f"{coordinates[0]},{coordinates[1]}"}
-        result = requests.get(url, params)
-        altitude=result.json()['results'][0]['elevation']
+        try:
+            result = requests.get(url, params)
+            altitude=result.json()['results'][0]['elevation']
+        except:
+            altitude="Location not allowed.."
     else:
         altitude="Location not allowed.."    
         coordinates="Location not allowed.."    
@@ -1738,12 +1741,12 @@ def main_login(request):
             phone = response["data"]['Phone']
             try:
                 userID=response["data"]['_id']
+                client_admin_id=response["data"]['client_admin_id']
                 if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                     profile_image = "https://100014.pythonanywhere.com/media/user.png"
                 else:
                     profile_image = response["data"]['Profile_Image']
                 User_type=response["data"]['User_type']
-                client_admin_id=response["data"]['client_admin_id']
                 payment_status=response["data"]['payment_status']
                 newsletter=response["data"]['newsletter_subscription']
                 user_country=response["data"]['user_country']
@@ -2465,6 +2468,13 @@ def logininfo(request):
     if request.method == 'POST':
         session=request.data["session_id"]
         mydata=CustomSession.objects.filter(sessionID=session).first()
+        if not mydata:
+            public_field={"sessionID":session}
+            public=dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","find",public_field,"nil")
+            public_res=json.loads(public)
+            if public_res["data"] != None:
+                return Response({'userinfo':public_res["data"]})
+            return Response({"message":"SessionID not found in database, Please check and try again!!"})
         if not mydata:
             return Response({"message":"SessionID not found in database, Please check and try again!!"})
         if mydata.status != "login":

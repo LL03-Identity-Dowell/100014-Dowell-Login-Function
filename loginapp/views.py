@@ -47,13 +47,15 @@ from loginapp.models import (
 
 # server utility functions
 from server.utils.dowellconnection import dowellconnection
-from server.utils.dowell_func import generateOTP, dowellclock, get_next_pro_id
+from server.utils.dowell_func import generateOTP, dowellclock, get_next_pro_id, decrypt_message
 from server.utils.dowell_hash import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import passgen
 from server.utils import qrcodegen
 from server.utils.country_code import country_codes
 
+#Env variables
+from core.settings import ENCRYPTION_PASSWORD
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
@@ -198,7 +200,153 @@ def LinkLogin(request):
             return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
         return redirect(f'https://100093.pythonanywhere.com/public_link?linklogin_id={random_session}')
     
-    return render(request,"login/linkbased.html",context)
+    return render(request,"linkbased.html",context)
+
+#Master Login
+@method_decorator(xframe_options_exempt, name='dispatch')
+@csrf_exempt
+def master_login(request):
+    mainparams=request.GET.get("data",None)
+    context={}
+    if request.method == 'POST':
+        loc=request.POST["loc"]
+        if loc is not None and loc != "":
+            coordinates=loc.split(" ")
+            url = 'https://api.open-elevation.com/api/v1/lookup?'
+            params = {'locations': f"{coordinates[0]},{coordinates[1]}"}
+            try:
+                result = requests.get(url, params)
+                altitude=result.json()['results'][0]['elevation']
+            except:
+                altitude="Location not allowed.."
+        else:
+            coordinates="Location not allowed.."
+            altitude="Location not allowed.."
+        try:
+            lo = loc.split(" ")
+            country, city = country_city_name(lo[0], lo[1])
+        except:
+            city = ""
+            country = ""
+        device=request.POST["dev"]
+        osver=request.POST["os"]
+        browser=request.POST.get("brow")
+        ltime=request.POST["time"]
+        ipuser=request.POST["ip"]
+        language = request.POST.get("language", "English")
+        try:
+            if ipuser != "":
+                response = requests.get(f'https://ipapi.co/{ipuser}/json/').json()
+                ip_city=response.get("city")
+            else:
+                ip_city=None
+        except Exception as e:
+            ip_city=None
+        mobconn=request.POST["conn"]
+        zone = request.POST.get("timezone")
+        maindataa=decrypt_message(str.encode(mainparams[2:-1]),ENCRYPTION_PASSWORD)
+
+        maindata=maindataa.split("&")
+
+        company=None
+        org=None
+        dept=None
+        member=None
+        project=None
+        subproject=None
+        role_res=None
+        first_name=None
+        last_name=None
+        email=None
+        phone=None
+        User_type=None
+        payment_status=None
+        newsletter=None
+        user_country=None
+        privacy_policy=None
+        other_policy=None
+        userID=None
+        client_admin_id=None
+
+        user = authenticate(request, username="publicmember", password="Dowell@123")
+
+        try:
+            username=maindata[2].split("=")[1]
+            field = {"Username": username}
+        except:
+            return HttpResponse("Invalid data..")
+        id = dowellconnection("login", "bangalore", "login", "registration",
+                              "registration", "10004545", "ABCDE", "find", field, "nil")
+        response = json.loads(id)
+        if response["data"] != None:
+            try:
+                if response["data"]["User_status"]:
+                    if response["data"]["User_status"] == "inactive":
+                        resp = {"msg":"error","info": "Username is termed inactive. Please contact admin."}
+                        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+                    elif response["data"]["User_status"] == "deleted":
+                        resp = {"msg":"error","info": "User not found."}
+                        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+            except:
+                pass
+            form = login(request, user)
+            request.session.save()
+            session = request.session.session_key
+
+            try:
+                res = create_event()
+                event_id = res['event_id']
+            except:
+                event_id = None
+
+            profile_image = "https://100014.pythonanywhere.com/media/user.png"
+            first_name = response["data"]['Firstname']
+            last_name = response["data"]['Lastname']
+            email = response["data"]['Email']
+            phone = response["data"]['Phone']
+            try:
+                userID=response["data"]['_id']
+                client_admin_id=response["data"]['client_admin_id']
+                if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
+                    profile_image = "https://100014.pythonanywhere.com/media/user.png"
+                else:
+                    profile_image = response["data"]['Profile_Image']
+                User_type=response["data"]['User_type']
+                payment_status=response["data"]['payment_status']
+                newsletter=response["data"]['newsletter_subscription']
+                user_country=response["data"]['user_country']
+                privacy_policy=response["data"]['Policy_status']
+                other_policy=response["data"]['safety_security_policy']
+                role_res=response["data"]['Role']
+                company=response["data"]['company_id']
+                member=response["data"]['Memberof']
+                dept=response["data"]['dept_id']
+                org=response["data"]['org_id']
+                project=response["data"]['project_id']
+                subproject=response["data"]['subproject_id']
+            except:
+                pass
+            try:
+                final_ltime = parser.parse(ltime).strftime('%d %b %Y %H:%M:%S')
+                dowell_time = time.strftime(
+                    "%d %b %Y %H:%M:%S", time.gmtime(dowellclock()+1609459200))
+            except:
+                final_ltime = ''
+                dowell_time = ''
+            serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+
+            field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
+                             'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates,"altitude":altitude}
+            dowellconnection("login","bangalore","login","login","login","6752828281","ABCDE","insert",field_session,"nil")
+            info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates,"altitude":altitude}
+            info1=json.dumps(info)
+            infoo=str(info1)
+            custom_session=Linkbased_RandomSession.objects.create(sessionID=session,info=infoo,status="login")
+
+            return redirect(f'https://100093.pythonanywhere.com?session_id={session}&username={username}&type=public')
+        else:
+            return HttpResponse("Invalid data, Please try again later..")
+    return render(request,"linkbased.html",context)
 
 def register_legal_policy(request):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
