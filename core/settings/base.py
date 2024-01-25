@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY')
 
-ENCRYPT_KEY=env('ENCRYPT_KEY')
+ENCRYPT_KEY = env('ENCRYPT_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -89,6 +89,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 AUTH_USER_MODEL = "loginapp.Account"
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        # Any other authentication classes
+    ],
+
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -167,6 +174,7 @@ BASE_URL = "/"
 ROOT_URLCONF = 'core.urls'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-#For master_login
-ENCRYPTION_PASSWORD=env('ENCRYPTION_PASSWORD')
-DEFAULT_SALT=env('DEFAULT_SALT')
+# For master_login
+ENCRYPTION_PASSWORD = env('ENCRYPTION_PASSWORD')
+DEFAULT_SALT = env('DEFAULT_SALT')
+

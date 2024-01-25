@@ -4,7 +4,13 @@ env = environ.Env()
 environ.Env.read_env()
 
 DATABASES = {
-  'default': env.db()
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('DATABASE_NAME'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'HOST': env('DATABASE_HOST'),
+    }
 }
 
 USE_I18N = True
