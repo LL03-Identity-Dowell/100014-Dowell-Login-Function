@@ -151,14 +151,18 @@ const FaceLogin = () => {
           </div>
         ) : (
           <>
-            <Webcam
-              audio={false}
-              ref={webcamRef}
-              screenshotFormat="image/jpeg"
-              width={320}
-              height={240}
-              className="mb-2 rounded-md"
-            />
+            <div className="cameraContainer">
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/jpeg"
+                width={320}
+                height={240}
+                className="mb-2 rounded-md"
+              />
+              <div className="ovalContainer" />
+            </div>
+
             <button
               type="button"
               className="flex items-center justify-center w-full h-10 px-4 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
