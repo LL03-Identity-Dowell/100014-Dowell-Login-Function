@@ -7,6 +7,7 @@ import { FaCamera, FaFileUpload } from "react-icons/fa";
 import { CommonData } from "../utils/commonUtils";
 import { uploadPhoto } from "../redux/faceLoginSlice";
 import "../../src/index.css";
+import * as faceapi from "face-api.js";
 
 const FaceLogin = () => {
   const {
@@ -29,6 +30,7 @@ const FaceLogin = () => {
   const [imgSrc, setImgSrc] = useState(null);
   const [clock, setClock] = useState(120);
   const [start, setStart] = useState(false);
+  const [faceDetected, setFaceDetected] = useState(false);
   const dispatch = useDispatch();
   const { error, upload, picLoading } = useSelector((state) => state.faceLogin);
 
@@ -47,9 +49,20 @@ const FaceLogin = () => {
   const minutes = Math.floor(clock / 60);
   const seconds = clock % 60;
   // create a capture function
-  const handleCapture = useCallback(() => {
+  const handleCapture = useCallback(async () => {
     const imageSrc = webcamRef.current.getScreenshot();
+    const img = new Image();
+    img.src = imageSrc;
+    await img.decode(); // Wait for the image to load
+    const detections = await faceapi
+      .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceExpressions();
+    setFaceDetected(detections.length ? true : false);
     setImgSrc(imageSrc);
+    if (!detections.length) {
+      toast.error("Face not detected");
+    }
   }, [webcamRef, setImgSrc]);
 
   const handleRetake = () => {
@@ -57,6 +70,7 @@ const FaceLogin = () => {
   };
 
   const handleUpload = async () => {
+    console.log("Is face detected", faceDetected);
     // Check if imageSrc is not null
     setStart(true);
     setClock(120);
@@ -104,7 +118,21 @@ const FaceLogin = () => {
     showToast(upload, true);
     showToast(error);
   }, [error, upload, picLoading]);
+  useEffect(() => {
+    const loadModels = async () => {
+      console.log("This is step 1");
+      await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
+      console.log("This is step 2");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      console.log("This is step 3");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+      console.log("This is step 4");
+      await faceapi.nets.faceExpressionNet.loadFromUri("/models");
+      console.log("I look like all are loaded");
+    };
 
+    loadModels();
+  }, []);
   // Render loading state while initializing session ID
   if (isLoading) {
     return <div>Loading...</div>;
@@ -135,7 +163,7 @@ const FaceLogin = () => {
                   type="button"
                   className="flex items-center justify-center h-10 px-6 font-semibold rounded-md border bg-green-500 hover:bg-green-700 text-white"
                   onClick={handleUpload}
-                  disabled={start}
+                  disabled={start || !faceDetected}
                 >
                   <FaFileUpload className="mr-2" />
                   Upload
