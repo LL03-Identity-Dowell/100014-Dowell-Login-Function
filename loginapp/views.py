@@ -100,7 +100,7 @@ def linked_based(request):
                                 "login", "6752828281", "ABCDE", "insert", field, "nil")
         respj = json.loads(resp)
         qrcodegen.qrgen1(
-            user, respj["inserted_id"], f"media/userqrcodes/{respj['inserted_id']}.png")
+            user, respj["inserted_id"], f"userqrcodes/{respj['inserted_id']}.png")
         if murl is not None:
             # return HttpResponse("<script>function lav(){alert(%s) };lav();</script>" % (murl))
             return HttpResponse(f'<script>url={mobileurl};window.location.replace(url);</script>')
@@ -200,7 +200,7 @@ def LinkLogin(request):
             return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
         return redirect(f'https://100093.pythonanywhere.com/public_link?linklogin_id={random_session}')
     
-    return render(request,"linkbased.html",context)
+    return render(request,"link_based.html",context)
 
 #Master Login
 @method_decorator(xframe_options_exempt, name='dispatch')
@@ -346,7 +346,7 @@ def master_login(request):
             return redirect(f'https://100093.pythonanywhere.com?session_id={session}&username={username}&type=public')
         else:
             return HttpResponse("Invalid data, Please try again later..")
-    return render(request,"linkbased.html",context)
+    return render(request,"link_based.html",context)
 
 def register_legal_policy(request):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
