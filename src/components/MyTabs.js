@@ -89,7 +89,7 @@ const MyTabs = () => {
             </div>
           </div>
 
-          <div className="md:flex-grow">
+          <div className="md:flex-grow tabContainer">
             <Tab.List className="rounded-xl p-1">
               <div
                 className={`${
@@ -132,26 +132,6 @@ const MyTabs = () => {
               >
                 {categories[selectedTab].content}{" "}
               </div>
-              {/*               {categories.map((category, index) => (
-                <Tab.Panel key={category.id}>
-                  <div
-                    className={`rounded-xl bg-white ring-white ring-opacity-60 ring-offset-2
-                     ring-offset-green-400 focus:outline-none focus:ring-2`}
-                  >
-                    <ul>
-                      <li
-                        key={category.id}
-                        className={`relative rounded-md hover:bg-gray-100 `}
-                      >
-                        <div className="text-sm font-medium leading-5">
-                          <span>{getCategoryIcon(category.title)}</span>
-                          {category.content}
-                        </div>
-                      </li>
-                    </ul>
-                  </div>
-                </Tab.Panel>
-              ))} */}
             </Tab.Panels>
           </div>
         </div>
