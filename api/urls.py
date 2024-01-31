@@ -48,4 +48,6 @@ urlpatterns = [
     path('live_qr_users/',views.live_qr_users,name="live_qr_users"),
     path('live_public_users/',views.live_public_users,name="live_public_users"),
     path('live_users/',views.live_users,name="live_users"),
+
+    path('/master_login/',views.master_login,name="master_login")
 ]
