@@ -4,7 +4,7 @@ import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import { detectBrowser } from "../utils/browserUtils";
 import axios from "axios";
 import { linkLogin } from "../redux/loginSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 const LinkLogin = () => {
   const dispatch = useDispatch();
   const isLocationEnabled = useLocationEnabled();
@@ -17,6 +17,7 @@ const LinkLogin = () => {
   const [timezone, setTimezone] = useState("");
   const [browser, setBrowser] = useState("");
   const [ip, setIp] = useState("");
+  const { userInfo, error } = useSelector((state) => state.login);
 
   const handleSubmit = () => {
     // Get the query parameters
@@ -40,7 +41,7 @@ const LinkLogin = () => {
       timezone,
       browser,
       ip,
-      mainparams,
+      data: mainparams,
       language: "en",
     };
     dispatch(linkLogin(userData));
@@ -86,6 +87,11 @@ const LinkLogin = () => {
     }
   };
   useEffect(() => {
+    if (userInfo) {
+      window.location.href = userInfo.url;
+    }
+  }, [userInfo]);
+  useEffect(() => {
     if (
       latitude &&
       longitude &&
@@ -129,8 +135,12 @@ const LinkLogin = () => {
             </>
           )}
         </div>
+      ) : error ? (
+        <h1 className="errorMessage">
+          An Error has occurred. Please try again.
+        </h1>
       ) : (
-        <h1 className="locationText">Loading...</h1>
+        <div class="box"></div>
       )}
     </div>
   );

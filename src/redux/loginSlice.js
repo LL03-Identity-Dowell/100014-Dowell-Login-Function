@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const api_url = "https://100014.pythonanywhere.com/api/main_login/";
-
+const link_login_api = "https://100014.pythonanywhere.com/api/master_login/";
 export const loginUser = createAsyncThunk(
   "login/loginUser",
   async ({
@@ -56,10 +56,10 @@ export const linkLogin = createAsyncThunk(
     timezone,
     language,
     browser,
-    mainparams,
+    data,
   }) => {
     try {
-      const response = await axios.post(api_url, {
+      const response = await axios.post(link_login_api, {
         time,
         ip,
         os,
@@ -68,9 +68,8 @@ export const linkLogin = createAsyncThunk(
         timezone,
         language,
         browser,
-        mainparams,
+        data,
       });
-
       if (response?.data.msg === "success") {
         return response?.data;
       }
@@ -113,7 +112,7 @@ const loginSlice = createSlice({
       })
       .addCase(linkLogin.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error = true;
       });
   },
 });
