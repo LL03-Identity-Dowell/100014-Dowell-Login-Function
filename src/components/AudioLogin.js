@@ -5,6 +5,7 @@ import AudioPlayer from "../utils/AudioPlayer";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import { detectBrowser } from "../utils/browserUtils";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { voiceLogin } from "../redux/loginSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
@@ -62,6 +63,7 @@ const AudioLogin = () => {
   const handleAudioUpload = (audioData) => {
     setVoiceData(audioData);
     setIsRecording(false);
+    toast.success("Audio recorded");
   };
 
   const handleStartRecording = () => {
