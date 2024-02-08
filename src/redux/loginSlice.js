@@ -56,7 +56,7 @@ export const linkLogin = createAsyncThunk(
     timezone,
     language,
     browser,
-    data,
+    mainparams,
   }) => {
     try {
       const response = await axios.post(link_login_api, {
@@ -68,7 +68,46 @@ export const linkLogin = createAsyncThunk(
         timezone,
         language,
         browser,
+        mainparams,
+      });
+      if (response?.data.msg === "success") {
+        return response?.data;
+      }
+    } catch (error) {
+      throw new Error(error.response?.data.info);
+    }
+  }
+);
+export const voiceLogin = createAsyncThunk(
+  "login/voiceLogin",
+  async ({
+    time,
+    ip,
+    os,
+    device,
+    location,
+    timezone,
+    language,
+    browser,
+    data,
+    voiceData,
+    randomSession,
+    redirectUrl,
+  }) => {
+    try {
+      const response = await axios.post("api", {
+        time,
+        ip,
+        os,
+        device,
+        location,
+        timezone,
+        language,
+        browser,
         data,
+        voiceData,
+        randomSession,
+        redirectUrl,
       });
       if (response?.data.msg === "success") {
         return response?.data;
@@ -111,6 +150,18 @@ const loginSlice = createSlice({
         state.userInfo = action.payload;
       })
       .addCase(linkLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = true;
+      })
+      .addCase(voiceLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(voiceLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfo = action.payload;
+      })
+      .addCase(voiceLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = true;
       });
