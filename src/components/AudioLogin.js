@@ -42,6 +42,7 @@ const AudioLogin = () => {
 
   // Extract the redirect_url parameter from the query parameters
   const redirectUrl = queryParams.get("redirect_url");
+
   const handleSubmit = () => {
     const userData = {
       time,
@@ -59,6 +60,7 @@ const AudioLogin = () => {
     };
     console.log("User Data", userData);
     dispatch(voiceLogin(userData));
+    setVoiceData("");
   };
   const handleAudioUpload = (audioData) => {
     setVoiceData(audioData);
@@ -67,8 +69,10 @@ const AudioLogin = () => {
   };
 
   const handleStartRecording = () => {
-    setIsRecording(true);
     setVoiceData("");
+    setTimeout(() => {
+      setIsRecording(true);
+    }, 10);
   };
 
   const handleStopRecording = () => {
