@@ -563,6 +563,9 @@ def new_userinfo(request):
         main_member = {'team_member':team_members,'guest_members':guest_members,'public_members':public_members}
         userinfo = {'userinfo':var2, 'portfolio_info':var3 ,"userportfolio":productport,'members':main_member,"own_organisations":[{"org_name":organisations}],"other_org":otherorg,"roles":roles,"otherorg_list":otherorg_list}
         return Response(userinfo)
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    remote_addr = request.META.get('REMOTE_ADDR')
+    print(remote_addr)
     return Response({"message":"its working"})
 
 
@@ -2674,3 +2677,14 @@ def master_login(request):
     else:
         return Response({'msg':'error','info':'Invalid data, Please try again later!'},status=status.HTTP_400_BAD_REQUEST)
     return Response({'msg':'success','info':'API working'})
+
+
+
+
+
+
+
+
+
+
+
