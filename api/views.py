@@ -1047,7 +1047,7 @@ def forgot_username(request):
                 "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
             user = json.loads(user_json)
             username_list = []
-            if len(user['data']) > 1:
+            if len(user['data']) >= 1:
                 json_data = dowellconnection(
                     "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
                 data = json.loads(json_data)
