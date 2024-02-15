@@ -9,6 +9,8 @@ import { toast } from "react-toastify";
 import { voiceLogin } from "../redux/loginSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import "../../src/index.css";
+
 const AudioLogin = () => {
   const dispatch = useDispatch();
   const [isRecording, setIsRecording] = useState(false);
@@ -21,6 +23,8 @@ const AudioLogin = () => {
   const [timezone, setTimezone] = useState("");
   const [browser, setBrowser] = useState("");
   const [ip, setIp] = useState("");
+  const [start, setStart] = useState(false);
+  const [clock, setClock] = useState(120);
   const { initSession } = useSelector((state) => state.init);
   const randomSession = initSession.random_session;
   // Get the query parameters
@@ -44,6 +48,8 @@ const AudioLogin = () => {
   const redirectUrl = queryParams.get("redirect_url");
 
   const handleSubmit = () => {
+    setStart(true);
+    setClock(120);
     const userData = {
       time,
       timezone,
@@ -107,7 +113,17 @@ const AudioLogin = () => {
     setTime(Time);
     fetchIP();
   };
-
+  useEffect(() => {
+    let timerId;
+    if (start && clock > 0) {
+      timerId = setTimeout(() => setClock(clock - 1), 1000);
+    } else if (clock === 0) {
+      setStart(false); // Stop the countdown when time reaches zero
+    }
+    return () => clearTimeout(timerId);
+  }, [clock, start]);
+  const minutes = Math.floor(clock / 60);
+  const seconds = clock % 60;
   useEffect(() => {
     getDetail();
     askLocation();
@@ -146,10 +162,17 @@ const AudioLogin = () => {
         onClick={() => {
           handleSubmit();
         }}
+        disabled={start || !voiceData}
       >
         <FaFileUpload className="mr-2" />
         Upload
       </button>
+      {start && (
+        <h1 className="timerText">
+          Retry after : {minutes.toString().padStart(2, "0")}:
+          {seconds.toString().padStart(2, "0")}
+        </h1>
+      )}
     </div>
   );
 };
