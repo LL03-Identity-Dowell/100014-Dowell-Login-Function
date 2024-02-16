@@ -187,7 +187,7 @@ const SignUp = () => {
       const { phonecode, Phone } = data;
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
-        setSmsCountdown(60); // Reset the SMS countdown timer to 60 seconds
+        setSmsCountdown(15); // Reset the SMS countdown timer to 60 seconds
         setVerificationRequested(true);
         setLastClickedButton("sms");
       }
@@ -505,14 +505,12 @@ const SignUp = () => {
                     )}
                   </button>
                 </div>
-
                 {/* Display the countdown timer only after the first OTP attempt */}
                 {otpSent && otpCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
                     Resend OTP in: {otpCountdown}s
                   </div>
                 )}
-
                 {/* Display the email OTP attempts remaining */}
                 {attemptsOtp > 0 && otpSent && !error && (
                   <div>
@@ -521,7 +519,6 @@ const SignUp = () => {
                     </p>
                   </div>
                 )}
-
                 {/* Display checkbox to exempt from email OTP */}
                 {attemptsOtp === 0 && otpCountdown === 0 && (
                   <div className="text-sm leading-6">
@@ -651,41 +648,35 @@ const SignUp = () => {
                         wrapperClassName="radio-wrapper"
                         color="#1ff507"
                       />
-                    ) : (
+                    ) : attemptsSms === 2 ? (
                       "Get SMS"
+                    ) : (
+                      "Resend"
                     )}
                   </button>
                 </div>
 
                 {/* Display the countdown timer only after the first SMS attempt */}
-                {smsSent && smsCountdown > 0 && !error && (
+                {smsSent && smsCountdown > 0 && !error && attemptsSms >= 1 && (
                   <div className="text-base font-normal text-green-600">
                     Resend SMS in: {smsCountdown}s
                   </div>
                 )}
 
-                {attemptsSms > 0 && smsSent && !error && (
+                {/*              {attemptsSms > 0 && smsSent && !error && (
                   <div>
                     <p className="text-base font-normal text-green-600">
                       Attempts remaining: {attemptsSms}
                     </p>
                   </div>
-                )}
+                )} */}
 
-                {attemptsSms === 0 && smsCountdown === 0 && (
+                {attemptsSms === 0 && (
                   <div className="relative flex gap-x-3">
-                    <div className="flex h-6 items-center">
-                      <input
-                        id="exempt-checkbox"
-                        name="exempt-checkbox"
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
-                        onChange={(e) => setExempted(e.target.checked)}
-                      />
-                    </div>
                     <div className="text-sm leading-6">
                       <p className="text-gray-600">
-                        Exempt from SMS requirement
+                        If you don't get sms in two tries you'll get option to
+                        register without it's requirement
                       </p>
                     </div>
                   </div>
