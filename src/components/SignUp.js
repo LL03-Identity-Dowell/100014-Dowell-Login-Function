@@ -187,7 +187,7 @@ const SignUp = () => {
       const { phonecode, Phone } = data;
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
-        setSmsCountdown(15); // Reset the SMS countdown timer to 60 seconds
+        setSmsCountdown(attemptsSms === 1 ? 15 : 60); // Reset the SMS countdown timer to 60 seconds
         setVerificationRequested(true);
         setLastClickedButton("sms");
       }
@@ -195,7 +195,9 @@ const SignUp = () => {
       setExempted(true);
     }
   };
-
+  useEffect(() => {
+    console.log("this is attempt", attemptsSms);
+  }, [attemptsSms]);
   // Countdown timer for SMS
   useEffect(() => {
     if (smsCountdown > 0) {
@@ -657,7 +659,7 @@ const SignUp = () => {
                 </div>
 
                 {/* Display the countdown timer only after the first SMS attempt */}
-                {smsSent && smsCountdown > 0 && !error && attemptsSms >= 1 && (
+                {smsSent && smsCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
                     Resend SMS in: {smsCountdown}s
                   </div>
@@ -671,7 +673,7 @@ const SignUp = () => {
                   </div>
                 )} */}
 
-                {attemptsSms === 0 && (
+                {attemptsSms <= 1 && (
                   <div className="relative flex gap-x-3">
                     <div className="text-sm leading-6">
                       <p className="text-gray-600">
