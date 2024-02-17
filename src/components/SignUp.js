@@ -667,15 +667,7 @@ const SignUp = () => {
                   </div>
                 )}
 
-                {/*              {attemptsSms > 0 && smsSent && !error && (
-                  <div>
-                    <p className="text-base font-normal text-green-600">
-                      Attempts remaining: {attemptsSms}
-                    </p>
-                  </div>
-                )} */}
-
-                {attemptsSms === 0 && smsCountdown === 0 && (
+                {!attemptsSms && !smsCountdown && (
                   <div className="relative flex gap-x-3">
                     <div className="flex h-6 items-center">
                       <input
@@ -688,10 +680,17 @@ const SignUp = () => {
                     </div>
                     <div className="text-sm leading-6">
                       <p className="text-gray-600">
-                        If you don't get sms in two tries you'll get option to
-                        register without it's requirement
+                        Exempt from SMS requirement
                       </p>
                     </div>
+                  </div>
+                )}
+                {attemptsSms >= 0 && smsSent && !error && (
+                  <div>
+                    <p>
+                      If you don't get sms in two tries you'll get option to
+                      register without it's requirement
+                    </p>
                   </div>
                 )}
               </div>
