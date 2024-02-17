@@ -675,7 +675,7 @@ const SignUp = () => {
                   </div>
                 )} */}
 
-                {attemptsSms <= 1 && (
+                {attemptsSms === 0 && smsCountdown === 0 && (
                   <div className="relative flex gap-x-3">
                     <div className="flex h-6 items-center">
                       <input
