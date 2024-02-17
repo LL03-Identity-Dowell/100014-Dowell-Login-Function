@@ -104,6 +104,7 @@ const SignUp = () => {
   const [attemptsSms, setAttemptsSms] = useState(2);
   const [otpCountdown, setOtpCountdown] = useState(0);
   const [smsCountdown, setSmsCountdown] = useState(0);
+  const [timerText, setTimerText] = useState("");
   const [exempted, setExempted] = useState(false);
   const [lastClickedButton, setLastClickedButton] = useState(null);
   const [usernameMessages, setUsernameMessages] = useTimedMessage();
@@ -188,6 +189,9 @@ const SignUp = () => {
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
         setSmsCountdown(attemptsSms === 1 ? 15 : 60); // Reset the SMS countdown timer to 60 seconds
+        setTimerText(
+          attemptsSms === 1 ? "Exempt option in: " : "Resend SMS in: "
+        ); // Reset the SMS countdown timer to 60 seconds
         setVerificationRequested(true);
         setLastClickedButton("sms");
       }
@@ -195,9 +199,7 @@ const SignUp = () => {
       setExempted(true);
     }
   };
-  useEffect(() => {
-    console.log("this is attempt", attemptsSms);
-  }, [attemptsSms]);
+
   // Countdown timer for SMS
   useEffect(() => {
     if (smsCountdown > 0) {
@@ -661,7 +663,7 @@ const SignUp = () => {
                 {/* Display the countdown timer only after the first SMS attempt */}
                 {smsSent && smsCountdown > 0 && !error && (
                   <div className="text-base font-normal text-green-600">
-                    Resend SMS in: {smsCountdown}s
+                    {timerText} {smsCountdown}s
                   </div>
                 )}
 
@@ -675,6 +677,15 @@ const SignUp = () => {
 
                 {attemptsSms <= 1 && (
                   <div className="relative flex gap-x-3">
+                    <div className="flex h-6 items-center">
+                      <input
+                        id="exempt-checkbox"
+                        name="exempt-checkbox"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                        onChange={(e) => setExempted(e.target.checked)}
+                      />
+                    </div>
                     <div className="text-sm leading-6">
                       <p className="text-gray-600">
                         If you don't get sms in two tries you'll get option to
