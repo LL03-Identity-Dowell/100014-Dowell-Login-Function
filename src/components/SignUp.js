@@ -188,7 +188,7 @@ const SignUp = () => {
       const { phonecode, Phone } = data;
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
-        setSmsCountdown(attemptsSms === 1 ? 15 : 600); // Reset the SMS countdown timer to 60 seconds
+        setSmsCountdown(attemptsSms === 1 ? 15 : 60); // Reset the SMS countdown timer to 60 seconds
         setTimerText(
           attemptsSms === 1 ? "Exempt option in: " : "Resend SMS in: "
         ); // Reset the SMS countdown timer to 60 seconds
