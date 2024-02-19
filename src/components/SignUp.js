@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { MdAddAPhoto } from "react-icons/md";
+import { MdAddAPhoto, MdInfo } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -188,7 +188,7 @@ const SignUp = () => {
       const { phonecode, Phone } = data;
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
-        setSmsCountdown(attemptsSms === 1 ? 15 : 60); // Reset the SMS countdown timer to 60 seconds
+        setSmsCountdown(attemptsSms === 1 ? 15 : 600); // Reset the SMS countdown timer to 60 seconds
         setTimerText(
           attemptsSms === 1 ? "Exempt option in: " : "Resend SMS in: "
         ); // Reset the SMS countdown timer to 60 seconds
@@ -662,8 +662,19 @@ const SignUp = () => {
 
                 {/* Display the countdown timer only after the first SMS attempt */}
                 {smsSent && smsCountdown > 0 && !error && (
-                  <div className="text-base font-normal text-green-600">
+                  <div className="text-base font-normal text-green-600 smscontainer">
                     {timerText} {smsCountdown}s
+                    <div className="smsTimerDiv">
+                      <MdInfo />
+                      {attemptsSms >= 0 && smsSent && !error && (
+                        <div className="tooltiptext">
+                          <p className="tooltipInfoText">
+                            If you don't get sms in two tries, you'll get option
+                            to register without it's requirement.
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -683,14 +694,6 @@ const SignUp = () => {
                         Exempt from SMS requirement
                       </p>
                     </div>
-                  </div>
-                )}
-                {attemptsSms >= 0 && smsSent && !error && (
-                  <div>
-                    <p>
-                      If you don't get sms in two tries you'll get option to
-                      register without it's requirement
-                    </p>
                   </div>
                 )}
               </div>

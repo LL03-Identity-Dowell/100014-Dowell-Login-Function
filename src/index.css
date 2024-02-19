@@ -139,7 +139,43 @@
   align-items: center;
   justify-content: center;
 }
+.smscontainer {
+  display: flex;
+}
+.smsTimerDiv {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  margin-left: 5px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.smsTimerDiv:hover .tooltiptext {
+  visibility: visible;
+}
+.tooltiptext {
+  visibility: hidden;
+  background-color: rgb(68, 199, 68);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  margin-left: 25px;
+  margin-right: 4px;
+  font-size: medium;
+  position: absolute;
+}
 
+.tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent rgb(86, 216, 86) transparent transparent;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);
