@@ -183,9 +183,34 @@ const SignUp = () => {
 
   // Dispatch mobile sms
   const handleMobileOTP = (data) => {
+    const { phonecode, Phone } = data;
     if (attemptsSms > 0 && !exempted && smsCountdown === 0) {
-      setAttemptsSms((prevAttempts) => prevAttempts - 1);
-      const { phonecode, Phone } = data;
+      const {
+        Firstname,
+        Lastname,
+        Username,
+        user_type,
+        Email,
+        Password,
+        confirm_password,
+        user_country,
+        otp,
+      } = watch();
+      if (
+        Firstname &&
+        Lastname &&
+        Username &&
+        user_type &&
+        Email &&
+        Password &&
+        confirm_password &&
+        user_country &&
+        otp &&
+        phonecode &&
+        Phone
+      ) {
+        setAttemptsSms((prevAttempts) => prevAttempts - 1);
+      }
       if (phonecode && Phone && Phone.length > 0) {
         dispatch(sendMobileOTP({ phonecode, Phone }));
         setSmsCountdown(attemptsSms === 1 ? 15 : 60); // Reset the SMS countdown timer to 60 seconds
