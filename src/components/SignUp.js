@@ -159,7 +159,26 @@ const SignUp = () => {
   // dispatch email otp
   const handleEmailOTP = () => {
     if (attemptsOtp > 0) {
-      setAttemptsOtp((prevAttempts) => prevAttempts - 1);
+      const {
+        Firstname,
+        Lastname,
+        Username,
+        user_type,
+        Email,
+        Password,
+        confirm_password,
+      } = watch();
+      if (
+        Firstname &&
+        Lastname &&
+        Username &&
+        user_type &&
+        Email &&
+        Password &&
+        confirm_password
+      ) {
+        setAttemptsOtp((prevAttempts) => prevAttempts - 1);
+      }
       const email = watch("Email");
       const username = watch("Username");
       if (email && username) {
