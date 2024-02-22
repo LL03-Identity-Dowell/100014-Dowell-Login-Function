@@ -186,6 +186,17 @@
   margin-bottom: 20px;
   max-width: 500px;
 }
+.policyLink {
+  color: dodgerblue;
+  font-weight: bolder;
+  cursor: pointer;
+}
+.displayed {
+  display: block;
+}
+.notDisplayed {
+  display: none;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

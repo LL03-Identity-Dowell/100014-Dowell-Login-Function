@@ -108,6 +108,7 @@ const SignUp = () => {
   const [exempted, setExempted] = useState(false);
   const [lastClickedButton, setLastClickedButton] = useState(null);
   const [usernameMessages, setUsernameMessages] = useTimedMessage();
+  const [policyDisplay, setPolicyDispaly] = useState(false);
 
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
@@ -199,7 +200,9 @@ const SignUp = () => {
       return () => clearTimeout(otpTimer);
     }
   }, [otpCountdown]);
-
+  const handlePolicyDisplay = () => {
+    setPolicyDispaly(!policyDisplay);
+  };
   // Dispatch mobile sms
   const handleMobileOTP = (data) => {
     const { phonecode, Phone } = data;
@@ -819,7 +822,18 @@ const SignUp = () => {
                     />
                   </div>
                   <div className="text-sm leading-6">
-                    <p className="text-gray-600">Do you accept our policies?</p>
+                    <p className="text-gray-600">
+                      Do you accept our{" "}
+                      <span
+                        className="policyLink"
+                        onClick={() => {
+                          handlePolicyDisplay();
+                        }}
+                      >
+                        policies
+                      </span>
+                      ?
+                    </p>
                   </div>
                   {errors.policy_status && (
                     <p className="text-red-500 text-xs mt-1">
@@ -847,16 +861,19 @@ const SignUp = () => {
               </div>
             </fieldset>
           </div>
-          <iframe
-            title="policy"
-            id="for_policy"
-            className="policyFrame"
-            loading="lazy"
-            src="https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/?redirect_url=https://100014.pythonanywhere.com/legalpolicy1?s=&amp;session_id="
-            allow="fullscreen"
-            width="900"
-            height="200"
-          ></iframe>
+          <div className={policyDisplay ? "displayed" : "notDisplayed"}>
+            <iframe
+              title="policy"
+              id="for_policy"
+              className="policyFrame"
+              loading="lazy"
+              src="https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/?redirect_url=https://100014.pythonanywhere.com/legalpolicy1?s=&amp;session_id="
+              allow="fullscreen"
+              width="900"
+              height="200"
+            ></iframe>
+          </div>
+
           <div className="mt-8">
             <button type="submit" className="submit-btn" disabled={regLoading}>
               {regLoading ? (
