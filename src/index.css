@@ -176,6 +176,16 @@
   border-style: solid;
   border-color: transparent rgb(86, 216, 86) transparent transparent;
 }
+.policyFrame {
+  display: block;
+  width: calc(100% * 11 / 12);
+  border-radius: 4px;
+  padding: 3px;
+  border: thin solid rgb(10, 131, 3);
+  margin-top: 10px;
+  margin-bottom: 20px;
+  max-width: 500px;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

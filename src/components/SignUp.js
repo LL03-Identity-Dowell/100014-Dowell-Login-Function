@@ -847,7 +847,16 @@ const SignUp = () => {
               </div>
             </fieldset>
           </div>
-
+          <iframe
+            title="policy"
+            id="for_policy"
+            className="policyFrame"
+            loading="lazy"
+            src="https://100087.pythonanywhere.com/legalpolicies/FB1010000000167475042357408025/website-privacy-policy/policies/?redirect_url=https://100014.pythonanywhere.com/legalpolicy1?s=&amp;session_id="
+            allow="fullscreen"
+            width="900"
+            height="200"
+          ></iframe>
           <div className="mt-8">
             <button type="submit" className="submit-btn" disabled={regLoading}>
               {regLoading ? (
