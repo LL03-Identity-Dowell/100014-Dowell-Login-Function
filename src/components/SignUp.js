@@ -865,7 +865,9 @@ const SignUp = () => {
             {iframeLoading && (
               <div className="policyFrameSpinner iframespinner">
                 {" "}
-                Loading...
+                <div className="box" style={{ width: "50px", height: "50px" }}>
+                  {" "}
+                </div>
               </div>
             )}
             <iframe
