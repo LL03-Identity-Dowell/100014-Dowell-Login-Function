@@ -197,6 +197,21 @@
 .notDisplayed {
   display: none;
 }
+.policyFrameSpinner {
+  display: block;
+  width: calc(100% * 11 / 12);
+  border-radius: 4px;
+  padding: 3px;
+  border: thin solid white;
+  margin: 0 5px 0 5px;
+  max-width: 500px;
+}
+.iframespinner {
+  position: relative;
+  top: 140px;
+  display: flex;
+  justify-content: center;
+}
 @keyframes spin {
   0% {
     transform: rotate(0deg);

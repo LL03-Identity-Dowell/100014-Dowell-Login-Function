@@ -109,7 +109,7 @@ const SignUp = () => {
   const [lastClickedButton, setLastClickedButton] = useState(null);
   const [usernameMessages, setUsernameMessages] = useTimedMessage();
   const [policyDisplay, setPolicyDispaly] = useState(false);
-
+  const [iframeLoading, setIframeLoading] = useState(true);
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
 
@@ -862,6 +862,12 @@ const SignUp = () => {
             </fieldset>
           </div>
           <div className={policyDisplay ? "displayed" : "notDisplayed"}>
+            {iframeLoading && (
+              <div className="policyFrameSpinner iframespinner">
+                {" "}
+                Loading...
+              </div>
+            )}
             <iframe
               title="policy"
               id="for_policy"
@@ -871,6 +877,7 @@ const SignUp = () => {
               allow="fullscreen"
               width="900"
               height="200"
+              onLoad={() => setIframeLoading(false)}
             ></iframe>
           </div>
 
