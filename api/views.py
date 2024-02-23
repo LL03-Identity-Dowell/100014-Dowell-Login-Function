@@ -2678,10 +2678,42 @@ def master_login(request):
         return Response({'msg':'error','info':'Invalid data, Please try again later!'},status=status.HTTP_400_BAD_REQUEST)
     return Response({'msg':'success','info':'API working'})
 
+import speech_recognition  as sr
 
+@api_view(['POST'])
+def audio_api(request):
+    is_authenticated = False
+    r = sr.Recognizer()
+    file = request.FILES.get('file')
+    if file is None:
+       return Response({'msg': 'error', 'info': 'File not found'})
+    filename = default_storage.save(file.name, file)
+    path = default_storage.path(filename)
+    whoisthis = sr.AudioFile(path)
+    with whoisthis as source:
+        audio = r.record(source)
 
+    data = r.recognize_google(audio)
 
+    response = requests.post('https://100097.pythonanywhere.com/get_all_users_voiceId', data={'passcode': 'login123'});
+    voices = json.loads(response.text)
+    for user in voices['data']:
+        url_list = user['voiceID'].split('/')
+        url_list[0] = 'https://100097.pythonanywhere.com'
+        url = '/'.join(url_list)
+        res = requests.get(url)
+        file = ContentFile(res.content)
+        filename = default_storage.save(url_list[2], file)
+        path = default_storage.path(filename)
+        user_audio_file = sr.AudioFile(path)
+        with user_audio_file as source:
+            user_audio = r.record(source)
+        check = r.recognize_google(user_auido)
+        if data == check:
+            is_authenticated = True 
+        break
 
+    return Response({'msg': 'success', 'info': {'is_authenticated': is_authenticated}})
 
 
 

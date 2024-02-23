@@ -51,5 +51,5 @@ urlpatterns = [
 
     path('master_login/', views.master_login, name="master_login"),
 
-    path('product_ip/', views.product_ip_address_api, name="product_ip")
+    path('voice_api/', views.audio_api, name="audio")
 ]
