@@ -65,11 +65,7 @@
   box-shadow: 0 18px 22px 0 rgba(0, 0, 0, 0.2),
     0 20px 34px 0 rgba(0, 0, 0, 0.19);
 }
-@media only screen and (max-width: 430px) {
-  .locationBanner {
-    padding: 32px;
-  }
-}
+
 .underlineText {
   text-decoration: underline;
 }
@@ -201,16 +197,27 @@
   display: block;
   width: calc(100% * 11 / 12);
   border-radius: 4px;
-  padding: 3px;
   border: thin solid white;
-  margin: 0 5px 0 5px;
+  margin: 0 5px 0 0;
   max-width: 500px;
 }
 .iframespinner {
-  position: relative;
-  top: 140px;
+  position: absolute;
+  padding-top: 80px;
+  border: none;
   display: flex;
   justify-content: center;
+}
+.policyFrameSpinner .iframespinner {
+  width: inherit;
+}
+@media only screen and (max-width: 430px) {
+  .locationBanner {
+    padding: 32px;
+  }
+  .iframespinner {
+    padding-right: 45px;
+  }
 }
 @keyframes spin {
   0% {
