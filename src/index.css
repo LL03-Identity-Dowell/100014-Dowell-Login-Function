@@ -234,8 +234,17 @@
   top: 80%;
   right: 5%;
 }
+.samantaContainerhidden {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  top: 80%;
+  right: 5%;
+  visibility: hidden;
+}
 .samantaImage {
   position: absolute;
+  cursor: pointer;
 }
 .SamantaTooltip {
   background: #2e7d32;
