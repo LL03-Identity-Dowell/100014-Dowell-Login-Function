@@ -12,6 +12,7 @@ import { MdMessage } from "react-icons/md";
 const Home = () => {
   const dispatch = useDispatch();
   const [timer, setTimer] = useState(3000);
+  const [showCard, setShowCard] = useState(false);
   const { initSession, isLoading, error } = useSelector((state) => state.init);
   const [isFirefox, setIsFireFox] = useState(false);
   const isLocationEnabled = useLocationEnabled();
@@ -146,14 +147,27 @@ const Home = () => {
           !timer && !isLoading ? "samantaContainer" : "samantaContainerhidden"
         }
       >
-        <div className="SamantaTooltip">
-          <div className="tooltipText" id="tooltipText">
+        {showCard && (
+          <div className="samantasIframe" onClick={() => setShowCard(false)}>
             {" "}
-            Samanta is here to help you!{" "}
           </div>
-        </div>
+        )}
+        {!showCard && (
+          <div className="SamantaTooltip">
+            <div className="tooltipText" id="tooltipText">
+              {" "}
+              Samanta is here to help you!{" "}
+            </div>
+          </div>
+        )}
+
         <img src={samanta} alt="Samanta" className="samantaImage" />
-        <div className="SamantaMessageIcon">
+        <div
+          className="SamantaMessageIcon"
+          onClick={() => {
+            setShowCard(true);
+          }}
+        >
           {" "}
           <MdMessage fontSize="32px" color="white" />{" "}
         </div>
