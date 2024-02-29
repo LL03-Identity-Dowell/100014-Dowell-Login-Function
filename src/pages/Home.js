@@ -11,6 +11,7 @@ import { MdMessage } from "react-icons/md";
 
 const Home = () => {
   const dispatch = useDispatch();
+  const [timer, setTimer] = useState(3000);
   const { initSession, isLoading, error } = useSelector((state) => state.init);
   const [isFirefox, setIsFireFox] = useState(false);
   const isLocationEnabled = useLocationEnabled();
@@ -41,7 +42,7 @@ const Home = () => {
     // document.getElementById("tooltipText").classList.add("expand");
     setTimeout(() => {
       document.getElementById("tooltipText").classList.add("expand");
-    }, 500);
+    }, 3000);
   }, []);
 
   // Extract the redirect_url parameter from the query parameters
@@ -83,7 +84,9 @@ const Home = () => {
   useEffect(() => {
     askLocation();
   }, []);
-
+  useEffect(() => {
+    console.log(timer);
+  }, [timer]);
   return (
     <div className="mainContainer">
       {!isLocationEnabled ? (
@@ -132,13 +135,17 @@ const Home = () => {
           ) : (
             <div className="isolate md:py-4 md:px-4">
               <div className="shadow-sm mx-auto md:mt-14 max-w-5xl px-2 py-2 md:py-6 md:px-6">
-                <MyTabs />
+                <MyTabs timer={timer} setTimer={setTimer} />
               </div>
             </div>
           )}
         </>
       )}
-      <div className="samantaContainer">
+      <div
+        className={
+          !timer && !isLoading ? "samantaContainer" : "samantaContainerhidden"
+        }
+      >
         <div className="SamantaTooltip">
           <div className="tooltipText" id="tooltipText">
             {" "}
