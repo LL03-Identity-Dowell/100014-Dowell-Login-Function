@@ -12,7 +12,7 @@ import numpy as np
 try:
     import face_recognition
 except:
-    pass 
+    pass
 
 from django.shortcuts import render
 from django.core.files.base import ContentFile
@@ -41,14 +41,14 @@ from PIL import Image
 
 from loginapp.views import country_city_name, get_html_msg
 from loginapp.models import (
-  CustomSession, 
-  Account, 
-  LiveStatus, 
-  GuestAccount, 
-  mobile_sms, 
-  QR_Creation, 
-  RandomSession, 
-  Linkbased_RandomSession, 
+  CustomSession,
+  Account,
+  LiveStatus,
+  GuestAccount,
+  mobile_sms,
+  QR_Creation,
+  RandomSession,
+  Linkbased_RandomSession,
   Location_check,
   Face_Login,
   Live_QR_Status,
@@ -174,7 +174,7 @@ def register(request):
         else:
             mobile_sms.objects.create(
                 phone=full_number, sms=sms, expiry=time)
-            
+
         url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
         payload = {
             "sender" : "DowellLogin",
@@ -211,8 +211,8 @@ def register(request):
         account_list = Account.objects.filter(email=email)
 
         for acct in account_list:
-            if email == acct.email and role1 == acct.role:
-                account_list = Account.objects.filter(email=email).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
+            if email == acct.email and user == acct.username:
+                account_list = Account.objects.filter(username=username).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
     except Account.DoesNotExist:
         name = None
     if name is not None:
@@ -298,7 +298,8 @@ def register(request):
         response1 = requests.request("POST", url, headers=headers, data=payload)
 
         return Response({
-            'message':f"{user}, registration success",
+            'msg':'success',
+            'info':f"{user}, registration success!",
             'inserted_id':f"{inserted_idd}"
             })
     return Response("Internal server error")
@@ -366,7 +367,7 @@ def MobileLogin(request):
             request.session.save()
             session = request.session.session_key
             obj = get_custom_session_data(session)
-            # session_obj = 
+            # session_obj =
             if obj:
                 if obj['status'] == 'login':
                     data = {'session_id': session}
@@ -423,7 +424,7 @@ def MobileLogin(request):
             infoo = str(info1)
             custom_session = CustomSession.objects.create(
                 sessionID=session, info=infoo, document="", status="login")
-            
+
             custom_session_data = {'sessionID': session, 'info': infoo, 'status': 'login'}
             m_custom_session = dowellconnection("login", "bangalore", "login", "session",
                              "session", "1121", "ABCDE", "insert", custom_session_data, "nil")
@@ -1258,7 +1259,7 @@ def PublicApi(request):
         resp = {'msg': 'error',
                 "info": "Username, Password combination incorrect.."}
         return Response(resp)
-    
+
 @api_view(['GET','POST'])
 def login_init_api(request):
     if request.method == "POST":
@@ -1266,10 +1267,10 @@ def login_init_api(request):
         context = {'msg':'success'}
         past_login = request.session.session_key
         if past_login:
-            test_session = get_custom_session_data(past_login)
+            test_session = CustomSession.objects.filter(sessionID=past_login).first()
             if test_session:
-                if test_session['status'] == "login":
-                    login_detail = get_custom_session_data(past_login)
+                if test_session.status == "login":
+                    login_detail = json.loads(test_session.info)
                     response = {'msg':'error','info':'logged_in_user'}
                     if "org=" in mainparams and not "code=masterlink" in mainparams:
                         if "https://ll04-finance-dowell.github.io/100018-dowellWorkflowAi-testing/" in mainparams and "portfolio" in mainparams and "product" in mainparams :
@@ -1310,9 +1311,12 @@ def login_init_api(request):
             context["qrid_login"] = request.COOKIES.get('qrid_login')
             qrid_obj_1 = QR_Creation.objects.filter(
                 qrid=context["qrid_login"]).first()
-            if qrid_obj_1.info == "":
-                context["qrid_login_type"] = "new"
-            else:
+            try:
+                if qrid_obj_1.info == "":
+                    context["qrid_login_type"] = "new"
+                else:
+                    context["qrid_login_type"] = "old"
+            except:
                 context["qrid_login_type"] = "old"
             res = Response()
             res.data = context
@@ -1364,7 +1368,7 @@ def login_init_api(request):
         redirect_url = request.GET.get('redirect_url', None)
         past_login=request.COOKIES.get('DOWELL_LOGIN')
         if past_login:
-            test_session = get_custom_session_data(past_login) 
+            test_session = get_custom_session_data(past_login)
             if test_session:
                 if test_session['status'] == "login":
                     return Response({'msg':'error','info':'logged_in_user'})
@@ -1536,7 +1540,7 @@ def email_otp(request):
             return Response({'msg': msg, 'info': info})
     else:
         return Response({'msg': 'error', 'info': 'Enter email and the usage you are looking for. Look into documentation for more info.'},status=status.HTTP_400_BAD_REQUEST)
-    
+
 @api_view(['POST'])
 def mobilesms(request):
     phonecode = request.data.get("phonecode")
@@ -1633,8 +1637,8 @@ def main_login(request):
         except:
             altitude="Location not allowed.."
     else:
-        altitude="Location not allowed.."    
-        coordinates="Location not allowed.."    
+        altitude="Location not allowed.."
+        coordinates="Location not allowed.."
     mainparams=mdata("mainparams")
     try:
         lo = loc.split(" ")
@@ -1889,7 +1893,7 @@ def main_login(request):
 
 @api_view(['POST'])
 def main_logout(request):
-    session = request.COOKIES.get('DOWELL_LOGIN')
+    session = request.session.session_key
 
     mydata = CustomSession.objects.filter(sessionID=session).first()
     if mydata is not None:
@@ -1901,7 +1905,7 @@ def main_logout(request):
         mydata.info = a5
         if mydata.status != "logout":
             mydata.status = "logout"
-        mydata.save(update_fields=['info', 'status'])
+        mydata.save(update_fields=['status'])
     field_session = {'sessionID': session}
     update_field = {'status': 'logout'}
     dowellconnection("login", "bangalore", "login", "session", "session",
@@ -1937,7 +1941,7 @@ def user_data(request):
     else:
         return Response({"msg":"error","info":"User Not Found"},status=status.HTTP_400_BAD_REQUEST)
 
-    
+
 @api_view(['POST'])
 def user_report(request):
     response = {}
@@ -2057,7 +2061,7 @@ def otp_verify(request):
             return Response({"msg":"error","info":"Wrong OTP provided"})
     else:
         return Response({'msg': 'error','error':'Provide either email or phone number along with username'})
-    
+
 @api_view(['POST'])
 def LinkLogin(request):
     user=request.data.get("Username")
@@ -2383,7 +2387,7 @@ def face_login_api(request):
     else:
         os.remove(os.path.join(BASE_DIR, 'static/img/test_facelogin/test.jpg'))
         resp = {"msg":"error","info": "User not found"}
-        return Response(resp,status=status.HTTP_400_BAD_REQUEST) 
+        return Response(resp,status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def face_id(request):
@@ -2710,7 +2714,7 @@ def audio_api(request):
             user_audio = r.record(source)
         check = r.recognize_google(user_auido)
         if data == check:
-            is_authenticated = True 
+            is_authenticated = True
         break
 
     return Response({'msg': 'success', 'info': {'is_authenticated': is_authenticated}})

@@ -15,7 +15,7 @@ def get_default_profile_image():
 
 class GuestAccount(models.Model):
     username = models.CharField(max_length=20, unique=False)
-    email = models.CharField(max_length=30, unique=True)
+    email = models.CharField(max_length=30, unique=False)
     is_activated = models.BooleanField(default=False)
     otp = models.IntegerField(null=True)
     token = models.CharField(max_length=300, null=True)
@@ -90,10 +90,11 @@ class Linkbased_RandomSession(models.Model):
     sessionID = models.CharField(max_length=1000)
     info = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    status=models.CharField(max_length=100)
 
 
 class Location_check(models.Model):
-    username = models.CharField(max_length=1000, unique=True)
+    username = models.CharField(max_length=1000, unique=False)
     usual = models.TextField()
     unusual = models.TextField(null=True, blank=True)
 
@@ -152,6 +153,7 @@ class Account(AbstractUser):
     user_country = models.CharField(max_length=255, null=True, blank=True)
     newsletter_subscription = models.CharField(
         default="Accepted", max_length=255, null=True, blank=True)
+    current_task=models.CharField(max_length=100,default="")
 
     def __str__(self) -> str:
         return self.username

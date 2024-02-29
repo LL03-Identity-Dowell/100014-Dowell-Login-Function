@@ -199,7 +199,7 @@ def LinkLogin(request):
         if url is not None:
             return redirect(f'https://100093.pythonanywhere.com?linklogin_id={random_session}&redirect_url={url}')
         return redirect(f'https://100093.pythonanywhere.com/public_link?linklogin_id={random_session}')
-    
+
     return render(request,"link_based.html",context)
 
 #Master Login
@@ -688,7 +688,7 @@ def register(request):
                 return render(request, 'after_register_v2.html', {'user': user,'mainparams':main_params})
         else:
             return HttpResponse("check")
-        
+
     else:
         ...
     return render(request, 'register_v2.html', {'title': 'Register here', 'country_resp': country_codes, 'org': orgs, 'type': _type})
@@ -731,7 +731,7 @@ def login(request):
     main_params = main_params[main_params.find('?')+1:]
     if "code=masterlink1" in main_params:
         return redirect(f"linklogin?{main_params}")
-    
+
     saved_browser_session = request.session.session_key
     if saved_browser_session:
         if orgs: # Invite link
@@ -892,12 +892,12 @@ def login(request):
                   if response["data"]["User_status"] == "deleted":
                         context["error"]="Username, Password combination is incorrect!"
                         logout(request)
-                        return render(request,'login/new_login.html',context)
+                        return render(request,'new_login.html',context)
                   elif response["data"]["User_status"] == "inactive":
                       context["error"]="Account disabled, please contact admin"
                       logout(request)
-                      return render(request,'login/new_login.html',context)
-                    
+                      return render(request,'new_login.html',context)
+
                   obj.current_task = "Verifying User"
                   # obj.current_task="Logging In"
                   obj.save(update_fields=['current_task'])
@@ -1260,7 +1260,7 @@ def check_status(request):
             status = obj.current_task
             return render(request, 'check_status.html', {'status': status})
         except:
-            return render(request,'login/check_status.html')
+            return render(request,'check_status.html')
     return render(request, 'check_status.html')
 
 
@@ -1544,9 +1544,9 @@ def add_public(request):
                     field={"Username":ruser,"status":"offline"}
                     resp=dowellconnection("login","bangalore","login","public_members","public_members","1242001","ABCDE","insert",field,"nil")
                     respj=json.loads(resp)
-                return render(request,'login/create_users.html',{'msg':f'Successfully {number} users Created'})
+                return render(request,'create_users.html',{'msg':f'Successfully {number} users Created'})
             else:
-                return render(request,'login/create_users.html',{'msg':'Provide number greater than 0'})
+                return render(request,'create_users.html',{'msg':'Provide number greater than 0'})
         return render(request,'create_users.html')
     else:
         return HttpResponse("You don not have access to this page")

@@ -107,6 +107,7 @@ DATABASES = {
         'USER': env('DATABASE_USER'),
         'PASSWORD': env('DATABASE_PASSWORD'),
         'HOST': env('DATABASE_HOST'),
+
     }
 }
 
@@ -168,7 +169,7 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'XMLHttpRequest',
 ]
 CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
-
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
@@ -181,3 +182,9 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 ENCRYPTION_PASSWORD = env('ENCRYPTION_PASSWORD')
 DEFAULT_SALT = env('DEFAULT_SALT')
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_PASSWORD')
