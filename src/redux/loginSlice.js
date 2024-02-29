@@ -3,6 +3,7 @@ import axios from "axios";
 
 const api_url = "https://100014.pythonanywhere.com/api/main_login/";
 const link_login_api = "https://100014.pythonanywhere.com/api/master_login/";
+const voice_login_api = "https://100014.pythonanywhere.com/api/voice_api/";
 export const loginUser = createAsyncThunk(
   "login/loginUser",
   async ({
@@ -95,7 +96,7 @@ export const voiceLogin = createAsyncThunk(
     redirectUrl,
   }) => {
     try {
-      const response = await axios.post("api", {
+      const response = await axios.post(voice_login_api, {
         time,
         ip,
         os,
@@ -105,7 +106,7 @@ export const voiceLogin = createAsyncThunk(
         language,
         browser,
         data,
-        voiceData,
+        file: voiceData,
         randomSession,
         redirectUrl,
       });
