@@ -4,15 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { RotatingLines } from "react-loader-spinner";
 import Iframe from "react-iframe";
 import { toast } from "react-toastify";
-
 import { loginUser } from "../redux/loginSlice";
 import { detectBrowser } from "../utils/browserUtils";
 import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
-
-const LogIn = ({ setSelectedTab, timer }) => {
+const LogIn = ({ setSelectedTab, timer, setTimer }) => {
+  console.log("🚀 ~ LogIn ~ setTimer:", setTimer);
   const [userLanguage, setUserLanguage] = useState("en");
   const [showTimer, setShowTimer] = useState(false);
   const [username, setUsername] = useState("");
@@ -130,7 +129,8 @@ const LogIn = ({ setSelectedTab, timer }) => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (!activity) {
-        setSelectedTab(1);
+        // setSelectedTab(1);
+        setTimer(0);
       }
     }, timer);
     return () => {
