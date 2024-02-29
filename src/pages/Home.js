@@ -5,8 +5,8 @@ import { initSessionID } from "../redux/initSlice";
 import { Radio } from "react-loader-spinner";
 import { Navigate, useLocation } from "react-router-dom";
 import useLocationEnabled from "../utils/useLocationEnabled";
-import logo from "../../src/assets/images/croppedLogo.jpg";
 import "../../src/index.css";
+import samanta from "../assets/images/samanta.png";
 const Home = () => {
   const dispatch = useDispatch();
   const { initSession, isLoading, error } = useSelector((state) => state.init);
@@ -36,6 +36,10 @@ const Home = () => {
     } else {
       setIsFireFox(false);
     }
+    // document.getElementById("tooltipText").classList.add("expand");
+    setTimeout(() => {
+      document.getElementById("tooltipText").classList.add("expand");
+    }, 500);
   }, []);
 
   // Extract the redirect_url parameter from the query parameters
@@ -132,6 +136,15 @@ const Home = () => {
           )}
         </>
       )}
+      <div className="samantaContainer">
+        <div className="SamantaTooltip">
+          <div className="tooltipText" id="tooltipText">
+            {" "}
+            Samanta is here to help you!{" "}
+          </div>
+        </div>
+        <img src={samanta} alt="Samanta" className="samantaImage" />
+      </div>
     </div>
   );
 };
