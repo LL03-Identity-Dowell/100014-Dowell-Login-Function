@@ -7,6 +7,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import useLocationEnabled from "../utils/useLocationEnabled";
 import "../../src/index.css";
 import samanta from "../assets/images/samanta.png";
+import { MdMessage } from "react-icons/md";
+
 const Home = () => {
   const dispatch = useDispatch();
   const { initSession, isLoading, error } = useSelector((state) => state.init);
@@ -144,6 +146,10 @@ const Home = () => {
           </div>
         </div>
         <img src={samanta} alt="Samanta" className="samantaImage" />
+        <div className="SamantaMessageIcon">
+          {" "}
+          <MdMessage fontSize="32px" color="white" />{" "}
+        </div>
       </div>
     </div>
   );
