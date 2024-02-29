@@ -16,10 +16,10 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-const MyTabs = () => {
+const MyTabs = ({ timer, setTimer }) => {
+  console.log("🚀 ~ MyTabs ~ setTimer:", setTimer);
   const [tabMenuOpen, setTabMenuOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [timer, setTimer] = useState(3000);
   // Use media queries to determine the screen size
   const isMobile = useMediaQuery({ maxWidth: 767 });
 
@@ -31,7 +31,13 @@ const MyTabs = () => {
     {
       id: 1,
       title: "LogIn",
-      content: <LogIn setSelectedTab={setSelectedTab} timer={timer} />,
+      content: (
+        <LogIn
+          setSelectedTab={setSelectedTab}
+          timer={timer}
+          setTimer={setTimer}
+        />
+      ),
     },
     { id: 2, title: "Chat", content: <Chat /> },
     { id: 3, title: "Policy", content: <Policy /> },
