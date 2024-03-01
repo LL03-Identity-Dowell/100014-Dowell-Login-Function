@@ -152,6 +152,13 @@ const Home = () => {
             <div className="closeContainer" onClick={() => setShowCard(false)}>
               <MdClose fontSize={"22px"} />
             </div>
+            <div className="loginchatContainer">
+              <iframe
+                title="chatframe"
+                src="https://100096.pythonanywhere.com/chat/login/?session_id=LbGltVcrr7Vm9scIes2OjtM8"
+                id="chatAppFrame"
+              ></iframe>
+            </div>
           </div>
         )}
         {!showCard && !hideSamantha && (
