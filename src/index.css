@@ -265,14 +265,33 @@
   justify-content: flex-end;
 }
 .tooltipText {
-  overflow: hidden;
-  width: 0;
-  height: 20px;
-  transition: all 2s ease-in-out;
-  margin-bottom: 5px;
-}
-.expand {
   width: 220px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 4px;
+  animation: anime 3s linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forward;
+  animation-delay: 3s;
+}
+@keyframes anime {
+  0% {
+    width: 0;
+  }
+  25% {
+    width: 55px;
+  }
+  50% {
+    width: 110px;
+  }
+  75% {
+    width: 165px;
+  }
+  100% {
+    width: 220px;
+  }
 }
 .SamantaTooltip::after {
   content: " ";
@@ -326,4 +345,9 @@
     margin-top: -150px;
     background: white;
   }
+}
+.closeContainer {
+  float: right;
+  margin: 8px;
+  cursor: pointer;
 }
