@@ -273,8 +273,8 @@
   margin-bottom: 4px;
   animation: anime 3s linear;
   animation-iteration-count: 1;
-  animation-fill-mode: forward;
-  animation-delay: 3s;
+  animation-fill-mode: both;
+  animation-delay: 4s;
 }
 @keyframes anime {
   0% {
