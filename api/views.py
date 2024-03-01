@@ -1905,7 +1905,7 @@ def main_logout(request):
         mydata.info = a5
         if mydata.status != "logout":
             mydata.status = "logout"
-        mydata.save(update_fields=['status'])
+        mydata.save(update_fields=['status','info'])
     field_session = {'sessionID': session}
     update_field = {'status': 'logout'}
     dowellconnection("login", "bangalore", "login", "session", "session",
