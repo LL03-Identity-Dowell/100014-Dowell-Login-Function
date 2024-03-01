@@ -12,6 +12,7 @@ import { MdMessage, MdClose } from "react-icons/md";
 const Home = () => {
   const dispatch = useDispatch();
   const [timer, setTimer] = useState(3000);
+  const [hideSamantha, setHideSamantha] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const { initSession, isLoading, error } = useSelector((state) => state.init);
   const [isFirefox, setIsFireFox] = useState(false);
@@ -40,6 +41,9 @@ const Home = () => {
     } else {
       setIsFireFox(false);
     }
+    setTimeout(() => {
+      setHideSamantha(true);
+    }, 12000);
   }, []);
 
   // Extract the redirect_url parameter from the query parameters
@@ -150,13 +154,15 @@ const Home = () => {
             </div>
           </div>
         )}
-        {!showCard && (
+        {!showCard && !hideSamantha && (
           <div className="SamantaTooltip">
             <div className="tooltipText"> Samanta is here to help you! </div>
           </div>
         )}
 
-        <img src={samanta} alt="Samanta" className="samantaImage" />
+        {!hideSamantha && (
+          <img src={samanta} alt="Samanta" className="samantaImage" />
+        )}
         <div
           className="SamantaMessageIcon"
           onClick={() => {
