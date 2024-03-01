@@ -372,6 +372,14 @@
     margin-top: -150px;
     background: white;
   }
+  .SamantaTooltip {
+    width: 160px;
+    height: 60px;
+    animation: none;
+  }
+  .tooltipText {
+    height: auto;
+  }
 }
 .closeContainer {
   float: right;
