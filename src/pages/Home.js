@@ -13,6 +13,7 @@ const Home = () => {
   const dispatch = useDispatch();
   const [timer, setTimer] = useState(3000);
   const [hideSamantha, setHideSamantha] = useState(false);
+  const [iframeLoading, setIframeLoading] = useState(true);
   const [showCard, setShowCard] = useState(false);
   const { initSession, isLoading, error } = useSelector((state) => state.init);
   const [isFirefox, setIsFireFox] = useState(false);
@@ -149,15 +150,33 @@ const Home = () => {
       >
         {showCard && (
           <div className="samantasIframe">
-            <div className="closeContainer" onClick={() => setShowCard(false)}>
+            <div
+              className="closeContainer"
+              onClick={() => {
+                setShowCard(false);
+                setIframeLoading(true);
+              }}
+            >
               <MdClose fontSize={"22px"} />
             </div>
             <div className="loginchatContainer">
               <iframe
                 title="chatframe"
                 className="loginchatFrame"
+                onLoad={() => setIframeLoading(false)}
                 src="https://100096.pythonanywhere.com/chat/login/?session_id=LbGltVcrr7Vm9scIes2OjtM8"
               ></iframe>
+              {iframeLoading && (
+                <div className="loginiframespinner">
+                  {" "}
+                  <div
+                    className="box"
+                    style={{ width: "50px", height: "50px" }}
+                  >
+                    {" "}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
