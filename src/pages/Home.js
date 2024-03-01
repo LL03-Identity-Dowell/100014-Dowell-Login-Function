@@ -7,7 +7,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import useLocationEnabled from "../utils/useLocationEnabled";
 import "../../src/index.css";
 import samanta from "../assets/images/samanta.png";
-import { MdMessage } from "react-icons/md";
+import { MdMessage, MdClose } from "react-icons/md";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -40,10 +40,6 @@ const Home = () => {
     } else {
       setIsFireFox(false);
     }
-    // document.getElementById("tooltipText").classList.add("expand");
-    setTimeout(() => {
-      document.getElementById("tooltipText").classList.add("expand");
-    }, 3000);
   }, []);
 
   // Extract the redirect_url parameter from the query parameters
@@ -148,16 +144,15 @@ const Home = () => {
         }
       >
         {showCard && (
-          <div className="samantasIframe" onClick={() => setShowCard(false)}>
-            {" "}
+          <div className="samantasIframe">
+            <div className="closeContainer" onClick={() => setShowCard(false)}>
+              <MdClose fontSize={"22px"} />
+            </div>
           </div>
         )}
         {!showCard && (
           <div className="SamantaTooltip">
-            <div className="tooltipText" id="tooltipText">
-              {" "}
-              Samanta is here to help you!{" "}
-            </div>
+            <div className="tooltipText"> Samanta is here to help you! </div>
           </div>
         )}
 
