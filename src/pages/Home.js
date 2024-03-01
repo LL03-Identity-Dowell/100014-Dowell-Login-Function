@@ -155,8 +155,8 @@ const Home = () => {
             <div className="loginchatContainer">
               <iframe
                 title="chatframe"
+                className="loginchatFrame"
                 src="https://100096.pythonanywhere.com/chat/login/?session_id=LbGltVcrr7Vm9scIes2OjtM8"
-                id="chatAppFrame"
               ></iframe>
             </div>
           </div>
