@@ -861,7 +861,7 @@ const SignUp = () => {
               </div>
             </fieldset>
           </div>
-          <div className={policyDisplay ? "displayed" : "notDisplayed"}>
+          {/*           <div className={policyDisplay ? "displayed" : "notDisplayed"}>
             {iframeLoading && (
               <div className="policyFrameSpinner iframespinner">
                 {" "}
@@ -881,7 +881,7 @@ const SignUp = () => {
               height="200"
               onLoad={() => setIframeLoading(false)}
             ></iframe>
-          </div>
+          </div> */}
 
           <div className="mt-8">
             <button type="submit" className="submit-btn" disabled={regLoading}>

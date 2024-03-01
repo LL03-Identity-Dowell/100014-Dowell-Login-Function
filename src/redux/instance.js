@@ -5,7 +5,7 @@ const API_BASE_URL = "https://100014.pythonanywhere.com";
 
 export const instance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 5000, // 5 seconds
+  timeout: 120000, // 5 seconds
 });
 
 export const postData = async (endpoint, data) => {
