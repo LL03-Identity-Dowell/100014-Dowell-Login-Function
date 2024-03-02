@@ -212,7 +212,7 @@ def register(request):
 
         for acct in account_list:
             if email == acct.email and user == acct.username:
-                account_list = Account.objects.filter(username=username).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
+                account_list = Account.objects.filter(username=user).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
     except Account.DoesNotExist:
         name = None
     if name is not None:
@@ -2712,7 +2712,7 @@ def audio_api(request):
         user_audio_file = sr.AudioFile(path)
         with user_audio_file as source:
             user_audio = r.record(source)
-        check = r.recognize_google(user_auido)
+        check = r.recognize_google(user_audio)
         if data == check:
             is_authenticated = True
         break

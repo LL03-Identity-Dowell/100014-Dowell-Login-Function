@@ -14,3 +14,4 @@ python-dateutil
 qrcode
 speech-recognition-python
 speechrecognition
+face-recognition
