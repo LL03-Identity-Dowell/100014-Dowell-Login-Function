@@ -279,27 +279,25 @@ const SignUp = () => {
 
       // Determine the value of sms based on the exempted checkbox
       const smsValue = exempted ? null : getValues("sms");
+      let formData = new FormData();
+      formData.append("Profile_Image", Profile_Image);
+      formData.append("Firstname", Firstname);
+      formData.append("Lastname", Lastname);
+      formData.append("Username", Username);
+      formData.append("user_type", user_type);
+      formData.append("Email", Email);
+      formData.append("Password", Password);
+      formData.append("confirm_password", confirm_password);
+      formData.append("user_country", user_country);
+      formData.append("phonecode", phonecode);
+      formData.append("Phone", Phone);
+      formData.append("otp", otp);
+      formData.append("sms", smsValue);
+      formData.append("policy_status", policy_status);
+      formData.append("newsletter", newsletter);
 
       // Dispatch the registerUser action with the form data
-      dispatch(
-        registerUser({
-          Firstname,
-          Lastname,
-          Username,
-          user_type,
-          Email,
-          Password,
-          confirm_password,
-          user_country,
-          phonecode,
-          Phone,
-          otp,
-          sms: smsValue,
-          Profile_Image,
-          policy_status,
-          newsletter,
-        })
-      );
+      dispatch(registerUser(formData));
     } else {
       throw new Error(error.response.data.info);
     }
@@ -825,10 +823,10 @@ const SignUp = () => {
                     <p className="text-gray-600">
                       Do you accept our{" "}
                       <span
-                        className="policyLink"
+                      /*                className="policyLink"
                         onClick={() => {
                           handlePolicyDisplay();
-                        }}
+                        }} */
                       >
                         policies
                       </span>
