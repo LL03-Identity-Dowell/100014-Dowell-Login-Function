@@ -43,41 +43,9 @@ export const sendMobileOTP = createAsyncThunk(
 // Async thunk to handle registration API call
 export const registerUser = createAsyncThunk(
   "registration/registerUser",
-  async ({
-    Firstname,
-    Lastname,
-    Username,
-    user_type,
-    Email,
-    Password,
-    confirm_password,
-    user_country,
-    phonecode,
-    Phone,
-    otp,
-    sms,
-    Profile_Image,
-    policy_status,
-    newsletter,
-  }) => {
+  async (formData) => {
     try {
-      const response = await axios.post(`${base_url}/api/register/`, {
-        Firstname,
-        Lastname,
-        Username,
-        user_type,
-        Email,
-        Password,
-        confirm_password,
-        user_country,
-        phonecode,
-        Phone,
-        otp,
-        sms,
-        Profile_Image,
-        policy_status,
-        newsletter,
-      });
+      const response = await axios.post(`${base_url}/api/register/`, formData);
       if (response?.data.msg === "success") {
         return response?.data.info;
       }
