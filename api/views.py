@@ -2719,8 +2719,23 @@ def audio_api(request):
 
     return Response({'msg': 'success', 'info': {'is_authenticated': is_authenticated}})
 
+@api_view(['POST'])
+def check_user(request):
+    username=request.data.get("username")
+    password=request.data.get("password")
 
-
+    user = authenticate(request, username=username, password=password)
+    if user is not None:
+        field = {"Username": username,'Password': dowell_hash.dowell_hash(password)}
+        id = dowellconnection("login", "bangalore", "login", "registration",
+                              "registration", "10004545", "ABCDE", "find", field, "nil")
+        response = json.loads(id)
+        if response["data"] != None:
+            return Response({'msg':True})
+        else:
+            return Response({'msg':False},status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({'msg':False},status=status.HTTP_400_BAD_REQUEST)
 
 
 
