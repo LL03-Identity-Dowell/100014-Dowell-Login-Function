@@ -2731,11 +2731,11 @@ def check_user(request):
                               "registration", "10004545", "ABCDE", "find", field, "nil")
         response = json.loads(id)
         if response["data"] != None:
-            return Response({'msg':True})
+            return Response({'msg':True,'info':'User verification success'})
         else:
-            return Response({'msg':False},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg':False,'info':'Username, password combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'msg':False},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg':False,'info':'Username, password combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
 
 
 
