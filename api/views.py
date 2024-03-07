@@ -255,8 +255,18 @@ def register(request):
         org_id = client_admin_res["inserted_id"]
 
         userfield = {}
-        userresp = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
-        idd = json.loads(userresp)
+        data = {
+            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "db_name": "login_india_db1",
+            "coll_name": "registration",
+            "operation": "fetch",
+            "filters": {
+                "_id": "101001010101"
+            },
+        }
+        res = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
+        res = requests.post("https://datacube.uxlivinglab.online/db_api/get_data/", json=data)
+        idd = json.loads(res)
         res_list = idd["data"]
         profile_id = get_next_pro_id(res_list)
 
