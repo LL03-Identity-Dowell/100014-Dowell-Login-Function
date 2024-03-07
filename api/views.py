@@ -2726,7 +2726,7 @@ def check_user(request):
 
     user = authenticate(request, username=username, password=password)
     if user is not None:
-        field = {"Username": username,'Password': dowell_hash.dowell_hash(password)}
+        field = {"Username": username}
         id = dowellconnection("login", "bangalore", "login", "registration",
                               "registration", "10004545", "ABCDE", "find", field, "nil")
         response = json.loads(id)
