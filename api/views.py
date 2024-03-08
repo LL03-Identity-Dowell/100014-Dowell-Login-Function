@@ -188,10 +188,30 @@ def register(request):
         else:
             return Response({'msg': 'error','error':'The number is not valid'})
 
+        # Setup collection
+        def get_collection_name(username, country, collection_id = 0):
+            collection_name = country + username[0].lower() + str(collection_id)
+            return collection_name
 
-    user_exists = Account.objects.filter(username=user).first()
-    if user_exists:
+        data = {
+            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "db_name": "db0",
+            "collection_name": get_collection_name(user, user_country),
+            "operation": "fetch",
+            "filters": {
+                "_id": "101001010101"
+            },
+        }
+    # Check for username
+    user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
+    user_list = json.loads(data['data'])
+    filtered = list(filter(lambda obj: obj.get('Username', None) == user, user_list))
+    if (len(filtered) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
+
+   # user_exists = Account.objects.filter(username=user).first()
+   # if user_exists:
+   #     return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
 
     register_legal_policy(user)
     try:
@@ -207,14 +227,14 @@ def register(request):
         return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
 
     name = ""
-    try:
-        account_list = Account.objects.filter(email=email)
-
-        for acct in account_list:
-            if email == acct.email and role1 == acct.role:
-                account_list = Account.objects.filter(email=email).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
-    except Account.DoesNotExist:
-        name = None
+#    try:
+#        account_list = Account.objects.filter(email=email)
+#
+#        for acct in account_list:
+#            if email == acct.email and role1 == acct.role:
+#                account_list = Account.objects.filter(email=email).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
+#    except Account.DoesNotExist:
+#        name = None
     if name is not None:
         if image:
             new_user = Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone,profile_image=image)
