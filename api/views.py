@@ -1918,6 +1918,8 @@ def main_logout(request):
 @api_view(['POST'])
 def validate_username(request):
     username = request.data['username']
+    if ' ' in username:
+        return Response({'msg': 'error', 'info': "Username shouldn't contain space"}, status=status.HTTP_400_BAD_REQUEST)
     if username:
         qs = Account.objects.filter(username=username)
         if qs.exists():
