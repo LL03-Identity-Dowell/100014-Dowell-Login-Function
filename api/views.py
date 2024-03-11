@@ -301,7 +301,10 @@ def register(request):
         field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
         id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
         id_res=json.loads(id)
+        user_json = requests.post("https://datacube.uxlivinglab.online/db_api/crud/", json=field);
+        user = json.loads(user_json);
         inserted_idd=id_res['inserted_id']
+        inserted_id = user['inserted_id'];
 
         url = "https://100085.pythonanywhere.com/api/signup-feedback/"
         if not check_sms:
@@ -324,7 +327,7 @@ def register(request):
                 })
         headers = {
             'Content-Type': 'application/json'
-            }
+        }
         response1 = requests.request("POST", url, headers=headers, data=payload)
 
         return Response({
