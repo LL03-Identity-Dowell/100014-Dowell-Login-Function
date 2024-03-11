@@ -409,3 +409,28 @@
   width: 99%;
   height: 96%;
 }
+.signUpImageHolder {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  position: relative;
+}
+.signUpIconContainer {
+  background-color: black;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.singUpImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+}
