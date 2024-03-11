@@ -114,6 +114,7 @@ const SignUp = () => {
   const [signUpImage, setSignUpImage] = useState(null);
   const [showCloseIcon, setShowCloseIcon] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("Hello");
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
 
@@ -320,6 +321,14 @@ const SignUp = () => {
   // Check a username availability
   const checkUsernameAvailability = async () => {
     const username = watch("Username");
+    var regex = /^[a-zA-Z0-9]+$/;
+    const validUserName = regex.test(username);
+    console.log("This is the validUserName", validUserName);
+    if (!validUserName) {
+      setErrorMessage("Username must not contain spaces or special characters");
+      reset({ Username: "" });
+      return;
+    }
     if (username) {
       await dispatch(validateUsernameAsync(username));
     }
@@ -465,7 +474,9 @@ const SignUp = () => {
                     {errors.Username.message}
                   </p>
                 )}
-
+                {errorMessage && (
+                  <p className="text-red-500 text-xs mt-1"> {errorMessage}</p>
+                )}
                 {usernameMessages.map((msg) => (
                   <p
                     key={msg.id}
