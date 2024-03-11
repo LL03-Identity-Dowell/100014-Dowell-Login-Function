@@ -22,6 +22,7 @@ import {
   resetUsernameError,
   validateUsernameAsync,
 } from "../redux/validateUsernameSlice";
+import { MdClose } from "react-icons/md";
 
 // Schema for validation inputs
 const schema = yup.object().shape({
@@ -41,6 +42,7 @@ const schema = yup.object().shape({
     .string()
     .required("User Name is required")
     .max(20)
+    .matches(/^\S*$/, "Username must not contain spaces")
     .matches(/^[A-Za-z0-9]+$/, "Username must not include special characters")
     .notOneOf(
       ["administrator", "uxlivinglab", "dowellresearch", "dowellteam", "admin"],
@@ -109,6 +111,8 @@ const SignUp = () => {
   const [lastClickedButton, setLastClickedButton] = useState(null);
   const [usernameMessages, setUsernameMessages] = useTimedMessage();
   const [policyDisplay, setPolicyDispaly] = useState(false);
+  const [signUpImage, setSignUpImage] = useState(null);
+  const [showCloseIcon, setShowCloseIcon] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
@@ -366,7 +370,16 @@ const SignUp = () => {
     regLoading,
     lastClickedButton,
   ]);
-
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setSignUpImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
       <div className="shadow-sm mx-auto max-w-5xl px-2 py-6 md:px-4">
@@ -780,22 +793,55 @@ const SignUp = () => {
                     className="h-8 w-8 text-green-500"
                     aria-hidden="true"
                   />
-                  <div className="text-sm leading-6 text-gray-600">
-                    <label
-                      htmlFor="Profile_Image"
-                      className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-600 focus-within:ring-offset-2 hover:text-green-500"
+                  {signUpImage && (
+                    <div
+                      className="signUpImageHolder"
+                      onMouseOver={() => {
+                        setShowCloseIcon(true);
+                      }}
+                      onMouseOut={() => {
+                        setShowCloseIcon(false);
+                      }}
                     >
-                      <span>Click here</span>
-                      <input
-                        id="Profile_Image"
-                        name="Profile_Image"
-                        type="file"
-                        className="sr-only"
-                        {...register("Profile_Image")}
-                        accept="image/jpeg, image/png, image/gif"
+                      <img
+                        src={signUpImage}
+                        className="singUpImage"
+                        alt="Profile"
+                        style={{ opacity: showCloseIcon && "0.6" }}
                       />
-                    </label>
-                  </div>
+                      {showCloseIcon && (
+                        <div
+                          className="signUpIconContainer"
+                          onClick={() => {
+                            setSignUpImage(null);
+                            setShowCloseIcon(false);
+                          }}
+                        >
+                          {" "}
+                          <MdClose color="white" fontSize="14px" />{" "}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {!signUpImage && (
+                    <div className="text-sm leading-6 text-gray-600">
+                      <label
+                        htmlFor="Profile_Image"
+                        className="relative cursor-pointer rounded-md bg-white font-semibold text-green-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-green-600 focus-within:ring-offset-2 hover:text-green-500"
+                      >
+                        <span>Click here</span>
+                        <input
+                          id="Profile_Image"
+                          name="Profile_Image"
+                          type="file"
+                          className="sr-only"
+                          {...register("Profile_Image")}
+                          accept="image/jpeg, image/png, image/gif"
+                          onChange={handleImageChange}
+                        />
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
               {errors.Profile_Image && (
