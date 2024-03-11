@@ -114,7 +114,7 @@ const SignUp = () => {
   const [signUpImage, setSignUpImage] = useState(null);
   const [showCloseIcon, setShowCloseIcon] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState("Hello");
+  const [errorMessage, setErrorMessage] = useState("");
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
 
@@ -323,17 +323,17 @@ const SignUp = () => {
     const username = watch("Username");
     var regex = /^[a-zA-Z0-9]+$/;
     const validUserName = regex.test(username);
-    console.log("This is the validUserName", validUserName);
-    if (!validUserName) {
+    if (!validUserName && username) {
       setErrorMessage("Username must not contain spaces or special characters");
       reset({ Username: "" });
       return;
+    } else {
+      setErrorMessage("");
     }
     if (username) {
       await dispatch(validateUsernameAsync(username));
     }
   };
-
   useEffect(() => {
     if (isUsernameAvailable) {
       // Do not reset the form if the username is not available
