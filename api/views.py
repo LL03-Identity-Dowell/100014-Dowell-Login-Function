@@ -188,25 +188,26 @@ def register(request):
         else:
             return Response({'msg': 'error','error':'The number is not valid'})
 
-        # Setup collection
-        def get_collection_name(username, country, collection_id = 0):
-            collection_name = country + username[0].lower() + str(collection_id)
-            return collection_name
+    # Setup collection
+    def get_collection_name(username, country, collection_id = 0):
+        collection_name = country + username[0].lower() + str(collection_id)
+        return collection_name
 
-        data = {
-            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
-            "db_name": "db0",
-            "collection_name": get_collection_name(user, user_country),
-            "operation": "fetch",
-            "filters": {
-                "_id": "101001010101"
-            },
-        }
+    #Main data attributes for signup database
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": get_collection_name(user, user_country),
+        "operation": "fetch",
+        "filters": {
+            "Username": user
+        },
+    }
     # Check for username
     user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
     user_list = json.loads(data['data'])
-    filtered = list(filter(lambda obj: obj.get('Username', None) == user, user_list))
-    if (len(filtered) > 0):
+    # filtered = list(filter(lambda obj: obj.get('Username', None) == user, user_list))
+    if (len(user_list) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
 
    # user_exists = Account.objects.filter(username=user).first()
@@ -226,7 +227,6 @@ def register(request):
     if check_sms == "Wrong":
         return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
 
-    name = ""
 #    try:
 #        account_list = Account.objects.filter(email=email)
 #
@@ -235,7 +235,7 @@ def register(request):
 #                account_list = Account.objects.filter(email=email).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
 #    except Account.DoesNotExist:
 #        name = None
-    if name is not None:
+    if user is not None:
         if image:
             new_user = Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone,profile_image=image)
         else:
@@ -275,20 +275,18 @@ def register(request):
         org_id = client_admin_res["inserted_id"]
 
         userfield = {}
-        data = {
-            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
-            "db_name": "login_india_db1",
-            "coll_name": "registration",
-            "operation": "fetch",
-            "filters": {
-                "_id": "101001010101"
-            },
-        }
-        res = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
-        res = requests.post("https://datacube.uxlivinglab.online/db_api/get_data/", json=data)
-        idd = json.loads(res)
-        res_list = idd["data"]
-        profile_id = get_next_pro_id(res_list)
+        # data = {
+        #     "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        #     "db_name": "db0",
+        #     "coll_name": get_collection_name(user, user_country),
+        #     "operation": "insert",
+            
+        # }
+        # res = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
+        # res = requests.post("https://datacube.uxlivinglab.online/db_api/get_data/", json=data)
+        # idd = json.loads(res)
+        # res_list = idd["data"]
+        # profile_id = get_next_pro_id(res_list)
 
         event_id = None
 
@@ -298,13 +296,19 @@ def register(request):
         except:
             pass
 
-        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
+        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
         id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
         id_res=json.loads(id)
-        user_json = requests.post("https://datacube.uxlivinglab.online/db_api/crud/", json=field);
-        user = json.loads(user_json);
+
+        #Putting insert values in database attribute 
+        data["operation"]="insert"
+        data["data"]={"info":field}
+
+        #Inserting data to signup database as per their collection name
+        user_json = requests.post("https://datacube.uxlivinglab.online/db_api/crud/", json=data)
+        user = json.loads(user_json)
         inserted_idd=id_res['inserted_id']
-        inserted_id = user['inserted_id'];
+        inserted_id = user['inserted_id']
 
         url = "https://100085.pythonanywhere.com/api/signup-feedback/"
         if not check_sms:
@@ -1713,8 +1717,8 @@ def main_login(request):
         random_session_obj.username=username
         random_session_obj.save(update_fields=['username'])
     company=None
-    org=Non
-    config = {}e
+    org=None
+    config = {}
     dept=None
     member=None
     project=None
