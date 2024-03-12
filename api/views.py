@@ -1713,7 +1713,8 @@ def main_login(request):
         random_session_obj.username=username
         random_session_obj.save(update_fields=['username'])
     company=None
-    org=None
+    org=Non
+    config = {}e
     dept=None
     member=None
     project=None
@@ -1733,10 +1734,27 @@ def main_login(request):
     client_admin_id=None
     # role_id=mdata["role_id"]
     user = authenticate(request, username=username, password=password)
+    # Setup collection
+    def get_collection_name(username, country, collection_id = 0):
+        collection_name = country + username[0].lower() + str(collection_id)
+        return collection_name
+
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": get_collection_name(username, user_country),
+        "operation": "fetch",
+        "filters": {
+                "Username": username,
+        },
+    }
+    # Check for username
+
     if user is not None:
         field = {"Username": username}
-        id = dowellconnection("login", "bangalore", "login", "registration",
-                              "registration", "10004545", "ABCDE", "find", field, "nil")
+        # id = dowellconnection("login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "find", field, "nil")
+        user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
+        user_list = json.loads(data['data'])
         response = json.loads(id)
         if response["data"] != None:
             try:
