@@ -322,9 +322,15 @@ const SignUp = () => {
   const checkUsernameAvailability = async () => {
     const username = watch("Username");
     var regex = /^[a-zA-Z0-9]+$/;
+    const letterRegex = /^[a-zA-Z]/;
+    const validNamestartWithAlphabet = letterRegex.test(username);
     const validUserName = regex.test(username);
     if (!validUserName && username) {
       setErrorMessage("Username must not contain spaces or special characters");
+      reset({ Username: "" });
+      return;
+    } else if (!validNamestartWithAlphabet) {
+      setErrorMessage("Username must start with an alphabet");
       reset({ Username: "" });
       return;
     } else {
