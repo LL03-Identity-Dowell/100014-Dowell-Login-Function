@@ -60,6 +60,7 @@ from server.utils import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import qrcodegen
 from server.utils import passgen
+from server.utils import datacube
 from api.serializers import UserSerializer
 from core.settings import STATIC_ROOT
 
@@ -157,7 +158,7 @@ def register(request):
 
     # Check for username
     data["collection_name"]="username_list"
-    user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
+    user_query = datacube.datacube_data_retrieval(**data) 
     user_list = json.loads(data['data'])
     if (len(user_list) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
