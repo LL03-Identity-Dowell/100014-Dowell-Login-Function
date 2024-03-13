@@ -118,7 +118,6 @@ def register(request):
     first = request.data.get("Firstname")
     last = request.data.get("Lastname")
     email = request.data.get("Email")
-    role1 = "guest"
     phonecode = request.data.get("phonecode")
     phone = request.data.get("Phone")
     user_type = request.data.get('user_type')
@@ -127,94 +126,7 @@ def register(request):
     other_policy = request.data.get('other_policy')
     newsletter = request.data.get('newsletter')
 
-    # Temporary Change..
-    if email and user and not image and not password and not first \
-            and not last and not phone and not phonecode and not user_type and not user_country \
-            and not policy_status and not other_policy and not newsletter:
-        otp = generateOTP()
-        try:
-            emailexist = GuestAccount.objects.get(email=email)
-        except GuestAccount.DoesNotExist:
-            emailexist = None
-        if emailexist is not None:
-            GuestAccount.objects.filter(email=email).update(otp=otp,expiry=datetime.datetime.now(),username=user)
-        else:
-            data=GuestAccount(username=user,email=email,otp=otp)
-            data.save()
-        url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
-        payload = json.dumps({
-            "toEmail":email,
-            "toName":user,
-            "topic":"RegisterOtp",
-            "otp":otp
-            })
-        headers = {
-            'Content-Type': 'application/json'
-            }
-        response1 = requests.request("POST", url, headers=headers, data=payload)
-        return Response({'msg':'success','info':'OTP sent successfully'})
-
-    elif phone and phonecode and not email and not user and not image and not password \
-            and not first and not last and not user_type and not user_country and not policy_status \
-            and not other_policy and not newsletter:
-        sms = generateOTP()
-
-        full_number =str(phonecode) + str(phone)
-        time = datetime.datetime.utcnow()
-        print(full_number)
-        if full_number == "251912912144":
-            sms="123456"
-        try:
-            phone_exists = mobile_sms.objects.get(phone=full_number)
-        except mobile_sms.DoesNotExist:
-            phone_exists = None
-        if phone_exists is not None:
-            mobile_sms.objects.filter(
-                phone=full_number).update(sms=sms, expiry=time)
-        else:
-            mobile_sms.objects.create(
-                phone=full_number, sms=sms, expiry=time)
-            
-        url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
-        payload = {
-            "sender" : "DowellLogin",
-            "recipient" : full_number,
-            "content" : f"Enter the following OTP to create your dowell account: {sms}",
-            "created_by" : "Manish"
-            }
-        response = requests.request("POST", url, data=payload)
-        if len(response.json()) > 1:
-            return Response({'msg':'success','info':'SMS sent successfully!!'})
-        else:
-            return Response({'msg': 'error','error':'The number is not valid'})
-
-    # Setup collection
-    def get_collection_name(username, country, collection_id = 0):
-        collection_name = country + username[0].lower() + str(collection_id)
-        return collection_name
-
-    #Main data attributes for signup database
-    data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
-        "db_name": "db0",
-        "collection_name": get_collection_name(user, user_country),
-        "operation": "fetch",
-        "filters": {
-            "Username": user
-        },
-    }
-    # Check for username
-    user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
-    user_list = json.loads(data['data'])
-    # filtered = list(filter(lambda obj: obj.get('Username', None) == user, user_list))
-    if (len(user_list) > 0):
-        return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
-
-   # user_exists = Account.objects.filter(username=user).first()
-   # if user_exists:
-   #     return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
-
-    register_legal_policy(user)
+    #Email and SMS verification
     try:
         check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
         check_sms= mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
@@ -227,118 +139,81 @@ def register(request):
     if check_sms == "Wrong":
         return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
 
-#    try:
-#        account_list = Account.objects.filter(email=email)
-#
-#        for acct in account_list:
-#            if email == acct.email and role1 == acct.role:
-#                account_list = Account.objects.filter(email=email).update(password = make_password(password),first_name = first,last_name = last,email = email,phonecode=phonecode,phone = phone,profile_image=image)
-#    except Account.DoesNotExist:
-#        name = None
-    if user is not None:
-        if image:
-            new_user = Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone,profile_image=image)
-        else:
-            new_user = Account.objects.create(email=email,username=user,password=make_password(password),first_name = first,last_name = last,phonecode=phonecode,phone = phone)
+    # Setup collection
+    def get_collection_name(username, country, collection_id = 0):
+        collection_name = country + username[0].lower() + str(collection_id)
+        return collection_name
 
-        profile_image = new_user.profile_image
-        json_data = open(os.path.join(STATIC_ROOT,'client.json'))
-        data1 = json.load(json_data)
-        json_data.close()
-        default =   {
-        "org_id":user,
-        "org_name":user,
-        "username": [user],
-        "member_type": "owner",
-        "product": "all",
-        "data_type": "Real_data",
-        "operations_right": "Add/Edit",
-        "role": "owner",
-        "security_layer": "None",
-        "portfolio_name": "default",
-        "portfolio_code": "123456",
-        "portfolio_specification": "",
-        "portfolio_uni_code": "default",
-        "portfolio_details": "",
-        "status": "enable"
-        }
-        data1["portpolio"].append(default)
-        data1["document_name"] = user
-        data1["Username"] = user
-        update_data1 = {"first_name":first,"last_name":last,"profile_img":f'https://100014.pythonanywhere.com/media/{profile_image}',"email":email,"phonecode":phonecode,"phone":phone}
-        data1["profile_info"].update(update_data1)
-        data1["organisations"][0]["org_name"] = user
-        update_data2={"first_name":first,"last_name":last,"email":email}
-        data1["members"]["team_members"]["accept_members"][0].update(update_data2)
-        client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data1,"nil")
-        client_admin_res = json.loads(client_admin)
-        org_id = client_admin_res["inserted_id"]
+    #Main data attributes for signup database
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": get_collection_name(user, user_country),
+        "operation": "fetch",
+        "filters": {                   
+            "Username": user
+        },
+    }
 
-        userfield = {}
-        # data = {
-        #     "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
-        #     "db_name": "db0",
-        #     "coll_name": get_collection_name(user, user_country),
-        #     "operation": "insert",
-            
-        # }
-        # res = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
-        # res = requests.post("https://datacube.uxlivinglab.online/db_api/get_data/", json=data)
-        # idd = json.loads(res)
-        # res_list = idd["data"]
-        # profile_id = get_next_pro_id(res_list)
+    # Check for username
+    data["collection_name"]="username_list"
+    user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
+    user_list = json.loads(data['data'])
+    if (len(user_list) > 0):
+        return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
+    
+    #Add username in policy model
+    register_legal_policy(user)
 
-        event_id = None
+    #Even ID of user
+    event_id = None
+    try:
+        res = create_event()
+        event_id = res['event_id']
+    except:
+        pass
 
-        try:
-            res = create_event()
-            event_id = res['event_id']
-        except:
-            pass
+    #Info of user to be inserted
+    field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
 
-        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
-        id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
-        id_res=json.loads(id)
+    #Putting insert values in database attribute 
+    data["operation"]="insert"
+    data["data"]={"info":field}
 
-        #Putting insert values in database attribute 
-        data["operation"]="insert"
-        data["data"]={"info":field}
+    #Inserting data to signup database as per their collection name
+    user_json = requests.post("https://datacube.uxlivinglab.online/db_api/crud/", json=data)
+    user = json.loads(user_json)
+    inserted_id = user['inserted_id']
 
-        #Inserting data to signup database as per their collection name
-        user_json = requests.post("https://datacube.uxlivinglab.online/db_api/crud/", json=data)
-        user = json.loads(user_json)
-        inserted_idd=id_res['inserted_id']
-        inserted_id = user['inserted_id']
-
-        url = "https://100085.pythonanywhere.com/api/signup-feedback/"
-        if not check_sms:
-            verified_phone="unverified"
-        else:
-            verified_phone="verified"
-        payload = json.dumps({
-            "topic" : "Signupfeedback",
-            "toEmail" : email,
-            "toName" : first +" "+ last,
-            "firstname" : first,
-            "lastname" : last,
-            "username" : user,
-            "phoneCode" : "+" + str(phonecode),
-            "phoneNumber" : phone,
-            "usertype" : user_type,
-            "country" : user_country,
-            "verified_phone":verified_phone,
-            "verified_email": "verified"
-                })
-        headers = {
-            'Content-Type': 'application/json'
-        }
-        response1 = requests.request("POST", url, headers=headers, data=payload)
-
-        return Response({
-            'message':f"{user}, registration success",
-            'inserted_id':f"{inserted_idd}"
+    #Signup COnfirmation Mail
+    url = "https://100085.pythonanywhere.com/api/signup-feedback/"
+    if not check_sms:
+        verified_phone="unverified"
+    else:
+        verified_phone="verified"
+    payload = json.dumps({
+        "topic" : "Signupfeedback",
+        "toEmail" : email,
+        "toName" : first +" "+ last,
+        "firstname" : first,
+        "lastname" : last,
+        "username" : user,
+        "phoneCode" : "+" + str(phonecode),
+        "phoneNumber" : phone,
+        "usertype" : user_type,
+        "country" : user_country,
+        "verified_phone":verified_phone,
+        "verified_email": "verified"
             })
-    return Response("Internal server error")
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    response1 = requests.request("POST", url, headers=headers, data=payload)
+
+    return Response({
+        'message':f"{user}, registration success",
+        'inserted_id':f"{inserted_id}"
+        })
 
 @api_view(["POST"])
 def MobileLogin(request):
