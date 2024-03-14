@@ -178,7 +178,6 @@ const SignUp = () => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const valideEmail = emailRegex.test(Email);
       if (!valideEmail) {
-        console.log("email is not valid");
         setEmailErrorMessage("Invaid email format!");
         return;
       } else {
