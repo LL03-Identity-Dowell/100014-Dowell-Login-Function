@@ -107,6 +107,14 @@ def get_custom_session_data(session_id):
     res_data = json.loads(json_data)
     return res_data.get('data')
 
+
+def get_or_create_collection(api_key, db_name, collection_name):
+    collections = datacube.datacube_collection_retrieval(api_key, db_name)
+    if collection_name in json.loads(collections):
+        return collection_name
+    collection = datacube.datacube_create_collection(api_key, db_name, collection_name)
+    return collection_name
+
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 @api_view(["POST"])
@@ -143,6 +151,7 @@ def register(request):
     # Setup collection
     def get_collection_name(username, country, collection_id = 0):
         collection_name = country + username[0].lower() + str(collection_id)
+        collection_name = get_or_create_collection("c9dfbcd2-8140-4f24-ac3e-50195f651754", "db0", collection_name)
         return collection_name
 
     #Main data attributes for signup database
