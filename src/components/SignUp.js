@@ -115,6 +115,7 @@ const SignUp = () => {
   const [showCloseIcon, setShowCloseIcon] = useState(false);
   const [iframeLoading, setIframeLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [emailErrorMessage, setEmailErrorMessage] = useState(null);
   // Use the custom hook to handle the verification
   const [verificationRequested, setVerificationRequested] = useState(false);
 
@@ -174,6 +175,15 @@ const SignUp = () => {
         Password,
         confirm_password,
       } = watch();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const valideEmail = emailRegex.test(Email);
+      if (!valideEmail) {
+        console.log("email is not valid");
+        setEmailErrorMessage("Invaid email format!");
+        return;
+      } else {
+        setEmailErrorMessage(null);
+      }
       if (
         Firstname &&
         Lastname &&
@@ -556,6 +566,7 @@ const SignUp = () => {
                     {errors.Email.message}
                   </p>
                 )}
+                <p className="text-red-500 text-xs mt-1">{emailErrorMessage}</p>
               </div>
 
               <div className="mt-2.5">
