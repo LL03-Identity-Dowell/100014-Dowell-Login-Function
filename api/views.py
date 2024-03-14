@@ -188,6 +188,8 @@ def register(request):
         else:
             return Response({'msg': 'error','error':'The number is not valid'})
 
+    if ' ' in user:
+        return Response({'msg':'error','info': "Username shouldn't contain space"},status=status.HTTP_400_BAD_REQUEST)
 
     user_exists = Account.objects.filter(username=user).first()
     if user_exists:
