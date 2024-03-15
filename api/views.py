@@ -148,17 +148,11 @@ def register(request):
     if check_sms == "Wrong":
         return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
 
-    # Setup collection
-    def get_collection_name(username, country, collection_id = 0):
-        collection_name = country + username[0].lower() + str(collection_id)
-        collection_name = get_or_create_collection("c9dfbcd2-8140-4f24-ac3e-50195f651754", "db0", collection_name)
-        return collection_name
-
     #Main data attributes for signup database
     data = {
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
         "db_name": "db0",
-        "collection_name": get_collection_name(user, user_country),
+        "collection_name": "username_list",
         "operation": "fetch",
         "filters": {                   
             "Username": user
@@ -166,14 +160,22 @@ def register(request):
     }
 
     # Check for username
-    data["collection_name"]="username_list"
     user_query = datacube.datacube_data_retrieval(**data) 
-    user_list = json.loads(data['data'])
+    user_list = json.loads(user_query['data'])
     if (len(user_list) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
-    
+
     #Add username in policy model
     register_legal_policy(user)
+
+    # Setup collection
+    def get_collection_name(username, country, collection_id = 0):
+        collection_name = country + username[0].lower() + str(collection_id)
+        collection_name = get_or_create_collection("c9dfbcd2-8140-4f24-ac3e-50195f651754", "db0", collection_name)
+        return collection_name
+
+    #Chnage collection value of main data attribute to user's collection
+    data["collection_name"]=get_collection_name(user,user_country)
 
     #Even ID of user
     event_id = None
@@ -184,14 +186,14 @@ def register(request):
         pass
 
     #Info of user to be inserted
-    field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
+    field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
 
     #Putting insert values in database attribute 
     data["operation"]="insert"
     data["data"]={"info":field}
 
     #Inserting data to signup database as per their collection name
-    user_json = requests.post("https://datacube.uxlivinglab.online/db_api/crud/", json=data)
+    user_json=datacube.datacube_data_insertion(**data)
     user = json.loads(user_json)
     inserted_id = user['inserted_id']
 
