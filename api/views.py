@@ -153,16 +153,17 @@ def register(request):
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
         "db_name": "db0",
         "collection_name": "username_list",
-        "operation": "fetch",
         "filters": {                   
-            "Username": user
+            "info":{"Username": user}
         },
+        "payment":False
     }
 
     # Check for username
     user_query = datacube.datacube_data_retrieval(**data) 
-    user_list = json.loads(user_query['data'])
-    if (len(user_list) > 0):
+    print(user_query)
+    user_list = json.loads(user_query)
+    if (len(user_list["data"]) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
 
     #Add username in policy model
@@ -174,8 +175,8 @@ def register(request):
         collection_name = get_or_create_collection("c9dfbcd2-8140-4f24-ac3e-50195f651754", "db0", collection_name)
         return collection_name
 
-    #Chnage collection value of main data attribute to user's collection
-    data["collection_name"]=get_collection_name(user,user_country)
+    data["data"]={"info":{"Username":user}}
+    username_updation=datacube.datacube_data_insertion(**data)
 
     #Even ID of user
     event_id = None
@@ -188,14 +189,16 @@ def register(request):
     #Info of user to be inserted
     field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
 
-    #Putting insert values in database attribute 
-    data["operation"]="insert"
+    #Chnage collection value of main data attribute to user's collection
+    data["collection_name"]=get_collection_name(user,user_country)
+
+    #Putting main data values in database attribute 
     data["data"]={"info":field}
 
     #Inserting data to signup database as per their collection name
     user_json=datacube.datacube_data_insertion(**data)
-    user = json.loads(user_json)
-    inserted_id = user['inserted_id']
+    user_json1 = json.loads(user_json)
+    inserted_id = user_json1["data"]['inserted_id']
 
     #Signup COnfirmation Mail
     url = "https://100085.pythonanywhere.com/api/signup-feedback/"
@@ -2650,7 +2653,7 @@ def audio_api(request):
         user_audio_file = sr.AudioFile(path)
         with user_audio_file as source:
             user_audio = r.record(source)
-        check = r.recognize_google(user_auido)
+        check = r.recognize_google(user_audio)
         if data == check:
             is_authenticated = True 
         break

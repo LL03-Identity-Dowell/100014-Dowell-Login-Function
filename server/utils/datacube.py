@@ -2,7 +2,7 @@ import json
 import requests
 
 
-def datacube_data_insertion(api_key, db_name, collection_name, data):
+def datacube_data_insertion(api_key, db_name, collection_name, data,filters=None,payment=None):
     """
     Insert data into a collection in the DataCube database.
 
@@ -27,7 +27,7 @@ def datacube_data_insertion(api_key, db_name, collection_name, data):
     return response.text
 
 
-def datacube_data_retrieval(api_key, db_name, collection_name, filters, limit, offset, payment):
+def datacube_data_retrieval(api_key, db_name, collection_name, filters,payment, limit=None, offset=None):
     """
     Retrieve data from a collection in the DataCube database.
 
@@ -47,9 +47,9 @@ def datacube_data_retrieval(api_key, db_name, collection_name, filters, limit, o
         "db_name": db_name,
         "coll_name": collection_name,
         "operation": "fetch",
-        "filters": "filters",
-        "limit": limit,
-        "offset": offset,
+        "filters": filters,
+        # "limit": limit,
+        # "offset": offset,
         "payment": payment
     }
 
