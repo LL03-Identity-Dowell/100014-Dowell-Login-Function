@@ -1360,14 +1360,33 @@ def email_otp(request):
     except:
         pass
 
+    # Datacube config 
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "username_list",
+        "filters": {                   
+            "info":{"Username": username}
+        },
+        "payment":False
+    }
+
     # Send OTP
     if email and usage:
         otp = generateOTP()
         if usage == "forgot_username":
-            user_qs = Account.objects.filter(email=email)
-            email_qs = GuestAccount.objects.filter(email=email).first()
-            if user_qs.exists():
-                if email_qs:
+            # user_qs = Account.objects.filter(email=email)
+            # Check for username
+            user_query = datacube.datacube_data_retrieval(**data) 
+            user_list = json.loads(user_query)
+            # email_qs = GuestAccount.objects.filter(email=email).first()
+            data['collection_name'] = 'email_otp';
+            email_query = datacube.datacube_data_retrieval(**data)
+            email_list = json.loads(email_query)
+            if (len(user_list["data"]) > 0): # username exists 
+                if len(email_list['data'] > 0): # email exists
+                    insert_data = data.copy()
+                    insert_data['operation'] = 'insert'
                     email_qs.otp = otp
                     email_qs.save(update_fields=['otp'])
                     for_html_msg = "recover username"
