@@ -185,8 +185,17 @@ def register(request):
     except:
         pass
 
+    # try:
+    #     final_ltime = parser.parse(ltime).strftime('%d %b %Y %H:%M:%S')
+    #     dowell_time = time.strftime(
+    #         "%d %b %Y %H:%M:%S", time.gmtime(dowellclock()+1609459200))
+    # except:
+    #     final_ltime = ''
+    #     dowell_time = ''
+    serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+
     #Info of user to be inserted
-    field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
+    field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"joined_serverclock":serverclock}
 
     #Change collection value of main data attribute to user's collection
     data["collection_name"]=get_collection_name(user,user_country)
@@ -876,10 +885,9 @@ def forgot_password(request):
     print(str(otp_input)+"  "+str(new_password))
     if new_password != confirm_password:
         return Response({'msg':'error','info': 'Passwords not matching'},status=status.HTTP_400_BAD_REQUEST)
-    want="no"
 
     # Send OTP
-    if username and email and not otp_input and not want:
+    if username and email and not otp_input :
         otp = generateOTP()
         message = get_html_msg(username, otp, 'reset password')
 
