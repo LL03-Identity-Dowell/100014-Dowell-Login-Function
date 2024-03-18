@@ -1392,7 +1392,7 @@ def email_otp(request):
             email_query = datacube.datacube_data_retrieval(**data)
             email_list = json.loads(email_query)
             if (len(user_list["data"]) > 0): # username exists 
-                if len(email_list['data'] > 0): # email exists
+                if len(email_list['data']) > 0: # email exists
                     insert_data = data.copy()
                     insert_data['operation'] = 'insert'
                     email_qs.otp = otp
@@ -1410,10 +1410,14 @@ def email_otp(request):
                 info = 'Email not associated with any user'
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "forgot_password":
-            user_qs = Account.objects.filter(email=email, username=username)
-            email_qs = GuestAccount.objects.filter(email=email).first()
-            if user_qs.exists():
-                if email_qs:
+            # user_qs = Account.objects.filter(email=email, username=username)
+            user_query = datacube.datacube_data_retrieval(**data) 
+            user_list = json.loads(user_query)
+            # email_qs = GuestAccount.objects.filter(email=email).first()
+            email_query = datacube.datacube_data_retrieval(**data)
+            email_list = json.loads(email_query)
+            if len(user_list['data']) > 0:
+                if len(email_list['data']) > 0:
                     GuestAccount.objects.filter(email=email).update(
                         otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
@@ -1429,11 +1433,15 @@ def email_otp(request):
                 info = 'Username, email combination is incorrect'
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "update_email":
-            user_qs = Account.objects.filter(
-                email=email, username=username).first()
-            email_qs = GuestAccount.objects.filter(email=email).first()
-            if not user_qs:
-                if email_qs:
+            #user_qs = Account.objects.filter(
+            #   email=email, username=username).first()
+            user_query = datacube.datacube_data_retrieval(**data) 
+            user_list = json.loads(user_query)
+            #email_qs = GuestAccount.objects.filter(email=email).first()
+            email_query = datacube.datacube_data_retrieval(**data)
+            email_list = json.loads(email_query)
+            if not (len(user_list['data']) > 0):
+                if len(email_list['data']) > 0:
                     GuestAccount.objects.filter(email=email).update(
                         otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
