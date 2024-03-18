@@ -161,7 +161,6 @@ def register(request):
 
     # Check for username
     user_query = datacube.datacube_data_retrieval(**data) 
-    print(user_query)
     user_list = json.loads(user_query)
     if (len(user_list["data"]) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
@@ -189,7 +188,7 @@ def register(request):
     #Info of user to be inserted
     field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
 
-    #Chnage collection value of main data attribute to user's collection
+    #Change collection value of main data attribute to user's collection
     data["collection_name"]=get_collection_name(user,user_country)
 
     #Putting main data values in database attribute 
