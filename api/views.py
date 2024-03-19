@@ -1422,8 +1422,15 @@ def email_otp(request):
             email_list = json.loads(email_query)
             if len(user_list['data']) > 0:
                 if len(email_list['data']) > 0:
-                    GuestAccount.objects.filter(email=email).update(
-                        otp=otp, expiry=datetime.datetime.utcnow(), username=username)
+                    username = user_list[0]['Username']
+                    email = email_list[0]['email']
+                    update_data = data.copy()
+                    update_data.pop('filters')
+                    update_data.pop('payment')
+                    update_data['query'] = {'email': email }
+                    update_data['update_data'] = {'otp': otp, 'expiry': datetime.datetime.utcnow(), username=username}
+                    #GuestAccount.objects.filter(email=email).update(
+                    #    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
                     guest_account = GuestAccount(
                         username = username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
