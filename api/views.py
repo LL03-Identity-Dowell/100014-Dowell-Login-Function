@@ -1382,16 +1382,39 @@ def email_otp(request):
     except:
         pass
 
+    # Datacube config 
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "username_list",
+        "filters": {                   
+            "info":{"Username": username}
+        },
+        "payment":False
+    }
+
     # Send OTP
     if email and usage:
         otp = generateOTP()
         if usage == "forgot_username":
-            user_qs = Account.objects.filter(email=email)
-            email_qs = GuestAccount.objects.filter(email=email).first()
-            if user_qs.exists():
-                if email_qs:
-                    email_qs.otp = otp
-                    email_qs.save(update_fields=['otp'])
+            # user_qs = Account.objects.filter(email=email)
+            # Check for username
+            user_query = datacube.datacube_data_retrieval(**data) 
+            user_list = json.loads(user_query)
+            # email_qs = GuestAccount.objects.filter(email=email).first()
+            data['collection_name'] = 'email_otp';
+            email_query = datacube.datacube_data_retrieval(**data)
+            email_list = json.loads(email_query)
+            if (len(user_list["data"]) > 0): # username exists 
+                if len(email_list['data']) > 0: # email exists
+                    insert_data = data.copy()
+                    insert_data.pop('filters')
+                    insert_data.pop('payment')
+                    insert_data['data'] = {'otp': otp}
+                    insert_data['payment'] = False
+                    inserted = datacube.datacube_data_insertion(**insert_data)
+                    #email_qs.otp = otp
+                    #email_qs.save(update_fields=['otp'])
                     for_html_msg = "recover username"
                     subject = "Your otp for recovering username of Dowell account"
                     msg = 'success'
@@ -1405,10 +1428,14 @@ def email_otp(request):
                 info = 'Email not associated with any user'
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "forgot_password":
-            user_qs = Account.objects.filter(email=email, username=username)
-            email_qs = GuestAccount.objects.filter(email=email).first()
-            if user_qs.exists():
-                if email_qs:
+            # user_qs = Account.objects.filter(email=email, username=username)
+            user_query = datacube.datacube_data_retrieval(**data) 
+            user_list = json.loads(user_query)
+            # email_qs = GuestAccount.objects.filter(email=email).first()
+            email_query = datacube.datacube_data_retrieval(**data)
+            email_list = json.loads(email_query)
+            if len(user_list['data']) > 0:
+                if len(email_list['data']) > 0:
                     GuestAccount.objects.filter(email=email).update(
                         otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
@@ -1424,11 +1451,15 @@ def email_otp(request):
                 info = 'Username, email combination is incorrect'
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "update_email":
-            user_qs = Account.objects.filter(
-                email=email, username=username).first()
-            email_qs = GuestAccount.objects.filter(email=email).first()
-            if not user_qs:
-                if email_qs:
+            #user_qs = Account.objects.filter(
+            #   email=email, username=username).first()
+            user_query = datacube.datacube_data_retrieval(**data) 
+            user_list = json.loads(user_query)
+            #email_qs = GuestAccount.objects.filter(email=email).first()
+            email_query = datacube.datacube_data_retrieval(**data)
+            email_list = json.loads(email_query)
+            if not (len(user_list['data']) > 0):
+                if len(email_list['data']) > 0:
                     GuestAccount.objects.filter(email=email).update(
                         otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
