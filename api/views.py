@@ -1394,9 +1394,13 @@ def email_otp(request):
             if (len(user_list["data"]) > 0): # username exists 
                 if len(email_list['data']) > 0: # email exists
                     insert_data = data.copy()
-                    insert_data['operation'] = 'insert'
-                    email_qs.otp = otp
-                    email_qs.save(update_fields=['otp'])
+                    insert_data.pop('filters')
+                    insert_data.pop('payment')
+                    insert_data['data'] = {'otp': otp}
+                    insert_data['payment'] = False
+                    inserted = datacube.datacube_data_insertion(**insert_data)
+                    #email_qs.otp = otp
+                    #email_qs.save(update_fields=['otp'])
                     for_html_msg = "recover username"
                     subject = "Your otp for recovering username of Dowell account"
                     msg = 'success'
