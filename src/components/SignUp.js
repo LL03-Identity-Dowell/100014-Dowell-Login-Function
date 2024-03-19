@@ -293,6 +293,7 @@ const SignUp = () => {
 
       // Determine the value of sms based on the exempted checkbox
       const smsValue = exempted ? null : getValues("sms");
+      const time = new Date();
       let formData = new FormData();
       formData.append("Profile_Image", Profile_Image);
       formData.append("Firstname", Firstname);
@@ -309,6 +310,7 @@ const SignUp = () => {
       formData.append("sms", smsValue);
       formData.append("policy_status", policy_status);
       formData.append("newsletter", newsletter);
+      formData.append("time", time);
 
       // Dispatch the registerUser action with the form data
       dispatch(registerUser(formData));
