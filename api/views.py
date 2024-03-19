@@ -108,21 +108,36 @@ def get_custom_session_data(session_id):
     return res_data.get('data')
 
 
-def get_or_create_collection(api_key, db_name, collection_name):
-    collections = datacube.datacube_collection_retrieval(api_key, db_name)
-    if collection_name in json.loads(collections):
+def get_or_create_collection(collection_name):
+
+    url = "https://datacube.uxlivinglab.online/db_api/collections/"
+    payload = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "payment": False
+    }
+    response = requests.get(url, json=payload)
+    collections=response.text
+
+    if collection_name in json.loads(collections)["data"]:
         return collection_name
-    collection = datacube.datacube_create_collection(api_key, db_name, collection_name)
+    
+    url="https://datacube.uxlivinglab.online/db_api/add_collection/"
+    del payload["payment"]
+    payload["coll_names"]=collection_name
+    payload["num_collections"]=1
+    collection = requests.post(url, json=payload)
     return collection_name
 
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 @api_view(["POST"])
-def register(request):
+def register(request): 
+    start=datetime.datetime.now()
     user = request.data["Username"]
     otp_input = request.data.get("otp")
     sms_input=request.data.get("sms")
-    image = request.FILES.get("Profile_Image")
+    image = request.data.get("Profile_Image")
     password = request.data.get("Password")
     first = request.data.get("Firstname")
     last = request.data.get("Lastname")
@@ -148,11 +163,13 @@ def register(request):
     if check_sms == "Wrong":
         return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
 
+    url = "https://datacube.uxlivinglab.online/db_api/get_data/"
     #Main data attributes for signup database
     data = {
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "operation": "fetch",
         "db_name": "db0",
-        "collection_name": "username_list",
+        "coll_name": "username_list",
         "filters": {                   
             "info":{"Username": user}
         },
@@ -160,8 +177,8 @@ def register(request):
     }
 
     # Check for username
-    user_query = datacube.datacube_data_retrieval(**data) 
-    user_list = json.loads(user_query)
+    user_query = requests.post(url,json=data) 
+    user_list = json.loads(user_query.text)
     if (len(user_list["data"]) > 0):
         return Response({'msg':'error','info': 'Username already taken'},status=status.HTTP_400_BAD_REQUEST)
 
@@ -169,13 +186,9 @@ def register(request):
     register_legal_policy(user)
 
     # Setup collection
-    def get_collection_name(username, country, collection_id = 0):
-        collection_name = country + username[0].lower() + str(collection_id)
-        collection_name = get_or_create_collection("c9dfbcd2-8140-4f24-ac3e-50195f651754", "db0", collection_name)
-        return collection_name
-
+    url="https://datacube.uxlivinglab.online/db_api/crud/"
+    data["operation"]="insert"
     data["data"]={"info":{"Username":user}}
-    username_updation=datacube.datacube_data_insertion(**data)
 
     #Even ID of user
     event_id = None
@@ -198,14 +211,15 @@ def register(request):
     field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"joined_serverclock":serverclock}
 
     #Change collection value of main data attribute to user's collection
-    data["collection_name"]=get_collection_name(user,user_country)
+    collection_name=f'{user_country}_{user[0].upper()}_0'
+    data["coll_name"] = get_or_create_collection(collection_name)
 
     #Putting main data values in database attribute 
     data["data"]={"info":field}
 
     #Inserting data to signup database as per their collection name
-    user_json=datacube.datacube_data_insertion(**data)
-    user_json1 = json.loads(user_json)
+    user_json=requests.post(url,json=data)
+    user_json1 = json.loads(user_json.text)
     inserted_id = user_json1["data"]['inserted_id']
 
     #Signup COnfirmation Mail
