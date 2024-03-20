@@ -893,68 +893,51 @@ def get_country_codes(request):
 
 @api_view(['POST'])
 def forgot_password(request):
+
     username = request.data.get('username', None)
     email = request.data.get('email', None)
     otp_input = request.data.get('otp', None)
     new_password = request.data.get('new_password', None)
     confirm_password = request.data.get('confirm_password', None)
-    print(str(otp_input)+"  "+str(new_password))
+    
     if new_password != confirm_password:
         return Response({'msg':'error','info': 'Passwords not matching'},status=status.HTTP_400_BAD_REQUEST)
 
-    # Send OTP
-    if username and email and not otp_input :
-        otp = generateOTP()
-        message = get_html_msg(username, otp, 'reset password')
+    data_all_passwords={
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "operation": "insert",
+        "db_name": "db0",
+        "coll_name": "all_passwords",
+        "data": {                   
+            "info":{"Username": username,"Email":email,"date":datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'),"Password":dowell_hash.dowell_hash(new_password)}
+        },
+        "payment":False
+    }
 
-        user_qs = Account.objects.filter(email=email, username=username)
-        email_qs = GuestAccount.objects.filter(email=email)
+    try:
+        guest = GuestAccount.objects.get(
+            otp=otp_input, email=email)
+    except GuestAccount.DoesNotExist:
+        guest = None
 
-        def send_otp(): return send_mail(
-            'Your otp for reseting password of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
-
-        if user_qs.exists():
-            if email_qs.exists():
-                GuestAccount.objects.filter(email=email).update(
-                    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
-                send_otp()
-                return Response({'msg':'success','info': 'OTP sent successfully'})
-            else:
-                guest_account = GuestAccount(
-                    username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
-                guest_account.save()
-                send_otp()
-                return Response({'msg': 'success','info':'OTP sent successfully'},status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'msg':'error','info': 'Username, email combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
-
-    # Create new password
-    elif username and email and otp_input and new_password:
-        try:
-            guest = GuestAccount.objects.get(
-                otp=otp_input, email=email)
-        except GuestAccount.DoesNotExist:
-            guest = None
-
-        if guest is not None:
-            acct = Account.objects.filter(
-                email=email, username=username).first()
-            acct.set_password(new_password)
-            acct.save()
-            fields = {'Username': username, 'Email': email}
-            user_json = dowellconnection(
-                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
-            user = json.loads(user_json)
-            if len(user['data']) >= 1:
-                update_fields = {
-                    'Password': dowell_hash.dowell_hash(new_password)}
-                dowellconnection(
-                    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
-                return Response({'msg':'success','info':'Password reset successfully'})
-        else:
-            return Response({'msg':'error','info': 'Wrong OTP'},status=status.HTTP_400_BAD_REQUEST)
+    if guest is not None:
+        acct = Account.objects.filter(
+            email=email, username=username).first()
+        old_pw=acct.password
+        acct.set_password(new_password)
+        acct.save()
+        fields = {'Username': username, 'Email': email}
+        update_fields = {
+            'Password': dowell_hash.dowell_hash(new_password)}
+        dowellconnection(
+            "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
+        
+        if old_pw != acct.password:
+            requests.post(url="https://datacube.uxlivinglab.online/db_api/crud/",json=data_all_passwords)
+        return Response({'msg':'success','info':'Password reset successfully'})
     else:
-        return Response({'msg':'error','info':"Request must have 'username' and 'email' for getting otp and then 'otp' and new password for changing otp. "},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg':'error','info': 'Wrong OTP'},status=status.HTTP_400_BAD_REQUEST)
+
     return Response({'info': 'Something went wrong'},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
