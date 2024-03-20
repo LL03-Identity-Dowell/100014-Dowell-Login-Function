@@ -188,7 +188,7 @@ def register(request):
     # Setup collection
     url="https://datacube.uxlivinglab.online/db_api/crud/"
     data["operation"]="insert"
-    data["data"]={"info":{"Username":user}}
+    data["data"]={"info":{"Username":user,"Email":email}}
 
     #Even ID of user
     event_id = None
