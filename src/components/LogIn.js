@@ -61,6 +61,10 @@ const LogIn = ({ setSelectedTab, timer, setTimer }) => {
       const { username, password } = e.target.elements;
       // update the username state
       setUsername(username.value);
+      if (!username.value && !password.value) {
+        toast.error("Please fill all credentials!");
+        return;
+      }
 
       const userData = {
         username: username.value,
