@@ -2,10 +2,10 @@ import React from "react";
 import Iframe from "react-iframe";
 import { Radio } from "react-loader-spinner";
 import { useSelector } from "react-redux";
-
+import { useState } from "react";
 const Policy = () => {
   const { initSession, isLoading } = useSelector((state) => state.init);
-
+  const [policyLoading, setPolicyLoading] = useState(true);
   const getIframeURL = () => {
     const randomSession = initSession.random_session;
     const baseURL =
@@ -19,6 +19,14 @@ const Policy = () => {
       <h2 className="font-semibold text-lg text-white bg-green-500 px-6 py-1 rounded-3xl">
         Legal, Privacy, Safety, Security Policies
       </h2>
+      {policyLoading && (
+        <div className="policyFrameSpinner iframespinner">
+          {" "}
+          <div className="box" style={{ width: "50px", height: "50px" }}>
+            {" "}
+          </div>
+        </div>
+      )}
       {isLoading ? (
         <Radio
           visible={true}
@@ -37,6 +45,9 @@ const Policy = () => {
           display="initial"
           position="relative"
           scrolling="yes"
+          onLoad={() => {
+            setPolicyLoading(false);
+          }}
         />
       )}
     </div>
