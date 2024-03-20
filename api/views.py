@@ -1543,6 +1543,16 @@ def mobilesms(request):
     phonecode = request.data.get("phonecode")
     phone = request.data.get("Phone")
     sms = generateOTP()
+    
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "mobile_sms",
+        "filters": {                   
+            "info":{"phone": phone}
+        },
+        "payment":False
+    }
 
     full_number ="+" + str(phonecode) + str(phone)
     time = datetime.datetime.utcnow()
@@ -1550,15 +1560,32 @@ def mobilesms(request):
     if full_number == "+251912912144":
         sms="123456"
     try:
-        phone_exists = mobile_sms.objects.get(phone=full_number)
+        phone_query = datacube.datacube_data_retrieval(**data)
+        phone_list = json.loads(phone_query)
+        phone_exists = len(phone_list) > 0
+        if not phone_exists:
+            raise mobile_sms.DoesNotExist
+        #phone_exists = mobile_sms.objects.get(phone=full_number)
     except mobile_sms.DoesNotExist:
         phone_exists = None
     if phone_exists is not None:
-        mobile_sms.objects.filter(
-            phone=full_number).update(sms=sms, expiry=time)
+        update_config = data.copy()
+        update_config.pop('filters')
+        update_config.pop('payment')
+        update_config['query'] = {'phone': full_number }
+        update_config['update_data'] = {'sms': sms, 'expiry': time}
+        datacube.datacube_data_update(**update_config)
+        #mobile_sms.objects.filter(
+        #    phone=full_number).update(sms=sms, expiry=time)
     else:
-        mobile_sms.objects.create(
-            phone=full_number, sms=sms, expiry=time)
+        insert_config = data.copy()
+        insert_config.pop('filters')
+        insert_config.pop('payment')
+        insert_config['data'] = {'phone': phone, 'sms': sms, 'expiry': time}
+        insert_config['payment'] = False
+        datacube.datacube_data_insertion(**insert_config)
+        #mobile_sms.objects.create(
+        #       phone=full_number, sms=sms, expiry=time)
     url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
     payload = {
         "sender" : "DowellLogin",
