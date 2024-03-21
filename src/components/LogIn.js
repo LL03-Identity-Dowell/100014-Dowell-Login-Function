@@ -10,6 +10,7 @@ import { getOperatingSystem, getDeviceType } from "../utils/deviceUtils";
 import LanguageDropdown from "./LanguageDropdown";
 import Coordinate from "../utils/Coordinate";
 import Timer from "../assets/images/count_up.gif";
+import { reset } from "../redux/loginSlice";
 const LogIn = ({ setSelectedTab, timer, setTimer }) => {
   console.log("🚀 ~ LogIn ~ setTimer:", setTimer);
   const [userLanguage, setUserLanguage] = useState("en");
@@ -128,7 +129,8 @@ const LogIn = ({ setSelectedTab, timer, setTimer }) => {
     } else {
       toast.error(error);
     }
-  }, [userInfo, error]);
+    dispatch(reset());
+  }, [userInfo, error, dispatch]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
