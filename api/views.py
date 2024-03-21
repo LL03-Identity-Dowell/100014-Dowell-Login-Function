@@ -121,7 +121,7 @@ def get_or_create_collection(collection_name):
     response = requests.get(url, json=payload)
     collections=response.text
 
-    if collection_name in json.loads(collections)["data"]:
+    if collection_name in json.loads(collections)["data"][0]:
         return collection_name
 
     url="https://datacube.uxlivinglab.online/db_api/add_collection/"
@@ -173,7 +173,7 @@ def register(request):
         "db_name": "db0",
         "coll_name": "username_list",
         "filters": {
-            "info": {"Username": user}
+            "info": {"Username": user,"Email":email}
         },
         "payment": False
     }
@@ -1373,7 +1373,7 @@ def email_otp(request):
         "db_name": "db0",
         "collection_name": "username_list",
         "filters": {                   
-            "info":{"email": email}
+            "info":{"Email": email}
         },
         "payment":False
     }
@@ -1383,7 +1383,7 @@ def email_otp(request):
         "db_name": "db0",
         "collection_name": "email_otp",
         "filters": {                   
-            "info":{"email": email }
+            "email": email 
         },
         "payment":False
     }
@@ -1396,11 +1396,11 @@ def email_otp(request):
         insert_config['payment'] = False
         return datacube.datacube_data_insertion(**insert_config)
 
-    def update_email_otp(update_data):
+    def update_email_otp(update_data,id):
         update_config = email_data.copy()
         update_config.pop('filters')
         update_config.pop('payment')
-        update_config['query'] = {'email': email }
+        update_config['query'] = {'email': email , "_id":id}
         update_config['update_data'] = update_data 
         return datacube.datacube_data_update(**update_config)
 
@@ -1418,7 +1418,7 @@ def email_otp(request):
             if (len(user_list["data"]) > 0): # username exists 
                 if len(email_list['data']) > 0: # email exists
                     update_data = { 'otp': otp }
-                    update_email_otp(update_data)
+                    update_email_otp(update_data,email_list["data"][0]["_id"])
                     #email_qs.otp = otp
                     #email_qs.save(update_fields=['otp'])
                     for_html_msg = "recover username"
@@ -1435,6 +1435,7 @@ def email_otp(request):
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "forgot_password":
             # user_qs = Account.objects.filter(email=email, username=username)
+            data["filters"]["info"]={"Username":username,**data["filters"]["info"]}
             user_query = datacube.datacube_data_retrieval(**data) 
             user_list = json.loads(user_query)
             # email_qs = GuestAccount.objects.filter(email=email).first()
@@ -1442,13 +1443,13 @@ def email_otp(request):
             email_list = json.loads(email_query)
             if len(user_list['data']) > 0:
                 if len(email_list['data']) > 0:
-                    update_data = {'otp': otp, 'expiry': datetime.datetime.now(), 'username': username}
-                    update_email_otp(update_data)
+                    update_data = {'otp': otp, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'username': username}
+                    update_email_otp(update_data,email_list["data"][0]["_id"])
 
                     #GuestAccount.objects.filter(email=email).update(
                     #    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
-                    insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now(), 'otp': otp}
+                    insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
                     insert_email_otp(insert_data)
                     #guest_account = GuestAccount(
                     #   username = username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
@@ -1464,17 +1465,19 @@ def email_otp(request):
         elif usage == "update_email":
             #user_qs = Account.objects.filter(
             #   email=email, username=username).first()
+            data["filters"]["info"]={"Username":username,**data["filters"]["info"]}
             user_query = datacube.datacube_data_retrieval(**data) 
             user_list = json.loads(user_query)
             #email_qs = GuestAccount.objects.filter(email=email).first()
             email_query = datacube.datacube_data_retrieval(**email_data)
             email_list = json.loads(email_query)
+            # return Response(user_list)
             if not (len(user_list['data']) > 0):
                 if len(email_list['data']) > 0:
-                    update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.utcnow(), 'otp': otp}
-                    update_email_otp(update_data)
+                    update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
+                    update_email_otp(update_data,email_list["data"][0]["_id"])
                 else:
-                    insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.utcnow(), 'otp': otp}
+                    insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
                     insert_email_otp(insert_data)
                     #guest_account = GuestAccount(
                     #    username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
@@ -1490,25 +1493,15 @@ def email_otp(request):
         elif usage == "create_account":
             for_html_msg = "use this email for creation"
             subject = "Your otp for creating dowell account"
-            try:
-                email_query = datacube.datacube_data_retrieval(**email_data)
-                email_list = json.loads(email_query)
-                email_exists = len(email_list) > 0
-                if not email_exists:
-                    raise Exception('email does not exist')
-                # emailexist = GuestAccount.objects.get(email=email)
-            except Exception:
-                emailexist = None
-            if emailexist is not None:
-                update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now(), 'otp': otp}
-                update_email_otp(update_data)
-                #GuestAccount.objects.filter(email=email).update(
-                #    otp=otp, expiry=datetime.datetime.now(), username=username)
+            email_query = datacube.datacube_data_retrieval(**email_data)
+            email_list = json.loads(email_query)
+            if len(email_list["data"]) > 0:
+                update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
+                update_email_otp(update_data,email_list["data"][0]["_id"])
             else:
-                insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now(), 'otp': otp}
+                insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
                 insert_email_otp(insert_data)
-                #data = GuestAccount(username=username, email=email, otp=otp)
-                #data.save()
+
             url = "https://100085.pythonanywhere.com/api/signUp-otp-verification/"
             payload = json.dumps({
                 "toEmail": email,

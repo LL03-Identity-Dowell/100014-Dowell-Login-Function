@@ -57,7 +57,7 @@ def datacube_data_retrieval(api_key, db_name, collection_name, filters,payment, 
     return response.text
 
 
-def datacube_data_update(api_key, db_name, coll_name, query, update_data):
+def datacube_data_update(api_key, db_name, collection_name, query, update_data):
     """
     Update data in a collection in the DataCube database.
 
@@ -73,7 +73,7 @@ def datacube_data_update(api_key, db_name, coll_name, query, update_data):
     payload = {
         "api_key": api_key,
         "db_name": db_name,
-        "coll_name": coll_name,
+        "coll_name": collection_name,
         "operation": "update",
         "query": query,
         "update_data": update_data,
