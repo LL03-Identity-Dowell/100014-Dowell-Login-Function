@@ -902,6 +902,11 @@ def forgot_password(request):
     
     if new_password != confirm_password:
         return Response({'msg':'error','info': 'Passwords not matching'},status=status.HTTP_400_BAD_REQUEST)
+    
+    # Setup collection
+    def get_collection_name(username, country, collection_id = 0):
+        collection_name = country + username[0].lower() + str(collection_id)
+        return collection_name
 
     data_all_passwords={
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
@@ -913,26 +918,67 @@ def forgot_password(request):
         },
         "payment":False
     }
+    
+    # Datacube user_list config 
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": 'user_list',
+        "filters": {                   
+            "info":{"email": email, 'username': username}
+        },
+        "payment":False
+    }
+    # Datacube email_otp config
+    email_data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "email_otp",
+        "filters": {                   
+            "info":{"email": email, 'otp': otp_input }
+        },
+        "payment":False
+    }
+
+    def update_user(update_data):
+        update_config = data.copy()
+        update_config.pop('filters')
+        update_config.pop('payment')
+        update_config['query'] = {'email': email, 'username': username }
+        update_config['update_data'] = update_data 
+        return datacube.datacube_data_update(**update_config)
 
     try:
-        guest = GuestAccount.objects.get(
-            otp=otp_input, email=email)
+        guest_query = datacube.datacube_data_retrieval(**email_data)
+        guest_list = json.loads(guest_query)
+        if len(guest_list) > 0:
+            guest = guest_list[0]
+        else:
+            raise GuestAccount.DoesNotExist
+        #guest = GuestAccount.objects.get(
+        #    otp=otp_input, email=email)
     except GuestAccount.DoesNotExist:
         guest = None
 
     if guest is not None:
-        acct = Account.objects.filter(
-            email=email, username=username).first()
-        old_pw=acct.password
-        acct.set_password(new_password)
-        acct.save()
+        acct_query = datacube.datacube_data_retrieval(**data)
+        acct_list = json.loads(acct_query)
+        if len(acct_list) > 0:
+            acct = acct_list[0]
+            old_password = acct['password']
+        #acct = Account.objects.filter(
+        #    email=email, username=username).first()
+        #old_pw = acct.password
+        #acct.set_password(new_password)
+        #acct.save()
         fields = {'Username': username, 'Email': email}
         update_fields = {
             'Password': dowell_hash.dowell_hash(new_password)}
-        dowellconnection(
-            "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
+        update_user(update_fields)
+        #dowellconnection(
+        #    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
         
-        if old_pw != acct.password:
+        if old_password != update_fields['Password']:
             requests.post(url="https://datacube.uxlivinglab.online/db_api/crud/",json=data_all_passwords)
         return Response({'msg':'success','info':'Password reset successfully'})
     else:
