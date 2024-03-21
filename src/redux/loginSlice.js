@@ -127,7 +127,11 @@ const loginSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    reset: (state) => {
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(loginUser.pending, (state) => {
@@ -169,4 +173,5 @@ const loginSlice = createSlice({
   },
 });
 
+export const { reset } = loginSlice.actions;
 export default loginSlice.reducer;
