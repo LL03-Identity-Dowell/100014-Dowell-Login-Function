@@ -11,8 +11,8 @@ import jwt
 import numpy as np
 try:
     import face_recognition
-except:
-    pass 
+except ImportError:
+    pass
 
 from django.shortcuts import render
 from django.core.files.base import ContentFile
@@ -42,20 +42,21 @@ from PIL import Image
 from loginapp.views import country_city_name, get_html_msg
 from loginapp.models import (
   CustomSession, 
-  Account, 
-  LiveStatus, 
-  GuestAccount, 
-  mobile_sms, 
-  QR_Creation, 
-  RandomSession, 
-  Linkbased_RandomSession, 
+  Account,
+  LiveStatus,
+  GuestAccount,
+  mobile_sms,
+  QR_Creation,
+  RandomSession,
+  Linkbased_RandomSession,
   Location_check,
   Face_Login,
   Live_QR_Status,
   Live_Public_Status
 )
 
-from server.utils.dowell_func import generateOTP, dowellconnection, dowellclock, get_next_pro_id, decrypt_message
+from server.utils.dowell_func import (generateOTP, dowellconnection,
+                                      dowellclock, get_next_pro_id, decrypt_message)
 from server.utils import dowell_hash
 from server.utils.event_function import create_event
 from server.utils import qrcodegen
@@ -64,7 +65,8 @@ from server.utils import datacube
 from api.serializers import UserSerializer
 from core.settings import STATIC_ROOT
 
-dpass="d0wellre$tp@$$"
+dpass = "d0wellre$tp@$$"
+
 
 def get_html_msg_new(username, otp, purpose):
     return f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to {purpose} of dowell account <br><h2>Your OTP is <strong>{otp}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
@@ -121,7 +123,7 @@ def get_or_create_collection(collection_name):
 
     if collection_name in json.loads(collections)["data"]:
         return collection_name
-    
+
     url="https://datacube.uxlivinglab.online/db_api/add_collection/"
     del payload["payment"]
     payload["coll_names"]=collection_name
@@ -132,7 +134,7 @@ def get_or_create_collection(collection_name):
 @method_decorator(xframe_options_exempt, name='dispatch')
 @csrf_exempt
 @api_view(["POST"])
-def register(request): 
+def register(request):
     start=datetime.datetime.now()
     user = request.data["Username"]
     otp_input = request.data.get("otp")
@@ -170,10 +172,10 @@ def register(request):
         "operation": "fetch",
         "db_name": "db0",
         "coll_name": "username_list",
-        "filters": {                   
-            "info":{"Username": user}
+        "filters": {
+            "info": {"Username": user}
         },
-        "payment":False
+        "payment": False
     }
 
     # Check for username
@@ -1371,7 +1373,7 @@ def email_otp(request):
         "db_name": "db0",
         "collection_name": "username_list",
         "filters": {                   
-            "info":{"Username": username}
+            "info":{"email": email}
         },
         "payment":False
     }
@@ -1381,7 +1383,7 @@ def email_otp(request):
         "db_name": "db0",
         "collection_name": "email_otp",
         "filters": {                   
-            "info":{"Username": username}
+            "info":{"email": email }
         },
         "payment":False
     }
@@ -1399,7 +1401,7 @@ def email_otp(request):
         update_config.pop('filters')
         update_config.pop('payment')
         update_config['query'] = {'email': email }
-        update_config['update_data'] = update_data     
+        update_config['update_data'] = update_data 
         return datacube.datacube_data_update(**update_config)
 
     # Send OTP
@@ -1440,16 +1442,13 @@ def email_otp(request):
             email_list = json.loads(email_query)
             if len(user_list['data']) > 0:
                 if len(email_list['data']) > 0:
-                    update_data = data.copy()
-                    update_data.pop('filters')
-                    update_data.pop('payment')
-                    update_data['query'] = {'email': email }
-                    update_data['update_data'] = {'otp': otp, 'expiry': datetime.datetime.utcnow(), 'username': username}
-                    updated_data = datacube.datacube_data_update(**update_data)
+                    update_data = {'otp': otp, 'expiry': datetime.datetime.now(), 'username': username}
+                    update_email_otp(update_data)
+
                     #GuestAccount.objects.filter(email=email).update(
                     #    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
-                    insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.utcnow(), 'otp': otp}
+                    insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now(), 'otp': otp}
                     insert_email_otp(insert_data)
                     #guest_account = GuestAccount(
                     #   username = username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
@@ -1501,12 +1500,12 @@ def email_otp(request):
             except Exception:
                 emailexist = None
             if emailexist is not None:
-                update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.utcnow(), 'otp': otp}
+                update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now(), 'otp': otp}
                 update_email_otp(update_data)
                 #GuestAccount.objects.filter(email=email).update(
                 #    otp=otp, expiry=datetime.datetime.now(), username=username)
             else:
-                insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.utcnow(), 'otp': otp}
+                insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now(), 'otp': otp}
                 insert_email_otp(insert_data)
                 #data = GuestAccount(username=username, email=email, otp=otp)
                 #data.save()
@@ -1544,6 +1543,16 @@ def mobilesms(request):
     phonecode = request.data.get("phonecode")
     phone = request.data.get("Phone")
     sms = generateOTP()
+    
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "mobile_sms",
+        "filters": {                   
+            "info":{"phone": phone}
+        },
+        "payment":False
+    }
 
     full_number ="+" + str(phonecode) + str(phone)
     time = datetime.datetime.utcnow()
@@ -1551,15 +1560,32 @@ def mobilesms(request):
     if full_number == "+251912912144":
         sms="123456"
     try:
-        phone_exists = mobile_sms.objects.get(phone=full_number)
+        phone_query = datacube.datacube_data_retrieval(**data)
+        phone_list = json.loads(phone_query)
+        phone_exists = len(phone_list) > 0
+        if not phone_exists:
+            raise mobile_sms.DoesNotExist
+        #phone_exists = mobile_sms.objects.get(phone=full_number)
     except mobile_sms.DoesNotExist:
         phone_exists = None
     if phone_exists is not None:
-        mobile_sms.objects.filter(
-            phone=full_number).update(sms=sms, expiry=time)
+        update_config = data.copy()
+        update_config.pop('filters')
+        update_config.pop('payment')
+        update_config['query'] = {'phone': full_number }
+        update_config['update_data'] = {'sms': sms, 'expiry': time}
+        datacube.datacube_data_update(**update_config)
+        #mobile_sms.objects.filter(
+        #    phone=full_number).update(sms=sms, expiry=time)
     else:
-        mobile_sms.objects.create(
-            phone=full_number, sms=sms, expiry=time)
+        insert_config = data.copy()
+        insert_config.pop('filters')
+        insert_config.pop('payment')
+        insert_config['data'] = {'phone': phone, 'sms': sms, 'expiry': time}
+        insert_config['payment'] = False
+        datacube.datacube_data_insertion(**insert_config)
+        #mobile_sms.objects.create(
+        #       phone=full_number, sms=sms, expiry=time)
     url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
     payload = {
         "sender" : "DowellLogin",
