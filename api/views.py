@@ -990,22 +990,60 @@ def forgot_password(request):
 def forgot_username(request):
     email = request.data.get('email', None)
     otp_input = request.data.get('otp', None)
+    
+    # Datacube user_list config 
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": 'user_list',
+        "filters": {                   
+            "info":{"email": email}
+        },
+        "payment":False
+    }
+
+    email_data = data.copy()
+    email_data['collection_name'] = 'email_otp'
+    
+    def insert_email_otp(insert_data):
+        insert_config = email_data.copy()
+        insert_config.pop('filters')
+        insert_config.pop('payment')
+        insert_config['data'] = insert_data
+        insert_config['payment'] = False
+        return datacube.datacube_data_insertion(**insert_config)
+
+    def update_email_otp(update_data,id):
+        update_config = email_data.copy()
+        update_config.pop('filters')
+        update_config.pop('payment')
+        update_config['query'] = {'email': email , "_id":id}
+        update_config['update_data'] = update_data 
+        return datacube.datacube_data_update(**update_config)
 
     # Send OTP
     if email and not otp_input:
         otp = generateOTP()
         message = get_html_msg('User', otp , 'recover username')
 
-        user_qs = Account.objects.filter(email=email)
-        email_qs = GuestAccount.objects.filter(email=email)
+        #user_qs = Account.objects.filter(email=email)
+        #email_qs = GuestAccount.objects.filter(email=email)
+        user_query = datacube.datacube_data_retrieval(**data)
+        user_list = json.loads(user_query)
+        user_exists = len(user_list) > 0
+        email_query = datacube.datacube_data_retrieval(**email_data)
+        email_list = json.loads(email_query)
+        email_exists = len(email_list) > 0
 
         def send_otp(): return send_mail(
             'Your otp for recovering username of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
 
-        if user_qs.exists():
-            if email_qs.exists():
-                GuestAccount.objects.filter(email=email).update(
-                    otp=otp, expiry=datetime.datetime.utcnow())
+        if user_exists:
+            if email_exists:
+                update_data = {'otp': otp, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'username': username}
+                update_email_otp(update_data,email_list["data"][0]["_id"])
+                #GuestAccount.objects.filter(email=email).update(
+                #    otp=otp, expiry=datetime.datetime.utcnow())
                 send_otp()
                 return Response({'msg':'success','info': 'OTP sent successfully'})
             else:
@@ -1016,19 +1054,29 @@ def forgot_username(request):
     # Create new password
     elif email and otp_input:
         try:
-            guest = GuestAccount.objects.filter(
-                otp=otp_input, email=email)
+            email_d = email_data.copy()
+            email_d['filters'] = {
+                'info': {'email': email, 'otp': otp_input}
+            }
+            guest_query = datacube.datacube_data_retrieval(**email_d)
+            guest_list = json.loads(guest_list)
+            if not len(guest_list) > 0:
+                raise GuestAccount.DoesNotExist
+            #guest = GuestAccount.objects.filter(
+            #    otp=otp_input, email=email)
         except GuestAccount.DoesNotExist:
             guest = None
         if guest:
             fields = {'Email': email}
-            user_json = dowellconnection(
-                "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
+            #user_json = dowellconnection(
+            #    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
+            user_json = datacube.datacube_data_retrieval(**data)
             user = json.loads(user_json)
             username_list = []
             if len(user['data']) >= 1:
-                json_data = dowellconnection(
-                    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
+                #json_data = dowellconnection(
+                #    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
+                json_data = datacube.datacube_data_retrieval(**data)
                 data = json.loads(json_data)
                 if len(data['data']) >= 1:
                     for obj in data['data']:
