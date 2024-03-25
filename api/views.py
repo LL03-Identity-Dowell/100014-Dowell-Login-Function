@@ -902,6 +902,7 @@ def forgot_password(request):
     
     if new_password != confirm_password:
         return Response({'msg':'error','info': 'Passwords not matching'},status=status.HTTP_400_BAD_REQUEST)
+
     
     # Setup collection
     def get_collection_name(username, country, collection_id = 0):
