@@ -153,17 +153,35 @@ def register(request):
     newsletter = request.data.get('newsletter')
 
     #Email and SMS verification
-    try:
-        check_otp = GuestAccount.objects.filter(otp=otp_input, email=email)
-        check_sms= mobile_sms.objects.filter(sms=sms_input,phone="+"+str(phonecode) + str(phone))
-    except GuestAccount.DoesNotExist:
-        check_otp = None
-        check_sms = "Wrong"
 
-    if not check_otp:
+    email_data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "email_otp",
+        "filters": {                   
+            "email": email,"otp":otp_input
+        },
+        "payment":False
+    }
+    check_otp = datacube.datacube_data_retrieval(**email_data)
+    check_otp1 = json.loads(check_otp)
+    if len(check_otp1["data"]) <= 0:
         return Response({'msg':'error','info':'Wrong Email OTP'},status=status.HTTP_400_BAD_REQUEST)
-    if check_sms == "Wrong":
-        return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
+
+    if sms_input is not None:
+        sms_data = {
+            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "db_name": "db0",
+            "collection_name": "mobile_sms",
+            "filters": {                   
+                "phone": "+"+str(phonecode) + str(phone),"sms":sms_input
+            },
+            "payment":False
+        }
+        check_sms = datacube.datacube_data_retrieval(**sms_data)
+        check_sms1 = json.loads(check_sms)
+        if len(check_sms1["data"]) <= 0 and phone:
+            return Response({'msg':'error','info':'Wrong Mobile SMS'},status=status.HTTP_400_BAD_REQUEST)
 
     url = "https://datacube.uxlivinglab.online/db_api/get_data/"
     #Main data attributes for signup database
@@ -173,7 +191,7 @@ def register(request):
         "db_name": "db0",
         "coll_name": "username_list",
         "filters": {
-            "info": {"Username": user,"Email":email}
+            "Username": user
         },
         "payment": False
     }
@@ -190,7 +208,8 @@ def register(request):
     # Setup collection
     url="https://datacube.uxlivinglab.online/db_api/crud/"
     data["operation"]="insert"
-    data["data"]={"info":{"Username":user,"Email":email}}
+    data["data"]={"Username":user,"Email":email,"Country":user_country}
+    requests.post(url,json=data)
 
     #Even ID of user
     event_id = None
@@ -217,7 +236,7 @@ def register(request):
     data["coll_name"] = get_or_create_collection(collection_name)
 
     #Putting main data values in database attribute 
-    data["data"]={"info":field}
+    data["data"]=field
 
     #Inserting data to signup database as per their collection name
     user_json=requests.post(url,json=data)
@@ -226,7 +245,7 @@ def register(request):
 
     #Signup COnfirmation Mail
     url = "https://100085.pythonanywhere.com/api/signup-feedback/"
-    if not check_sms:
+    if not sms_input:
         verified_phone="unverified"
     else:
         verified_phone="verified"
@@ -600,25 +619,52 @@ def password_change(request):
     username = request.data.get("username")
     old_password = request.data.get("old_password")
     new_password = request.data.get("new_password")
-    obj = authenticate(request, username = username, password = old_password)
+
+    url = "https://datacube.uxlivinglab.online/db_api/get_data/"
+    data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "operation": "fetch",
+        "db_name": "db0",
+        "coll_name": "username_list",
+        "filters": {
+            "Username": username
+        },
+        "payment": False
+    }
+
+    # Check for username
+    user_query = requests.post(url,json=data) 
+    user_list = json.loads(user_query.text)
+    if (len(user_list["data"]) < 1):
+        return Response({'msg':'error','info': 'Username not found'},status=status.HTTP_400_BAD_REQUEST)
+
+    data["coll_name"]=f'{user_list["data"][0]["Country"]}_{username[0].upper()}_0'
+    data["filters"]["Password"]=dowell_hash.dowell_hash(old_password)
+    user_query = requests.post(url,json=data) 
+    user_list = json.loads(user_query.text)
+    if (len(user_list["data"]) < 1):
+        return Response({'msg':'error','info': 'Username, Password Combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
+    
+
     if None in [username,old_password,new_password]:
         response = {'msg':'error','info':'Please provide all fields'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
-    if obj is not None:
-        try:
-            obj.set_password(new_password)
-            obj.save()
-            field = {'Username':username}
-            up_field = {'Password':dowell_hash.dowell_hash(new_password)}
-            dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","update",field,up_field)
-            response = {'msg':'success','info':'Password Changed successfully..'}
-            return Response(response)
-        except Exception as e:
-            response = {'msg':'success','info':'Error','error':e}
-            return Response(response)
-    else:
-        response = {'msg':'success','info':'Username, Password combination incorrect'}
+
+    try:
+        update_config = data.copy()
+        update_config.pop('filters')
+        update_config.pop('payment')
+        update_config["collection_name"]=data["coll_name"]
+        update_config['query'] = {"Username": username , "Password":dowell_hash.dowell_hash(old_password),"_id":user_list["data"][0]["_id"]}
+        update_config['update_data'] = {"Password":dowell_hash.dowell_hash(new_password)} 
+        datacube.datacube_data_update(**update_config)
+    except Exception as e:
+        print(e)
+        response = {'msg':'error','info':'Internal server error'}
         return Response(response,status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({'msg':'success','info':'Password Changed successfully..'})
+
 
 @api_view(['POST'])
 def profile_update(request):
@@ -996,106 +1042,39 @@ def forgot_username(request):
     data = {
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
         "db_name": "db0",
-        "collection_name": 'user_list',
+        "collection_name": 'username_list',
         "filters": {                   
-            "info":{"email": email}
+            "Email": email
         },
         "payment":False
     }
 
     email_data = data.copy()
     email_data['collection_name'] = 'email_otp'
+    email_data["filters"]={"email":email,"otp":otp_input}
     
-    def insert_email_otp(insert_data):
-        insert_config = email_data.copy()
-        insert_config.pop('filters')
-        insert_config.pop('payment')
-        insert_config['data'] = insert_data
-        insert_config['payment'] = False
-        return datacube.datacube_data_insertion(**insert_config)
-
-    def update_email_otp(update_data,id):
-        update_config = email_data.copy()
-        update_config.pop('filters')
-        update_config.pop('payment')
-        update_config['query'] = {'email': email , "_id":id}
-        update_config['update_data'] = update_data 
-        return datacube.datacube_data_update(**update_config)
-
-    # Send OTP
-    if email and not otp_input:
-        otp = generateOTP()
-        message = get_html_msg('User', otp , 'recover username')
-
-        #user_qs = Account.objects.filter(email=email)
-        #email_qs = GuestAccount.objects.filter(email=email)
-        user_query = datacube.datacube_data_retrieval(**data)
-        user_list = json.loads(user_query)
-        user_exists = len(user_list) > 0
-        email_query = datacube.datacube_data_retrieval(**email_data)
-        email_list = json.loads(email_query)
-        email_exists = len(email_list) > 0
-
-        def send_otp(): return send_mail(
-            'Your otp for recovering username of Dowell account', otp, settings.EMAIL_HOST_USER, [email], fail_silently=False, html_message=message)
-
-        if user_exists:
-            if email_exists:
-                update_data = {'otp': otp, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'username': username}
-                update_email_otp(update_data,email_list["data"][0]["_id"])
-                #GuestAccount.objects.filter(email=email).update(
-                #    otp=otp, expiry=datetime.datetime.utcnow())
-                send_otp()
-                return Response({'msg':'success','info': 'OTP sent successfully'})
-            else:
-                return Response({'msg':'error','info': 'Email not found'},status=status.HTTP_400_BAD_REQUEST)
+    email_check = datacube.datacube_data_retrieval(**email_data)
+    email_check1 = json.loads(email_check)
+    
+    if len(email_check1["data"]) > 0:
+        user_json = datacube.datacube_data_retrieval(**data)
+        user = json.loads(user_json)
+        username_list = []
+        if len(user['data']) >= 1:
+            for obj in user['data']:
+                if obj["Username"] not in username_list:
+                    username_list.append(obj["Username"])
+            context = RequestContext(
+                request, {'email': email, 'username_list': username_list})
+            html_msg = 'Dear user, <br> The list of username associated with your email: <strong>{{email}}</strong> as dowell account are as follows: <br><h3>{% for a in username_list %}<ul><li>{{a}}</li></ul>{%endfor%}</h3><br>You can proceed to login now!'
+            template = Template(html_msg)
+            send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
+                        email], fail_silently=False, html_message=template.render(context))
+            return Response({'msg':'success','info':'Your username/s was sent to your mail'})
         else:
-            return Response({'msg':'error','info': 'Email not found'},status=status.HTTP_400_BAD_REQUEST)
-
-    # Create new password
-    elif email and otp_input:
-        try:
-            email_d = email_data.copy()
-            email_d['filters'] = {
-                'info': {'email': email, 'otp': otp_input}
-            }
-            guest_query = datacube.datacube_data_retrieval(**email_d)
-            guest_list = json.loads(guest_list)
-            if not len(guest_list) > 0:
-                raise GuestAccount.DoesNotExist
-            #guest = GuestAccount.objects.filter(
-            #    otp=otp_input, email=email)
-        except GuestAccount.DoesNotExist:
-            guest = None
-        if guest:
-            fields = {'Email': email}
-            #user_json = dowellconnection(
-            #    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, "nill")
-            user_json = datacube.datacube_data_retrieval(**data)
-            user = json.loads(user_json)
-            username_list = []
-            if len(user['data']) >= 1:
-                #json_data = dowellconnection(
-                #    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, 'nil')
-                json_data = datacube.datacube_data_retrieval(**data)
-                data = json.loads(json_data)
-                if len(data['data']) >= 1:
-                    for obj in data['data']:
-                        if obj['Username'] not in username_list:
-                            username_list.append(obj['Username'])
-                    context = RequestContext(
-                        request, {'email': email, 'username_list': username_list})
-                    html_msg = 'Dear user, <br> The list of username associated with your email: <strong>{{email}}</strong> as dowell account are as follows: <br><h3>{% for a in username_list %}<ul><li>{{a}}</li></ul>{%endfor%}</h3><br>You can proceed to login now!'
-                    template = Template(html_msg)
-                    send_mail('Username/s associated with your email in Dowell', '', settings.EMAIL_HOST_USER, [
-                              email], fail_silently=False, html_message=template.render(context))
-                return Response({'msg':'success','info':'Your username/s was sent to your mail'})
-            else:
-                return Response({'msg':'error','info': 'Email not found'},status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'msg':'error','info': 'Wrong OTP'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg':'error','info': 'No user found for this email'},status=status.HTTP_400_BAD_REQUEST)
     else:
-        return Response({'msg':'error','info':"Request must have field 'email' for getting otp in mail and then add field 'otp' for getting list of username in mail.."},status=status.HTTP_400_BAD_REQUEST)
+        return Response({'msg':'error','info': 'Email and OTP combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
 
 def processApikey(api_key, api_services):
     url = f'https://100105.pythonanywhere.com/api/v3/process-services/?type=api_service&api_key={api_key}'
@@ -1468,7 +1447,7 @@ def email_otp(request):
         "db_name": "db0",
         "collection_name": "username_list",
         "filters": {                   
-            "info":{"Email": email}
+            "Email": email
         },
         "payment":False
     }
@@ -1503,19 +1482,14 @@ def email_otp(request):
     if email and usage:
         otp = generateOTP()
         if usage == "forgot_username":
-            # user_qs = Account.objects.filter(email=email)
-            # Check for username
             user_query = datacube.datacube_data_retrieval(**data) 
             user_list = json.loads(user_query)
-            # email_qs = GuestAccount.objects.filter(email=email).first()
             email_query = datacube.datacube_data_retrieval(**email_data)
             email_list = json.loads(email_query)
-            if (len(user_list["data"]) > 0): # username exists 
-                if len(email_list['data']) > 0: # email exists
-                    update_data = { 'otp': otp }
+            if (len(user_list["data"]) > 0): 
+                if len(email_list['data']) > 0: 
+                    update_data = { 'otp': otp, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S') }
                     update_email_otp(update_data,email_list["data"][0]["_id"])
-                    #email_qs.otp = otp
-                    #email_qs.save(update_fields=['otp'])
                     for_html_msg = "recover username"
                     subject = "Your otp for recovering username of Dowell account"
                     msg = 'success'
@@ -1529,26 +1503,18 @@ def email_otp(request):
                 info = 'Email not associated with any user'
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "forgot_password":
-            # user_qs = Account.objects.filter(email=email, username=username)
-            data["filters"]["info"]={"Username":username,**data["filters"]["info"]}
+            data["filters"]["Username"]=username
             user_query = datacube.datacube_data_retrieval(**data) 
             user_list = json.loads(user_query)
-            # email_qs = GuestAccount.objects.filter(email=email).first()
             email_query = datacube.datacube_data_retrieval(**email_data)
             email_list = json.loads(email_query)
             if len(user_list['data']) > 0:
                 if len(email_list['data']) > 0:
                     update_data = {'otp': otp, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'username': username}
                     update_email_otp(update_data,email_list["data"][0]["_id"])
-
-                    #GuestAccount.objects.filter(email=email).update(
-                    #    otp=otp, expiry=datetime.datetime.utcnow(), username=username)
                 else:
                     insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
                     insert_email_otp(insert_data)
-                    #guest_account = GuestAccount(
-                    #   username = username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
-                    #guest_account.save()
                 msg = 'success'
                 info = 'OTP sent Successfully'
                 for_html_msg = "reset password"
@@ -1558,15 +1524,11 @@ def email_otp(request):
                 info = 'Username, email combination is incorrect'
                 status_code=status.HTTP_400_BAD_REQUEST
         elif usage == "update_email":
-            #user_qs = Account.objects.filter(
-            #   email=email, username=username).first()
-            data["filters"]["info"]={"Username":username,**data["filters"]["info"]}
+            data["filters"]["Username"]=username
             user_query = datacube.datacube_data_retrieval(**data) 
             user_list = json.loads(user_query)
-            #email_qs = GuestAccount.objects.filter(email=email).first()
             email_query = datacube.datacube_data_retrieval(**email_data)
             email_list = json.loads(email_query)
-            # return Response(user_list)
             if not (len(user_list['data']) > 0):
                 if len(email_list['data']) > 0:
                     update_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
@@ -1574,9 +1536,6 @@ def email_otp(request):
                 else:
                     insert_data = {'username': username, 'email': email, 'expiry': datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'), 'otp': otp}
                     insert_email_otp(insert_data)
-                    #guest_account = GuestAccount(
-                    #    username=username, email=email, otp=otp, expiry=datetime.datetime.utcnow())
-                    #guest_account.save()
                 msg = 'success'
                 info = 'OTP sent Successfully'
                 for_html_msg = "use this address as email"
@@ -1631,49 +1590,37 @@ def mobilesms(request):
     phonecode = request.data.get("phonecode")
     phone = request.data.get("Phone")
     sms = generateOTP()
+    full_number ="+" + str(phonecode) + str(phone)
     
     data = {
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
         "db_name": "db0",
         "collection_name": "mobile_sms",
         "filters": {                   
-            "info":{"phone": phone}
+            "phone": full_number
         },
         "payment":False
     }
 
-    full_number ="+" + str(phonecode) + str(phone)
-    time = datetime.datetime.utcnow()
-    print(full_number)
-    if full_number == "+251912912144":
-        sms="123456"
-    try:
-        phone_query = datacube.datacube_data_retrieval(**data)
-        phone_list = json.loads(phone_query)
-        phone_exists = len(phone_list) > 0
-        if not phone_exists:
-            raise mobile_sms.DoesNotExist
-        #phone_exists = mobile_sms.objects.get(phone=full_number)
-    except mobile_sms.DoesNotExist:
-        phone_exists = None
-    if phone_exists is not None:
+    time = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
+    phone_query = datacube.datacube_data_retrieval(**data)
+    phone_list = json.loads(phone_query)
+    # return Response(phone_list)
+    if len(phone_list["data"]) > 0:
+    # if phone_exists is not None:
         update_config = data.copy()
         update_config.pop('filters')
         update_config.pop('payment')
         update_config['query'] = {'phone': full_number }
         update_config['update_data'] = {'sms': sms, 'expiry': time}
         datacube.datacube_data_update(**update_config)
-        #mobile_sms.objects.filter(
-        #    phone=full_number).update(sms=sms, expiry=time)
     else:
         insert_config = data.copy()
         insert_config.pop('filters')
         insert_config.pop('payment')
-        insert_config['data'] = {'phone': phone, 'sms': sms, 'expiry': time}
+        insert_config['data'] = {'phone': full_number, 'sms': sms, 'expiry': time}
         insert_config['payment'] = False
         datacube.datacube_data_insertion(**insert_config)
-        #mobile_sms.objects.create(
-        #       phone=full_number, sms=sms, expiry=time)
     url = "https://100085.pythonanywhere.com/api/v1/dowell-sms/c9dfbcd2-8140-4f24-ac3e-50195f651754/"
     payload = {
         "sender" : "DowellLogin",

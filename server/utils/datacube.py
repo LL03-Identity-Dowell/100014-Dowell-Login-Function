@@ -57,7 +57,7 @@ def datacube_data_retrieval(api_key, db_name, collection_name, filters,payment, 
     return response.text
 
 
-def datacube_data_update(api_key, db_name, collection_name, query, update_data):
+def datacube_data_update(api_key, db_name, collection_name, query, update_data,operation=None,coll_name=None):
     """
     Update data in a collection in the DataCube database.
 
@@ -79,7 +79,7 @@ def datacube_data_update(api_key, db_name, collection_name, query, update_data):
         "update_data": update_data,
         "payment": False
     }
-
+    print(payload)
     response = requests.put(url, json=payload)
     return response.text
 
