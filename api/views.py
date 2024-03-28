@@ -700,28 +700,6 @@ def profile_update(request):
     update_fields=[]
     img_exists=""
     resp2={"success_fields":[],"error_fields":[]}
-    if username and Email and not imgg and not Phone and not Lastname and not Firstname and not vision \
-        and not language_preferences and not nationality and not native_language and not user_country and not user_location \
-            and not user_city and not zip_code and not address and not email_otp:
-        check=Account.objects.filter(username=username,email=Email)
-        check_guest=GuestAccount.objects.filter(email=Email).first()
-        if not check:
-            otp_input = generateOTP()
-            message = f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to use this email address in your existing dowell account <br><h2>Your OTP is <strong>{otp_input}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
-
-            def send_otp(): return send_mail(
-                'Your otp for changing email in your Dowell account', otp_input, settings.EMAIL_HOST_USER, [Email], fail_silently=False, html_message=message)
-
-            if check_guest:
-                check_guest.otp=otp_input
-                check_guest.save(update_fields=['otp'])
-            else:
-                guest_account=GuestAccount(username="user", email=Email, otp=otp_input, expiry=datetime.datetime.utcnow())
-                guest_account.save()
-            send_otp()
-            return Response({'msg':'success','info':'OTP sent successfully'})
-        else:
-            return Response({'msg':'error','info':'Given email is already in use with your account'})
 
     if imgg is not None:
         if obj.profile_image == "":
@@ -756,12 +734,20 @@ def profile_update(request):
         data1["profile_info"].update(update_data1)
         resp2["success_fields"].append("Lastname")
     if Email is not None and email_otp is not None:
-        try:
-            guest =GuestAccount.objects.get(
-                otp=email_otp, email=Email)
-        except GuestAccount.DoesNotExist:
-            guest = None
-        if guest is not None:
+        
+        email_data = {
+        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "db_name": "db0",
+        "collection_name": "email_otp",
+        "filters": {                   
+            "email": Email, 'otp': email_otp 
+        },
+        "payment":False
+        }
+
+        guest_query = datacube.datacube_data_retrieval(**email_data)
+        query1=json.loads(guest_query)
+        if len(query1["data"]) > 0:
             obj.email=Email
             update_fields.append("email")
             up_field["Email"]=Email
@@ -949,19 +935,13 @@ def forgot_password(request):
     if new_password != confirm_password:
         return Response({'msg':'error','info': 'Passwords not matching'},status=status.HTTP_400_BAD_REQUEST)
 
-    
-    # Setup collection
-    def get_collection_name(username, country, collection_id = 0):
-        collection_name = country + username[0].lower() + str(collection_id)
-        return collection_name
-
     data_all_passwords={
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
         "operation": "insert",
         "db_name": "db0",
         "coll_name": "all_passwords",
         "data": {                   
-            "info":{"Username": username,"Email":email,"date":datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'),"Password":dowell_hash.dowell_hash(new_password)}
+            "Username": username,"Email":email,"date":datetime.datetime.now().strftime('%d %b %Y %H:%M:%S'),"Password":dowell_hash.dowell_hash(new_password)
         },
         "payment":False
     }
@@ -970,9 +950,9 @@ def forgot_password(request):
     data = {
         "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
         "db_name": "db0",
-        "collection_name": 'user_list',
+        "collection_name": 'username_list',
         "filters": {                   
-            "info":{"email": email, 'username': username}
+            "Email": email, 'Username': username
         },
         "payment":False
     }
@@ -982,56 +962,37 @@ def forgot_password(request):
         "db_name": "db0",
         "collection_name": "email_otp",
         "filters": {                   
-            "info":{"email": email, 'otp': otp_input }
+            "email": email, 'otp': otp_input 
         },
         "payment":False
     }
 
-    def update_user(update_data):
+    def update_user(update_data,coll_name):
         update_config = data.copy()
         update_config.pop('filters')
         update_config.pop('payment')
-        update_config['query'] = {'email': email, 'username': username }
+        update_config["collection_name"]=coll_name
+        update_config['query'] = {'Email': email, 'Username': username }
         update_config['update_data'] = update_data 
         return datacube.datacube_data_update(**update_config)
 
-    try:
-        guest_query = datacube.datacube_data_retrieval(**email_data)
-        guest_list = json.loads(guest_query)
-        if len(guest_list) > 0:
-            guest = guest_list[0]
-        else:
-            raise GuestAccount.DoesNotExist
-        #guest = GuestAccount.objects.get(
-        #    otp=otp_input, email=email)
-    except GuestAccount.DoesNotExist:
-        guest = None
 
-    if guest is not None:
+    guest_query = datacube.datacube_data_retrieval(**email_data)
+    guest_list = json.loads(guest_query)
+    if len(guest_list["data"]) > 0:
         acct_query = datacube.datacube_data_retrieval(**data)
         acct_list = json.loads(acct_query)
-        if len(acct_list) > 0:
-            acct = acct_list[0]
-            old_password = acct['password']
-        #acct = Account.objects.filter(
-        #    email=email, username=username).first()
-        #old_pw = acct.password
-        #acct.set_password(new_password)
-        #acct.save()
-        fields = {'Username': username, 'Email': email}
-        update_fields = {
-            'Password': dowell_hash.dowell_hash(new_password)}
-        update_user(update_fields)
-        #dowellconnection(
-        #    "login", "bangalore", "login", "registration", "registration", "10004545", "ABCDE", "fetch", fields, update_fields)
-        
-        if old_password != update_fields['Password']:
+        if len(acct_list["data"]) > 0:
+            update_fields = {
+                'Password': dowell_hash.dowell_hash(new_password)}
+            update_user(update_fields,f'{acct_list["data"][0]["Country"]}_{username[0].upper()}_0')
             requests.post(url="https://datacube.uxlivinglab.online/db_api/crud/",json=data_all_passwords)
-        return Response({'msg':'success','info':'Password reset successfully'})
+            return Response({'msg':'success','info':'Password reset successfully'})
+        else:
+            return Response({'msg':'error','info': 'User not found'},status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'msg':'error','info': 'Wrong OTP'},status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({'info': 'Something went wrong'},status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def forgot_username(request):
