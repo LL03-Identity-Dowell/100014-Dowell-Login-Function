@@ -1391,17 +1391,16 @@ def email_otp(request):
     id = dowellconnection("login", "bangalore", "login", "registration",
                               "registration", "10004545", "ABCDE", "find", field, "nil")
     response = json.loads(id)
-    try:
-        if response["data"] != None:
-            if response["data"]["User_status"]:
-                if response["data"]["User_status"] == "inactive":
-                    resp = {"msg":"error","info": "Username is termed inactive. Please contact admin."}
-                    return Response(resp,status=status.HTTP_400_BAD_REQUEST)
-                elif response["data"]["User_status"] == "deleted":
-                    resp = {"msg":"error","info": "User not found."}
-                    return Response(resp,status=status.HTTP_400_BAD_REQUEST)
-    except:
-        pass
+    # try:
+    #     if user_list["data"][0]["User_status"]:
+    #         if user_list["data"][0]["User_status"] == "inactive":
+    #             resp = {"msg":"error","info": "Username is termed inactive. Please contact admin."}
+    #             return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+    #         elif user_list["data"][0]["User_status"] == "deleted":
+    #             resp = {"msg":"error","info": "User not found."}
+    #             return Response(resp,status=status.HTTP_400_BAD_REQUEST)
+    # except:
+    #     pass
 
     # Datacube user_list config 
     data = {
@@ -1709,7 +1708,6 @@ def main_login(request):
     if (len(user_list["data"]) < 1):
         return Response({'msg':'error','info': 'Username not found'},status=status.HTTP_400_BAD_REQUEST)
 
-    return Response("OK")
 
     # try:
     #     obj.current_task="Logging In"
@@ -1777,44 +1775,56 @@ def main_login(request):
             
         request.session.save()
         session = request.session.session_key
-            # obj = CustomSession.objects.filter(sessionID=session)
-            # if obj:
-            #     if obj.first().status == 'login':
-            #         data = {"msg":"success","info":"Logged in successfully","session_id": session}
-            #         response = Response()
-            #         response.set_cookie('DOWELL_LOGIN', session, domain='pythonanywhere.com')
-            #         response.data=data
-            #         return response
+
+        url = "https://datacube.uxlivinglab.online/db_api/collections/"
+        payload = {
+            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "db_name": f'{user_list["data"][0]["Country"]}_db_0',
+            "payment": False
+        }
+        response = requests.get(url, json=payload)
+        collections=response.text
+
+        if datetime.datetime.now().strftime('%d %b %Y') in json.loads(collections)["data"][0]:
+            collection_name=datetime.datetime.now().strftime('%d %b %Y')
+        else:
+            url="https://datacube.uxlivinglab.online/db_api/add_collection/"
+            del payload["payment"]
+            payload["coll_names"]=datetime.datetime.now().strftime('%d %b %Y')
+            payload["num_collections"]=1
+            collection = requests.post(url, json=payload)
+            collection_name=datetime.datetime.now().strftime('%d %b %Y')
+
         try:
             res = create_event()
             event_id = res['event_id']
         except:
             event_id = None
         profile_image = "https://100014.pythonanywhere.com/media/user.png"
-        first_name = response["data"]['Firstname']
-        last_name = response["data"]['Lastname']
-        email = response["data"]['Email']
-        phone = response["data"]['Phone']
+        first_name = user_list["data"][0]['Firstname']
+        last_name = user_list["data"][0]['Lastname']
+        email = user_list["data"][0]['Email']
+        phone = user_list["data"][0]['Phone']
         try:
-            userID=response["data"]['_id']
-            client_admin_id=response["data"]['client_admin_id']
-            if response["data"]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
+            userID=user_list["data"][0]['_id']
+            client_admin_id=user_list["data"][0]['client_admin_id']
+            if user_list["data"][0]['Profile_Image'] == "https://100014.pythonanywhere.com/media/":
                 profile_image = "https://100014.pythonanywhere.com/media/user.png"
             else:
-                profile_image = response["data"]['Profile_Image']
-            User_type=response["data"]['User_type']
-            payment_status=response["data"]['payment_status']
-            newsletter=response["data"]['newsletter_subscription']
-            user_country=response["data"]['user_country']
-            privacy_policy=response["data"]['Policy_status']
-            other_policy=response["data"]['safety_security_policy']
-            role_res=response["data"]['Role']
-            company=response["data"]['company_id']
-            member=response["data"]['Memberof']
-            dept=response["data"]['dept_id']
-            org=response["data"]['org_id']
-            project=response["data"]['project_id']
-            subproject=response["data"]['subproject_id']
+                profile_image = user_list["data"][0]['Profile_Image']
+            User_type=user_list["data"][0]['User_type']
+            payment_status=user_list["data"][0]['payment_status']
+            newsletter=user_list["data"][0]['newsletter_subscription']
+            user_country=user_list["data"][0]['user_country']
+            privacy_policy=user_list["data"][0]['Policy_status']
+            other_policy=user_list["data"][0]['safety_security_policy']
+            role_res=user_list["data"][0]['Role']
+            company=user_list["data"][0]['company_id']
+            member=user_list["data"][0]['Memberof']
+            dept=user_list["data"][0]['dept_id']
+            org=user_list["data"][0]['org_id']
+            project=user_list["data"][0]['project_id']
+            subproject=user_list["data"][0]['subproject_id']
         except:
             pass
         try:
@@ -1826,15 +1836,21 @@ def main_login(request):
             dowell_time = ''
         serverclock = datetime.datetime.now().strftime('%d %b %Y %H:%M:%S')
 
-        field_session = {'sessionID': session, 'role': role_res, 'username': username, 'Email': email, "profile_img": profile_image, 'Phone': phone, "User_type": User_type, 'language': language, 'city': city, 'country': country, 'org': org, 'company_id': company, 'project': project, 'subproject': subproject, 'dept': dept, 'Memberof': member,
-                            'status': 'login', 'dowell_time': dowell_time, 'timezone': zone, 'regional_time': final_ltime, 'server_time': serverclock, 'userIP': ipuser, 'userOS': osver, 'browser': browser, 'userdevice': device, 'userbrowser': "", 'UserID': userID, 'login_eventID': event_id, "redirect_url": "", "client_admin_id": client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates,"altitude":altitude}
-        dowellconnection("login", "bangalore", "login", "session",
-                            "session", "1121", "ABCDE", "insert", field_session, "nil")
-
         info={"role":role_res,"username":username,"first_name":first_name,"last_name":last_name,"email":email,"profile_img":profile_image,"phone":phone,"User_type":User_type,"language":language,"city":city,"country":country,"status":"login","dowell_time":dowell_time,"timezone":zone,"regional_time":final_ltime,"server_time":serverclock,"userIP":ipuser,"userOS":osver,"userDevice":device,"language":language,"userID":userID,"login_eventID":event_id,"client_admin_id":client_admin_id,"payment_status":payment_status,"user_country":user_country,"newsletter_subscription":newsletter,"Privacy_policy":privacy_policy,"Safety,Security_policy":other_policy,"coordinates":coordinates,"altitude":altitude}
-        info1=json.dumps(info)
-        infoo=str(info1)
-        custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
+        
+        url = "https://datacube.uxlivinglab.online/db_api/get_data/"
+        #Main data attributes for signup database
+        data = {
+            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "operation": "insert",
+            "db_name": f'{user_list["data"][0]["Country"]}_db_0',
+            "coll_name": collection_name,
+            "data": info,
+            "payment": False
+        }
+        inserted=requests.post(url,data)
+
+        # custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
 
         serverclock1=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         LiveStatus.objects.create(sessionID=session,username=username,product="",status="login",created=serverclock1,updated=serverclock1)
