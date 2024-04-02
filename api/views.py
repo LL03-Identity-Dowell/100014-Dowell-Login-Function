@@ -1673,27 +1673,33 @@ def main_login(request):
     ipuser = mdata("ip")
     try:
         if ipuser != "":
-            response = requests.get(f'https://ipapi.co/{ipuser}/json/').json()
-            ip_city = response.get("city")
+            response = requests.get(f'https://ipapi.co/{ipuser}/json/').text
+            resp1=json.loads(response)
+            country_code_iso3=resp1["country_code_iso3"]
+            ip_city = resp1["city"]
         else:
             ip_city = None
+            country_code_iso3=None
     except Exception as e:
         ip_city = None
+        country_code_iso3=None
 
     zone = mdata("timezone")
     random_session = mdata("randomSession")
+
+    # if country_code_iso3 is None:
+    #     return Response({"msg":"error","info":"Location not received"},status=status.HTTP_400_BAD_REQUEST)
 
     if None in [username, password, loc, device, osver, ltime, ipuser, mainparams,random_session]:
         resp = {"msg":"error","info": "Provide all credentials",
                 "Credentials": "username, password, location, device, os, time, ip, mainparams"}
         return Response(resp,status=status.HTTP_400_BAD_REQUEST)
-    browser = mdata("browser")
     language = mdata("language", "English")
 
     url = "https://datacube.uxlivinglab.online/db_api/get_data/"
     #Main data attributes for signup database
     data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f",
         "operation": "fetch",
         "db_name": "db0",
         "coll_name": "username_list",
@@ -1721,13 +1727,6 @@ def main_login(request):
             return Response({"msg":"error","info":"Please accept the terms in policy page!"},status=status.HTTP_400_BAD_REQUEST)
         random_session_obj.username=username
         random_session_obj.save(update_fields=['username'])
-    company=None
-    org=None
-    config = {}
-    dept=None
-    member=None
-    project=None
-    subproject=None
     role_res=None
     first_name=None
     last_name=None
@@ -1745,17 +1744,18 @@ def main_login(request):
 
     # Setup collection
     data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f",
         "db_name": "db0",
-        "collection_name": f'{user_list["data"][0]["Country"]}_{username[0].upper()}_0',
+        "coll_name": f'{user_list["data"][0]["Country"]}_{username[0].upper()}_0',
         "operation": "fetch",
         "filters": {
                 "Username": username,"Password":dowell_hash.dowell_hash(password)
         },
     }
     # Check for username
-    user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', data=data)
-    user_list = json.loads(user_query)
+    user_query = requests.post('https://datacube.uxlivinglab.online/db_api/get_data/', json=data)
+    print(user_query)
+    user_list = json.loads(user_query.text)
     if len(user_list["data"]) > 0:
         try:
             if user_list["data"][0]["User_status"]:
@@ -1778,22 +1778,23 @@ def main_login(request):
 
         url = "https://datacube.uxlivinglab.online/db_api/collections/"
         payload = {
-            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
-            "db_name": f'{user_list["data"][0]["Country"]}_db_0',
+            "api_key": "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f",
+            "db_name": f'India_db1',
             "payment": False
         }
         response = requests.get(url, json=payload)
-        collections=response.text
-
-        if datetime.datetime.now().strftime('%d %b %Y') in json.loads(collections)["data"][0]:
-            collection_name=datetime.datetime.now().strftime('%d %b %Y')
+        collections=json.loads(response.text)
+        # return Response(collections)
+        
+        if datetime.datetime.now().strftime('%d-%m-%Y') in collections["data"][0]:
+            collection_name=datetime.datetime.now().strftime('%d-%m-%Y')
         else:
             url="https://datacube.uxlivinglab.online/db_api/add_collection/"
             del payload["payment"]
-            payload["coll_names"]=datetime.datetime.now().strftime('%d %b %Y')
+            payload["coll_names"]=datetime.datetime.now().strftime('%d-%m-%Y')
             payload["num_collections"]=1
-            collection = requests.post(url, json=payload)
-            collection_name=datetime.datetime.now().strftime('%d %b %Y')
+            requests.post(url, json=payload)
+            collection_name=payload["coll_names"]
 
         try:
             res = create_event()
@@ -1819,12 +1820,6 @@ def main_login(request):
             privacy_policy=user_list["data"][0]['Policy_status']
             other_policy=user_list["data"][0]['safety_security_policy']
             role_res=user_list["data"][0]['Role']
-            company=user_list["data"][0]['company_id']
-            member=user_list["data"][0]['Memberof']
-            dept=user_list["data"][0]['dept_id']
-            org=user_list["data"][0]['org_id']
-            project=user_list["data"][0]['project_id']
-            subproject=user_list["data"][0]['subproject_id']
         except:
             pass
         try:
@@ -1841,14 +1836,14 @@ def main_login(request):
         url = "https://datacube.uxlivinglab.online/db_api/get_data/"
         #Main data attributes for signup database
         data = {
-            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "api_key": "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f",
             "operation": "insert",
-            "db_name": f'{user_list["data"][0]["Country"]}_db_0',
+            "db_name": f'India_db1',
             "coll_name": collection_name,
             "data": info,
             "payment": False
         }
-        inserted=requests.post(url,data)
+        requests.post(url,data)
 
         # custom_session=CustomSession.objects.create(sessionID=session,info=infoo,document="",status="login")
 
@@ -1872,7 +1867,6 @@ def main_login(request):
                     except:
                         unusual=location_check.unusual
                         pass
-                    print(unusual)
                     if unusual is not None:
                         for a in unusual:
                             if ip_city == list(a.keys())[0]:
