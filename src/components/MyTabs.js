@@ -32,11 +32,11 @@ const MyTabs = ({ timer, setTimer }) => {
       id: 1,
       title: "LogIn",
       content: (
-        <LogIn
-          setSelectedTab={setSelectedTab}
-          timer={timer}
-          setTimer={setTimer}
-        />
+          <LogIn
+            setSelectedTab={setSelectedTab}
+            timer={timer}
+            setTimer={setTimer}
+            />
       ),
     },
     { id: 2, title: "Chat", content: <Chat /> },
@@ -136,7 +136,9 @@ const MyTabs = ({ timer, setTimer }) => {
                 className={`rounded-xl bg-white ring-white ring-opacity-60 ring-offset-2
                      ring-offset-green-400 focus:outline-none focus:ring-2`}
               >
-                {categories[selectedTab].content}{" "}
+              
+                {isMobile ? <div>{categories[selectedTab].content}{" "}</div> :<div style={{width:"626px"}}>{categories[selectedTab].content}{""}</div>}
+               {/* {categories[selectedTab].content}{" "} */}
               </div>
             </Tab.Panels>
           </div>

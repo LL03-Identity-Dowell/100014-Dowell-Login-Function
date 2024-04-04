@@ -1,6 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { MdAddAPhoto, MdInfo } from "react-icons/md";
 import DoWellVerticalLogo from "../assets/images/Dowell-logo-Vertical.jpeg";
+import WorkFlowLogo from "../assets/product logo/Workflow-AI-2.png"
+import LivingLabAdmin from "../assets/product logo/Living-Lab-Admin-1.png"
+import CustomerSupportLogo from "../assets/product logo/customer-support-centre.png" 
+import ApiLogo from "../assets/product logo/API.svg" 
+import DowellMapsLogo from "../assets/product logo/dowell-maps-1.png" 
+import DatacubeLogo from "../assets/product logo/datacube-f09edb53.svg" 
+import LegalzardLogo from "../assets/product logo/Legalzard-1.png" 
+import LivingLabChatLogo from "../assets/product logo/Livinglab-chat-1.png" 
+import LogoScanLogo from "../assets/product logo/Logo-Scan-1.png" 
+import PermutationCalculatorLogo from "../assets/product logo/Permutation-calculator.png" 
+import SalesAgentAppLogo from "../assets/product logo/Sales-agent-app.png" 
+import SecureDataLogo from "../assets/product logo/secure-data.png" 
+import SecureRepoLogo from "../assets/product logo/secure-repositories.png" 
+import SocialMediaLogo from "../assets/product logo/Social-media-automation-1.png" 
+import TeamManagementLogo from "../assets/product logo/Social-media-automation-2.png" 
+
 import { Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCountries } from "../redux/countriesSlice";
@@ -406,13 +422,63 @@ const SignUp = () => {
       reader.readAsDataURL(file);
     }
   };
+  
+
+  // logo 
+  const queryParams = new URLSearchParams(window.location.search);
+  const redirectUrl = queryParams.get('redirect_url');
+console.log(redirectUrl)
+  const [productLogo, setProductLogo] = useState('');
+
+  useEffect(() => {
+    // Parse the redirect_url to extract product information
+    const productInfo = redirectUrl; // Assuming the product info is the last part of the URL
+    // Logic to determine the logo based on product information
+    let logoUrl = '';
+    switch (productInfo) {
+      case 'https://ll04-finance-dowell.github.io/workflowai.online':
+        logoUrl = WorkFlowLogo;
+        break;
+      case 'https://100093.pythonanywhere.com/home':
+        logoUrl = LivingLabAdmin;
+        break;
+      case 'https://ll09-legalcompliance-dowell.github.io/':
+        logoUrl = LegalzardLogo;
+        break;
+      case 'https://100050.pythonanywhere.com/calculator':
+        logoUrl = PermutationCalculatorLogo;
+        break;
+      case 'https://ll07-team-dowell.github.io/Jobportal':
+        logoUrl = TeamManagementLogo;
+        break;
+      case 'https://www.socialmediaautomation.uxlivinglab.online/':
+        logoUrl = SocialMediaLogo;
+        break;
+        case 'https://ll03-identity-dowell.github.io/100096-DowellChat/#/customer-support':
+        logoUrl = CustomerSupportLogo;
+        break;
+      case 'https://ll03-identity-dowell.github.io/100096-DowellChat/#/living-lab-chat':
+        logoUrl = LivingLabChatLogo;
+        break;
+      case 'https://ll05-ai-dowell.github.io/100105-DowellApiKeySystem':
+        logoUrl = ApiLogo;
+        break;
+      case 'https://ll07-team-dowell.github.io/100045-SecureRepository':
+        logoUrl = SecureDataLogo
+        break;
+      default:
+        logoUrl = DoWellVerticalLogo;
+    }
+    setProductLogo(logoUrl);
+  }, [redirectUrl]);
+  console.log(productLogo)
   return (
     <div className="isolate px-2 py-4 sm:py-12 lg:px-8">
       <div className="shadow-sm mx-auto max-w-5xl px-2 py-6 md:px-4">
         <div className="flex items-center justify-center">
           <div className="text-center space-y-2">
-            <img
-              src={DoWellVerticalLogo}
+           <img
+              src={productLogo}
               alt="DoWell logo"
               className="h-34 w-44 rounded-sm drop-shadow-md mx-auto"
             />
