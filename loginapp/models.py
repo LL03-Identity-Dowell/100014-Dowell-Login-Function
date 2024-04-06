@@ -155,3 +155,7 @@ class Account(AbstractUser):
 
     def __str__(self) -> str:
         return self.username
+
+class login_status(models.Model):
+    username=models.CharField(max_length=300)
+    current_task=models.CharField(max_length=300)

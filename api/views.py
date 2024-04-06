@@ -52,7 +52,8 @@ from loginapp.models import (
   Location_check,
   Face_Login,
   Live_QR_Status,
-  Live_Public_Status
+  Live_Public_Status,
+  login_status
 )
 
 from server.utils.dowell_func import (generateOTP, dowellconnection,
@@ -1665,7 +1666,6 @@ def main_login(request):
     except:
         city = ""
         country = ""
-    # return Response({"city":city,"country":country,"zone":timezone_str})
     device = mdata("device")
     osver = mdata("os")
     # brow=mdata["browser"]
@@ -1687,8 +1687,8 @@ def main_login(request):
     zone = mdata("timezone")
     random_session = mdata("randomSession")
 
-    # if country_code_iso3 is None:
-    #     return Response({"msg":"error","info":"Location not received"},status=status.HTTP_400_BAD_REQUEST)
+    if country_code_iso3 is None:
+        return Response({"msg":"error","info":"Location not received"},status=status.HTTP_400_BAD_REQUEST)
 
     if None in [username, password, loc, device, osver, ltime, ipuser, mainparams,random_session]:
         resp = {"msg":"error","info": "Provide all credentials",
@@ -1714,12 +1714,12 @@ def main_login(request):
     if (len(user_list["data"]) < 1):
         return Response({'msg':'error','info': 'Username not found'},status=status.HTTP_400_BAD_REQUEST)
 
-
-    # try:
-    #     obj.current_task="Logging In"
-    #     obj.save(update_fields=['current_task'])
-    # except:
-    #     pass
+    status_object=login_status.objects.filter(username=username).first()
+    try:
+        status_object.current_task="Logging In"
+        status_object.save(update_fields=['current_task'])
+    except:
+        pass
     random_session_obj1=RandomSession.objects.filter(username=username).first()
     if random_session_obj1 is None:
         random_session_obj=RandomSession.objects.filter(sessionID=random_session).first()
@@ -1767,11 +1767,11 @@ def main_login(request):
                     return Response(resp,status=status.HTTP_400_BAD_REQUEST)
         except:
             pass
-            # try:
-            #     obj.current_task="Verifying User"
-            #     obj.save(update_fields=['current_task'])
-            # except:
-            #     pass
+            try:
+                status_object.current_task="Verifying User"
+                status_object.save(update_fields=['current_task'])
+            except:
+                pass
             
         request.session.save()
         session = request.session.session_key
@@ -1779,12 +1779,11 @@ def main_login(request):
         url = "https://datacube.uxlivinglab.online/db_api/collections/"
         payload = {
             "api_key": "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f",
-            "db_name": f'India_db1',
+            "db_name": f'{country_code_iso3}_db1',
             "payment": False
         }
         response = requests.get(url, json=payload)
         collections=json.loads(response.text)
-        # return Response(collections)
         
         if datetime.datetime.now().strftime('%d-%m-%Y') in collections["data"][0]:
             collection_name=datetime.datetime.now().strftime('%d-%m-%Y')
@@ -1838,7 +1837,7 @@ def main_login(request):
         data = {
             "api_key": "1b834e07-c68b-4bf6-96dd-ab7cdc62f07f",
             "operation": "insert",
-            "db_name": f'India_db1',
+            "db_name": f'{country_code_iso3}_db1',
             "coll_name": collection_name,
             "data": info,
             "payment": False
@@ -1898,11 +1897,11 @@ def main_login(request):
                             response = requests.post(url_email, json=payload)
                     except:
                         pass
-        # try:
-        #     obj.current_task="Connecting to UX Living Lab"
-        #     obj.save(update_fields=['current_task'])
-        # except:
-        #     pass
+        try:
+            status_object.current_task="Connecting to UX Living Lab"
+            status_object.save(update_fields=['current_task'])
+        except:
+            pass
 
         data = {"msg":"success","session_id": session}
 

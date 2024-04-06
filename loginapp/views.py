@@ -42,7 +42,8 @@ from loginapp.models import (
     LiveStatus,
     Live_Public_Status,
     Live_QR_Status,
-    Linkbased_RandomSession
+    Linkbased_RandomSession,
+    login_status
 )
 
 # server utility functions
@@ -1255,7 +1256,7 @@ def forgot_username(request):
 def check_status(request):
     username = request.GET.get('username')
     if username is not None:
-        obj = Account.objects.filter(username=username).first()
+        obj = login_status.objects.filter(username=username).first()
         try:
             status = obj.current_task
             return render(request, 'check_status.html', {'status': status})
