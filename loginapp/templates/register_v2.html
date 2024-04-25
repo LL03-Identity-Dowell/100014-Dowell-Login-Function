@@ -2162,16 +2162,16 @@ else
 
                                                                 </div>
 
-                                                                <button
+<!--                                                                 <button
                                                                     style="margin-left:2%;margin-bottom:2%;display:block"
                                                                     id="sms_btn">Get OTP
                                                                 </button>
                                                                 <div style=" margin-left:2%;color:red;height:30%"
                                                                     id="output1"></div>
                                                                 <div style=" margin-left:2%;color:green;height:30%"
-                                                                    id="success1"></div>
+                                                                    id="success1"></div> -->
 
-                                                                <br><br>
+<!--                                                                 <br><br>
                                                                 <div style="padding:1%;display:none" id="sms_not_receiveDIV">
                                                                     <label
                                                                     class="elementor-field-label"
@@ -2179,9 +2179,9 @@ else
                                                                         for="sms_not_receive">Did not receive the otp?</label>
                                                                     <input type="checkbox" id="sms_not_receive"
                                                                         value="yes"><br>
-                                                                </div>
+                                                                </div> -->
 
-                                                                <div id="smsDIV" style="display:block"
+<!--                                                                 <div id="smsDIV" style="display:block"
                                                                     class="elementor-field-type-tel elementor-field-group elementor-column elementor-field-group-field_a0b39ea elementor-col-100 elementor-field-required elementor-mark-required">
                                                                     <label for="form-field-field_a0b39ea"
                                                                         class="elementor-field-label ">
@@ -2193,16 +2193,16 @@ else
                                                                         title="Only numbers and phone characters (#, -, *, etc) are accepted."
                                                                         >
 
-                                                                </div>
+                                                                </div> -->
 
-                                                                <button
+<!--                                                                 <button
                                                                     style="margin-left:2%;margin-bottom:2%;display:none"
                                                                     id="sms_verify">Verify
                                                                 </button>
                                                                 <div style=" margin-left:2%;color:red;height:30%"
                                                                     id="output_sms"></div>
                                                                 <div style=" margin-left:2%;color:green;height:30%"
-                                                                    id="success_sms"></div>
+                                                                    id="success_sms"></div> -->
 
                                                                 <div
                                                                     class="elementor-field-type-upload elementor-field-group elementor-column elementor-field-group-field_ee619fc elementor-col-100">
@@ -2519,7 +2519,7 @@ else
                                                             </script>
 
                                                             <script>
-                                                            var mobile_otp_remains=4
+                                                            	var mobile_otp_remains=4
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
                                                                 // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 var email_otp_restricted = localStorage.getItem('email_otp_restricted');
@@ -2845,22 +2845,17 @@ function containsSpecialChars(str) {
                                                                     if ($('#password1').val() == $('#password2').val()) {
                                                                         if(password_strength == "valid"){
                                                                             if ($('#otp_status').val() == "verified") {
-                                                                                if ($('#sms_status').val() == "verified") {
-                                                                                    if( $('#username').val().length >=8){
-                                                                                        if (containsSpecialChars($('#username').val())) {
-                                                                                            $('#error_msg').html("Space and special characters not allowed in username")
-                                                                                            return false
-                                                                                        } else {
-                                                                                            return true
-                                                                                        }
-                                                                                    }else{
-                                                                                        $('#error_msg').html("Length of username must be greater than 8")
-                                                                                        return false
-                                                                                    }
-                                                                                } else {
-                                                                                    $('#error_msg').html("Verify the mobile OTP first!")
-                                                                                    return false
-                                                                                }
+										    if( $('#username').val().length >=8){
+											if (containsSpecialChars($('#username').val())) {
+											    $('#error_msg').html("Space and special characters not allowed in username")
+											    return false
+											} else {
+											    return true
+											}
+										    }else{
+											$('#error_msg').html("Length of username must be greater than 8")
+											return false
+										    }
                                                                             } else {
                                                                                 $('#error_msg').html("Verify the email OTP first!")
                                                                                 return false
