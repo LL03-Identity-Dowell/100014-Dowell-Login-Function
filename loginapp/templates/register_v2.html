@@ -2519,7 +2519,7 @@ else
                                                             </script>
 
                                                             <script>
-                                                            	var mobile_otp_remains=1
+                                                            	var mobile_otp_remains=5
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
                                                                 // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 var email_otp_restricted = localStorage.getItem('email_otp_restricted');
@@ -2845,17 +2845,22 @@ function containsSpecialChars(str) {
                                                                     if ($('#password1').val() == $('#password2').val()) {
                                                                         if(password_strength == "valid"){
                                                                             if ($('#otp_status').val() == "verified") {
-										    if( $('#username').val().length >=8){
-											if (containsSpecialChars($('#username').val())) {
-											    $('#error_msg').html("Space and special characters not allowed in username")
-											    return false
-											} else {
-											    return true
-											}
-										    }else{
-											$('#error_msg').html("Length of username must be greater than 8")
-											return false
-										    }
+                                                                                if ($('#sms_status').val() == "verified") {
+                                                                                    if( $('#username').val().length >=8){
+                                                                                        if (containsSpecialChars($('#username').val())) {
+                                                                                            $('#error_msg').html("Space and special characters not allowed in username")
+                                                                                            return false
+                                                                                        } else {
+                                                                                            return true
+                                                                                        }
+                                                                                    }else{
+                                                                                        $('#error_msg').html("Length of username must be greater than 8")
+                                                                                        return false
+                                                                                    }
+                                                                                } else {
+                                                                                    $('#error_msg').html("Verify the mobile OTP first!")
+                                                                                    return false
+                                                                                }
                                                                             } else {
                                                                                 $('#error_msg').html("Verify the email OTP first!")
                                                                                 return false
@@ -2867,7 +2872,6 @@ function containsSpecialChars(str) {
                                                                     }else{
                                                                         $('#error_msg').html('Passwords Not Matching').css('color', 'red');
                                                                         return false
-
                                                                     }
                                                                 }
 
