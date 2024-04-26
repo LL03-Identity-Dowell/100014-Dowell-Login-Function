@@ -1766,7 +1766,7 @@ else
                                                                 <div class="registrationFormAlert" style="color:green;" id="CheckPasswordMatch"></div>
 
                                                                 <div
-                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
+                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100">
                                                                     <label for="form-field-field_5a25b50"
                                                                         class="elementor-field-label">
                                                                         Country </label>
@@ -2125,7 +2125,7 @@ else
                                                                     </div>
                                                                 </div>
                                                                 <div
-                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
+                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100">
                                                                     <label for="form-field-field_5a25b50"
                                                                         class="elementor-field-label">
                                                                         Country Code </label>
@@ -2162,16 +2162,16 @@ else
 
                                                                 </div>
 
-<!--                                                                 <button
+                                                                <button
                                                                     style="margin-left:2%;margin-bottom:2%;display:block"
                                                                     id="sms_btn">Get OTP
                                                                 </button>
                                                                 <div style=" margin-left:2%;color:red;height:30%"
                                                                     id="output1"></div>
                                                                 <div style=" margin-left:2%;color:green;height:30%"
-                                                                    id="success1"></div> -->
+                                                                    id="success1"></div>
 
-<!--                                                                 <br><br>
+                                                                <br><br>
                                                                 <div style="padding:1%;display:none" id="sms_not_receiveDIV">
                                                                     <label
                                                                     class="elementor-field-label"
@@ -2179,9 +2179,9 @@ else
                                                                         for="sms_not_receive">Did not receive the otp?</label>
                                                                     <input type="checkbox" id="sms_not_receive"
                                                                         value="yes"><br>
-                                                                </div> -->
+                                                                </div>
 
-<!--                                                                 <div id="smsDIV" style="display:block"
+                                                                <div id="smsDIV" style="display:block"
                                                                     class="elementor-field-type-tel elementor-field-group elementor-column elementor-field-group-field_a0b39ea elementor-col-100 elementor-field-required elementor-mark-required">
                                                                     <label for="form-field-field_a0b39ea"
                                                                         class="elementor-field-label ">
@@ -2193,16 +2193,16 @@ else
                                                                         title="Only numbers and phone characters (#, -, *, etc) are accepted."
                                                                         >
 
-                                                                </div> -->
+                                                                </div>
 
-<!--                                                                 <button
+                                                                <button
                                                                     style="margin-left:2%;margin-bottom:2%;display:none"
                                                                     id="sms_verify">Verify
                                                                 </button>
                                                                 <div style=" margin-left:2%;color:red;height:30%"
                                                                     id="output_sms"></div>
                                                                 <div style=" margin-left:2%;color:green;height:30%"
-                                                                    id="success_sms"></div> -->
+                                                                    id="success_sms"></div>
 
                                                                 <div
                                                                     class="elementor-field-type-upload elementor-field-group elementor-column elementor-field-group-field_ee619fc elementor-col-100">
@@ -2550,31 +2550,31 @@ else
                                                                         }, 300 * 1000 - email_diff);
                                                                     }
                                                                 }
-                                                                // if (mobile_otp_remains == null) {
-                                                                //     localStorage.setItem('mobile_otp_remains', 5)
-                                                                // }
-                                                                // else if (mobile_otp_remains == 0) {
-                                                                //     if (mobile_otp_restricted == null) {
-                                                                //         mobile_otp_restricted = Date()
-                                                                //     }
-                                                                //     mobile_diff = Date.parse(Date()) - Date.parse(mobile_otp_restricted)
-                                                                //     if (mobile_diff >= 300000) {
-                                                                //         $('#sms_btn').prop('disabled', false);
-                                                                //         localStorage.setItem("mobile_otp_remains", 5);
-                                                                //         mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                //         localStorage.removeItem('mobile_otp_restricted');
-                                                                //         $('#output1').html("");
-                                                                //         $('#success1').html("You can send otp now..");
-                                                                //     } else {
-                                                                //         setTimeout(function () {
-                                                                //             $('#sms_btn').prop('disabled', false);
-                                                                //             localStorage.setItem("mobile_otp_remains", 5);
-                                                                //             mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                //             localStorage.removeItem('mobile_otp_restricted');
-                                                                //             $('#success1').html("You can send otp now..");
-                                                                //         }, 300 * 1000 - mobile_diff);
-                                                                //     }
-                                                                // }
+                                                                if (mobile_otp_remains == null) {
+                                                                    localStorage.setItem('mobile_otp_remains', 5)
+                                                                }
+                                                                else if (mobile_otp_remains == 0) {
+                                                                    if (mobile_otp_restricted == null) {
+                                                                        mobile_otp_restricted = Date()
+                                                                    }
+                                                                    mobile_diff = Date.parse(Date()) - Date.parse(mobile_otp_restricted)
+                                                                    if (mobile_diff >= 300000) {
+                                                                        $('#sms_btn').prop('disabled', false);
+                                                                        localStorage.setItem("mobile_otp_remains", 5);
+                                                                        mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                        localStorage.removeItem('mobile_otp_restricted');
+                                                                        $('#output1').html("");
+                                                                        $('#success1').html("You can send otp now..");
+                                                                    } else {
+                                                                        setTimeout(function () {
+                                                                            $('#sms_btn').prop('disabled', false);
+                                                                            localStorage.setItem("mobile_otp_remains", 5);
+                                                                            mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                            localStorage.removeItem('mobile_otp_restricted');
+                                                                            $('#success1').html("You can send otp now..");
+                                                                        }, 300 * 1000 - mobile_diff);
+                                                                    }
+                                                                }
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
                                                                 // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 $('#sms_btn').on('click', function (e) {
