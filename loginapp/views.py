@@ -581,7 +581,7 @@ def register(request):
 
             # Mongodb document structure
             print(os.getcwd())
-            json_data = open('loginapp/static/client.json')
+            json_data = open('new_version/loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
 
