@@ -580,6 +580,7 @@ def register(request):
             profile_image = account.profile_image
 
             # Mongodb document structure
+            print(os.getcwd())
             json_data = open('loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
