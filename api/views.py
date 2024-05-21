@@ -29,7 +29,7 @@ def get_or_create_collection(collection_name):
     url = "https://datacube.uxlivinglab.online/db_api/collections/"
     payload = {
         "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
-        "db_name": "dowell_login_users",
+        "db_name": "db0",
         "payment": False
     }
     response = requests.get(url, json=payload)
@@ -83,7 +83,7 @@ def email_otp(request):
     username = request.data.get('username', 'User')
     usage = request.data.get('usage', None) 
     data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
         "db_name": "db0",
         "collection_name": "username_list",
         "filters": {                   
@@ -93,7 +93,7 @@ def email_otp(request):
     }
     # Datacube email_otp config
     email_data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
         "db_name": "db0",
         "collection_name": "email_otp",
         "filters": {                   
@@ -233,7 +233,7 @@ def mobilesms(request):
     full_number ="+" + str(phonecode) + str(phone)
     
     data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
         "db_name": "db0",
         "collection_name": "mobile_sms",
         "filters": {                   
@@ -409,7 +409,7 @@ def register(request):
     #Email and SMS verification
 
     email_data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
         "db_name": "db0",
         "collection_name": "email_otp",
         "filters": {                   
@@ -424,7 +424,7 @@ def register(request):
 
     if sms_input is not None:
         sms_data = {
-            "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+            "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
             "db_name": "db0",
             "collection_name": "mobile_sms",
             "filters": {                   
@@ -486,23 +486,13 @@ def register(request):
     field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"joined_serverclock":serverclock}
 
     #Change collection value of main data attribute to user's collection
-    #collection_name=f'{user_country}_{user[0].upper()}_0'
-    collname = get_or_create_collection(user)
-    datains = {
-        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
-        "operation": "fetch",
-        "db_name": "dowell_login_users",
-        "coll_name": collname,
-        "data":field,
-        "payment": False
-    }
-    
-
+    collection_name=f'{user_country}_{user[0].upper()}_0'
+    data["coll_name"] = get_or_create_collection(collection_name)
     #Putting main data values in database attribute 
     data["data"]=field
 
     #Inserting data to signup database as per their collection name
-    user_json=requests.post(url,json=datains)
+    user_json=requests.post(url,json=data)
     user_json1 = json.loads(user_json.text)
     inserted_id = user_json1["data"]['inserted_id']
 
