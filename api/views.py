@@ -1,10 +1,52 @@
 from django.shortcuts import render
 import json
 import requests
+
+from django.core.mail import send_mail
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from utils.dowell_func import (generateOTP,
+                                      dowellclock, get_next_pro_id, decrypt_message)
+from dowll_login.models import (
+  CustomSession, 
+  mobile_sms,
+  RandomSession,
+  
+)
+from utils import dowell_hash
+from utils.event_function import create_event
+from utils import qrcodegen
+from utils import passgen
+from utils import datacube
+from django.conf import settings
+from django.core.files.storage import default_storage
+from dowll_login.views import country_city_name, get_html_msg
 import datetime
+def get_or_create_collection(collection_name):
+
+    url = "https://datacube.uxlivinglab.online/db_api/collections/"
+    payload = {
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
+        "db_name": "dowell_login_users",
+        "payment": False
+    }
+    response = requests.get(url, json=payload)
+    collections=response.text
+
+    if collection_name in json.loads(collections)["data"][0]:
+        return collection_name
+
+    url="https://datacube.uxlivinglab.online/db_api/add_collection/"
+    del payload["payment"]
+    payload["coll_names"]=collection_name
+    payload["num_collections"]=1
+    collection = requests.post(url, json=payload)
+    return collection_name
+def get_html_msg_new(username, otp, purpose):
+    return f'Dear {username}, <br> Please Enter below <strong>OTP</strong> to {purpose} of dowell account <br><h2>Your OTP is <strong>{otp}</strong></h2><br>Note: This OTP is valid for the next 2 hours only.'
+
 def register_legal_policy(user):
     policy_url = "https://100087.pythonanywhere.com/api/legalpolicies/ayaquq6jdyqvaq9h6dlm9ysu3wkykfggyx0/iagreestatus/"
     RandomSession.objects.create(
@@ -398,7 +440,7 @@ def register(request):
     url = "https://datacube.uxlivinglab.online/db_api/get_data/"
     #Main data attributes for signup database
     data = {
-        "api_key": "c9dfbcd2-8140-4f24-ac3e-50195f651754",
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
         "operation": "fetch",
         "db_name": "db0",
         "coll_name": "username_list",
@@ -444,14 +486,23 @@ def register(request):
     field={"Profile_Image":image,"Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"joined_serverclock":serverclock}
 
     #Change collection value of main data attribute to user's collection
-    collection_name=f'{user_country}_{user[0].upper()}_0'
-    data["coll_name"] = get_or_create_collection(collection_name)
+    #collection_name=f'{user_country}_{user[0].upper()}_0'
+    collname = get_or_create_collection(user)
+    datains = {
+        "api_key": "0699dbbb-2786-4dfa-a1db-fc12f2210228",
+        "operation": "fetch",
+        "db_name": "dowell_login_users",
+        "coll_name": collname,
+        "data":field,
+        "payment": False
+    }
+    
 
     #Putting main data values in database attribute 
     data["data"]=field
 
     #Inserting data to signup database as per their collection name
-    user_json=requests.post(url,json=data)
+    user_json=requests.post(url,json=datains)
     user_json1 = json.loads(user_json.text)
     inserted_id = user_json1["data"]['inserted_id']
 

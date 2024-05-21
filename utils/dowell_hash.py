@@ -1,7 +1,7 @@
 import hashlib
 import base64
 import json
-from .dowellconnection import dowellconnection
+
 def dowell_hash(pwd):
     if len(pwd)>=8:
         strtobase=base64.b64encode(pwd.encode())
@@ -13,14 +13,14 @@ def dowell_hash(pwd):
         return f'{lstostr}dowell={st}'
     else:
         return "password less than 8 charector"
-def dowell_authenticate(username,password):
-    field={"Username":username,"Password":dowell_hash(password)}
-    response=dowellconnection("login","bangalore","login","dowell_users","dowell_users","1116","ABCDE","fetch",field,"nil")
-    resp=json.loads(response)
-    if len(resp["data"])<1:
-        return "username or password wrong"
-    else:
-        return resp
+# def dowell_authenticate(username,password):
+#     field={"Username":username,"Password":dowell_hash(password)}
+#     response=dowellconnection("login","bangalore","login","dowell_users","dowell_users","1116","ABCDE","fetch",field,"nil")
+#     resp=json.loads(response)
+#     if len(resp["data"])<1:
+#         return "username or password wrong"
+#     else:
+#         return resp
         # request.session["session_id"]=resp["data"][0]["role"]
         # field1={"Username":username,"session_id"=resp["data"][0]["role"]}
         # session=dowellconnection("login","bangalore","login","dowell_session","dowell_session","1119","ABCDE","insert",field,"nil")

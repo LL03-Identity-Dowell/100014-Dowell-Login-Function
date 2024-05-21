@@ -3,7 +3,7 @@ import random
 import math
 from cryptography.fernet import Fernet
 import json
-from . dowellconnection import dowellconnection
+
 
 #For Master Login
 import base64
