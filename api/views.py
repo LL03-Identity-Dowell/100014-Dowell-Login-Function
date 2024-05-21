@@ -15,6 +15,7 @@ from dowll_login.models import (
   RandomSession,
   
 )
+from utils.dowellconnection import dowellconnection
 from utils import dowell_hash
 from utils.event_function import create_event
 from utils import qrcodegen
