@@ -252,10 +252,28 @@ def register(request):
         data1["organisations"][0]["org_name"] = user
         update_data2={"first_name":first,"last_name":last,"email":email}
         data1["members"]["team_members"]["accept_members"][0].update(update_data2)
+        
         client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data1,"nil")
         client_admin_res = json.loads(client_admin)
         org_id = client_admin_res["inserted_id"]
-
+        qrposturl="https://www.qrcodereviews.uxlivinglab.online/api/v6/qrcodes/"
+        qrpost={
+          "num_qrcodes": 1,
+          "company_id": org_id,
+          "qrcode_type": "Link",
+          "product_name": "Login",
+          "qrcode_color": "#FF0000",
+          "created_by": user,
+          "lat": "None",
+          "long":"None",
+          "is_active": False,
+          "redirect_link": "None"
+        }
+        res=requests.post(qrposturl,data=qrpost)
+        red=json.loads(res.text)
+        msqrid=red["generate_master_QR_code_id"]
+        qrid=red["qrcodes_data"][0]["qrcode_id"]
+        qrurl=red["qrcodes_data"][0]["qrcode_image_url"]
         userfield = {}
         userresp = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
         idd = json.loads(userresp)
@@ -269,8 +287,30 @@ def register(request):
             event_id = res['event_id']
         except:
             pass
-
-        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter}
+        murl="https://www.qrcodereviews.uxlivinglab.online/api/v6/master-qrcodes/"
+        masterdata={
+            "generate_master_QR_code_id":msqrid,
+            "email":email,
+            "name":user,
+            "location":user_country,
+            "description":"user details"
+        }
+        msresp=request.post(murl,data=masterdata)
+        msrespdata=json.loads(msresp.text)
+        msqrid1=msrespdata["master_qrcode"]["master_qr_code_id"]
+        qracturl=f"https://www.qrcodereviews.uxlivinglab.online/api/v6/activate-qr-code/{msqrid1}/"
+        qractda={
+            "redirect_link":f"https://100093.pythonanywhere.com/userdetails?qrid={qrid}",
+            "name":user,
+            "location":user_country,
+            "lat":"None",
+            "long":"None",
+            "description":"user details"
+        }
+        msresp1=request.post(qracturl,data=qractda)
+        msrespdata1=json.loads(msresp1.text)
+        print(msrespdata1["message"])
+        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"qrid":"","qrurl":""}
         id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
         id_res=json.loads(id)
         inserted_idd=id_res['inserted_id']
