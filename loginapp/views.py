@@ -561,7 +561,8 @@ def register(request):
                 account = Account.objects.filter(email=email)
 
                 for data in account:
-                    if email == data.email and role1 == data.role:
+                    # if email == data.email and role1 == data.role:
+                    if email == data.email:
                         account = Account.objects.filter(email=email).update(password=make_password(
                             password1), first_name=first, last_name=last, email=email, phonecode=phonecode, phone=phone, profile_image=img)
             except Account.DoesNotExist:
@@ -579,7 +580,8 @@ def register(request):
             profile_image = account.profile_image
 
             # Mongodb document structure
-            json_data = open('loginapp/static/client.json')
+            print(os.getcwd())
+            json_data = open('new_version/loginapp/static/client.json')
             data = json.load(json_data)
             json_data.close()
 

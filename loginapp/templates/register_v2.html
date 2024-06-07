@@ -1665,10 +1665,10 @@ else
                                                                 hidden>
                                                             <input type="text" id="mainparams" name="mainparams"
                                                                 value="" hidden>
-                                                            <input type="text" id="otp_status" name="otp_status"
-                                                                value="" hidden>
-                                                            <input type="text" id="sms_status" name="sms_status"
-                                                                value="" hidden>
+                                                            <input type="text" id="otp_status"  name="otp_status"
+                                                                value="verified" hidden>
+                                                            <input type="text" id="sms_status"  name="sms_status"
+                                                                value="verified" hidden>
                                                             <input type="hidden" name="queried_id" value="87" />
 
                                                             <div
@@ -1766,7 +1766,7 @@ else
                                                                 <div class="registrationFormAlert" style="color:green;" id="CheckPasswordMatch"></div>
 
                                                                 <div
-                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
+                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100">
                                                                     <label for="form-field-field_5a25b50"
                                                                         class="elementor-field-label">
                                                                         Country </label>
@@ -1779,7 +1779,7 @@ else
                                                                         <select name="user_country"
                                                                             id="form-field-field_5a25b50"
                                                                             class="elementor-field-textual elementor-size-sm"
-                                                                            required="required" aria-required="true">
+                                                                        >
                                                                             <option value="">Select your country..
                                                                             </option>
                                                                             <option value="Afghanistan">Afghanistan
@@ -2125,7 +2125,7 @@ else
                                                                     </div>
                                                                 </div>
                                                                 <div
-                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100 elementor-field-required elementor-mark-required">
+                                                                    class="elementor-field-type-select elementor-field-group elementor-column elementor-field-group-field_5a25b50 elementor-col-100">
                                                                     <label for="form-field-field_5a25b50"
                                                                         class="elementor-field-label">
                                                                         Country Code </label>
@@ -2137,7 +2137,7 @@ else
                                                                         </div>
                                                                         <select name="phonecode" id="phonecode"
                                                                             class="elementor-field-textual elementor-size-sm"
-                                                                            required="required" aria-required="true">
+                                                                        >
                                                                             {% for x,y in country_resp %}
                                                                             <option value="{{x}}">{{y}}</option>
                                                                             {%endfor%}
@@ -2179,10 +2179,10 @@ else
                                                                         for="sms_not_receive">Did not receive the otp?</label>
                                                                     <input type="checkbox" id="sms_not_receive"
                                                                         value="yes"><br>
-                                                                </div>
+                                                              </div>
 
                                                                 <div id="smsDIV" style="display:block"
-                                                                    class="elementor-field-type-tel elementor-field-group elementor-column elementor-field-group-field_a0b39ea elementor-col-100 elementor-field-required elementor-mark-required">
+                                                                    class="elementor-field-type-tel elementor-field-group elementor-column elementor-field-group-field_a0b39ea elementor-col-100">
                                                                     <label for="form-field-field_a0b39ea"
                                                                         class="elementor-field-label ">
                                                                         Enter OTP from SMS </label>
@@ -2193,7 +2193,7 @@ else
                                                                         title="Only numbers and phone characters (#, -, *, etc) are accepted."
                                                                         >
 
-                                                                </div>
+                                                                </div> 
 
                                                                 <button
                                                                     style="margin-left:2%;margin-bottom:2%;display:none"
@@ -2519,7 +2519,7 @@ else
                                                             </script>
 
                                                             <script>
-                                                            var mobile_otp_remains=4
+                                                            	var mobile_otp_remains=2
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
                                                                 // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 var email_otp_restricted = localStorage.getItem('email_otp_restricted');
@@ -2550,31 +2550,31 @@ else
                                                                         }, 300 * 1000 - email_diff);
                                                                     }
                                                                 }
-                                                                // if (mobile_otp_remains == null) {
-                                                                //     localStorage.setItem('mobile_otp_remains', 5)
-                                                                // }
-                                                                // else if (mobile_otp_remains == 0) {
-                                                                //     if (mobile_otp_restricted == null) {
-                                                                //         mobile_otp_restricted = Date()
-                                                                //     }
-                                                                //     mobile_diff = Date.parse(Date()) - Date.parse(mobile_otp_restricted)
-                                                                //     if (mobile_diff >= 300000) {
-                                                                //         $('#sms_btn').prop('disabled', false);
-                                                                //         localStorage.setItem("mobile_otp_remains", 5);
-                                                                //         mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                //         localStorage.removeItem('mobile_otp_restricted');
-                                                                //         $('#output1').html("");
-                                                                //         $('#success1').html("You can send otp now..");
-                                                                //     } else {
-                                                                //         setTimeout(function () {
-                                                                //             $('#sms_btn').prop('disabled', false);
-                                                                //             localStorage.setItem("mobile_otp_remains", 5);
-                                                                //             mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
-                                                                //             localStorage.removeItem('mobile_otp_restricted');
-                                                                //             $('#success1').html("You can send otp now..");
-                                                                //         }, 300 * 1000 - mobile_diff);
-                                                                //     }
-                                                                // }
+                                                                if (mobile_otp_remains == null) {
+                                                                    localStorage.setItem('mobile_otp_remains', 5)
+                                                                }
+                                                                else if (mobile_otp_remains == 0) {
+                                                                    if (mobile_otp_restricted == null) {
+                                                                        mobile_otp_restricted = Date()
+                                                                    }
+                                                                    mobile_diff = Date.parse(Date()) - Date.parse(mobile_otp_restricted)
+                                                                    if (mobile_diff >= 300000) {
+                                                                        $('#sms_btn').prop('disabled', false);
+                                                                        localStorage.setItem("mobile_otp_remains", 5);
+                                                                        mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                        localStorage.removeItem('mobile_otp_restricted');
+                                                                        $('#output1').html("");
+                                                                        $('#success1').html("You can send otp now..");
+                                                                    } else {
+                                                                        setTimeout(function () {
+                                                                            $('#sms_btn').prop('disabled', false);
+                                                                            localStorage.setItem("mobile_otp_remains", 5);
+                                                                            mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
+                                                                            localStorage.removeItem('mobile_otp_restricted');
+                                                                            $('#success1').html("You can send otp now..");
+                                                                        }, 300 * 1000 - mobile_diff);
+                                                                    }
+                                                                }
                                                                 var email_otp_remains = localStorage.getItem('email_otp_remains');
                                                                 // var mobile_otp_remains = localStorage.getItem('mobile_otp_remains');
                                                                 $('#sms_btn').on('click', function (e) {
@@ -2872,7 +2872,6 @@ function containsSpecialChars(str) {
                                                                     }else{
                                                                         $('#error_msg').html('Passwords Not Matching').css('color', 'red');
                                                                         return false
-
                                                                     }
                                                                 }
 
@@ -2981,7 +2980,7 @@ function containsSpecialChars(str) {
                                                                     </span>
                                                                 </button>
                                                             </div>
-                                                    </div> ̰
+                                                    </div>
                                                     <center><span style="color:red" id="error_msg">{{error}}</span>
                                                     </center>
                                                     <script>
