@@ -279,7 +279,6 @@ def register(request):
         idd = json.loads(userresp)
         res_list = idd["data"]
         profile_id = get_next_pro_id(res_list)
-
         event_id = None
 
         try:
@@ -295,7 +294,7 @@ def register(request):
             "location":user_country,
             "description":"user details"
         }
-        msresp=request.post(murl,data=masterdata)
+        msresp=requests.post(murl,data=masterdata)
         msrespdata=json.loads(msresp.text)
         msqrid1=msrespdata["master_qrcode"]["master_qr_code_id"]
         qracturl=f"https://www.qrcodereviews.uxlivinglab.online/api/v6/activate-qr-code/{msqrid1}/"
@@ -307,10 +306,10 @@ def register(request):
             "long":"None",
             "description":"user details"
         }
-        msresp1=request.post(qracturl,data=qractda)
+        msresp1=requests.post(qracturl,data=qractda)
         msrespdata1=json.loads(msresp1.text)
         print(msrespdata1["message"])
-        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"qrid":"","qrurl":""}
+        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"qrid":qrid,"qrurl":qrurl}
         id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
         id_res=json.loads(id)
         inserted_idd=id_res['inserted_id']

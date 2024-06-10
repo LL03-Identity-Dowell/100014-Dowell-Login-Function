@@ -637,7 +637,24 @@ def register(request):
 
             client_admin_res = json.loads(client_admin)
             org_id = client_admin_res["inserted_id"]
-
+            qrposturl="https://www.qrcodereviews.uxlivinglab.online/api/v6/qrcodes/"
+            qrpost={
+            "num_qrcodes": 1,
+            "company_id": org_id,
+            "qrcode_type": "Link",
+            "product_name": "Login",
+            "qrcode_color": "#FF0000",
+            "created_by": user,
+            "lat": "None",
+            "long":"None",
+            "is_active": False,
+            "redirect_link": "None"
+            }
+            res=requests.post(qrposturl,data=qrpost)
+            red=json.loads(res.text)
+            msqrid=red["generate_master_QR_code_id"]
+            qrid=red["qrcodes_data"][0]["qrcode_id"]
+            qrurl=red["qrcodes_data"][0]["qrcode_image_url"]
             user_field = {}
             user_resp = dowellconnection("login", "bangalore", "login", "registration",
                                          "registration", "10004545", "ABCDE", "fetch", user_field, "nil")
@@ -650,9 +667,31 @@ def register(request):
                 event_id = res['event_id']
             except:
                 pass
-
+            murl="https://www.qrcodereviews.uxlivinglab.online/api/v6/master-qrcodes/"
+            masterdata={
+                "generate_master_QR_code_id":msqrid,
+                "email":email,
+                "name":user,
+                "location":user_country,
+                "description":"user details"
+            }
+            msresp=requests.post(murl,data=masterdata)
+            msrespdata=json.loads(msresp.text)
+            msqrid1=msrespdata["master_qrcode"]["master_qr_code_id"]
+            qracturl=f"https://www.qrcodereviews.uxlivinglab.online/api/v6/activate-qr-code/{msqrid1}/"
+            qractda={
+                "redirect_link":f"https://100093.pythonanywhere.com/userdetails?qrid={qrid}",
+                "name":user,
+                "location":user_country,
+                "lat":"None",
+                "long":"None",
+                "description":"user details"
+            }
+            msresp1=requests.post(qracturl,data=qractda)
+            msrespdata1=json.loads(msresp1.text)
+            print(msrespdata1["message"])
             field = {"Profile_Image": f"https://100014.pythonanywhere.com/media/{profile_image}", "Username": user, "Password": dowell_hash(password1), "Firstname": first, "Lastname": last, "Email": email, "phonecode": phonecode, "Phone": phone, "profile_id": profile_id, "client_admin_id": client_admin_res[
-                "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter}
+                "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter,"qrid":qrid,"qrurl":qrurl}
             if sms == "" or sms == None:
                 sms_verified = "unverified"
                 field["verified"] = "False"
