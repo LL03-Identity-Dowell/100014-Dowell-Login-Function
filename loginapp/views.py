@@ -688,8 +688,8 @@ def register(request):
                 "description":"user details"
             }
             msresp1=requests.post(qracturl,data=qractda)
-            msrespdata1=json.loads(msresp1.text)
-            print(msrespdata1["message"])
+            # msrespdata1=json.loads(msresp1.text)
+            # print(msrespdata1["message"])
             field = {"Profile_Image": f"https://100014.pythonanywhere.com/media/{profile_image}", "Username": user, "Password": dowell_hash(password1), "Firstname": first, "Lastname": last, "Email": email, "phonecode": phonecode, "Phone": phone, "profile_id": profile_id, "client_admin_id": client_admin_res[
                 "inserted_id"], "Policy_status": policy_status, "User_type": user_type, "eventId": event_id, "payment_status": "unpaid", "safety_security_policy": other_policy, "user_country": user_country, "newsletter_subscription": newsletter,"qrid":qrid,"qrurl":qrurl}
             if sms == "" or sms == None:
