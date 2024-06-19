@@ -1,0 +1,4 @@
+SECRET_KEY=-ojk4*a6o)g0numyy3s=+e8h5am_l^py&i&q0ft$9$wp=nsdb1
+DEBUG=True
+ENCRYPTION_PASSWORD='uxliveadmin'
+DEFAULT_SALT=b'\xc1\x12\xc4\xef\xd9\xbf\xac\xc5\xdc\x8e\x02BC\xa6f\xa4'
