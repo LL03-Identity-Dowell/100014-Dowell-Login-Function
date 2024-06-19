@@ -5,6 +5,7 @@ urlpatterns = [
     path('mobilelogout/', views.MobileLogout, name='mobilelogout'),
     path('linkbased/', views.LinkBased, name='linkbased'),
     path('register/', views.register, name='register'),
+    path('test_register/', views.register, name='test_register'),
 
     path('profile_view/', views.profile_view, name='profile_view'),
     path('profile_update/', views.profile_update, name='profile_update'),
