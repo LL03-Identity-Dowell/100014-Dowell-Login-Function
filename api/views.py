@@ -2780,7 +2780,25 @@ def check_user(request):
                               "registration", "10004545", "ABCDE", "find", field, "nil")
         response = json.loads(id)
         if response["data"] != None:
-            return Response({'success':True,'message':'User verification success'})
+            insertf={"document_name":username}
+            login=dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","fetch",insertf,"nil")
+            rr=json.loads(login)
+            re=rr["data"][0]["other_organisation"]
+            orgs=[]
+            userdetails={}
+            userdetails["Firstname"]=response["data"][0]["Firstname"]
+            userdetails["Lastname"]=response["data"][0]["Lastname"]
+            userdetails["Username"]=response["data"][0]["Username"]
+            userdetails["Email"]=response["data"][0]["Email"]
+            userdetails["workspace_id"]=rr["data"][0]["_id"]
+            userdetails["user_id"]=response["data"][0]["_id"]
+            for i in re:
+                try:
+                    if i["role"]:
+                        orgs.append({"org_name":i["org_name"],"role":i["role"]})
+                except:
+                    pass
+            return Response({'success':True,'message':'User verification success'},"response":{"userinfo":userdetails,"orgs_n_roles":orgs})
         else:
             return Response({'success':False,'message':'Username, password combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
     else:
