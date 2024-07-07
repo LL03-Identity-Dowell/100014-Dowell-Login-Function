@@ -2798,7 +2798,7 @@ def check_user(request):
                         orgs.append({"org_name":i["org_name"],"role":i["role"]})
                 except:
                     pass
-            return Response({'success':True,'message':'User verification success'},"response":{"userinfo":userdetails,"orgs_n_roles":orgs})
+            return Response({'success':True,'message':'User verification success',"response":{"userinfo":userdetails,"orgs_n_roles":orgs}})
         else:
             return Response({'success':False,'message':'Username, password combination is incorrect'},status=status.HTTP_400_BAD_REQUEST)
     else:
