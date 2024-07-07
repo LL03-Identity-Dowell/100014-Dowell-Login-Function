@@ -2777,7 +2777,7 @@ def check_user(request):
     if user is not None:
         field = {"Username": username}
         id = dowellconnection("login", "bangalore", "login", "registration",
-                              "registration", "10004545", "ABCDE", "find", field, "nil")
+                              "registration", "10004545", "ABCDE", "fetch", field, "nil")
         response = json.loads(id)
         if response["data"] != None:
             insertf={"document_name":username}
