@@ -2795,7 +2795,7 @@ def check_user(request):
             for i in re:
                 try:
                     if i["role"]:
-                        orgs.append({"org_name":i["org_name"],"role":i["role"]})
+                        orgs.append({"org_name":i["org_name"],"org_id":i["org_id"],"role":i["role"]})
                 except:
                     pass
             return Response({'success':True,'message':'User verification success',"response":[{"userinfo":userdetails,"orgs_n_roles":orgs}]})
