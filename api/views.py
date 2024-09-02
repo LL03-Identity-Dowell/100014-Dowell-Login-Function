@@ -256,26 +256,26 @@ def register(request):
         client_admin = dowellconnection("login","bangalore","login","client_admin","client_admin","1159","ABCDE","insert",data1,"nil")
         client_admin_res = json.loads(client_admin)
         org_id = client_admin_res["inserted_id"]
-        url6="https://www.qrcodereviews.uxlivinglab.online/api/v6/create-mastercode/"
-        dataqr={
-            "num_qrcodes": 1,
-            "company_id": org_id,
-            "qrcode_type": "Link",
-            "product_name": "login",
-            "qrcode_color": "#FF0000",
-            "created_by": user,
-            "lat": "None",
-            "long":"None",
-            "redirect_link": "https://100093.pythonanywhere.com/userdetails",
-            "name": user,
-            "email": email
-        }
-        msresp=requests.post(url6,data=dataqr)
-        rdata=json.loads(msresp.text)
-        msqrid=rdata["master_qrcode"]["master_qr_code_id"]
-        qridurl=rdata["master_qrcode"]["qr_code_details"][0]["qrcode_image_url"]
-        qrid=rdata["master_qrcode"]["qr_code_details"][0]["qrcode_id"]
-        mcodeurl=rdata["master_qrcode"]["master_qrcode_image_url"]
+        # url6="https://www.qrcodereviews.uxlivinglab.online/api/v6/create-mastercode/"
+        # dataqr={
+        #     "num_qrcodes": 1,
+        #     "company_id": org_id,
+        #     "qrcode_type": "Link",
+        #     "product_name": "login",
+        #     "qrcode_color": "#FF0000",
+        #     "created_by": user,
+        #     "lat": "None",
+        #     "long":"None",
+        #     "redirect_link": "https://100093.pythonanywhere.com/userdetails",
+        #     "name": user,
+        #     "email": email
+        # }
+        # msresp=requests.post(url6,data=dataqr)
+        # rdata=json.loads(msresp.text)
+        # msqrid=rdata["master_qrcode"]["master_qr_code_id"]
+        # qridurl=rdata["master_qrcode"]["qr_code_details"][0]["qrcode_image_url"]
+        # qrid=rdata["master_qrcode"]["qr_code_details"][0]["qrcode_id"]
+        # mcodeurl=rdata["master_qrcode"]["master_qrcode_image_url"]
         userfield = {}
         userresp = dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","fetch",userfield,"nil")
         idd = json.loads(userresp)
@@ -288,19 +288,19 @@ def register(request):
             event_id = res['event_id']
         except:
             pass
-        murl=f"https://www.qrcodereviews.uxlivinglab.online/api/v6/activate-qr-code/{msqrid}/"
-        mdata={
-            "redirect_link":f"https://100093.pythonanywhere.com/userdetails?qrid={qrid}",
-            "name":user,
-            "location":user_country,
-            "lat":country_city_name,
-            "long":country_city_name,
-            "description":"user details"
-        }
-        msresp1=requests.put(murl,data=mdata)
+        # murl=f"https://www.qrcodereviews.uxlivinglab.online/api/v6/activate-qr-code/{msqrid}/"
+        # mdata={
+        #     "redirect_link":f"https://100093.pythonanywhere.com/userdetails?qrid={qrid}",
+        #     "name":user,
+        #     "location":user_country,
+        #     "lat":country_city_name,
+        #     "long":country_city_name,
+        #     "description":"user details"
+        # }
+        # msresp1=requests.put(murl,data=mdata)
         # msrespdata1=json.loads(msresp1.text)
         # print(msrespdata1["message"])
-        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"qrid":qrid,"qrurl":qridurl}
+        field={"Profile_Image":f"https://100014.pythonanywhere.com/media/{profile_image}","Username":user,"Password": dowell_hash.dowell_hash(password),"Firstname":first,"Lastname":last,"Email":email,"phonecode":phonecode,"Phone":phone,"profile_id":profile_id,"client_admin_id":client_admin_res["inserted_id"],"Policy_status":policy_status,"User_type":user_type,"eventId":event_id,"payment_status":"unpaid","safety_security_policy":other_policy,"user_country":user_country,"newsletter_subscription":newsletter,"qrid":"None","qrurl":"None"}
         id=dowellconnection("login","bangalore","login","registration","registration","10004545","ABCDE","insert",field,"nil")
         id_res=json.loads(id)
         inserted_idd=id_res['inserted_id']
